@@ -8,7 +8,6 @@ import '../../theme/radius.dart';
 import '../../theme/shadows.dart';
 import '../../theme/spacing.dart';
 import '../../widgets/home_indicator.dart';
-import '../../widgets/status_bar.dart';
 
 /// Pickup — Order Flow step 0 (Order Flow.dc.html, `isPickup`): collecting a
 /// batch of ready orders from the branch, confirmed in one action. No tab bar;
@@ -36,7 +35,6 @@ class PickupScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              const StatusBar(),
               _header(context),
               Expanded(
                 child: ListView.separated(

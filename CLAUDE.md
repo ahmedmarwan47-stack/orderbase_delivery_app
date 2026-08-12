@@ -82,7 +82,8 @@ Use `AppSpacing` (`lib/theme/spacing.dart`) for padding/gaps, not raw numbers.
 
 Arabic-first, right-to-left. Every screen wraps its body in `Directionality(textDirection: rtl)`;
 `MaterialApp` locale is `ar` with `flutter_localizations`. Font: **Noto Kufi Arabic** (via
-`google_fonts`). The status-bar row (`9:41` + signal glyph) stays **LTR** even inside RTL screens.
+`google_fonts`). Screens rely on `SafeArea` for the top inset; the OS status bar (real device /
+simulator) is the only one shown — the app no longer draws its own `9:41` row.
 
 ---
 
@@ -99,7 +100,8 @@ Arabic-first, right-to-left. Every screen wraps its body in `Directionality(text
 
 ## Shared widgets (`lib/widgets/`) — reuse across screens
 
-- `StatusBar` — `9:41` + signal/wifi/battery glyph (LTR).
+- `StatusBar` — mock `9:41` + signal/wifi/battery glyph (LTR). **No longer used** — the OS status
+  bar is shown instead; kept only for the browser fallback / mockup parity.
 - `BottomNav` — the 4-tab bar, `active`-tab driven, optional notifications badge; includes the
   `HomeIndicator`.
 - `HomeIndicator` — the home-indicator pill on a white strip (used directly by screens with no tab

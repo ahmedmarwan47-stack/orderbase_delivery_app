@@ -8,7 +8,6 @@ import '../../theme/shadows.dart';
 import '../../theme/spacing.dart';
 import '../../widgets/bottom_nav.dart';
 import '../../widgets/map_view.dart';
-import '../../widgets/status_bar.dart';
 
 /// Home / الرئيسية — design option 1a ("Airy": next-stop hero + 2×2 stats).
 /// Ported from Home Directions.dc.html (#1a).
@@ -31,7 +30,6 @@ class HomeScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              const StatusBar(background: AppColors.background),
               const _MerchantHeader(),
               Expanded(
                 child: SingleChildScrollView(

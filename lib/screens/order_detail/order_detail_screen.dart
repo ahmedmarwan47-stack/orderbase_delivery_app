@@ -6,7 +6,6 @@ import '../../theme/radius.dart';
 import '../../theme/spacing.dart';
 import '../../widgets/bottom_nav.dart';
 import '../../widgets/map_view.dart';
-import '../../widgets/status_bar.dart';
 import '../order_flow_sheets/fail_sheet.dart';
 import '../order_flow_sheets/handoff_sheet.dart';
 import '../order_flow_sheets/postpone_sheet.dart';
@@ -79,7 +78,6 @@ class OrderDetailScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              const StatusBar(),
               _header(context),
               Expanded(
                 child: SingleChildScrollView(

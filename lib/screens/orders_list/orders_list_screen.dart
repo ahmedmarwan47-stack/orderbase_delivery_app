@@ -7,7 +7,6 @@ import '../../theme/radius.dart';
 import '../../theme/shadows.dart';
 import '../../theme/spacing.dart';
 import '../../widgets/bottom_nav.dart';
-import '../../widgets/status_bar.dart';
 
 /// Orders list — first step of the Order Flow (Order Flow.dc.html, `isOrders`).
 /// Header + filter chips + order cards. The filter is local state.
@@ -69,7 +68,6 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
           bottom: false,
           child: Column(
             children: [
-              const StatusBar(),
               _header(),
               Expanded(
                 child: ListView.separated(

@@ -5,7 +5,6 @@ import '../../theme/colors.dart';
 import '../../theme/radius.dart';
 import '../../theme/spacing.dart';
 import '../../widgets/home_indicator.dart';
-import '../../widgets/status_bar.dart';
 
 /// The three outcomes of a delivery attempt, shown on the result screen.
 enum ResultKind { delivered, failed, postponed }
@@ -80,7 +79,6 @@ class ResultScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              const StatusBar(),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 36),
