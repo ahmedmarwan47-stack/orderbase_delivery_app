@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'screens/home/home_screen.dart';
 import 'theme/colors.dart';
 import 'theme/typography.dart';
 
@@ -33,27 +34,7 @@ class OrderbaseCourierApp extends StatelessWidget {
           surface: AppColors.surface,
         ),
       ),
-      // Placeholder home — replaced as soon as the first screen is ported.
-      home: const _PendingFirstScreen(),
-    );
-  }
-}
-
-class _PendingFirstScreen extends StatelessWidget {
-  const _PendingFirstScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        body: Center(
-          child: Text(
-            'لسه معملناش أول شاشة',
-            style: AppTypography.size18,
-          ),
-        ),
-      ),
+      home: const HomeScreen(),
     );
   }
 }

@@ -17,6 +17,7 @@ abstract final class AppColors {
   static const borderDefault = Color(0xFFE6E5E2); // card/button outline
   static const borderHeader = Color(0xFFEEEDEA); // header/bottom-nav hairline
   static const borderCard = Color(0x0D000000); // rgba(0,0,0,.05) card outline
+  static const borderCardFaint = Color(0x0A000000); // rgba(0,0,0,.04) hero/stat card
 
   // Text
   static const textPrimary = Color(0xFF1A1919);
@@ -34,11 +35,17 @@ abstract final class AppColors {
   // Status: delivered
   static const deliveredBg = Color(0xFFE9F6EE);
   static const deliveredText = Color(0xFF15803D);
+  static const deliveredBorder = Color(0x3816A34A); // rgba(22,163,74,.22)
+
+  // Positive green accent — progress bar, cash total, stat check/chat icons.
+  // Brighter than deliveredText (#15803D); kept distinct on purpose.
+  static const greenAccent = Color(0xFF16A34A);
 
   // Status: failed
   static const failedBg = Color(0xFFFDECEC);
   static const failedBorder = Color(0xFFF0C4C3);
   static const failedText = Color(0xFFB8120F);
+  static const stopCountText = Color(0xFFB0201E); // "المحطة 2 من 5" pill text
 
   // Status: postponed (amber)
   static const postponedBg = Color(0xFFFEF6E4); // pill background
@@ -47,6 +54,10 @@ abstract final class AppColors {
   static const postponedBorderStrong = Color(0xFFE6D6B4); // button outline variant
   static const postponedText = Color(0xFF9A5A00);
   static const postponedTextStrong = Color(0xFF6B4A12); // body copy on banner
+  static const heroCodPillBg = Color(0xFFFBF0DE); // COD pill inside the hero card
+
+  // Neutral icon-tile background (stat card "in progress" tile)
+  static const iconTileNeutral = Color(0xFFF2F1EE);
 
   // Selected / high-emphasis fill (chips, primary buttons)
   static const inkFill = Color(0xFF1A1919);
