@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/order_detail/order_detail_screen.dart';
 import '../screens/orders_list/orders_list_screen.dart';
+import '../screens/pickup/pickup_screen.dart';
 import '../theme/colors.dart';
 
 /// Temporary launcher listing the screens built so far, so each can be opened
@@ -18,6 +19,7 @@ class DevGallery extends StatelessWidget {
               .push(MaterialPageRoute(builder: (_) => const OrderDetailScreen())),
         ),
     'تفاصيل الطلب · Order detail': (_) => const OrderDetailScreen(),
+    'استلام من الفرع · Pickup': (_) => const PickupScreen(),
   };
 
   @override

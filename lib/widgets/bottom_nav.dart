@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../icons/app_icon.dart';
 import '../theme/colors.dart';
+import 'home_indicator.dart';
 
 enum NavTab { home, orders, notifications, more }
 
@@ -43,18 +44,7 @@ class BottomNav extends StatelessWidget {
               ],
             ),
           ),
-          // Home indicator
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Container(
-              width: 135,
-              height: 5,
-              decoration: BoxDecoration(
-                color: AppColors.textPrimary.withValues(alpha: 0.85),
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-          ),
+          const HomeIndicator(),
         ],
       ),
     );

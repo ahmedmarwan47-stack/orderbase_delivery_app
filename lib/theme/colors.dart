@@ -56,6 +56,8 @@ abstract final class AppColors {
   static const postponedText = Color(0xFF9A5A00);
   static const postponedTextStrong = Color(0xFF6B4A12); // body copy on banner
   static const heroCodPillBg = Color(0xFFFBF0DE); // COD pill inside the hero card
+  static const pickupBannerBorder = Color(0xFFF3DDB4); // "ready for pickup" banner
+  static const pickupBannerText = Color(0xFF7A4E12); // "ready for pickup" banner copy
 
   // Neutral icon-tile background (stat card "in progress" tile)
   static const iconTileNeutral = Color(0xFFF2F1EE);
