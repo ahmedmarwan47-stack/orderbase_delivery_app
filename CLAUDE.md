@@ -40,7 +40,7 @@ Each `.dc.html` is ONE interactive screen that drives multiple **states** via a
 
 ## Progress (screen inventory)
 
-**Built & verified** (all in `lib/screens/`, all reachable from `DevGallery`):
+**Built & verified** (all in `lib/screens/`, reachable from the app shell and/or `DevGallery`):
 
 | Screen | Folder | From |
 |---|---|---|
@@ -57,6 +57,10 @@ bar opens the **handoff** sheet → *delivered* result; the "لم يتم الت�
 *postponed* result (its back arrow returns to fail). Sheets are shown via `showAppSheet` /
 `SheetShell` (`lib/widgets/app_sheet.dart`) and previewed standalone through `SheetPreviewHost`
 (`lib/dev/sheet_preview_host.dart`). The list→detail tap is wired via `OrdersListScreen.onOpenOrder`.
+
+**The app is now wired into a real tab shell** (`lib/app/app_shell.dart`) — Home + Orders tabs,
+Home/Orders → detail → flow → result → back to a tab. See the *App shell* section below. Verified
+on the iOS Simulator.
 
 **Next up:** the other standalone screens (Queue States, Settlement, COD Collection, Failure
 States, Auth) and the remaining Home variants (1b / 1c / 2a), in whatever order the user asks.
@@ -120,11 +124,24 @@ Sample data mirrors each mockup's `state`, kept identical so screens are compara
 - `flow_order.dart` — `FlowOrder` for the Order Flow shape (meta/state/cod-bool/amount) +
   `sampleFlowOrders`.
 
+## App shell (`lib/app/app_shell.dart`)
+
+The real entry point — `main.dart` sets `home: const AppShell()`. It's an `IndexedStack` +
+`BottomNav` tab host:
+- **Home** and **الطلبات (Orders)** are real screens. **الاشعارات / المزيد** are `_PlaceholderTab`
+  ("قريبًا") until those screens are built.
+- Tapping **عرض الطلب** (Home hero) or an **order card** (Orders) pushes the order-detail flow
+  *over* the shell. The Result screen's buttons pop the whole flow back via
+  `popUntil((r) => r.isFirst)`; "العودة للرئيسية" also switches to the Home tab.
+- Screens forward `BottomNav.onTap` up through an `onSelectTab` callback; the shell owns the
+  selected `NavTab`. `OrderDetailScreen` takes `onFinishToNext` / `onFinishToHome` / `onSelectTab`.
+- **Not yet in the shell:** Pickup and the standalone Result variants — reach them via DevGallery.
+
 ## DevGallery (`lib/dev/dev_gallery.dart`)
 
-Temporary launcher listing every built screen so each is reachable while there's no real
-navigation yet. `main.dart` sets `home: const DevGallery()`. **Add a gallery entry for each new
-screen.** Replace with the real entry flow once screens are wired end-to-end.
+Launcher listing every built screen, now reached from the **المزيد (More)** tab's "الشاشات (Dev)"
+button (no longer the app's `home`). Still the place to preview screens not yet wired into the
+shell. **Add a gallery entry for each new screen.**
 
 ---
 
@@ -132,10 +149,21 @@ screen.** Replace with the real entry flow once screens are wired end-to-end.
 
 - **Flutter SDK:** `~/development/flutter` (stable). Add to PATH:
   `export PATH="$HOME/development/flutter/bin:$PATH"`.
-- **iOS Simulator:** requires **full Xcode** + `sudo xcode-select --switch
-  /Applications/Xcode.app/Contents/Developer` + `sudo xcodebuild -runFirstLaunch` (user runs these;
-  they need a password). Until then, `flutter run` can't build for iOS/macOS.
-- **Verify in the browser instead (no Xcode needed):**
+- **iOS Simulator — WORKING (preferred verification path).** Xcode 26.6 is installed and selected
+  system-wide (`sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`); license /
+  first-launch already accepted. iOS 26.5 runtime + iPhone 17 simulators are available.
+  - **No CocoaPods needed.** The only iOS plugin is `path_provider_foundation` (transitive via
+    `google_fonts`, `native_build: false`) — Flutter builds without a Podfile. Don't chase
+    CocoaPods install unless a future plugin with native code forces it.
+  - **Build + run:** `flutter build ios --simulator --debug` (first compile ~100s) → the `.app`
+    lands at `build/ios/iphonesimulator/Runner.app`. Then use the **`Claude_Code_iOS_Simulator`**
+    MCP: `control attach` (open the panel first), `control launch` with `app_path` = that `.app`,
+    then `control screenshot` / `tap` to verify. Coordinate space is 402×874 points.
+  - If `attach` errors with "Xcode installed but not selected", the system-wide
+    `/var/db/xcode_select_link` is missing — re-run the `sudo xcode-select -s …` above (needs the
+    user's password; the MCP server runs outside the shell so a shell-only `DEVELOPER_DIR` won't
+    help it).
+- **Browser fallback (no Xcode needed):**
   `flutter run -d web-server --web-port 8080 --web-hostname 127.0.0.1`, then open
   `http://127.0.0.1:8080` in the Browser pane at a phone viewport (~390×844). First compile is slow
   (~1–2 min); wait for the `is being served at` log line.
@@ -163,5 +191,5 @@ screen.** Replace with the real entry flow once screens are wired end-to-end.
 
 - Remote: `git@github.com:ahmedmarwan47-stack/orderbase_delivery_app.git` (SSH; HTTPS has no creds
   on this machine). Branch `main`.
-- One commit per screen, pushed after browser verification. End commit messages with
+- One commit per screen, pushed after simulator (or browser) verification. End commit messages with
   `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`.

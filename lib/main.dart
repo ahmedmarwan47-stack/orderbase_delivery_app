@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'dev/dev_gallery.dart';
+import 'app/app_shell.dart';
 import 'theme/colors.dart';
 import 'theme/typography.dart';
 
@@ -34,7 +34,7 @@ class OrderbaseCourierApp extends StatelessWidget {
           surface: AppColors.surface,
         ),
       ),
-      home: const DevGallery(),
+      home: const AppShell(),
     );
   }
 }

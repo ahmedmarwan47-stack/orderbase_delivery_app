@@ -12,11 +12,13 @@ import '../../widgets/status_bar.dart';
 /// Orders list — first step of the Order Flow (Order Flow.dc.html, `isOrders`).
 /// Header + filter chips + order cards. The filter is local state.
 class OrdersListScreen extends StatefulWidget {
-  const OrdersListScreen({super.key, this.onOpenOrder});
+  const OrdersListScreen({super.key, this.onOpenOrder, this.onSelectTab});
 
-  /// Called when an order card is tapped (opens the detail step). Wired once
-  /// the detail screen exists; a no-op for now.
+  /// Called when an order card is tapped (opens the detail step).
   final ValueChanged<FlowOrder>? onOpenOrder;
+
+  /// Forwarded to the bottom nav so the app shell can switch tabs.
+  final ValueChanged<NavTab>? onSelectTab;
 
   @override
   State<OrdersListScreen> createState() => _OrdersListScreenState();
@@ -81,7 +83,10 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                   ),
                 ),
               ),
-              const BottomNav(active: NavTab.orders, notificationsBadge: true),
+              BottomNav(
+                  active: NavTab.orders,
+                  notificationsBadge: true,
+                  onTap: widget.onSelectTab),
             ],
           ),
         ),

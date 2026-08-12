@@ -16,11 +16,31 @@ import '../result/result_screen.dart';
 /// A faithful static port of the designed detail for order #89289; the mockup
 /// doesn't parametrize this view per order, so neither do we yet.
 class OrderDetailScreen extends StatelessWidget {
-  const OrderDetailScreen({super.key});
+  const OrderDetailScreen({
+    super.key,
+    this.onFinishToNext,
+    this.onFinishToHome,
+    this.onSelectTab,
+  });
+
+  /// Result screen's primary button ("continue route — next stop").
+  final VoidCallback? onFinishToNext;
+
+  /// Result screen's secondary button ("back to home").
+  final VoidCallback? onFinishToHome;
+
+  /// Bottom-nav taps (the app shell pops the flow and switches tab).
+  final ValueChanged<NavTab>? onSelectTab;
 
   void _openResult(BuildContext context, ResultKind kind) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => ResultScreen(kind: kind)),
+      MaterialPageRoute(
+        builder: (_) => ResultScreen(
+          kind: kind,
+          onContinue: onFinishToNext,
+          onHome: onFinishToHome,
+        ),
+      ),
     );
   }
 
@@ -90,7 +110,10 @@ class OrderDetailScreen extends StatelessWidget {
                 ),
               ),
               _DeliverBar(onDeliver: () => _deliver(context)),
-              const BottomNav(active: NavTab.orders, notificationsBadge: true),
+              BottomNav(
+                  active: NavTab.orders,
+                  notificationsBadge: true,
+                  onTap: onSelectTab),
             ],
           ),
         ),

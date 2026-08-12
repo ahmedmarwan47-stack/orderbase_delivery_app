@@ -13,7 +13,13 @@ import '../../widgets/status_bar.dart';
 /// Home / الرئيسية — design option 1a ("Airy": next-stop hero + 2×2 stats).
 /// Ported from Home Directions.dc.html (#1a).
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.onSelectTab, this.onOpenOrder});
+
+  /// Forwarded to the bottom nav so the app shell can switch tabs.
+  final ValueChanged<NavTab>? onSelectTab;
+
+  /// Opens the current order's detail ("عرض الطلب" button on the hero card).
+  final VoidCallback? onOpenOrder;
 
   @override
   Widget build(BuildContext context) {
@@ -33,15 +39,16 @@ class HomeScreen extends StatelessWidget {
                       AppSpacing.s20, AppSpacing.s4, AppSpacing.s20, AppSpacing.s20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: const [
-                      _NextStopCard(),
-                      SizedBox(height: AppSpacing.s20),
-                      _TodayStats(),
+                    children: [
+                      _NextStopCard(onViewOrder: onOpenOrder),
+                      const SizedBox(height: AppSpacing.s20),
+                      const _TodayStats(),
                     ],
                   ),
                 ),
               ),
-              const BottomNav(active: NavTab.home, notificationsBadge: true),
+              BottomNav(
+                  active: NavTab.home, notificationsBadge: true, onTap: onSelectTab),
             ],
           ),
         ),
@@ -103,7 +110,9 @@ class _MerchantHeader extends StatelessWidget {
 // ───────────────────────────── Next-stop card ──────────────────────────
 
 class _NextStopCard extends StatelessWidget {
-  const _NextStopCard();
+  const _NextStopCard({this.onViewOrder});
+
+  final VoidCallback? onViewOrder;
 
   @override
   Widget build(BuildContext context) {
@@ -254,7 +263,10 @@ class _NextStopCard extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: SizedBox(
+                  child: GestureDetector(
+                    onTap: onViewOrder,
+                    behavior: HitTestBehavior.opaque,
+                    child: SizedBox(
                     height: 52,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
@@ -273,6 +285,7 @@ class _NextStopCard extends StatelessWidget {
                           AppIcon(AppIconName.chevronLeft, color: Colors.white, size: 18),
                         ],
                       ),
+                    ),
                     ),
                   ),
                 ),
