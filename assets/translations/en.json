@@ -188,6 +188,7 @@
   "auth_brand_name": "Orderbase",
   "auth_back": "Back",
   "auth_account": "My account",
+  "auth_logout": "Log out",
   "auth_merchant": "Merchant number",
   "auth_username": "Username",
   "auth_password": "Password",

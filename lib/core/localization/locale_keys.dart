@@ -239,6 +239,7 @@ abstract final class LocaleKeys {
   static const String authBrandName = 'auth_brand_name';
   static const String authBack = 'auth_back';
   static const String authAccount = 'auth_account';
+  static const String authLogout = 'auth_logout';
   // Field labels / hints (shared across the flow)
   static const String authMerchant = 'auth_merchant';
   static const String authUsername = 'auth_username';

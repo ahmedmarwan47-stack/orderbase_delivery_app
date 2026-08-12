@@ -10,6 +10,7 @@ import '../../../../config/res/config_imports.dart';
 import '../../../../data/flow_order.dart';
 import '../../../../data/order.dart' show formatThousands;
 import '../../../cod/presentation/imports/cod_imports.dart';
+import '../../../failure_states/presentation/imports/failure_states_imports.dart';
 import '../../../../widgets/app_sheet.dart';
 import '../../../../widgets/bottom_nav.dart';
 import '../../../../widgets/home_indicator.dart';

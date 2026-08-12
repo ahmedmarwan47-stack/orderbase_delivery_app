@@ -1,10 +1,9 @@
 part of '../imports/order_flow_imports.dart';
 
 /// Order detail — Order Flow step 2 (Order Flow.dc.html, `isOrder`).
-/// The header order number, customer name, cash-card amount and the deliver →
-/// COD call are driven by [order]; the deeper content (address, items, notes,
-/// timeline) is still sample copy from the mockup (per-order data not modelled
-/// yet). Reached via the '/order-detail' route.
+/// The header order number, customer name, cash-card amount, address, items,
+/// notes and timeline are all driven by [order] (see [FlowOrder]). Reached
+/// via the '/order-detail' route.
 class OrderDetailScreen extends StatelessWidget {
   const OrderDetailScreen({
     super.key,
@@ -64,21 +63,23 @@ class OrderDetailScreen extends StatelessWidget {
                       16.szH,
                       const _HDivider(),
                       16.szH,
-                      const _AddressSection(),
+                      _AddressSection(address: o.address),
                       16.szH,
                       const _HDivider(),
                       16.szH,
-                      const _ItemsSection(),
+                      _ItemsSection(items: o.items),
                       16.szH,
-                      const _NotesCard(),
-                      16.szH,
+                      if (o.note != null) ...[
+                        _NotesCard(note: o.note!),
+                        16.szH,
+                      ],
                       if (isCod) ...[
                         _PaymentCard(amount: o.amount ?? ''),
                         16.szH,
                       ],
                       _FailButton(onTap: () => controller.fail(context)),
                       16.szH,
-                      const _Timeline(),
+                      _Timeline(pickedTime: o.pickedTime, assignedTime: o.assignedTime),
                     ],
                   ).paddingOnly(
                     left: AppPadding.pW20,

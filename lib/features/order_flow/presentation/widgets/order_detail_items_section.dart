@@ -1,8 +1,11 @@
 part of '../imports/order_flow_imports.dart';
 
-/// Items block — title then two item rows (the first divided from the second).
+/// Items block — title then one row per order item (dividers between rows,
+/// none after the last).
 class _ItemsSection extends StatelessWidget {
-  const _ItemsSection();
+  const _ItemsSection({required this.items});
+
+  final List<FlowOrderItem> items;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +27,8 @@ class _ItemsSection extends StatelessWidget {
             ),
           ],
         ).paddingOnly(bottom: AppPadding.pH8),
-        const _ItemRow(withDivider: true),
-        const _ItemRow(withDivider: false),
+        for (var i = 0; i < items.length; i++)
+          _ItemRow(item: items[i], withDivider: i < items.length - 1),
       ],
     );
   }
@@ -33,7 +36,8 @@ class _ItemsSection extends StatelessWidget {
 
 /// A single order line — merchant thumb, name/variant/weight, and quantity.
 class _ItemRow extends StatelessWidget {
-  const _ItemRow({required this.withDivider});
+  const _ItemRow({required this.item, required this.withDivider});
+  final FlowOrderItem item;
   final bool withDivider;
 
   @override
@@ -66,17 +70,17 @@ class _ItemRow extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    LocaleKeys.orderDetailItemName.tr(),
+                    item.name,
                     style: const TextStyle().setMainTextColor.s14.bold,
                   ),
                   4.szH,
                   Text(
-                    LocaleKeys.orderDetailItemVariant.tr(),
+                    item.variant,
                     style: const TextStyle().setSecondaryColor.s12.regular,
                   ),
                   4.szH,
                   Text(
-                    LocaleKeys.orderDetailItemWeight.tr(),
+                    item.weight,
                     style: const TextStyle().setTertiaryColor.s12.bold.tabular,
                   ),
                 ],
@@ -87,7 +91,7 @@ class _ItemRow extends StatelessWidget {
               child: Align(
                 alignment: Alignment.center,
                 child: Text(
-                  '×2',
+                  '×${item.qty}',
                   textDirection: TextDirection.ltr,
                   style: const TextStyle().setMainTextColor.s16.extraBold.tabular,
                 ),

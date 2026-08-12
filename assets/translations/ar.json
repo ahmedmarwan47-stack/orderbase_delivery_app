@@ -188,6 +188,7 @@
   "auth_brand_name": "أوردربيس",
   "auth_back": "الرجوع",
   "auth_account": "حسابي",
+  "auth_logout": "تسجيل الخروج",
   "auth_merchant": "رقم التاجر",
   "auth_username": "اسم المستخدم",
   "auth_password": "كلمة المرور",

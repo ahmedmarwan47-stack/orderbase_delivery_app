@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../config/res/config_imports.dart';
+import '../../../../core/session/auth_session.dart';
 import '../../../../widgets/home_indicator.dart';
 
 // Controllers (ephemeral per-screen form state)

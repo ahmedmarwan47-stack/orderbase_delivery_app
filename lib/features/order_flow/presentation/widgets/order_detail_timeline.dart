@@ -3,7 +3,10 @@ part of '../imports/order_flow_imports.dart';
 /// Order route timeline — an active (red) node connected by a rail to a muted
 /// upcoming/past node.
 class _Timeline extends StatelessWidget {
-  const _Timeline();
+  const _Timeline({required this.pickedTime, required this.assignedTime});
+
+  final String pickedTime;
+  final String assignedTime;
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +42,9 @@ class _Timeline extends StatelessWidget {
               ),
               12.szW,
               Expanded(
-                child: const _TimelineText(
+                child: _TimelineText(
                   titleKey: LocaleKeys.orderDetailTimelinePicked,
-                  timeKey: LocaleKeys.orderDetailTimelinePickedTime,
+                  time: pickedTime,
                   titleColor: AppColors.textPrimary,
                 ).paddingOnly(bottom: AppPadding.pH12),
               ),
@@ -56,10 +59,10 @@ class _Timeline extends StatelessWidget {
               child: const _Dot(color: AppColors.timelineDotMuted, size: 12),
             ),
             12.szW,
-            const Expanded(
+            Expanded(
               child: _TimelineText(
                 titleKey: LocaleKeys.orderDetailTimelineAssigned,
-                timeKey: LocaleKeys.orderDetailTimelineAssignedTime,
+                time: assignedTime,
                 titleColor: AppColors.textTertiary,
               ),
             ),
@@ -79,11 +82,11 @@ class _Timeline extends StatelessWidget {
 class _TimelineText extends StatelessWidget {
   const _TimelineText({
     required this.titleKey,
-    required this.timeKey,
+    required this.time,
     required this.titleColor,
   });
   final String titleKey;
-  final String timeKey;
+  final String time;
   final Color titleColor;
 
   @override
@@ -96,7 +99,7 @@ class _TimelineText extends StatelessWidget {
           style: const TextStyle().setColor(titleColor).s14.bold.withHeight(20 / 14),
         ),
         Text(
-          timeKey.tr(),
+          time,
           textDirection: TextDirection.ltr,
           style: const TextStyle().setSecondaryColor.s12.regular.withHeight(16 / 12),
         ),

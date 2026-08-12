@@ -2,7 +2,9 @@ part of '../imports/order_flow_imports.dart';
 
 /// Amber customer-notes card.
 class _NotesCard extends StatelessWidget {
-  const _NotesCard();
+  const _NotesCard({required this.note});
+
+  final String note;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class _NotesCard extends StatelessWidget {
           ),
           8.szH,
           Text(
-            LocaleKeys.orderDetailNotesBody.tr(),
+            note,
             style: const TextStyle()
                 .setColor(AppColors.postponedTextStrong)
                 .s14

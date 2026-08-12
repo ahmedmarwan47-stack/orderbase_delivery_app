@@ -16,8 +16,9 @@ import '../theme/spacing.dart';
 import '../theme/typography.dart';
 import '../widgets/bottom_nav.dart';
 
-/// The app's real entry point: a tabbed shell hosting the built screens and
-/// wiring the Order Flow end-to-end.
+/// The signed-in app: a tabbed shell hosting the built screens and wiring the
+/// Order Flow end-to-end. Shown by [AuthGate] (the real `/` entry point) once
+/// the courier is logged in.
 ///
 /// Tabs map to [NavTab]: **Home** and **Orders** are real screens; the
 /// **notifications** / **more** tabs are placeholders until those screens are

@@ -2,9 +2,10 @@ part of '../imports/order_flow_imports.dart';
 
 /// Orchestrates the Order Flow state machine off the Order Detail screen:
 /// the "delivered" bar opens the handoff sheet → delivered result; the
-/// "not delivered" button opens the fail sheet → failed result, whose "تأجيل"
-/// hands off to the postpone sheet → postponed result (postpone's back arrow
-/// returns to the fail sheet). Holds no disposable state — pure navigation.
+/// "not delivered" button opens the Failure States flow → failed result (or,
+/// when the customer asks to postpone, hands off to the postpone sheet →
+/// postponed result; postpone's back arrow reopens the failure flow). Holds
+/// no disposable state — pure navigation.
 ///
 /// [orderNum] (with '#') and [customer] identify the order on the Result
 /// screen; the sheets surface the real outcome (collected cash, fail reason,
@@ -56,12 +57,8 @@ class OrderFlowController {
 
   /// Delivery, payment-aware:
   /// - **prepaid** → handoff sheet (proof photo) → delivered result. No cash.
-  /// - **COD** → handoff sheet (proof photo) → COD 2a collection → delivered.
-  ///
-  /// The COD collection flow currently reports only success/dismissal (it does
-  /// not surface the exact cash collected or wallet change), so the delivered
-  /// result shows the order's due amount as the collected total and omits the
-  /// wallet-change row. See the follow-up note in the task report.
+  /// - **COD** → handoff sheet (proof photo) → COD 2a collection → delivered,
+  ///   with the real collected cash and any wallet change shown on the result.
   Future<void> deliver(
     BuildContext context, {
     required bool cod,
@@ -89,41 +86,60 @@ class OrderFlowController {
       orderNum: orderNum.replaceAll('#', '').trim(),
       customerName: customer,
     );
-    if (collected == true && context.mounted) {
+    if (collected != null && context.mounted) {
+      final hasWalletChange = collected.walletChange > 0;
+      final unit = LocaleKeys.orderDetailEgpSuffix.tr();
       _openResult(
         context,
         ResultKind.delivered,
-        codAmount: '${formatThousands(due)} ${LocaleKeys.orderDetailEgpSuffix.tr()}',
+        codAmount: '${formatThousands(collected.amount)} $unit',
+        showWalletChange: hasWalletChange,
+        walletChange:
+            hasWalletChange ? '+${formatThousands(collected.walletChange)} $unit' : null,
       );
     }
   }
 
-  /// Fail sheet → failed result, or hand off to the postpone sheet →
-  /// postponed result. The postpone sheet's back arrow returns to the fail
-  /// sheet. The chosen reason/note and re-attempt slot are threaded into the
-  /// result.
+  /// Not-delivered → the full Failure States flow (reason → per-reason step →
+  /// return-to-branch → logged), mapped back onto the Order Flow outcomes:
+  /// - **returned to branch** → failed result.
+  /// - **postpone** (the customer asked to reschedule) → hands off to the
+  ///   existing postpone sheet → postponed result; its back arrow reopens the
+  ///   failure flow.
+  /// - **retry now / retry later** (wrong address corrected, or traffic) →
+  ///   the order stays active on Order Detail for re-attempt; no result.
+  /// - dismissed at any step → no result.
   Future<void> fail(BuildContext context) async {
-    final outcome = await showFailSheet(context);
+    final outcome = await showFailureFlow(context);
     if (!context.mounted || outcome == null) return;
-    if (outcome.action == FailResult.failed) {
-      _openResult(
-        context,
-        ResultKind.failed,
-        reasonLabel: outcome.reasonLabel,
-      );
-      return;
-    }
-    // postpone
-    final p = await showPostponeSheet(context);
-    if (!context.mounted || p == null) return;
-    if (p.action == PostponeResult.confirm) {
-      _openResult(
-        context,
-        ResultKind.postponed,
-        postponeDisplay: p.display,
-      );
-    } else if (p.action == PostponeResult.back) {
-      fail(context); // reopen the fail sheet
+
+    switch (outcome.resolution) {
+      case FailureResolution.returnedToBranch:
+        _openResult(
+          context,
+          ResultKind.failed,
+          reasonLabel: outcome.reason?.label,
+        );
+        break;
+      case FailureResolution.postpone:
+        final p = await showPostponeSheet(context);
+        if (!context.mounted || p == null) return;
+        if (p.action == PostponeResult.confirm) {
+          _openResult(
+            context,
+            ResultKind.postponed,
+            postponeDisplay: p.display,
+          );
+        } else if (p.action == PostponeResult.back) {
+          fail(context); // reopen the failure flow
+        }
+        break;
+      case FailureResolution.retryNow:
+      case FailureResolution.retryLater:
+        // Retryable — the order stays in the active queue; nothing to show.
+        break;
+      case FailureResolution.cancelled:
+        break;
     }
   }
 }

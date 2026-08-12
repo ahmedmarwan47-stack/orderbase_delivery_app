@@ -2,7 +2,9 @@ part of '../imports/order_flow_imports.dart';
 
 /// Address block — pinned address line, the map preview, and open-on-map.
 class _AddressSection extends StatelessWidget {
-  const _AddressSection();
+  const _AddressSection({required this.address});
+
+  final String address;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class _AddressSection extends StatelessWidget {
             8.szW,
             Expanded(
               child: Text(
-                LocaleKeys.orderDetailAddress.tr(),
+                address,
                 style: const TextStyle()
                     .setColor(AppColors.textBody)
                     .s14
