@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../screens/home/home_screen.dart';
 import '../screens/order_detail/order_detail_screen.dart';
+import '../screens/order_flow_sheets/fail_sheet.dart';
+import '../screens/order_flow_sheets/handoff_sheet.dart';
+import '../screens/order_flow_sheets/postpone_sheet.dart';
 import '../screens/orders_list/orders_list_screen.dart';
 import '../screens/pickup/pickup_screen.dart';
 import '../screens/result/result_screen.dart';
 import '../theme/colors.dart';
+import 'sheet_preview_host.dart';
 
 /// Temporary launcher listing the screens built so far, so each can be opened
 /// while there's no real navigation yet. Replaced by the app's actual entry
@@ -24,6 +28,11 @@ class DevGallery extends StatelessWidget {
     'نتيجة · Result — تم التسليم': (_) => const ResultScreen(kind: ResultKind.delivered),
     'نتيجة · Result — لم يتم التسليم': (_) => const ResultScreen(kind: ResultKind.failed),
     'نتيجة · Result — تأجيل': (_) => const ResultScreen(kind: ResultKind.postponed),
+    'ورقة · Handoff sheet': (_) =>
+        SheetPreviewHost(label: 'تأكيد التسليم', open: showHandoffSheet),
+    'ورقة · Fail sheet': (_) => SheetPreviewHost(label: 'سبب عدم التسليم', open: showFailSheet),
+    'ورقة · Postpone sheet': (_) =>
+        SheetPreviewHost(label: 'تأجيل التسليم', open: showPostponeSheet),
   };
 
   @override

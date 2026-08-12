@@ -28,6 +28,7 @@ enum AppIconName {
   user,
   bag,
   note,
+  cam,
 }
 
 extension on AppIconName {

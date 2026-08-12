@@ -7,16 +7,47 @@ import '../../theme/spacing.dart';
 import '../../widgets/bottom_nav.dart';
 import '../../widgets/map_view.dart';
 import '../../widgets/status_bar.dart';
+import '../order_flow_sheets/fail_sheet.dart';
+import '../order_flow_sheets/handoff_sheet.dart';
+import '../order_flow_sheets/postpone_sheet.dart';
+import '../result/result_screen.dart';
 
 /// Order detail — Order Flow step 2 (Order Flow.dc.html, `isOrder`).
 /// A faithful static port of the designed detail for order #89289; the mockup
 /// doesn't parametrize this view per order, so neither do we yet.
 class OrderDetailScreen extends StatelessWidget {
-  const OrderDetailScreen({super.key, this.onDeliver, this.onFail});
+  const OrderDetailScreen({super.key});
 
-  /// Opens the handoff sheet (delivered) / fail sheet — wired once those exist.
-  final VoidCallback? onDeliver;
-  final VoidCallback? onFail;
+  void _openResult(BuildContext context, ResultKind kind) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => ResultScreen(kind: kind)),
+    );
+  }
+
+  /// Handoff sheet → delivered result.
+  Future<void> _deliver(BuildContext context) async {
+    final ok = await showHandoffSheet(context);
+    if (ok == true && context.mounted) _openResult(context, ResultKind.delivered);
+  }
+
+  /// Fail sheet → failed result, or hand off to the postpone sheet → postponed
+  /// result. The postpone sheet's back arrow returns to the fail sheet.
+  Future<void> _fail(BuildContext context) async {
+    final outcome = await showFailSheet(context);
+    if (!context.mounted || outcome == null) return;
+    if (outcome == FailResult.failed) {
+      _openResult(context, ResultKind.failed);
+      return;
+    }
+    // postpone
+    final p = await showPostponeSheet(context);
+    if (!context.mounted) return;
+    if (p == PostponeResult.confirm) {
+      _openResult(context, ResultKind.postponed);
+    } else if (p == PostponeResult.back) {
+      _fail(context); // reopen the fail sheet
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,29 +67,29 @@ class OrderDetailScreen extends StatelessWidget {
                       AppSpacing.s20, AppSpacing.s16, AppSpacing.s20, AppSpacing.s20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: const [
-                      _CustomerSection(),
-                      SizedBox(height: AppSpacing.s16),
-                      _HDivider(),
-                      SizedBox(height: AppSpacing.s16),
-                      _AddressSection(),
-                      SizedBox(height: AppSpacing.s16),
-                      _HDivider(),
-                      SizedBox(height: AppSpacing.s16),
-                      _ItemsSection(),
-                      SizedBox(height: AppSpacing.s16),
-                      _NotesCard(),
-                      SizedBox(height: AppSpacing.s16),
-                      _PaymentCard(),
-                      SizedBox(height: AppSpacing.s16),
-                      _FailButton(),
-                      SizedBox(height: AppSpacing.s16),
-                      _Timeline(),
+                    children: [
+                      const _CustomerSection(),
+                      const SizedBox(height: AppSpacing.s16),
+                      const _HDivider(),
+                      const SizedBox(height: AppSpacing.s16),
+                      const _AddressSection(),
+                      const SizedBox(height: AppSpacing.s16),
+                      const _HDivider(),
+                      const SizedBox(height: AppSpacing.s16),
+                      const _ItemsSection(),
+                      const SizedBox(height: AppSpacing.s16),
+                      const _NotesCard(),
+                      const SizedBox(height: AppSpacing.s16),
+                      const _PaymentCard(),
+                      const SizedBox(height: AppSpacing.s16),
+                      _FailButton(onTap: () => _fail(context)),
+                      const SizedBox(height: AppSpacing.s16),
+                      const _Timeline(),
                     ],
                   ),
                 ),
               ),
-              _DeliverBar(onDeliver: onDeliver),
+              _DeliverBar(onDeliver: () => _deliver(context)),
               const BottomNav(active: NavTab.orders, notificationsBadge: true),
             ],
           ),
@@ -458,21 +489,24 @@ class _PaymentCard extends StatelessWidget {
 // ─────────────────────────────── Fail btn ──────────────────────────────
 
 class _FailButton extends StatelessWidget {
-  const _FailButton();
+  const _FailButton({required this.onTap});
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    // Note: wired via the parent's onFail once the fail sheet exists.
-    return Container(
-      height: 52,
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: AppColors.failedBorder, width: 1.5),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 52,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: AppColors.failedBorder, width: 1.5),
+        ),
+        alignment: Alignment.center,
+        child: const Text('لم يتم التسليم',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.dangerAccent)),
       ),
-      alignment: Alignment.center,
-      child: const Text('لم يتم التسليم',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.dangerAccent)),
     );
   }
 }

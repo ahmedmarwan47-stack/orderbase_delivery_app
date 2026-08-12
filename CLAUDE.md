@@ -49,18 +49,17 @@ Each `.dc.html` is ONE interactive screen that drives multiple **states** via a
 | Order detail | `order_detail/order_detail_screen.dart` | `Order Flow.dc.html` `isOrder` (static, #89289) |
 | Pickup | `pickup/pickup_screen.dart` | `Order Flow.dc.html` `isPickup` |
 | Result (delivered / failed / postponed) | `result/result_screen.dart` | `Order Flow.dc.html` `isResult` |
+| Handoff / Fail / Postpone sheets | `order_flow_sheets/*.dart` | `Order Flow.dc.html` `showHandoff` / `showFail` / `showPostpone` |
 
-**Not yet built (next up in the flow):** the 3 bottom sheets in `Order Flow.dc.html` —
-- `handoff` (confirm delivery + cash/change) → drives the *delivered* result
-- `fail` (pick a reason) → drives the *failed* result
-- `postpone` (pick a new time) → drives the *postponed* result
+**The Order Flow is now navigable end-to-end.** In `OrderDetailScreen`: the sticky "delivered"
+bar opens the **handoff** sheet → *delivered* result; the "لم يتم التسليم" button opens the
+**fail** sheet → *failed* result, and its "تأجيل" button hands off to the **postpone** sheet →
+*postponed* result (its back arrow returns to fail). Sheets are shown via `showAppSheet` /
+`SheetShell` (`lib/widgets/app_sheet.dart`) and previewed standalone through `SheetPreviewHost`
+(`lib/dev/sheet_preview_host.dart`). The list→detail tap is wired via `OrdersListScreen.onOpenOrder`.
 
-Their trigger callbacks already exist and are wired as no-ops: `OrderDetailScreen.onDeliver`
-(handoff) and `.onFail` (fail); postpone opens from within the fail/detail flow. The list→detail
-tap is wired (`OrdersListScreen.onOpenOrder`).
-
-**After the sheets:** the other standalone screens (Queue States, Settlement, COD Collection,
-Failure States, Auth) and the remaining Home variants, in whatever order the user asks.
+**Next up:** the other standalone screens (Queue States, Settlement, COD Collection, Failure
+States, Auth) and the remaining Home variants (1b / 1c / 2a), in whatever order the user asks.
 
 ---
 

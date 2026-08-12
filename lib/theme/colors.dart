@@ -89,4 +89,14 @@ abstract final class AppColors {
   // Timeline (order route)
   static const timelineRing = Color(0xFFF7D7D6); // ring around the active red dot
   static const timelineDotMuted = Color(0xFFC4C4C8); // upcoming/past gray dot
+
+  // Bottom sheets (handoff / fail / postpone)
+  static const scrim = Color(0x73141212); // rgba(20,18,18,.45) dimmed backdrop
+  static const sheetGrabber = Color(0xFFE0DFDB); // the top drag handle
+  static const dashedBorder = Color(0xFFD6D5D1); // photo-capture dashed border + switch-off track
+  static const photoDashBg = Color(0xFFFAFAF9); // photo-capture dashed area
+  static const photoTile = Color(0xFFF0EFEC); // camera icon tile
+  static const photoGreenWash = Color(0x2416A34A); // rgba(22,163,74,.14) captured-photo overlay
+  static const reasonRowBg = Color(0xFFF8F7F5); // unselected reason row
+  static const reasonDotBorder = Color(0xFFCFCEC9); // unselected reason radio ring
 }
