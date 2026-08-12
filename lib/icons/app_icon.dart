@@ -25,6 +25,9 @@ enum AppIconName {
   fail,
   cash,
   chat,
+  user,
+  bag,
+  note,
 }
 
 extension on AppIconName {

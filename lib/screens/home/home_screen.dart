@@ -7,6 +7,7 @@ import '../../theme/radius.dart';
 import '../../theme/shadows.dart';
 import '../../theme/spacing.dart';
 import '../../widgets/bottom_nav.dart';
+import '../../widgets/map_view.dart';
 import '../../widgets/status_bar.dart';
 
 /// Home / الرئيسية — design option 1a ("Airy": next-stop hero + 2×2 stats).
@@ -170,7 +171,7 @@ class _NextStopCard extends StatelessWidget {
             ),
           ),
           // map strip
-          const _MapStrip(),
+          const MapView(height: 96, showHairlines: true),
           // order info
           Padding(
             padding: const EdgeInsets.fromLTRB(
@@ -315,45 +316,6 @@ class _ProgressSeg extends StatelessWidget {
       child: Container(
         height: 6,
         decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
-      ),
-    );
-  }
-}
-
-class _MapStrip extends StatelessWidget {
-  const _MapStrip();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 96,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: AppColors.surfaceSubtle),
-                  bottom: BorderSide(color: AppColors.surfaceSubtle),
-                ),
-              ),
-              child: SvgPicture.asset('assets/images/map_strip.svg', fit: BoxFit.cover),
-            ),
-          ),
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: AppColors.brand,
-              shape: BoxShape.circle,
-              boxShadow: AppShadows.pin,
-            ),
-            child: const Center(
-              child: AppIcon(AppIconName.pin, color: Colors.white, size: 19),
-            ),
-          ),
-        ],
       ),
     );
   }

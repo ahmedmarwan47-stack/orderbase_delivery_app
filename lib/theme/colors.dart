@@ -24,6 +24,7 @@ abstract final class AppColors {
   static const textSecondary = Color(0xFF6B6B73);
   static const textTertiary = Color(0xFF52525B);
   static const textMuted = Color(0xFF8A7A72); // address lines, hints
+  static const textBody = Color(0xFF3F3F46); // long-form address / body copy
 
   // Brand
   static const brand = Color(0xFFE72B29);
@@ -71,4 +72,18 @@ abstract final class AppColors {
   // Search highlight
   static const markBg = Color(0xFFFFE9A8);
   static const markText = Color(0xFF5A4300);
+
+  // Hairline dividers between list items (lighter than borderHeader)
+  static const itemDivider = Color(0xFFF5F4F1);
+
+  // Dark COD payment card (Order Detail)
+  static const paymentCardBg = Color(0xFF1A1919);
+  static const paymentLabel = Color(0xFFA6A6AD); // muted label on dark card
+  static const paymentSuffix = Color(0xFFC9C9CE); // "جم" suffix on dark card
+  static const paymentTile = Color(0x1AFFFFFF); // rgba(255,255,255,.1) icon tile
+  static const cashBright = Color(0xFF3BD07A); // bright cash green on dark card
+
+  // Timeline (order route)
+  static const timelineRing = Color(0xFFF7D7D6); // ring around the active red dot
+  static const timelineDotMuted = Color(0xFFC4C4C8); // upcoming/past gray dot
 }

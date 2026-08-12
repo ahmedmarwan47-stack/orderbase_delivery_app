@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../screens/home/home_screen.dart';
+import '../screens/order_detail/order_detail_screen.dart';
 import '../screens/orders_list/orders_list_screen.dart';
 import '../theme/colors.dart';
 
@@ -12,7 +13,11 @@ class DevGallery extends StatelessWidget {
 
   static final _screens = <String, WidgetBuilder>{
     'الرئيسية · Home (1a)': (_) => const HomeScreen(),
-    'طلبات اليوم · Orders list': (_) => const OrdersListScreen(),
+    'طلبات اليوم · Orders list': (context) => OrdersListScreen(
+          onOpenOrder: (_) => Navigator.of(context)
+              .push(MaterialPageRoute(builder: (_) => const OrderDetailScreen())),
+        ),
+    'تفاصيل الطلب · Order detail': (_) => const OrderDetailScreen(),
   };
 
   @override
