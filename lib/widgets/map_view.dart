@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../icons/app_icon.dart';
-import '../theme/colors.dart';
+import '../config/res/config_imports.dart';
 import '../theme/shadows.dart';
 
 /// Static decorative map with a centered red pin. Used both as the short strip
@@ -34,7 +33,7 @@ class MapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget map = SvgPicture.asset('assets/images/map_strip.svg', fit: BoxFit.cover);
+    Widget map = SvgPicture.asset(AppAssets.img.mapStrip, fit: BoxFit.cover);
     if (borderRadius > 0) {
       map = ClipRRect(borderRadius: BorderRadius.circular(borderRadius), child: map);
     }
@@ -67,7 +66,12 @@ class MapView extends StatelessWidget {
                 boxShadow: AppShadows.pin,
               ),
               child: Center(
-                child: AppIcon(AppIconName.pin, color: Colors.white, size: pinIconSize),
+                child: IconWidget(
+                  icon: AppAssets.svg.pin,
+                  color: AppColors.surface,
+                  height: pinIconSize,
+                  width: pinIconSize,
+                ),
               ),
             ),
           ),

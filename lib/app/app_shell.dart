@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../dev/dev_gallery.dart';
-import '../screens/home/home_screen.dart';
-import '../screens/order_detail/order_detail_screen.dart';
-import '../screens/orders_list/orders_list_screen.dart';
+import '../features/home/presentation/imports/home_imports.dart';
+import '../features/order_flow/presentation/imports/order_flow_imports.dart';
+import '../features/orders/presentation/imports/orders_imports.dart';
 import '../theme/colors.dart';
 import '../theme/spacing.dart';
 import '../theme/typography.dart';

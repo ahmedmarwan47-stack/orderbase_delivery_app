@@ -18,6 +18,7 @@ abstract final class AppColors {
   static const borderHeader = Color(0xFFEEEDEA); // header/bottom-nav hairline
   static const borderCard = Color(0x0D000000); // rgba(0,0,0,.05) card outline
   static const borderCardFaint = Color(0x0A000000); // rgba(0,0,0,.04) hero/stat card
+  static const iconButtonBorder = Color(0x12000000); // rgba(0,0,0,.07) header search icon button (Home 1a)
 
   // Text
   static const textPrimary = Color(0xFF1A1919);

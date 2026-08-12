@@ -43,6 +43,13 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  # ── Flutter_Base stack (adopted via the impeccable/Flutter_Base skills) ──
+  flutter_bloc: ^8.1.6        # Cubit/Bloc state management
+  flutter_modular: ^6.3.4     # DI + routing (Modular.get / Modular.to)
+  easy_localization: ^3.0.7   # LocaleKeys.*.tr() i18n
+  flutter_screenutil: ^5.9.3  # responsive .h/.w/.sp/.r sizing
+  rxdart: ^0.28.0             # debounce for search fields
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -73,6 +80,7 @@ flutter:
     - assets/icons/
     - assets/images/
     - assets/merchant/
+    - assets/translations/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

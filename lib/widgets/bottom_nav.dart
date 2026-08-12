@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../icons/app_icon.dart';
-import '../theme/colors.dart';
+import '../config/res/config_imports.dart';
 import 'home_indicator.dart';
 
 enum NavTab { home, orders, notifications, more }
@@ -32,15 +31,22 @@ class BottomNav extends StatelessWidget {
             decoration: const BoxDecoration(
               border: Border(top: BorderSide(color: AppColors.borderHeader)),
             ),
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: EdgeInsets.fromLTRB(
+              AppPadding.pW16,
+              AppPadding.pH12,
+              AppPadding.pW16,
+              AppPadding.pH8,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _item(NavTab.home, AppIconName.home, 'الرئيسية'),
-                _item(NavTab.orders, AppIconName.orders, 'الطلبات'),
-                _item(NavTab.notifications, AppIconName.bell, 'الاشعارات',
+                _item(NavTab.home, AppAssets.svg.home, LocaleKeys.navHome.tr()),
+                _item(NavTab.orders, AppAssets.svg.orders,
+                    LocaleKeys.navOrders.tr()),
+                _item(NavTab.notifications, AppAssets.svg.bell,
+                    LocaleKeys.navNotifications.tr(),
                     badge: notificationsBadge),
-                _item(NavTab.more, AppIconName.more, 'المزيد'),
+                _item(NavTab.more, AppAssets.svg.more, LocaleKeys.navMore.tr()),
               ],
             ),
           ),
@@ -50,46 +56,47 @@ class BottomNav extends StatelessWidget {
     );
   }
 
-  Widget _item(NavTab tab, AppIconName icon, String label, {bool badge = false}) {
+  Widget _item(NavTab tab, String icon, String label, {bool badge = false}) {
     final isActive = tab == active;
     final color = isActive ? AppColors.dangerAccent : AppColors.textSecondary;
-    return GestureDetector(
-      onTap: onTap == null ? null : () => onTap!(tab),
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              AppIcon(icon, color: color, size: 23),
-              if (badge)
-                Positioned(
-                  top: -2,
-                  right: -2,
-                  child: Container(
-                    width: 7,
-                    height: 7,
-                    decoration: BoxDecoration(
-                      color: AppColors.brand,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.surface, width: 1.5),
-                    ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            IconWidget(
+              icon: icon,
+              color: color,
+              height: 23.h, // 23px glyph — no matching AppSize token
+              width: 23.w,
+            ),
+            if (badge)
+              Positioned(
+                top: -2,
+                right: -2,
+                child: Container(
+                  width: 7.w, // 7px badge dot — no matching AppSize token
+                  height: 7.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.brand,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.surface, width: 1.5),
                   ),
                 ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
+              ),
+          ],
+        ),
+        4.szH,
+        Text(
+          label,
+          style: (isActive
+                  ? const TextStyle().semiBold
+                  : const TextStyle().regular)
+              .s12
+              .setColor(color),
+        ),
+      ],
+    ).onClick(onTap: onTap == null ? null : () => onTap!(tab));
   }
 }

@@ -10,6 +10,7 @@ class Order {
     this.due,
     this.cod,
     this.prepaid = false,
+    this.dist,
     this.returns,
     this.reason,
     this.postponedAt,
@@ -23,6 +24,7 @@ class Order {
   final String? due; // promised delivery time label, e.g. "٢:٤٥ م"
   final int? cod; // cash-on-delivery amount in EGP
   final bool prepaid;
+  final String? dist; // distance label shown on the queue card, e.g. "4.2 كم"
   final String? returns; // postponed: when it returns to the active queue
   final String? reason; // postponed: reason given
   final String? postponedAt; // postponed: when it was postponed
@@ -37,6 +39,7 @@ class Order {
       due: due,
       cod: cod,
       prepaid: prepaid,
+      dist: dist,
       returns: returns,
       reason: reason,
       postponedAt: postponedAt,
@@ -55,6 +58,7 @@ final List<Order> sampleOrders = [
     status: OrderStatus.transit,
     due: '٢:٤٥ م',
     cod: 1200,
+    dist: '4.2 كم',
   ),
   const Order(
     num: '#89304',
@@ -82,6 +86,7 @@ final List<Order> sampleOrders = [
     status: OrderStatus.transit,
     due: '٣:١٥ م',
     prepaid: true,
+    dist: '6.8 كم',
   ),
   const Order(
     num: '#89298',
@@ -91,6 +96,7 @@ final List<Order> sampleOrders = [
     status: OrderStatus.transit,
     due: '٣:٤٠ م',
     cod: 640,
+    dist: '11.5 كم',
   ),
   const Order(
     num: '#89311',
@@ -111,6 +117,7 @@ final List<Order> sampleOrders = [
     status: OrderStatus.transit,
     due: '٤:٠٠ م',
     cod: 450,
+    dist: '7.3 كم',
   ),
   const Order(
     num: '#89355',

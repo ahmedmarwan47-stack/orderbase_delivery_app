@@ -12,8 +12,9 @@ disagree, the mockup wins; update this file instead.
 
 ## Design project (how to fetch the mockups)
 
-- **Project id:** `cbf7a892-3a95-4d11-809c-fd57222729d7`
-- **URL:** `https://claude.ai/design/p/cbf7a892-3a95-4d11-809c-fd57222729d7`
+- **Project id:** `6bbc0e73-b279-4e8d-affc-ae79997f2cf8` (the old `cbf7a892-…` id now 404s
+  via DesignSync — use this one; `list_projects` won't surface it, so pass the id directly)
+- **URL:** `https://claude.ai/design/p/6bbc0e73-b279-4e8d-affc-ae79997f2cf8`
 - **Type:** regular project, `canEdit: true`, reachable through the user's claude.ai login.
 - **Tool:** the `DesignSync` MCP tool. If it's deferred, load it first with
   `ToolSearch` → `select:DesignSync`. Then `DesignSync get_file` with the `projectId` above and a
@@ -40,16 +41,20 @@ Each `.dc.html` is ONE interactive screen that drives multiple **states** via a
 
 ## Progress (screen inventory)
 
-**Built & verified** (all in `lib/screens/`, reachable from the app shell and/or `DevGallery`):
+**Built & verified — the WHOLE app is now migrated to the Flutter_Base style** (every screen lives
+under `lib/features/<name>/presentation/`; `lib/screens/` is gone). Reachable from the app shell
+and/or `DevGallery`:
 
-| Screen | Folder | From |
+| Screen | Feature folder | From |
 |---|---|---|
-| Home (option 1a) | `home/home_screen.dart` | `Home Directions.dc.html` #1a |
-| Orders list | `orders_list/orders_list_screen.dart` | `Order Flow.dc.html` `isOrders` |
-| Order detail | `order_detail/order_detail_screen.dart` | `Order Flow.dc.html` `isOrder` (static, #89289) |
-| Pickup | `pickup/pickup_screen.dart` | `Order Flow.dc.html` `isPickup` |
-| Result (delivered / failed / postponed) | `result/result_screen.dart` | `Order Flow.dc.html` `isResult` |
-| Handoff / Fail / Postpone sheets | `order_flow_sheets/*.dart` | `Order Flow.dc.html` `showHandoff` / `showFail` / `showPostpone` |
+| Home (option 1a) | `features/home/` | `Home Directions.dc.html` #1a |
+| Orders list | `features/orders/` | `Order Flow.dc.html` `isOrders` |
+| Order detail / Result / Handoff·Fail·Postpone sheets | `features/order_flow/` | `Order Flow.dc.html` `isOrder`/`isResult`/`showHandoff`/`showFail`/`showPostpone` |
+| Pickup | `features/pickup/` | `Order Flow.dc.html` `isPickup` |
+| Queue States (1a–1e) — the pilot | `features/queue/` | `Queue States.dc.html` |
+
+Shared widgets (`lib/widgets/bottom_nav`, `home_indicator`, `map_view`, `status_pill`, `app_sheet`)
+were also converted in place (same public APIs, Flutter_Base internals).
 
 **The Order Flow is now navigable end-to-end.** In `OrderDetailScreen`: the sticky "delivered"
 bar opens the **handoff** sheet → *delivered* result; the "لم يتم التسليم" button opens the
@@ -62,8 +67,52 @@ bar opens the **handoff** sheet → *delivered* result; the "لم يتم الت�
 Home/Orders → detail → flow → result → back to a tab. See the *App shell* section below. Verified
 on the iOS Simulator.
 
-**Next up:** the other standalone screens (Queue States, Settlement, COD Collection, Failure
-States, Auth) and the remaining Home variants (1b / 1c / 2a), in whatever order the user asks.
+**Next up:** the not-yet-built screens (Settlement, COD Collection, Failure States, Auth) and the
+remaining Home variants (1b / 1c / 2a) — build these in the Flutter_Base style described below.
+
+---
+
+## Architecture: the app is Flutter_Base
+
+The **whole app** now follows "Flutter_Base" — an opinionated architecture from the
+`impeccable`-installed skills in `.claude/skills/` (**read those before adding or changing any
+feature**). New screens go under `lib/features/<name>/presentation/` in the same shape. Deps:
+`flutter_bloc`, `flutter_modular`, `easy_localization`, `flutter_screenutil`, `rxdart`.
+
+> Still "plain" (intentionally, not screens): `lib/theme/*` (the token *source* — `AppColors`,
+> `AppShadows`, `AppTypography`; `AppSpacing` is legacy, prefer `AppPadding`/`AppSize`),
+> `lib/widgets/status_bar.dart` (unused), and `lib/dev/*` (DevGallery + SheetPreviewHost helpers).
+
+The `features/queue/` pilot is the canonical reference — copy its patterns. Foundation:
+
+- **Tokens** `lib/config/res/` — `AppSize`/`AppPadding`/`AppMargin`/`AppCircular`/`FontSizeManager`/
+  `FontWeightManager` (screenutil `.h/.w/.sp/.r`), plus `config_imports.dart` (single-import barrel;
+  **`hide TextDirection`** on the easy_localization export — intl's clashes with dart:ui's).
+- **Extensions** `lib/core/extensions/` — `12.szH`/`8.szW`, `.paddingAll()`/`.paddingOnlyDirectional()`,
+  `.marginAll()`, `.onClick()`, and `TextStyleEx` (`const TextStyle().setMainTextColor.s14.bold`).
+  NB: the chain method is **`.withHeight(x)`**, not `.height` (that's a `TextStyle` field).
+- **Core widgets** `lib/core/widgets/` — `IconWidget(icon: AppAssets.svg.x, color:)` + `AppAssets`.
+- **i18n** — `easy_localization` in `main.dart`; keys in `lib/core/localization/locale_keys.dart`
+  (hand-authored — no `generate/strings` codegen), strings in `assets/translations/{ar,en}.json`.
+- **Routing/DI** — `flutter_modular`: `AppModule` (`lib/app_module.dart`) routes `/` (shell),
+  `/queue`, `/queue/postponed`, `/order-detail`, `/pickup`; `main.dart` is `ModularApp` +
+  `EasyLocalization` + `ScreenUtilInit(designSize: 368×812)` + `MaterialApp.router`. `app_shell.dart`
+  hosts the Home/Orders tabs and pushes the order-detail flow (imports the feature hubs).
+- **Feature layout** (every `features/<name>/presentation/`) — `imports/<name>_imports.dart` hub
+  (`library;` + `part`/`part of`; other feature files are `part of` it), `controllers/*` (ViewController
+  = ValueNotifier / rxdart debounce — **no setState**), `view/` (public Screens), `widgets/` (one
+  private `_Widget` per file). Cross-feature nav is `Modular.to.pushNamed('/route')`; each feature's
+  Arabic copy lives in `LocaleKeys` + the json (prefix keys by feature, e.g. `home_*`, `order_detail_*`).
+
+**Deviations from the skills (design-driven, intentional):** `IconWidget` accepts `color:` (our icon
+set is monochrome stroke art, recolored at runtime — unlike Flutter_Base's pre-coloured exports);
+Queue keeps its **custom white header** instead of `DefaultScaffold`'s colored app-bar (the mockup
+demands it); `LocaleKeys` is hand-authored (no codegen script). Arabic-keyboard digits are
+normalized to Western in search (`QueueViewController._toEnglishDigits`, the "toEnglishNumbers" rule).
+
+**Verify Queue:** the 5 states are reachable from `DevGallery` (More tab → الشاشات (Dev)). Because
+synthetic taps on that button are flaky, the reliable path is a temporary `AppModule` `/` route swap
+to `QueueScreen(...)` / `PostponedScreen()` (revert to `AppShell` before committing).
 
 ---
 

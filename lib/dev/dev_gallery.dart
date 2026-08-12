@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../screens/home/home_screen.dart';
-import '../screens/order_detail/order_detail_screen.dart';
-import '../screens/order_flow_sheets/fail_sheet.dart';
-import '../screens/order_flow_sheets/handoff_sheet.dart';
-import '../screens/order_flow_sheets/postpone_sheet.dart';
-import '../screens/orders_list/orders_list_screen.dart';
-import '../screens/pickup/pickup_screen.dart';
-import '../screens/result/result_screen.dart';
+import '../data/order.dart';
+import '../features/home/presentation/imports/home_imports.dart';
+import '../features/order_flow/presentation/imports/order_flow_imports.dart';
+import '../features/orders/presentation/imports/orders_imports.dart';
+import '../features/pickup/presentation/imports/pickup_imports.dart';
+import '../features/queue/presentation/imports/queue_imports.dart';
 import '../theme/colors.dart';
 import 'sheet_preview_host.dart';
 
@@ -23,6 +21,17 @@ class DevGallery extends StatelessWidget {
           onOpenOrder: (_) => Navigator.of(context)
               .push(MaterialPageRoute(builder: (_) => const OrderDetailScreen())),
         ),
+    'قائمة الطلبات · Queue (1b)': (_) => const QueueScreen(),
+    'بحث · Queue search (1a)': (_) =>
+        const QueueScreen(startSearching: true, initialQuery: 'زهراء'),
+    'لا نتائج · Queue no-results (1c)': (_) =>
+        const QueueScreen(startSearching: true, initialQuery: '89345'),
+    'فاضية · Queue cleared (1d)': (_) => QueueScreen(
+          orders: sampleOrders
+              .where((o) => o.status == OrderStatus.postponed)
+              .toList(),
+        ),
+    'المؤجلة · Postponed (1e)': (_) => const PostponedScreen(),
     'تفاصيل الطلب · Order detail': (_) => const OrderDetailScreen(),
     'استلام من الفرع · Pickup': (_) => const PickupScreen(),
     'نتيجة · Result — تم التسليم': (_) => const ResultScreen(kind: ResultKind.delivered),

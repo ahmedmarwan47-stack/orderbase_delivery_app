@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/colors.dart';
+import '../config/res/config_imports.dart';
 
 /// The iOS-style home-indicator pill on a white strip, as it appears at the
 /// bottom of every screen in the mockups. Used inside [BottomNav] and directly
@@ -12,14 +12,14 @@ class HomeIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: AppColors.surface,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.symmetric(vertical: AppPadding.pH8),
       alignment: Alignment.center,
       child: Container(
-        width: 135,
-        height: 5,
+        width: 135.w, // fixed iOS home-indicator pill — no token
+        height: 5.h,
         decoration: BoxDecoration(
           color: AppColors.textPrimary.withValues(alpha: 0.85),
-          borderRadius: BorderRadius.circular(3),
+          borderRadius: BorderRadius.circular(3.r),
         ),
       ),
     );
