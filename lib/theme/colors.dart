@@ -62,6 +62,9 @@ abstract final class AppColors {
   // Selected / high-emphasis fill (chips, primary buttons)
   static const inkFill = Color(0xFF1A1919);
 
+  // Muted count text inside an unselected filter chip
+  static const chipCountMuted = Color(0xFF9A9994);
+
   // Destructive accent (clear filter, active nav icon)
   static const dangerAccent = Color(0xFFC81E1C);
 
