@@ -94,6 +94,24 @@ abstract final class LocaleKeys {
   static const String homeStatTotalCollected = 'home_stat_total_collected';
   static const String homeEgp = 'home_egp';
 
+  // Home variants (1b Glance / 1c Compact / 2a Flat)
+  static const String homeOnline = 'home_online';
+  static const String homeOnlineNow = 'home_online_now';
+  static const String homeTotalCollectedToday = 'home_total_collected_today';
+  static const String homeCodShort = 'home_cod_short';
+  static const String homeRemainingStops = 'home_remaining_stops';
+  static const String homeRemainingCount = 'home_remaining_count';
+  static const String homeStop3Name = 'home_stop3_name';
+  static const String homeStop3Area = 'home_stop3_area';
+  static const String homeStop3Time = 'home_stop3_time';
+  static const String homeStop4Name = 'home_stop4_name';
+  static const String homeStop4Area = 'home_stop4_area';
+  static const String homeStop4Time = 'home_stop4_time';
+  static const String homeEtaShort = 'home_eta_short';
+  static const String homeOrderNoShort = 'home_order_no_short';
+  static const String homeStatFailedShort = 'home_stat_failed_short';
+  static const String homeCollectionShort = 'home_collection_short';
+
   // ── orders ──
   static const String ordersSubtitle = 'orders_subtitle';
   static const String ordersFilterActive = 'orders_filter_active';
@@ -166,6 +184,7 @@ abstract final class LocaleKeys {
   static const String handoffCollectedLabel = 'handoff_collected_label';
   static const String handoffEgpSuffix = 'handoff_egp_suffix';
   static const String handoffWalletToggle = 'handoff_wallet_toggle';
+  static const String handoffCollectNext = 'handoff_collect_next';
   static const String failTitle = 'fail_title';
   static const String failReason1 = 'fail_reason_1';
   static const String failReason2 = 'fail_reason_2';
@@ -187,4 +206,220 @@ abstract final class LocaleKeys {
   static const String postponeConfirm = 'postpone_confirm';
   static const String postponeAm = 'postpone_am';
   static const String postponePm = 'postpone_pm';
+
+  // Accessibility labels (screen-reader only, never shown on screen)
+  static const String a11yClose = 'a11y_close';
+  static const String a11yBack = 'a11y_back';
+  static const String a11yClearSearch = 'a11y_clear_search';
+  static const String a11ySearch = 'a11y_search';
+
+  // COD collection (COD Collection.dc.html — 2a: typed amount, excess → wallet)
+  static const String codEntryTitle = 'cod_entry_title';
+  static const String codOrderLine = 'cod_order_line';
+  static const String codUnit = 'cod_unit';
+  static const String codHintMatch = 'cod_hint_match';
+  static const String codHintShort = 'cod_hint_short';
+  static const String codHintExtra = 'cod_hint_extra';
+  static const String codConfirmWrite = 'cod_confirm_write';
+  static const String codConfirmIncomplete = 'cod_confirm_incomplete';
+  static const String codConfirm = 'cod_confirm';
+  static const String codSheetTitleExtra = 'cod_sheet_title_extra';
+  static const String codSheetTitleMatch = 'cod_sheet_title_match';
+  static const String codSheetBodyExtra = 'cod_sheet_body_extra';
+  static const String codSheetBodyMatch = 'cod_sheet_body_match';
+  static const String codSummaryCollected = 'cod_summary_collected';
+  static const String codSummaryOrderValue = 'cod_summary_order_value';
+  static const String codSummaryToWallet = 'cod_summary_to_wallet';
+  static const String codSettlementLabel = 'cod_settlement_label';
+  static const String codSettlementBreakdown = 'cod_settlement_breakdown';
+  static const String codConfirmDelivery = 'cod_confirm_delivery';
+  static const String codEditAmount = 'cod_edit_amount';
+
+  // Auth (Auth.dc.html — 1a login · 1b forgot · 1c code · 1d new · 1e change · 1f success)
+  static const String authBrandName = 'auth_brand_name';
+  static const String authBack = 'auth_back';
+  static const String authAccount = 'auth_account';
+  // Field labels / hints (shared across the flow)
+  static const String authMerchant = 'auth_merchant';
+  static const String authUsername = 'auth_username';
+  static const String authPassword = 'auth_password';
+  static const String authNewPassword = 'auth_new_password';
+  static const String authConfirmPassword = 'auth_confirm_password';
+  static const String authCurrentPassword = 'auth_current_password';
+  static const String authConfirmHint = 'auth_confirm_hint';
+  static const String authShowPassword = 'auth_show_password';
+  static const String authHidePassword = 'auth_hide_password';
+  // 1a login
+  static const String authLoginTitle = 'auth_login_title';
+  static const String authLoginSubtitle = 'auth_login_subtitle';
+  static const String authForgotLink = 'auth_forgot_link';
+  static const String authLoginSubmit = 'auth_login_submit';
+  // 1b forgot
+  static const String authForgotTitle = 'auth_forgot_title';
+  static const String authForgotSubtitle = 'auth_forgot_subtitle';
+  static const String authWhatsappTitle = 'auth_whatsapp_title';
+  static const String authWhatsappBody = 'auth_whatsapp_body';
+  static const String authSendCode = 'auth_send_code';
+  // 1c code
+  static const String authCodeTitle = 'auth_code_title';
+  static const String authCodeSubtitle = 'auth_code_subtitle';
+  static const String authResendIn = 'auth_resend_in';
+  static const String authResend = 'auth_resend';
+  static const String authCodeHelp = 'auth_code_help';
+  static const String authCodeConfirm = 'auth_code_confirm';
+  // 1d new password
+  static const String authNewTitle = 'auth_new_title';
+  static const String authNewSubtitle = 'auth_new_subtitle';
+  static const String authStrengthLabel = 'auth_strength_label';
+  static const String authStrengthWeak = 'auth_strength_weak';
+  static const String authStrengthGood = 'auth_strength_good';
+  static const String authStrengthStrong = 'auth_strength_strong';
+  static const String authRuleLength = 'auth_rule_length';
+  static const String authRuleMatch = 'auth_rule_match';
+  static const String authSavePassword = 'auth_save_password';
+  // 1e change password
+  static const String authChangeTitle = 'auth_change_title';
+  static const String authForgotItLink = 'auth_forgot_it_link';
+  static const String authChangeNote = 'auth_change_note';
+  static const String authUpdatePassword = 'auth_update_password';
+  // 1f success
+  static const String authSuccessTitle = 'auth_success_title';
+  static const String authSuccessBody = 'auth_success_body';
+  static const String authSuccessSignIn = 'auth_success_sign_in';
+  static const String authSuccessBackToOrders = 'auth_success_back_to_orders';
+
+  // Failure States — reasons (labels / titles / return-item reasons)
+  static const String failureReasonNotPresent = 'failure_reason_not_present';
+  static const String failureReasonRefused = 'failure_reason_refused';
+  static const String failureReasonMismatch = 'failure_reason_mismatch';
+  static const String failureReasonWrongAddress = 'failure_reason_wrong_address';
+  static const String failureReasonTraffic = 'failure_reason_traffic';
+  static const String failureReasonOther = 'failure_reason_other';
+
+  // Failure States — outcome tags
+  static const String failureTagReturnsToBranch = 'failure_tag_returns_to_branch';
+  static const String failureTagRetryable = 'failure_tag_retryable';
+
+  // Failure States — sample context data
+  static const String failureSampleAddress = 'failure_sample_address';
+  static const String failureSampleAddressDetail = 'failure_sample_address_detail';
+  static const String failureSampleCorrectedAddress = 'failure_sample_corrected_address';
+  static const String failureSamplePiecesLabel = 'failure_sample_pieces_label';
+  static const String failureAttemptCallNoAnswer = 'failure_attempt_call_no_answer';
+  static const String failureAttemptWhatsappNoReply = 'failure_attempt_whatsapp_no_reply';
+
+  // Failure States — shared copy
+  static const String failureNext = 'failure_next';
+  static const String failureNextReturnToBranch = 'failure_next_return_to_branch';
+  static const String failureStep1Of2 = 'failure_step_1_of_2';
+  static const String failureStep2Retryable = 'failure_step_2_retryable';
+  static const String failureStep2Final = 'failure_step_2_final';
+  static const String failureNoteMandatory = 'failure_note_mandatory';
+  static const String failureStatusInTransit = 'failure_status_in_transit';
+  static const String failureOrders = 'failure_orders';
+
+  // Failure States — 1a reason step
+  static const String failureReasonTitle = 'failure_reason_title';
+  static const String failureCustomerAskedPostpone = 'failure_customer_asked_postpone';
+
+  // Failure States — 1b not present
+  static const String failureNotPresentSampleNote = 'failure_not_present_sample_note';
+  static const String failureContactAttemptsLabel = 'failure_contact_attempts_label';
+  static const String failureSkipContactAttempts = 'failure_skip_contact_attempts';
+  static const String failureContactBlockingHint = 'failure_contact_blocking_hint';
+  static const String failureLastNudgeWarning = 'failure_last_nudge_warning';
+  static const String failureCall = 'failure_call';
+  static const String failureWhatsapp = 'failure_whatsapp';
+
+  // Failure States — 1c wrong address
+  static const String failureWrongAddressSampleNote = 'failure_wrong_address_sample_note';
+  static const String failureCorrectAddressLabel = 'failure_correct_address_label';
+  static const String failureConfirmedByPhone = 'failure_confirmed_by_phone';
+  static const String failureAfterCorrection = 'failure_after_correction';
+  static const String failureUpdateAddressRetry = 'failure_update_address_retry';
+  static const String failureRetryNow = 'failure_retry_now';
+  static const String failureRetryNowCaption = 'failure_retry_now_caption';
+  static const String failurePostponeLaterToday = 'failure_postpone_later_today';
+  static const String failurePostponeLaterCaption = 'failure_postpone_later_caption';
+
+  // Failure States — 1d product mismatch
+  static const String failureMismatchSampleNote = 'failure_mismatch_sample_note';
+  static const String failurePhotoDeliveredLabel = 'failure_photo_delivered_label';
+  static const String failurePhotoHint = 'failure_photo_hint';
+  static const String failureDiffNoteLabel = 'failure_diff_note_label';
+  static const String failureMismatchWarning = 'failure_mismatch_warning';
+  static const String failureCaptureWrongProduct = 'failure_capture_wrong_product';
+  static const String failureCaptureHint = 'failure_capture_hint';
+
+  // Failure States — 1e return to branch
+  static const String failureReturnToBranchTitle = 'failure_return_to_branch_title';
+  static const String failureReturnToBranchIntro = 'failure_return_to_branch_intro';
+  static const String failureReturnHeldHint = 'failure_return_held_hint';
+  static const String failureLogNonDelivery = 'failure_log_non_delivery';
+  static const String failureBackToReason = 'failure_back_to_reason';
+  static const String failureSummaryReason = 'failure_summary_reason';
+  static const String failureSummaryOrder = 'failure_summary_order';
+  static const String failureSummaryReturnedPieces = 'failure_summary_returned_pieces';
+  static const String failureSummaryReturnedTo = 'failure_summary_returned_to';
+  static const String failureCustodyConfirm = 'failure_custody_confirm';
+
+  // Failure States — host (preview affordances)
+  static const String failureStatusCouldNotDeliver = 'failure_status_could_not_deliver';
+  static const String failureReopenSheet = 'failure_reopen_sheet';
+
+  // Failure States — 1f logged / undo
+  static const String failureLoggedTitle = 'failure_logged_title';
+  static const String failureContinueRoute = 'failure_continue_route';
+  static const String failureBackToOrdersList = 'failure_back_to_orders_list';
+  static const String failureReasonLocksHint = 'failure_reason_locks_hint';
+  static const String failureLoggedSummaryPrefix = 'failure_logged_summary_prefix';
+  static const String failureLoggedSummaryPieces = 'failure_logged_summary_pieces';
+  static const String failureCanUndoNow = 'failure_can_undo_now';
+  static const String failureUndoWindowEnds = 'failure_undo_window_ends';
+  static const String failureUndo = 'failure_undo';
+
+  // Failure States — 1g returns list
+  static const String failureSampleMetaSara = 'failure_sample_meta_sara';
+  static const String failureSampleMetaPostponed = 'failure_sample_meta_postponed';
+  static const String failureSampleMetaCorrected = 'failure_sample_meta_corrected';
+  static const String failureStatusDelivered = 'failure_status_delivered';
+  static const String failureSampleMetaMona = 'failure_sample_meta_mona';
+  static const String failureActiveCount = 'failure_active_count';
+  static const String failureFilterAll = 'failure_filter_all';
+  static const String failureFilterFailed = 'failure_filter_failed';
+  static const String failureReturnsToBranch = 'failure_returns_to_branch';
+  static const String failurePiecesCount3 = 'failure_pieces_count_3';
+  static const String failurePieces1 = 'failure_pieces_1';
+  static const String failureHandReturns = 'failure_hand_returns';
+  static const String failureNavHome = 'failure_nav_home';
+  static const String failureNavCollection = 'failure_nav_collection';
+  static const String failureNavAccount = 'failure_nav_account';
+
+  // ── settlement (Settlement.dc.html) ──
+  static const String settlementCashierDefault = 'settlement_cashier_default';
+  static const String settlementBack = 'settlement_back';
+  static const String settlementTitle = 'settlement_title';
+  static const String settlementSubtitle = 'settlement_subtitle';
+  static const String settlementNotSettled = 'settlement_not_settled';
+  static const String settlementSettleCta = 'settlement_settle_cta';
+  static const String settlementCollectionsTitle = 'settlement_collections_title';
+  static const String settlementCollectionsHint = 'settlement_collections_hint';
+  static const String settlementCurrency = 'settlement_currency';
+  static const String settlementOrderValue = 'settlement_order_value';
+  static const String settlementWalletChange = 'settlement_wallet_change';
+  static const String settlementCashInHand = 'settlement_cash_in_hand';
+  static const String settlementBreakdownOrders = 'settlement_breakdown_orders';
+  static const String settlementBreakdownWallet = 'settlement_breakdown_wallet';
+  static const String settlementBreakdownCount = 'settlement_breakdown_count';
+  static const String settlementSettledTitle = 'settlement_settled_title';
+  static const String settlementSettledBody = 'settlement_settled_body';
+  static const String settlementSummaryDelivered = 'settlement_summary_delivered';
+  static const String settlementSummaryWallet = 'settlement_summary_wallet';
+  static const String settlementSummaryCashier = 'settlement_summary_cashier';
+  static const String settlementSummaryTime = 'settlement_summary_time';
+  static const String settlementSummaryTimeValue = 'settlement_summary_time_value';
+  static const String settlementBalanceLabel = 'settlement_balance_label';
+  static const String settlementClosed = 'settlement_closed';
+  static const String settlementBackHome = 'settlement_back_home';
+  static const String settlementLockedNote = 'settlement_locked_note';
 }

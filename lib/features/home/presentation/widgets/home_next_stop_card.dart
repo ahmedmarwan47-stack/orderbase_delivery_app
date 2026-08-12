@@ -180,7 +180,7 @@ class _HomeNextStopCard extends StatelessWidget {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: AppColors.inkFill,
-                      borderRadius: BorderRadius.circular(15.r), // radii exempt
+                      borderRadius: BorderRadius.circular(AppCircular.r15), // radii exempt
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -207,7 +207,7 @@ class _HomeNextStopCard extends StatelessWidget {
                 iconColor: AppColors.brand,
                 size: AppSize.sH52,
                 iconSize: 21.h, // mockup glyph 21px (off the 4px grid)
-                radius: 15.r,
+                radius: AppCircular.r15,
                 background: AppColors.surface,
                 border: AppColors.brand,
                 borderWidth: 1.5,
@@ -218,7 +218,7 @@ class _HomeNextStopCard extends StatelessWidget {
                 iconColor: AppColors.greenAccent,
                 size: AppSize.sH52,
                 iconSize: 21.h,
-                radius: 15.r,
+                radius: AppCircular.r15,
                 background: AppColors.deliveredBg,
                 border: AppColors.deliveredBorder,
               ),

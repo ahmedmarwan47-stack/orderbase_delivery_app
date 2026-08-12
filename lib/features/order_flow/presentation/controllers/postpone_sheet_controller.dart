@@ -22,6 +22,15 @@ class PostponeSheetController {
     return '${d.day} ${_months[d.month - 1]} ${d.year}';
   }
 
+  /// Compact date (no year) used for the result summary, e.g. "13 سبتمبر".
+  String get shortDateLabel {
+    final d = date.value;
+    return '${d.day} ${_months[d.month - 1]}';
+  }
+
+  /// The re-attempt slot as shown on the result screen, e.g. "13 سبتمبر · 4:00 م".
+  String get display => '$shortDateLabel · $timeLabel';
+
   String get timeLabel {
     final t = time.value;
     final h = t.hourOfPeriod == 0 ? 12 : t.hourOfPeriod;

@@ -17,6 +17,8 @@ extension TextStyleEx on TextStyle {
   TextStyle get s18 => copyWith(fontSize: FontSizeManager.s18);
   TextStyle get s20 => copyWith(fontSize: FontSizeManager.s20);
   TextStyle get s24 => copyWith(fontSize: FontSizeManager.s24);
+  TextStyle get s28 => copyWith(fontSize: FontSizeManager.s28);
+  TextStyle get s36 => copyWith(fontSize: FontSizeManager.s36);
 
   // ── weights ──
   TextStyle get light => copyWith(fontWeight: FontWeightManager.light);

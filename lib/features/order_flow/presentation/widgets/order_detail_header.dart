@@ -3,7 +3,10 @@ part of '../imports/order_flow_imports.dart';
 /// White header — back row, order number + date, the transit status pill and
 /// the COD note.
 class _OrderDetailHeader extends StatelessWidget {
-  const _OrderDetailHeader();
+  const _OrderDetailHeader({required this.orderNum});
+
+  /// The order number label, including the leading '#'.
+  final String orderNum;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +53,7 @@ class _OrderDetailHeader extends StatelessWidget {
                         ),
                         8.szW,
                         Text(
-                          '#89289',
+                          orderNum,
                           textDirection: TextDirection.ltr,
                           style: const TextStyle()
                               .setMainTextColor

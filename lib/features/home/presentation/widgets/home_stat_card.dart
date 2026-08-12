@@ -34,7 +34,7 @@ class _HomeStatCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18.r), // radii exempt from 4px rule
+        borderRadius: BorderRadius.circular(AppCircular.r18), // radii exempt from 4px rule
         border: Border.all(color: AppColors.borderCardFaint),
         boxShadow: AppShadows.card,
       ),

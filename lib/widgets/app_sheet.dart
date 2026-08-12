@@ -11,15 +11,20 @@ Future<T?> showAppSheet<T>(BuildContext context, {required Widget child}) {
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     barrierColor: AppColors.scrim,
-    builder: (_) => Directionality(
-      textDirection: TextDirection.rtl,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.9,
+    builder: (sheetContext) {
+      final media = MediaQuery.of(sheetContext);
+      return Padding(
+        // Lift the sheet above the on-screen keyboard when a field is focused.
+        padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: media.size.height * 0.9),
+            child: child,
+          ),
         ),
-        child: child,
-      ),
-    ),
+      );
+    },
   );
 }
 
@@ -37,13 +42,15 @@ class SheetShell extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(26.r)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppCircular.r26)),
       ),
+      // Add the device's bottom inset (home indicator) so the sheet's last
+      // control never sits under it. showModalBottomSheet doesn't do this for us.
       padding: EdgeInsets.only(
         left: AppPadding.pW20,
         top: AppPadding.pH8,
         right: AppPadding.pW20,
-        bottom: AppPadding.pH24,
+        bottom: AppPadding.pH24 + MediaQuery.of(context).viewPadding.bottom,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -56,7 +63,7 @@ class SheetShell extends StatelessWidget {
               margin: EdgeInsets.symmetric(vertical: AppMargin.mH8),
               decoration: BoxDecoration(
                 color: AppColors.sheetGrabber,
-                borderRadius: BorderRadius.circular(3.r),
+                borderRadius: BorderRadius.circular(AppCircular.r3),
               ),
             ),
           ),
@@ -66,7 +73,11 @@ class SheetShell extends StatelessWidget {
               Row(
                 children: [
                   if (onBack != null) ...[
-                    _SheetIconButton(icon: AppAssets.svg.chevronRight, onTap: onBack!),
+                    _SheetIconButton(
+                      icon: AppAssets.svg.chevronRight,
+                      label: LocaleKeys.a11yBack.tr(),
+                      onTap: onBack!,
+                    ),
                     8.szW,
                   ],
                   Text(title, style: const TextStyle().setMainTextColor.s18.extraBold),
@@ -74,6 +85,7 @@ class SheetShell extends StatelessWidget {
               ),
               _SheetIconButton(
                 icon: AppAssets.svg.x,
+                label: LocaleKeys.a11yClose.tr(),
                 onTap: () => Navigator.of(context).maybePop(),
               ),
             ],
@@ -90,27 +102,39 @@ class SheetShell extends StatelessWidget {
 }
 
 class _SheetIconButton extends StatelessWidget {
-  const _SheetIconButton({required this.icon, required this.onTap});
+  const _SheetIconButton({required this.icon, required this.onTap, this.label});
   final String icon;
   final VoidCallback onTap;
+  final String? label;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 34.w, // icon button tile — no token
-      height: 34.h,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceMuted,
-        borderRadius: BorderRadius.circular(10.r),
-      ),
-      child: Center(
-        child: IconWidget(
-          icon: icon,
-          color: AppColors.textTertiary,
-          height: AppSize.sH18,
-          width: AppSize.sW18,
+    // Visual tile stays 34 (per the mockup); the tap area is padded out to a
+    // 44pt minimum so it's reliably hittable one-handed.
+    return Semantics(
+      button: true,
+      label: label,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minWidth: 44.w, minHeight: 44.h),
+        child: Center(
+          child: Container(
+            width: 34.w, // icon button tile — no token
+            height: 34.h,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceMuted,
+              borderRadius: BorderRadius.circular(AppCircular.r10),
+            ),
+            child: Center(
+              child: IconWidget(
+                icon: icon,
+                color: AppColors.textTertiary,
+                height: AppSize.sH18,
+                width: AppSize.sW18,
+              ),
+            ),
+          ),
         ),
-      ),
-    ).onClick(onTap: onTap);
+      ).onClick(onTap: onTap),
+    );
   }
 }

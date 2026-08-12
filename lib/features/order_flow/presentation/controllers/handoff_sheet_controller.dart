@@ -1,21 +1,15 @@
 part of '../imports/order_flow_imports.dart';
 
-/// Ephemeral state for the handoff sheet: whether the delivery photo has been
-/// captured and whether the change goes to the wallet. No `setState`.
+/// Ephemeral state for the handoff sheet: whether the proof-of-delivery photo
+/// has been captured. No `setState`. (Cash moved to the COD 2a flow.)
 class HandoffSheetController {
-  HandoffSheetController()
-      : photo = ValueNotifier(false),
-        wallet = ValueNotifier(true);
+  HandoffSheetController() : photo = ValueNotifier(false);
 
   final ValueNotifier<bool> photo;
-  final ValueNotifier<bool> wallet;
 
   void capture() => photo.value = true;
 
-  void toggleWallet() => wallet.value = !wallet.value;
-
   void dispose() {
     photo.dispose();
-    wallet.dispose();
   }
 }

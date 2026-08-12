@@ -9,7 +9,7 @@ class _NotesCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.postponedBannerBg,
-        borderRadius: BorderRadius.circular(18.r), // mockup radius
+        borderRadius: BorderRadius.circular(AppCircular.r18), // mockup radius
         border: Border.all(color: AppColors.postponedBorder),
       ),
       child: Column(

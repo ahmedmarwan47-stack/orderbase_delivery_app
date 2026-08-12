@@ -1,13 +1,23 @@
 part of '../../imports/order_flow_imports.dart';
 
-/// Outcome of the fail sheet.
+/// Which branch the fail sheet chose.
 enum FailResult { failed, postpone }
 
+/// Outcome of the fail sheet: the branch taken plus, for a recorded failure,
+/// the chosen reason (already translated) and the mandatory note.
+class FailOutcome {
+  const FailOutcome({required this.action, this.reasonLabel, this.note});
+
+  final FailResult action;
+  final String? reasonLabel;
+  final String? note;
+}
+
 /// Fail sheet (Order Flow.dc.html, `showFail`): pick a non-delivery reason,
-/// add a note, then either record the failure or hand off to the postpone
-/// sheet. Returns the chosen [FailResult].
-Future<FailResult?> showFailSheet(BuildContext context) {
-  return showAppSheet<FailResult>(context, child: const _FailSheet());
+/// add a mandatory note, then either record the failure or hand off to the
+/// postpone sheet. Returns the chosen [FailOutcome].
+Future<FailOutcome?> showFailSheet(BuildContext context) {
+  return showAppSheet<FailOutcome>(context, child: const _FailSheet());
 }
 
 /// StatefulWidget only to own the [FailSheetController] lifecycle — no
@@ -54,40 +64,73 @@ class _FailSheetState extends State<_FailSheet> {
           ),
           8.szH,
           Container(
-            constraints: BoxConstraints(minHeight: 58.h),
             width: double.infinity,
             decoration: BoxDecoration(
               color: AppColors.background,
               borderRadius: BorderRadius.circular(AppCircular.r13),
               border: Border.all(color: AppColors.borderHeader),
             ),
-            child: Text(
-              LocaleKeys.failNoteHint.tr(),
-              style: const TextStyle().setSecondaryColor.s14.regular,
-            ).paddingSymmetric(
-              horizontal: AppPadding.pW16,
-              vertical: AppPadding.pH12,
+            child: TextField(
+              controller: _controller.note,
+              textDirection: TextDirection.rtl,
+              minLines: 2,
+              maxLines: 4,
+              textInputAction: TextInputAction.newline,
+              style: const TextStyle().setMainTextColor.s14.regular,
+              decoration: InputDecoration(
+                isCollapsed: true,
+                border: InputBorder.none,
+                hintText: LocaleKeys.failNoteHint.tr(),
+                hintStyle: const TextStyle().setSecondaryColor.s14.regular,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: AppPadding.pW16,
+                  vertical: AppPadding.pH12,
+                ),
+              ),
             ),
           ),
           20.szH,
-          Container(
-            height: 54.h, // primary action height
-            decoration: BoxDecoration(
-              color: AppColors.dangerAccent,
-              borderRadius: BorderRadius.circular(15.r), // mockup radius
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              LocaleKeys.failSubmit.tr(),
-              style: const TextStyle().setWhite.s16.bold,
-            ),
-          ).onClick(onTap: () => Navigator.of(context).pop(FailResult.failed)),
+          // The failure record needs a reason and a note: keep the button muted
+          // and untappable until both are provided.
+          ValueListenableBuilder<bool>(
+            valueListenable: _controller.canSubmit,
+            builder: (_, canSubmit, _) {
+              return Container(
+                height: 54.h, // primary action height
+                decoration: BoxDecoration(
+                  color:
+                      canSubmit ? AppColors.dangerAccent : AppColors.borderDefault,
+                  borderRadius:
+                      BorderRadius.circular(AppCircular.r15), // mockup radius
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  LocaleKeys.failSubmit.tr(),
+                  style: const TextStyle()
+                      .setColor(
+                          canSubmit ? AppColors.surface : AppColors.chipCountMuted)
+                      .s16
+                      .bold,
+                ),
+              ).onClick(
+                onTap: canSubmit
+                    ? () => Navigator.of(context).pop(
+                          FailOutcome(
+                            action: FailResult.failed,
+                            reasonLabel: _controller.selectedReasonKey?.tr(),
+                            note: _controller.note.text.trim(),
+                          ),
+                        )
+                    : null,
+              );
+            },
+          ),
           8.szH,
           Container(
             height: 50.h, // secondary action height
             decoration: BoxDecoration(
               color: AppColors.surface,
-              borderRadius: BorderRadius.circular(15.r), // mockup radius
+              borderRadius: BorderRadius.circular(AppCircular.r15), // mockup radius
               border: Border.all(color: AppColors.borderDefault, width: 1.5),
             ),
             alignment: Alignment.center,
@@ -107,7 +150,10 @@ class _FailSheetState extends State<_FailSheet> {
                 ),
               ],
             ),
-          ).onClick(onTap: () => Navigator.of(context).pop(FailResult.postpone)),
+          ).onClick(
+            onTap: () => Navigator.of(context)
+                .pop(const FailOutcome(action: FailResult.postpone)),
+          ),
         ],
       ),
     );

@@ -12,7 +12,7 @@ class _HomeProgressSeg extends StatelessWidget {
         height: AppSize.sH6,
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(3.r), // radii exempt from 4px rule
+          borderRadius: BorderRadius.circular(AppCircular.r3), // radii exempt from 4px rule
         ),
       ),
     );

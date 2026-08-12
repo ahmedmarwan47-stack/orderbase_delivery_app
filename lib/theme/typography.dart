@@ -1,5 +1,10 @@
 import 'package:flutter/widgets.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+/// The Noto Kufi Arabic family, bundled locally under `assets/fonts/` and
+/// declared in `pubspec.yaml`. Previously fetched at runtime via `google_fonts`,
+/// which left the Arabic-first UI blank/fallback on a first launch offline — the
+/// normal field condition for a courier. Bundling makes type work with no network.
+const String kFontFamily = 'Noto Kufi Arabic';
 
 /// Font sizes follow the 4-pixel rule: multiples of 4, with 14 and 18 as the
 /// only exceptions (see /CLAUDE.md). Line heights below are a best-effort
@@ -12,7 +17,8 @@ import 'package:google_fonts/google_fonts.dart';
 /// at both 700 and 800). Call `.copyWith(fontWeight: ...)` at the use site.
 abstract final class AppTypography {
   static TextStyle _style(double fontSize, double lineHeight) {
-    return GoogleFonts.notoKufiArabic(
+    return TextStyle(
+      fontFamily: kFontFamily,
       fontSize: fontSize,
       height: lineHeight / fontSize,
       color: const Color(0xFF1A1919),

@@ -2,7 +2,10 @@ part of '../imports/order_flow_imports.dart';
 
 /// Customer block — label + name, then the call / whatsapp action buttons.
 class _CustomerSection extends StatelessWidget {
-  const _CustomerSection();
+  const _CustomerSection({required this.name});
+
+  /// The customer's display name.
+  final String name;
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +31,7 @@ class _CustomerSection extends StatelessWidget {
               ],
             ),
             Text(
-              'Mohmaed Hamdy',
-              textDirection: TextDirection.ltr,
+              name,
               style: const TextStyle().setMainTextColor.s16.bold,
             ),
           ],

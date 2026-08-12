@@ -22,7 +22,7 @@ class _PickupConfirmBar extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: AppColors.inkFill,
-              borderRadius: BorderRadius.circular(15.r), // confirm button radius
+              borderRadius: BorderRadius.circular(AppCircular.r15), // confirm button radius
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

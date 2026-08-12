@@ -37,8 +37,6 @@ dependencies:
 
   # Renders the icon set ported from the design project's assets/icons/icon-data.js
   flutter_svg: ^2.2.1
-  # Noto Kufi Arabic, matching the mockups' font
-  google_fonts: ^6.3.2
   # Arabic (RTL) locale support for MaterialApp
   flutter_localizations:
     sdk: flutter
@@ -79,8 +77,23 @@ flutter:
   assets:
     - assets/icons/
     - assets/images/
+    - assets/images/result/
     - assets/merchant/
     - assets/translations/
+
+  # Noto Kufi Arabic — bundled locally (was runtime-fetched via google_fonts).
+  # Weights match the design system: 400 regular, 600 semibold, 700 bold, 800 extrabold.
+  fonts:
+    - family: Noto Kufi Arabic
+      fonts:
+        - asset: assets/fonts/NotoKufiArabic-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/NotoKufiArabic-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/NotoKufiArabic-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/NotoKufiArabic-ExtraBold.ttf
+          weight: 800
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

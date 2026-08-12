@@ -43,10 +43,13 @@ abstract final class AppSize {
   static double get sW16 => 16.w;
   static double get sW18 => 18.w;
   static double get sW20 => 20.w;
+  static double get sW22 => 22.w;
   static double get sW24 => 24.w;
+  static double get sW28 => 28.w;
   static double get sW40 => 40.w;
   static double get sW44 => 44.w;
   static double get sW48 => 48.w;
+  static double get sW56 => 56.w;
   static double get sW64 => 64.w;
   static double get sW88 => 88.w;
 }
@@ -94,14 +97,22 @@ abstract final class AppMargin {
 /// Corner radii. Mockups use 8/12/13/14/16/20/22/24 (radii are exempt from the
 /// 4px rule). `.r` keeps them proportional under screenutil.
 abstract final class AppCircular {
+  static double get r3 => 3.r; // grabber / progress pills
+  static double get r7 => 7.r; // pay pill
   static double get r8 => 8.r;
+  static double get r9 => 9.r;
+  static double get r10 => 10.r;
+  static double get r11 => 11.r;
   static double get r12 => 12.r;
   static double get r13 => 13.r;
   static double get r14 => 14.r;
+  static double get r15 => 15.r; // primary buttons
   static double get r16 => 16.r;
+  static double get r18 => 18.r; // money / large cards
   static double get r20 => 20.r;
   static double get r22 => 22.r;
   static double get r24 => 24.r;
+  static double get r26 => 26.r; // bottom-sheet top corners
   static double get infinity => 999.r;
 }
 
@@ -115,6 +126,8 @@ abstract final class FontSizeManager {
   static double get s18 => 18.sp;
   static double get s20 => 20.sp;
   static double get s24 => 24.sp;
+  static double get s28 => 28.sp; // auth screen titles
+  static double get s36 => 36.sp; // COD amount entry — the cash figure
 }
 
 /// Font weights. Mockup headings go up to w800, so `extraBold` is included.

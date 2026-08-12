@@ -1,16 +1,41 @@
 part of '../../imports/order_flow_imports.dart';
 
-/// Handoff sheet (Order Flow.dc.html, `showHandoff`): capture a delivery photo,
-/// confirm the collected cash, optionally move the change to the wallet, then
-/// confirm. Returns `true` when delivery is confirmed.
-Future<bool?> showHandoffSheet(BuildContext context) {
-  return showAppSheet<bool>(context, child: const _HandoffSheet());
+/// Handoff sheet (Order Flow.dc.html, `showHandoff`): capture the proof-of-
+/// delivery photo, then confirm. Cash is no longer collected here — for a COD
+/// order the caller runs the COD 2a flow after this; a prepaid order has no
+/// cash step at all. Returns `true` when the photo step is confirmed.
+Future<bool?> showHandoffSheet(
+  BuildContext context, {
+  bool cod = true,
+  String orderNum = '#89289',
+  String customerName = 'محمد حمدي',
+}) {
+  return showAppSheet<bool>(
+    context,
+    child: _HandoffSheet(
+      cod: cod,
+      orderNum: orderNum,
+      customerName: customerName,
+    ),
+  );
 }
 
 /// StatefulWidget only to own the [HandoffSheetController] lifecycle — no
 /// `setState`; reactive parts rebuild via [ValueListenableBuilder].
 class _HandoffSheet extends StatefulWidget {
-  const _HandoffSheet();
+  const _HandoffSheet({
+    required this.cod,
+    required this.orderNum,
+    required this.customerName,
+  });
+
+  /// COD order → the primary button leads on to cash collection (COD 2a);
+  /// prepaid → it confirms delivery directly.
+  final bool cod;
+
+  /// The order number (with '#') and customer name shown in the header line.
+  final String orderNum;
+  final String customerName;
 
   @override
   State<_HandoffSheet> createState() => _HandoffSheetState();
@@ -38,10 +63,11 @@ class _HandoffSheetState extends State<_HandoffSheet> {
               style: const TextStyle().setSecondaryColor.s14.regular,
               children: [
                 TextSpan(
-                  text: '#89289',
+                  text: widget.orderNum,
                   style: const TextStyle().setTertiaryColor.bold,
                 ),
-                TextSpan(text: LocaleKeys.handoffOrderCustomer.tr()),
+                // i18n: " — " separator between order number and customer name.
+                TextSpan(text: ' — ${widget.customerName}'),
               ],
             ),
           ),
@@ -64,33 +90,48 @@ class _HandoffSheetState extends State<_HandoffSheet> {
             builder: (_, captured, _) =>
                 captured ? _capturedPhoto() : _capturePrompt(),
           ),
-          16.szH,
-          _codCard(),
-          16.szH,
-          Container(
-            height: AppSize.sH56,
-            decoration: BoxDecoration(
-              color: AppColors.inkFill,
-              borderRadius: BorderRadius.circular(15.r), // mockup radius
-            ),
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconWidget(
-                  icon: AppAssets.svg.check,
-                  color: AppColors.surface,
-                  height: AppSize.sH20,
-                  width: AppSize.sW20,
+          20.szH,
+          // The proof photo is required (red *): the confirm button stays
+          // disabled (muted fill + text, no tap) until a photo is captured.
+          ValueListenableBuilder<bool>(
+            valueListenable: _controller.photo,
+            builder: (_, captured, _) {
+              final fg =
+                  captured ? AppColors.surface : AppColors.chipCountMuted;
+              return Container(
+                height: AppSize.sH56,
+                decoration: BoxDecoration(
+                  color: captured ? AppColors.inkFill : AppColors.borderDefault,
+                  borderRadius:
+                      BorderRadius.circular(AppCircular.r15), // mockup radius
                 ),
-                8.szW,
-                Text(
-                  LocaleKeys.handoffTitle.tr(),
-                  style: const TextStyle().setWhite.s16.bold,
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconWidget(
+                      icon:
+                          widget.cod ? AppAssets.svg.cash : AppAssets.svg.check,
+                      color: fg,
+                      height: AppSize.sH20,
+                      width: AppSize.sW20,
+                    ),
+                    8.szW,
+                    Text(
+                      widget.cod
+                          ? LocaleKeys.handoffCollectNext.tr()
+                          : LocaleKeys.handoffTitle.tr(),
+                      style: const TextStyle().setColor(fg).s16.bold,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ).onClick(onTap: () => Navigator.of(context).pop(true)),
+              ).onClick(
+                onTap: captured
+                    ? () => Navigator.of(context).pop(true)
+                    : null,
+              );
+            },
+          ),
         ],
       ),
     );
@@ -112,7 +153,7 @@ class _HandoffSheetState extends State<_HandoffSheet> {
             height: 52.h,
             decoration: BoxDecoration(
               color: AppColors.photoTile,
-              borderRadius: BorderRadius.circular(14.r), // mockup radius
+              borderRadius: BorderRadius.circular(AppCircular.r14), // mockup radius
             ),
             child: Center(
               child: IconWidget(
@@ -150,19 +191,34 @@ class _HandoffSheetState extends State<_HandoffSheet> {
             PositionedDirectional(
               top: 10.h,
               start: 10.w,
-              child: Container(
-                width: 30.w,
-                height: 30.h,
-                decoration: const BoxDecoration(
-                  color: AppColors.greenAccent,
-                  shape: BoxShape.circle,
+              // Confirm beat: the "captured" check settles in with a small
+              // scale + fade the instant the photo lands. Instant under
+              // Reduce Motion. This subtree is rebuilt only when the photo is
+              // taken, so the one-shot tween plays exactly once.
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: 1),
+                duration: MediaQuery.of(context).disableAnimations
+                    ? Duration.zero
+                    : const Duration(milliseconds: 260),
+                curve: Curves.easeOutCubic,
+                builder: (_, t, child) => Opacity(
+                  opacity: t.clamp(0.0, 1.0),
+                  child: Transform.scale(scale: 0.7 + 0.3 * t, child: child),
                 ),
-                child: Center(
-                  child: IconWidget(
-                    icon: AppAssets.svg.check,
-                    color: AppColors.surface,
-                    height: 17.h,
-                    width: 17.w,
+                child: Container(
+                  width: 30.w,
+                  height: 30.h,
+                  decoration: const BoxDecoration(
+                    color: AppColors.greenAccent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: IconWidget(
+                      icon: AppAssets.svg.check,
+                      color: AppColors.surface,
+                      height: 17.h,
+                      width: 17.w,
+                    ),
                   ),
                 ),
               ),
@@ -174,7 +230,7 @@ class _HandoffSheetState extends State<_HandoffSheet> {
                 height: 32.h,
                 decoration: BoxDecoration(
                   color: AppColors.scrim,
-                  borderRadius: BorderRadius.circular(9.r), // mockup radius
+                  borderRadius: BorderRadius.circular(AppCircular.r9), // mockup radius
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -200,141 +256,4 @@ class _HandoffSheetState extends State<_HandoffSheet> {
     );
   }
 
-  Widget _codCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(AppCircular.r16),
-        border: Border.all(color: AppColors.borderHeader),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                LocaleKeys.handoffCodRequired.tr(),
-                style: const TextStyle().setSecondaryColor.s14.regular,
-              ),
-              Text(
-                LocaleKeys.handoffCodAmount.tr(),
-                style: const TextStyle().setMainTextColor.s16.extraBold.tabular,
-              ),
-            ],
-          ),
-          16.szH,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                LocaleKeys.handoffCollectedLabel.tr(),
-                style: const TextStyle().setMainTextColor.s14.bold,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(11.r), // mockup radius
-                  border: Border.all(color: AppColors.inkFill, width: 1.5),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '1,250',
-                      style: const TextStyle().setMainTextColor.s18.extraBold.tabular,
-                    ),
-                    8.szW,
-                    Text(
-                      LocaleKeys.handoffEgpSuffix.tr(),
-                      style: const TextStyle().setSecondaryColor.s12.regular,
-                    ),
-                  ],
-                ).paddingSymmetric(
-                  horizontal: AppPadding.pW12,
-                  vertical: AppPadding.pH8,
-                ),
-              ),
-            ],
-          ),
-          Container(
-            margin: EdgeInsets.only(top: AppMargin.mH16),
-            padding: EdgeInsets.only(top: AppPadding.pH12),
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: AppColors.summaryDivider)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      IconWidget(
-                        icon: AppAssets.svg.wallet,
-                        color: AppColors.postponedText,
-                        height: AppSize.sH18,
-                        width: AppSize.sW18,
-                      ),
-                      8.szW,
-                      Flexible(
-                        child: Text(
-                          LocaleKeys.handoffWalletToggle.tr(),
-                          style: const TextStyle()
-                              .setColor(AppColors.textBody)
-                              .s14
-                              .semiBold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                8.szW,
-                ValueListenableBuilder<bool>(
-                  valueListenable: _controller.wallet,
-                  builder: (_, on, _) => _WalletToggle(on: on),
-                ),
-              ],
-            ).onClick(onTap: _controller.toggleWallet),
-          ),
-        ],
-      ).paddingAll(AppPadding.pH16),
-    );
-  }
-}
-
-/// The wallet on/off switch — knob sits at the RTL end when on.
-class _WalletToggle extends StatelessWidget {
-  const _WalletToggle({required this.on});
-  final bool on;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 46.w, // fixed track width from the mockup
-      decoration: BoxDecoration(
-        color: on ? AppColors.greenAccent : AppColors.dashedBorder,
-        borderRadius: BorderRadius.circular(15.r), // mockup radius
-      ),
-      child: Row(
-        // flex-end (mockup "on") maps to the end of the RTL row.
-        mainAxisAlignment: on ? MainAxisAlignment.end : MainAxisAlignment.start,
-        children: [
-          Container(
-            width: 21.w,
-            height: 21.h,
-            decoration: const BoxDecoration(
-              color: AppColors.surface,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0x33000000),
-                  offset: Offset(0, 1),
-                  blurRadius: 2,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ).paddingAll(AppPadding.pH4),
-    );
-  }
 }

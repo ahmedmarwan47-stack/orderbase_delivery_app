@@ -19,7 +19,7 @@ class HomeIndicator extends StatelessWidget {
         height: 5.h,
         decoration: BoxDecoration(
           color: AppColors.textPrimary.withValues(alpha: 0.85),
-          borderRadius: BorderRadius.circular(3.r),
+          borderRadius: BorderRadius.circular(AppCircular.r3),
         ),
       ),
     );

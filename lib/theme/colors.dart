@@ -24,7 +24,7 @@ abstract final class AppColors {
   static const textPrimary = Color(0xFF1A1919);
   static const textSecondary = Color(0xFF6B6B73);
   static const textTertiary = Color(0xFF52525B);
-  static const textMuted = Color(0xFF8A7A72); // address lines, hints
+  static const textMuted = Color(0xFF7E6E65); // address lines, hints — AA on white (4.88:1)
   static const textBody = Color(0xFF3F3F46); // long-form address / body copy
 
   // Brand
@@ -63,6 +63,11 @@ abstract final class AppColors {
   // Neutral icon-tile background (stat card "in progress" tile)
   static const iconTileNeutral = Color(0xFFF2F1EE);
 
+  // COD collection (COD Collection.dc.html, 2a): the "excess → wallet" accent —
+  // brighter than the postponed ambers; borders the amount field and the
+  // over-collected state.
+  static const codExcessAmber = Color(0xFFE0AC4E);
+
   // Selected / high-emphasis fill (chips, primary buttons)
   static const inkFill = Color(0xFF1A1919);
 
@@ -100,4 +105,35 @@ abstract final class AppColors {
   static const photoGreenWash = Color(0x2416A34A); // rgba(22,163,74,.14) captured-photo overlay
   static const reasonRowBg = Color(0xFFF8F7F5); // unselected reason row
   static const reasonDotBorder = Color(0xFFCFCEC9); // unselected reason radio ring
+
+  // Failure States (Failure States.dc.html) — the not-delivered flow.
+  static const transitPillBg = Color(0xFFE7F0FB); // pale "في الطريق" pill / tile bg
+  static const failWarnAmberBorder = Color(0xFFF0DFBC); // 1b "last nudge" warning card border
+  static const failWarnAmberText = Color(0xFF7A4A00); // 1b warning body text
+  static const failWarnRedBorder = Color(0xFFF5CFCE); // 1d mismatch warning card border
+  static const failWarnRedText = Color(0xFF8E1512); // 1d mismatch warning body text
+  static const retryNowSubtext = Color(0xFF4A6B55); // 1c retry-now green caption
+  static const darkCardRowBg = Color(0xFF2A2927); // 1g return-item row on the dark card
+  static const undoTrack = Color(0xFF3A3937); // 1f undo progress track (unfilled)
+  static const mutedOnDark = Color(0xFFA3A29E); // warm muted text on dark cards (1f/1g)
+
+  // Settlement (Settlement.dc.html) — dark "cash in hand" card details.
+  static const darkCardHairline = Color(0x1FFFFFFF); // rgba(255,255,255,.12) breakdown divider on the dark card
+  static const walletAmberOnDark = Color(0xFFF0B75A); // softer amber for the wallet figure on ink (brighter than codExcessAmber)
+
+  // Home variants (Home Directions.dc.html 1b/1c/2a) — mockup hexes with no
+  // existing token. Grown from the Glance/Compact/Flat explorations.
+  static const flatMuted = Color(0xFF85847F); // Flat (2a) muted labels / meta
+  static const flatBadgeBg = Color(0xFFEDECE8); // Flat (2a) numbered stop badge
+  static const flatDivider = Color(0xFFE8E7E3); // Flat (2a) hairline dividers / circle button border
+  static const flatBlack = Color(0xFF000000); // Flat (2a) pure-black primary button + banner text
+  static const flatBannerBg = Color(0xFF898989); // Flat (2a) grey "today's overview" banner
+  static const flatMutedDot = Color(0xFFC6C5C0); // Flat (2a) chevron + meta separator dot
+  static const darkTileLabel = Color(0xFFCCCCD0); // Compact (1c) muted label on the dark collection tile
+  static const cashSuffixGreen = Color(0xFF7BDDA3); // lighter green "جم" suffix on the dark cash banner/tile
+  static const cashTileWash = Color(0x263BD07A); // rgba(59,208,122,.15) icon-tile wash on the dark cash banner
+  static const onlineBarBorder = Color(0x4016A34A); // rgba(22,163,74,.25) "you're online" bar border (Glance 1b)
+  static const onlineDotGlow = Color(0x2E16A34A); // rgba(22,163,74,.18) green online-dot glow (Glance 1b)
+  static const softDropShadow = Color(0x2E000000); // rgba(0,0,0,.18) soft card drop shadow (Flat/Compact route cards)
+  static const deepDropShadow = Color(0x80000000); // rgba(0,0,0,.5) deep drop shadow on the dark cash banner (Glance 1b)
 }

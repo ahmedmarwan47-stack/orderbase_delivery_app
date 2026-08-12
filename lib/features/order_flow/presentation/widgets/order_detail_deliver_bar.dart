@@ -23,7 +23,7 @@ class _DeliverBar extends StatelessWidget {
         height: AppSize.sH56,
         decoration: BoxDecoration(
           color: AppColors.inkFill,
-          borderRadius: BorderRadius.circular(15.r), // mockup radius
+          borderRadius: BorderRadius.circular(AppCircular.r15), // mockup radius
         ),
         alignment: Alignment.center,
         child: Row(

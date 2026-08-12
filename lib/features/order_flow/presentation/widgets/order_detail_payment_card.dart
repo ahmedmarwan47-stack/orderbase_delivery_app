@@ -2,14 +2,17 @@ part of '../imports/order_flow_imports.dart';
 
 /// Dark cash-on-delivery payment card.
 class _PaymentCard extends StatelessWidget {
-  const _PaymentCard();
+  const _PaymentCard({required this.amount});
+
+  /// The cash-to-collect amount label, e.g. "1,200".
+  final String amount;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paymentCardBg,
-        borderRadius: BorderRadius.circular(18.r), // mockup radius
+        borderRadius: BorderRadius.circular(AppCircular.r18), // mockup radius
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -27,7 +30,7 @@ class _PaymentCard extends StatelessWidget {
               4.szH,
               Text.rich(
                 TextSpan(
-                  text: '1,200',
+                  text: amount,
                   style: const TextStyle()
                       .setWhite
                       .s24

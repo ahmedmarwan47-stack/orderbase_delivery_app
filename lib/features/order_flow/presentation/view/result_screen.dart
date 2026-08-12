@@ -8,12 +8,18 @@ enum ResultKind { delivered, failed, postponed }
 /// row is variant-specific, and two follow-up actions. Defaults match the
 /// mockup's sample data for order #89289 (Arabic defaults resolve through
 /// [LocaleKeys] when not supplied).
-class ResultScreen extends StatelessWidget {
+///
+/// The arrival is authored (see [_ResultScreenState]): photo/badge, verdict,
+/// summary, and actions settle in a short capped stagger so closing a stop
+/// *feels* complete. Each outcome carries the motion at a different weight —
+/// a calm settle for delivered, a quieter one for failed — and the whole
+/// sequence collapses to instant when the platform asks to reduce motion.
+class ResultScreen extends StatefulWidget {
   const ResultScreen({
     super.key,
     this.kind = ResultKind.delivered,
     this.orderNum = '#89289',
-    this.customer = 'Mohmaed Hamdy',
+    this.customer = 'محمد حمدي',
     this.codAmount,
     this.showWalletChange = true,
     this.walletChange,
@@ -34,6 +40,9 @@ class ResultScreen extends StatelessWidget {
   final VoidCallback? onContinue;
   final VoidCallback? onHome;
 
+  @override
+  State<ResultScreen> createState() => _ResultScreenState();
+
   Color get _tint => switch (kind) {
         ResultKind.delivered => AppColors.greenAccent,
         ResultKind.postponed => AppColors.postponedText,
@@ -52,6 +61,32 @@ class ResultScreen extends StatelessWidget {
         ResultKind.failed => AppAssets.svg.fail,
       };
 
+  /// Delivered / failed show the isolated result photo; postponed keeps the
+  /// tinted clock badge.
+  Widget _badge() {
+    final photo = switch (kind) {
+      ResultKind.delivered => AppAssets.img.resultSuccess,
+      ResultKind.failed => AppAssets.img.resultFailure,
+      ResultKind.postponed => null,
+    };
+    if (photo != null) {
+      return Image.asset(photo, height: 168.h, fit: BoxFit.contain);
+    }
+    return Container(
+      width: AppSize.sW88 + AppSize.sW8, // 96 badge
+      height: AppSize.sH88 + AppSize.sH8,
+      decoration: BoxDecoration(color: _tintBg, shape: BoxShape.circle),
+      child: Center(
+        child: IconWidget(
+          icon: _icon,
+          color: _tint,
+          height: 52.h, // large badge glyph
+          width: 52.w,
+        ),
+      ),
+    );
+  }
+
   String get _title => switch (kind) {
         ResultKind.delivered => LocaleKeys.resultDeliveredTitle,
         ResultKind.postponed => LocaleKeys.resultPostponedTitle,
@@ -65,6 +100,82 @@ class ResultScreen extends StatelessWidget {
         ResultKind.failed => LocaleKeys.resultFailedSub,
       }
           .tr();
+}
+
+class _ResultScreenState extends State<ResultScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _entrance;
+
+  /// Motion character by outcome: delivered gets the fullest, calmest settle;
+  /// failed the shortest and quietest; postponed sits between.
+  Duration get _entranceDuration => switch (widget.kind) {
+        ResultKind.delivered => const Duration(milliseconds: 500),
+        ResultKind.postponed => const Duration(milliseconds: 460),
+        ResultKind.failed => const Duration(milliseconds: 420),
+      };
+
+  /// How far the photo/badge scales up on entry — a fuller settle for a
+  /// delivered handoff, barely any for a failed one.
+  double get _badgeScaleFrom => switch (widget.kind) {
+        ResultKind.delivered => 0.90,
+        ResultKind.postponed => 0.93,
+        ResultKind.failed => 0.96,
+      };
+
+  @override
+  void initState() {
+    super.initState();
+    _entrance = AnimationController(vsync: this, duration: _entranceDuration);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Honor Reduce Motion: jump to the settled state instead of animating.
+    if (MediaQuery.of(context).disableAnimations) {
+      _entrance.value = 1;
+    } else if (_entrance.status == AnimationStatus.dismissed) {
+      _entrance.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _entrance.dispose();
+    super.dispose();
+  }
+
+  /// Wraps [child] in a capped, interval-gated fade + rise (+ optional scale)
+  /// driven by [_entrance]. Exponential ease-out; the settled default (t=1) is
+  /// a plain, fully-visible child, so a stalled controller never strands
+  /// content.
+  Widget _rise({
+    required double begin,
+    required double end,
+    double dy = 10,
+    double scaleFrom = 1.0,
+    required Widget child,
+  }) {
+    final interval = Interval(begin, end, curve: Curves.easeOutCubic);
+    return AnimatedBuilder(
+      animation: _entrance,
+      child: child,
+      builder: (_, ch) {
+        final t = interval.transform(_entrance.value);
+        Widget out = Transform.translate(
+          offset: Offset(0, (1 - t) * dy),
+          child: ch,
+        );
+        if (scaleFrom != 1.0) {
+          out = Transform.scale(
+            scale: scaleFrom + (1 - scaleFrom) * t,
+            child: out,
+          );
+        }
+        return Opacity(opacity: t, child: out);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,52 +193,71 @@ class ResultScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Center(
-                      child: Container(
-                        width: AppSize.sW88 + AppSize.sW8, // 96 badge
-                        height: AppSize.sH88 + AppSize.sH8,
-                        decoration: BoxDecoration(color: _tintBg, shape: BoxShape.circle),
-                        child: Center(
-                          child: IconWidget(
-                            icon: _icon,
-                            color: _tint,
-                            height: 52.h, // large badge glyph
-                            width: 52.w,
-                          ),
-                        ),
+                      child: _rise(
+                        begin: 0,
+                        end: 0.55,
+                        dy: 6,
+                        scaleFrom: _badgeScaleFrom,
+                        child: widget._badge(),
                       ),
                     ),
                     20.szH,
-                    Text(
-                      _title,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle().setMainTextColor.s24.extraBold,
+                    _rise(
+                      begin: 0.12,
+                      end: 0.6,
+                      child: Text(
+                        widget._title,
+                        textAlign: TextAlign.center,
+                        style:
+                            const TextStyle().setMainTextColor.s24.extraBold,
+                      ),
                     ),
                     8.szH,
-                    Text(
-                      _sub,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle()
-                          .setSecondaryColor
-                          .s14
-                          .regular
-                          .withHeight(1.6),
+                    _rise(
+                      begin: 0.22,
+                      end: 0.72,
+                      child: Text(
+                        widget._sub,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle()
+                            .setSecondaryColor
+                            .s14
+                            .regular
+                            .withHeight(1.6),
+                      ),
                     ),
                     20.szH,
-                    _ResultSummaryCard(
-                      kind: kind,
-                      orderNum: orderNum,
-                      customer: customer,
-                      codAmount: codAmount ?? LocaleKeys.resultDefaultCod.tr(),
-                      showWalletChange: showWalletChange,
-                      walletChange: walletChange ?? LocaleKeys.resultDefaultWallet.tr(),
-                      reasonLabel: reasonLabel ?? LocaleKeys.resultDefaultReason.tr(),
-                      postponeDisplay:
-                          postponeDisplay ?? LocaleKeys.resultDefaultPostpone.tr(),
+                    _rise(
+                      begin: 0.34,
+                      end: 0.9,
+                      dy: 12,
+                      child: _ResultSummaryCard(
+                        kind: widget.kind,
+                        orderNum: widget.orderNum,
+                        customer: widget.customer,
+                        codAmount:
+                            widget.codAmount ?? LocaleKeys.resultDefaultCod.tr(),
+                        showWalletChange: widget.showWalletChange,
+                        walletChange: widget.walletChange ??
+                            LocaleKeys.resultDefaultWallet.tr(),
+                        reasonLabel: widget.reasonLabel ??
+                            LocaleKeys.resultDefaultReason.tr(),
+                        postponeDisplay: widget.postponeDisplay ??
+                            LocaleKeys.resultDefaultPostpone.tr(),
+                      ),
                     ),
                   ],
                 ).paddingSymmetric(horizontal: 36.w), // wide mockup gutter
               ),
-              _ResultActions(onContinue: onContinue, onHome: onHome),
+              _rise(
+                begin: 0.46,
+                end: 1.0,
+                dy: 12,
+                child: _ResultActions(
+                  onContinue: widget.onContinue,
+                  onHome: widget.onHome,
+                ),
+              ),
               const HomeIndicator(),
             ],
           ),

@@ -21,6 +21,10 @@ class FlowOrder {
   final bool cod; // cash-on-delivery
   final String? pay; // status label for non-active/paid rows ("مدفوع", ...)
   final String? amount; // COD amount label, e.g. "1,200"
+
+  /// The COD amount as an int (e.g. "1,200" → 1200) for the collection flow.
+  /// Falls back to 0 when there is no amount (prepaid rows).
+  int get codDue => int.tryParse((amount ?? '').replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
 }
 
 /// Sample data identical to the mockup's `orderList`, so the ported screen is

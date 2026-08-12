@@ -40,13 +40,17 @@ class BottomNav extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _item(NavTab.home, AppAssets.svg.home, LocaleKeys.navHome.tr()),
+                _item(NavTab.home, AppAssets.svg.home, LocaleKeys.navHome.tr(),
+                    activeIcon: AppAssets.svg.homeFilled),
                 _item(NavTab.orders, AppAssets.svg.orders,
-                    LocaleKeys.navOrders.tr()),
+                    LocaleKeys.navOrders.tr(),
+                    activeIcon: AppAssets.svg.ordersFilled),
                 _item(NavTab.notifications, AppAssets.svg.bell,
                     LocaleKeys.navNotifications.tr(),
+                    activeIcon: AppAssets.svg.bellFilled,
                     badge: notificationsBadge),
-                _item(NavTab.more, AppAssets.svg.more, LocaleKeys.navMore.tr()),
+                _item(NavTab.more, AppAssets.svg.more, LocaleKeys.navMore.tr(),
+                    activeIcon: AppAssets.svg.moreFilled),
               ],
             ),
           ),
@@ -56,9 +60,24 @@ class BottomNav extends StatelessWidget {
     );
   }
 
-  Widget _item(NavTab tab, String icon, String label, {bool badge = false}) {
+  Widget _item(NavTab tab, String icon, String label,
+      {String? activeIcon, bool badge = false}) {
     final isActive = tab == active;
     final color = isActive ? AppColors.dangerAccent : AppColors.textSecondary;
+    // Active tab renders the filled (solid) glyph; inactive keeps the stroke
+    // one. Both are still recolored via IconWidget's srcIn filter.
+    final displayIcon = isActive ? (activeIcon ?? icon) : icon;
+    return MergeSemantics(
+      child: Semantics(
+        button: true,
+        selected: isActive,
+        child: _itemBody(tab, displayIcon, label, color, isActive, badge),
+      ),
+    );
+  }
+
+  Widget _itemBody(NavTab tab, String icon, String label, Color color,
+      bool isActive, bool badge) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [

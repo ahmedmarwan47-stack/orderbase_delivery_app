@@ -21,6 +21,7 @@ class _QueueSearchHeader extends StatelessWidget {
                 icon: AppAssets.svg.chevronRight,
                 onTap: vc.closeSearch,
                 size: AppSize.sH40,
+                label: LocaleKeys.a11yBack.tr(),
               ),
               12.szW,
               Expanded(child: _SearchField(vc: vc)),
@@ -101,21 +102,31 @@ class _ClearChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: AppSize.sW24,
-      height: AppSize.sH24,
-      decoration: const BoxDecoration(
-        color: AppColors.sheetGrabber,
-        shape: BoxShape.circle,
-      ),
-      child: Center(
-        child: IconWidget(
-          icon: AppAssets.svg.x,
-          color: AppColors.textTertiary,
-          height: AppSize.sH14,
-          width: AppSize.sW14,
+    // 24pt dot visual, but a 44pt tap area so it's reliably hittable.
+    return Semantics(
+      button: true,
+      label: LocaleKeys.a11yClearSearch.tr(),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minWidth: 44.w, minHeight: 44.h),
+        child: Center(
+          child: Container(
+            width: AppSize.sW24,
+            height: AppSize.sH24,
+            decoration: const BoxDecoration(
+              color: AppColors.sheetGrabber,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: IconWidget(
+                icon: AppAssets.svg.x,
+                color: AppColors.textTertiary,
+                height: AppSize.sH14,
+                width: AppSize.sW14,
+              ),
+            ),
+          ),
         ),
-      ),
-    ).onClick(onTap: onTap);
+      ).onClick(onTap: onTap),
+    );
   }
 }

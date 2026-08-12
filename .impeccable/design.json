@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-12T00:00:00Z",
+  "title": "Design System: Orderbase Courier",
+  "extensions": {
+    "colorMeta": {
+      "ink": { "role": "primary", "displayName": "Ink Black", "canonical": "#1A1919", "tonalRamp": ["#0D0D0D", "#1A1919", "#2E2D2D", "#4A4948", "#6B6B6A", "#94938F", "#C2C0BB", "#EDEBE6"] },
+      "brand-red": { "role": "secondary", "displayName": "Signal Red", "canonical": "#E72B29", "tonalRamp": ["#5E0E0D", "#8A1614", "#B81D1B", "#E72B29", "#EE5250", "#F37F7D", "#F8ABAA", "#FCD6D5"] },
+      "transit-blue": { "role": "tertiary", "displayName": "Transit Blue", "canonical": "#1F6FD6", "tonalRamp": ["#0C2C56", "#123F7A", "#18579F", "#1F6FD6", "#4B8CDE", "#78A9E6", "#A5C6EF", "#D2E2F7"] },
+      "delivered-green": { "role": "tertiary", "displayName": "Delivered Green", "canonical": "#15803D", "tonalRamp": ["#08361A", "#0C4E27", "#116634", "#15803D", "#1FA352", "#4FBB77", "#8FD4A6", "#CFEDD9"] },
+      "postponed-amber": { "role": "tertiary", "displayName": "Postponed Amber", "canonical": "#9A5A00", "tonalRamp": ["#3D2400", "#5C3600", "#7B4800", "#9A5A00", "#C07A1F", "#D89E52", "#E9C48E", "#F5E4C8"] },
+      "failed-red": { "role": "tertiary", "displayName": "Failed Red", "canonical": "#B8120F", "tonalRamp": ["#4A0706", "#6E0B09", "#92100D", "#B8120F", "#D53E3B", "#E3706E", "#EFA3A2", "#F9D3D2"] },
+      "paper": { "role": "neutral", "displayName": "Warm Paper", "canonical": "#F6F5F3", "tonalRamp": ["#3B3A37", "#5C5A56", "#807D78", "#A5A29C", "#C9C6C0", "#E4E2DD", "#F6F5F3", "#FCFBFA"] },
+      "surface-muted": { "role": "neutral", "displayName": "Muted Surface", "canonical": "#F4F3F0", "tonalRamp": ["#3A3934", "#5A584F", "#7E7B6F", "#A3A093", "#C7C4B9", "#E2E0D8", "#F4F3F0", "#FBFAF8"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Cash amounts and headline totals — the heaviest moment on a screen." },
+      "headline": { "displayName": "Headline", "purpose": "Screen and section titles." },
+      "title": { "displayName": "Title", "purpose": "Customer name — the primary line of a card." },
+      "body": { "displayName": "Body", "purpose": "Order numbers (extra-bold, LTR), primary content, button labels." },
+      "label": { "displayName": "Label", "purpose": "Chip labels, addresses/hints, scope text." },
+      "caption": { "displayName": "Caption", "purpose": "Status pills, meta rows, count badges, muted labels." }
+    },
+    "shadows": [
+      { "name": "card-lift", "value": "0 1px 3px rgba(0,0,0,0.05)", "purpose": "Default resting elevation for list/stat cards." },
+      { "name": "hero-lift", "value": "0 8px 26px -14px rgba(0,0,0,0.22)", "purpose": "The next-stop hero card only — a deeper, tightly-spread lift." },
+      { "name": "pin-glow", "value": "0 4px 10px rgba(231,43,41,0.4)", "purpose": "The red map pin's colored shadow — the one shadow carrying brand color." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Default easing for state and tap transitions." }
+    ],
+    "breakpoints": [
+      { "name": "phone", "value": "368px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The delivery-confirming action — ink-black fill, white label with leading check icon.",
+      "html": "<button class=\"ds-btn-primary\" dir=\"rtl\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 6 9 17l-5-5\"/></svg><span>تم التسليم</span></button>",
+      "css": ".ds-btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; width: 260px; height: 56px; background: #1A1919; color: #FFFFFF; border: none; border-radius: 15px; font-family: 'Noto Kufi Arabic', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.15s cubic-bezier(0.4,0,0.2,1), background 0.15s; } .ds-btn-primary:hover { background: #2E2D2D; } .ds-btn-primary:active { transform: scale(0.985); }"
+    },
+    {
+      "name": "Filter Chip (selected)",
+      "kind": "chip",
+      "refersTo": "chip-selected",
+      "description": "Selected filter chip — ink fill, white label, translucent-white count badge.",
+      "html": "<button class=\"ds-chip-selected\" dir=\"rtl\"><span>الكل</span><span class=\"ds-chip-count\">١٢</span></button>",
+      "css": ".ds-chip-selected { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; background: #1A1919; color: #FFFFFF; border: none; border-radius: 12px; font-family: 'Noto Kufi Arabic', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; } .ds-chip-count { background: rgba(255,255,255,0.2); border-radius: 8px; padding: 1px 8px; font-size: 12px; font-weight: 700; }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Active search field — muted fill with the signature 2px ink border and red cursor.",
+      "html": "<div class=\"ds-input-search\" dir=\"rtl\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"#6B6B73\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m21 21-4.3-4.3\"/></svg><input type=\"text\" placeholder=\"بحث…\" /></div>",
+      "css": ".ds-input-search { display: flex; align-items: center; gap: 8px; width: 280px; height: 48px; padding: 0 12px; background: #F4F3F0; border: 2px solid #1A1919; border-radius: 14px; } .ds-input-search input { flex: 1; border: none; background: transparent; outline: none; caret-color: #E72B29; font-family: 'Noto Kufi Arabic', sans-serif; font-size: 16px; font-weight: 700; color: #1A1919; text-align: right; } .ds-input-search input::placeholder { color: #9A9994; }"
+    },
+    {
+      "name": "Order Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Queue order card — merchant thumb, number + status pill, name, meta, and a COD divider row.",
+      "html": "<div class=\"ds-card-order\" dir=\"rtl\"><div class=\"ds-card-top\"><div class=\"ds-thumb\"></div><div class=\"ds-card-info\"><div class=\"ds-card-head\"><span class=\"ds-num\">#1043</span><span class=\"ds-pill-transit\">قيد التوصيل</span></div><div class=\"ds-name\">سارة عبد الله</div><div class=\"ds-meta\">المعادي · ٢٫٤ كم</div></div></div><div class=\"ds-cod-row\"><span>مطلوب تحصيل</span><span class=\"ds-cod-amount\">١٬٢٠٠ جم</span></div></div>",
+      "css": ".ds-card-order { width: 320px; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.05); border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 16px; font-family: 'Noto Kufi Arabic', sans-serif; } .ds-card-top { display: flex; gap: 16px; } .ds-thumb { width: 64px; height: 64px; border-radius: 12px; background: linear-gradient(135deg,#E4E2DD,#C9C6C0); flex: none; } .ds-card-head { display: flex; align-items: center; gap: 8px; } .ds-num { font-size: 16px; font-weight: 800; color: #1A1919; direction: ltr; } .ds-pill-transit { background: #1F6FD6; color: #FFFFFF; border-radius: 8px; padding: 2px 8px; font-size: 12px; font-weight: 700; } .ds-name { font-size: 18px; font-weight: 700; color: #1A1919; margin-top: 4px; } .ds-meta { font-size: 14px; color: #8A7A72; margin-top: 4px; } .ds-cod-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #F5F4F1; margin-top: 12px; padding-top: 12px; } .ds-cod-row > span:first-child { font-size: 12px; color: #6B6B73; } .ds-cod-amount { font-size: 16px; font-weight: 800; color: #1A1919; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "custom",
+      "refersTo": "status-pill",
+      "description": "The status semaphore unit — paired wash + text, here the delivered (green) variant.",
+      "html": "<span class=\"ds-status-pill\" dir=\"rtl\">تم التسليم</span>",
+      "css": ".ds-status-pill { display: inline-block; background: #E9F6EE; color: #15803D; border: 1px solid rgba(22,163,74,0.22); border-radius: 8px; padding: 4px 8px; font-family: 'Noto Kufi Arabic', sans-serif; font-size: 12px; font-weight: 700; }"
+    },
+    {
+      "name": "COD Payment Card",
+      "kind": "custom",
+      "refersTo": "payment-card",
+      "description": "The system's heaviest object — dark ink card giving cash first-class weight.",
+      "html": "<div class=\"ds-payment-card\" dir=\"rtl\"><div class=\"ds-pay-text\"><div class=\"ds-pay-label\">المبلغ المطلوب تحصيله</div><div class=\"ds-pay-amount\">1,200 <span>جم</span></div></div><div class=\"ds-pay-tile\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" fill=\"none\" stroke=\"#3BD07A\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"2\" y=\"6\" width=\"20\" height=\"12\" rx=\"2\"/><circle cx=\"12\" cy=\"12\" r=\"2.5\"/></svg></div></div>",
+      "css": ".ds-payment-card { display: flex; align-items: center; justify-content: space-between; width: 300px; background: #1A1919; border-radius: 18px; padding: 16px 20px; font-family: 'Noto Kufi Arabic', sans-serif; } .ds-pay-label { color: #A6A6AD; font-size: 12px; font-weight: 400; } .ds-pay-amount { color: #FFFFFF; font-size: 24px; font-weight: 800; line-height: 1; margin-top: 4px; font-variant-numeric: tabular-nums; direction: ltr; text-align: right; } .ds-pay-amount span { color: #C9C9CE; font-size: 14px; font-weight: 700; } .ds-pay-tile { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; background: rgba(255,255,255,0.1); border-radius: 13px; }"
+    },
+    {
+      "name": "Bottom Navigation",
+      "kind": "nav",
+      "refersTo": "bottom-nav",
+      "description": "Four-tab bottom bar — active tab in danger-red, hairline top border.",
+      "html": "<nav class=\"ds-bottom-nav\" dir=\"rtl\"><div class=\"ds-nav-item ds-active\"><svg viewBox=\"0 0 24 24\" width=\"23\" height=\"23\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 10.5 12 3l9 7.5\"/><path d=\"M5 9.5V21h14V9.5\"/></svg><span>الرئيسية</span></div><div class=\"ds-nav-item\"><svg viewBox=\"0 0 24 24\" width=\"23\" height=\"23\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"/><path d=\"M8 8h8M8 12h8M8 16h5\"/></svg><span>الطلبات</span></div><div class=\"ds-nav-item ds-badge\"><svg viewBox=\"0 0 24 24\" width=\"23\" height=\"23\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6\"/><path d=\"M10 20a2 2 0 0 0 4 0\"/></svg><span>الإشعارات</span></div><div class=\"ds-nav-item\"><svg viewBox=\"0 0 24 24\" width=\"23\" height=\"23\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><circle cx=\"5\" cy=\"12\" r=\"1.6\"/><circle cx=\"12\" cy=\"12\" r=\"1.6\"/><circle cx=\"19\" cy=\"12\" r=\"1.6\"/></svg><span>المزيد</span></div></nav>",
+      "css": ".ds-bottom-nav { display: flex; justify-content: space-around; width: 320px; background: #FFFFFF; border-top: 1px solid #EEEDEA; padding: 12px 16px 8px; font-family: 'Noto Kufi Arabic', sans-serif; } .ds-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6B6B73; position: relative; } .ds-nav-item span { font-size: 12px; font-weight: 400; } .ds-nav-item.ds-active { color: #C81E1C; } .ds-nav-item.ds-active span { font-weight: 600; } .ds-nav-item.ds-badge::after { content: ''; position: absolute; top: -2px; right: calc(50% - 13px); width: 7px; height: 7px; background: #E72B29; border: 1.5px solid #FFFFFF; border-radius: 50%; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Courier's Manifest",
+    "overview": "Orderbase looks like a well-kept delivery manifest made digital: a warm off-white paper surface, ink-black ink for the things that matter (actions, totals, names), colored status \"stamps\" that speak only when they carry meaning, and cash rendered as a heavy dark card you can feel the weight of. It is a working document for someone in motion — held one-handed, read in a glance between stops — so it stays calm, legible, and decisive rather than expressive. Character lives in precise details, not in decoration. Depth is softly lifted: cards rest on gentle, low-opacity shadows and are delineated by 1px hairline borders over a tonally layered ground. The palette is disciplined — one warm-neutral family carries almost everything, brand red is spent sparingly, and the four status hues are the only saturated voices allowed. This is deliberately not a flashy consumer app and not a dense enterprise dashboard.",
+    "keyCharacteristics": [
+      "Warm paper ground (#F6F5F3), never pure white as the page.",
+      "Ink-black is the action color; brand red is a rare locator, not a fill.",
+      "Status color as functional semaphore — blue in-transit, green delivered, amber postponed, red failed.",
+      "One typeface (Noto Kufi Arabic), hierarchy by weight and size on a strict 4px grid.",
+      "Cash is a first-class, heavyweight dark surface.",
+      "RTL-native throughout; directional padding and mirroring are the default."
+    ],
+    "rules": [
+      { "name": "The One Red Rule", "body": "Brand red (#E72B29) marks location, attention, and the active nav destination only. It is never a button fill or a large surface. The action color is ink-black; red is a pin, not paint.", "section": "colors" },
+      { "name": "The Semaphore Rule", "body": "Saturated color appears only as a status signal (transit/delivered/postponed/failed) or a search highlight. If a color isn't reporting state, it isn't on screen.", "section": "colors" },
+      { "name": "The 4-Pixel Rule", "body": "Font sizes are multiples of 4 — with 14px and 18px as the only two exceptions. Spacing has no exceptions. No fractional pixels.", "section": "typography" },
+      { "name": "The One-Family Rule", "body": "Never introduce a second typeface for emphasis. If you need more weight, go up the weight ladder (400 → 600 → 700 → 800), not to a new font.", "section": "typography" },
+      { "name": "The Hairline-and-Whisper Rule", "body": "Separation comes first from a 1px hairline border and tonal contrast; shadow is the soft second layer. Never lean on a heavy drop shadow to do a border's job.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do body every screen on warm paper (#F6F5F3) with white surfaces layered above it.",
+      "Do use ink-black (#1A1919) for primary actions, selected states, and the COD card.",
+      "Do keep every gap and padding on the 4px grid, and every font size a multiple of 4 (only 14/18 excepted).",
+      "Do reserve saturated color for status semaphore and search highlight only.",
+      "Do give cash the heaviest treatment on its screen (dark card, 24px extra-bold tabular figures).",
+      "Do build in RTL with directional spacing APIs, and set order numbers LTR within the Arabic flow.",
+      "Do separate surfaces with a 1px hairline first, then the soft card shadow."
+    ],
+    "donts": [
+      "Don't fill a button or large surface with brand red — red is a locator (pin, active nav, cursor), not paint.",
+      "Don't add gradients, glassmorphism, glossy effects, or bright decorative fills — this is a work tool, not a lifestyle app.",
+      "Don't shrink into a dense dashboard: no tiny type, cramped tables, or enterprise density.",
+      "Don't introduce a second typeface — build hierarchy by weight within Noto Kufi Arabic.",
+      "Don't lean on heavy drop shadows to separate elements; that's the hairline border's job.",
+      "Don't use pure white as the page background, and don't invent off-grid spacing or fractional pixels."
+    ]
+  }
+}

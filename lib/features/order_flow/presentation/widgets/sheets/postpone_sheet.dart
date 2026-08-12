@@ -1,13 +1,22 @@
 part of '../../imports/order_flow_imports.dart';
 
-/// Outcome of the postpone sheet.
+/// Which branch the postpone sheet chose.
 enum PostponeResult { confirm, back }
+
+/// Outcome of the postpone sheet: the branch taken plus, on confirm, the chosen
+/// re-attempt slot as a display string (e.g. "13 سبتمبر · 4:00 م").
+class PostponeOutcome {
+  const PostponeOutcome({required this.action, this.display});
+
+  final PostponeResult action;
+  final String? display;
+}
 
 /// Postpone sheet (Order Flow.dc.html, `showPostpone`): pick a new date/time
 /// (with quick-slot shortcuts) for a later re-attempt. The back arrow returns
-/// to the fail sheet. Returns [PostponeResult].
-Future<PostponeResult?> showPostponeSheet(BuildContext context) {
-  return showAppSheet<PostponeResult>(context, child: const _PostponeSheet());
+/// to the fail sheet. Returns [PostponeOutcome].
+Future<PostponeOutcome?> showPostponeSheet(BuildContext context) {
+  return showAppSheet<PostponeOutcome>(context, child: const _PostponeSheet());
 }
 
 /// StatefulWidget only to own the [PostponeSheetController] lifecycle — no
@@ -32,7 +41,8 @@ class _PostponeSheetState extends State<_PostponeSheet> {
   Widget build(BuildContext context) {
     return SheetShell(
       title: LocaleKeys.postponeTitle.tr(),
-      onBack: () => Navigator.of(context).pop(PostponeResult.back),
+      onBack: () => Navigator.of(context)
+          .pop(const PostponeOutcome(action: PostponeResult.back)),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -92,7 +102,7 @@ class _PostponeSheetState extends State<_PostponeSheet> {
             height: AppSize.sH56,
             decoration: BoxDecoration(
               color: AppColors.inkFill,
-              borderRadius: BorderRadius.circular(15.r), // mockup radius
+              borderRadius: BorderRadius.circular(AppCircular.r15), // mockup radius
             ),
             alignment: Alignment.center,
             child: Row(
@@ -111,7 +121,14 @@ class _PostponeSheetState extends State<_PostponeSheet> {
                 ),
               ],
             ),
-          ).onClick(onTap: () => Navigator.of(context).pop(PostponeResult.confirm)),
+          ).onClick(
+            onTap: () => Navigator.of(context).pop(
+              PostponeOutcome(
+                action: PostponeResult.confirm,
+                display: _controller.display,
+              ),
+            ),
+          ),
         ],
       ),
     );

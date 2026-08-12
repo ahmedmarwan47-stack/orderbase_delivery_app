@@ -49,6 +49,21 @@ class OrderbaseCourierApp extends StatelessWidget {
             surface: AppColors.surface,
           ),
         ),
+        // Deliberately light-only: the "warm paper" identity has no dark variant.
+        // Pinning ThemeMode.light keeps the app consistent under system dark mode
+        // instead of a mechanically inverted look.
+        themeMode: ThemeMode.light,
+        // Honor the OS text-size setting, but cap it so large accessibility
+        // sizes don't clip the fixed-height chrome (pills, deliver bar, etc.).
+        builder: (context, child) {
+          final mq = MediaQuery.of(context);
+          return MediaQuery(
+            data: mq.copyWith(
+              textScaler: mq.textScaler.clamp(maxScaleFactor: 1.3),
+            ),
+            child: child!,
+          );
+        },
         routerConfig: Modular.routerConfig,
       ),
     );

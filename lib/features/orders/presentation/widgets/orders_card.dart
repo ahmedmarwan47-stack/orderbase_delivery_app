@@ -80,7 +80,7 @@ class _PayPill extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(7.r), // 7px pill (radii exempt from 4px rule)
+        borderRadius: BorderRadius.circular(AppCircular.r7), // 7px pill (radii exempt from 4px rule)
       ),
       child: Text(labelKey.tr(), style: const TextStyle().setColor(fg).s12.bold)
           .paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),

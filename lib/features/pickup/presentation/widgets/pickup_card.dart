@@ -48,7 +48,7 @@ class _PickupCard extends StatelessWidget {
                       Container(
                         decoration: BoxDecoration(
                           color: payBg,
-                          borderRadius: BorderRadius.circular(7.r), // pay pill
+                          borderRadius: BorderRadius.circular(AppCircular.r7), // pay pill
                         ),
                         child: Text(
                           payLabel,

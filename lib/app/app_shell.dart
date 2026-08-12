@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../core/widgets/app_assets.dart';
+import '../core/widgets/icon_widget.dart';
+import '../data/flow_order.dart';
 import '../dev/dev_gallery.dart';
+import '../features/auth/presentation/imports/auth_imports.dart';
+import '../features/failure_states/presentation/imports/failure_states_imports.dart';
 import '../features/home/presentation/imports/home_imports.dart';
 import '../features/order_flow/presentation/imports/order_flow_imports.dart';
 import '../features/orders/presentation/imports/orders_imports.dart';
+import '../features/pickup/presentation/imports/pickup_imports.dart';
+import '../features/settlement/presentation/imports/settlement_imports.dart';
 import '../theme/colors.dart';
 import '../theme/spacing.dart';
 import '../theme/typography.dart';
@@ -32,12 +39,14 @@ class _AppShellState extends State<AppShell> {
 
   void _select(NavTab t) => setState(() => _tab = t);
 
-  /// Push the order-detail flow, wiring its Result screen back to the shell.
-  void _openOrder() {
+  /// Push the order-detail flow for [order], wiring its Result screen back to
+  /// the shell.
+  void _openOrder(FlowOrder order) {
     void popToShell() => Navigator.of(context).popUntil((r) => r.isFirst);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => OrderDetailScreen(
+          order: order,
           onFinishToNext: popToShell,
           onFinishToHome: () {
             popToShell();
@@ -59,18 +68,16 @@ class _AppShellState extends State<AppShell> {
       child: IndexedStack(
         index: _tab.index,
         children: [
-          HomeScreen(onSelectTab: _select, onOpenOrder: _openOrder),
-          OrdersListScreen(
-              onSelectTab: _select, onOpenOrder: (_) => _openOrder()),
+          HomeScreen(
+            onSelectTab: _select,
+            onOpenOrder: () => _openOrder(sampleFlowOrders.first),
+          ),
+          OrdersListScreen(onSelectTab: _select, onOpenOrder: _openOrder),
           _PlaceholderTab(
               tab: NavTab.notifications,
               title: 'الاشعارات',
               onSelectTab: _select),
-          _PlaceholderTab(
-              tab: NavTab.more,
-              title: 'المزيد',
-              onSelectTab: _select,
-              showDevEntry: true),
+          _MoreTab(onSelectTab: _select),
         ],
       ),
     );
@@ -84,13 +91,11 @@ class _PlaceholderTab extends StatelessWidget {
     required this.tab,
     required this.title,
     required this.onSelectTab,
-    this.showDevEntry = false,
   });
 
   final NavTab tab;
   final String title;
   final ValueChanged<NavTab> onSelectTab;
-  final bool showDevEntry;
 
   @override
   Widget build(BuildContext context) {
@@ -115,18 +120,6 @@ class _PlaceholderTab extends StatelessWidget {
                       Text('قريبًا',
                           style: AppTypography.size14
                               .copyWith(color: AppColors.textTertiary)),
-                      if (showDevEntry) ...[
-                        const SizedBox(height: AppSpacing.s24),
-                        OutlinedButton(
-                          onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (_) => const DevGallery())),
-                          child: Text('الشاشات (Dev)',
-                              style: AppTypography.size14.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary)),
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -134,6 +127,135 @@ class _PlaceholderTab extends StatelessWidget {
               BottomNav(
                   active: tab, notificationsBadge: true, onTap: onSelectTab),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The **More** tab — a real menu linking the built-but-not-tabbed screens
+/// (settlement, returns, pickup, account) plus the DevGallery, so everything is
+/// reachable from the running app rather than only through dev tooling.
+class _MoreTab extends StatelessWidget {
+  const _MoreTab({required this.onSelectTab});
+
+  final ValueChanged<NavTab> onSelectTab;
+
+  void _push(BuildContext context, Widget screen) =>
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.s20, AppSpacing.s12,
+                    AppSpacing.s20, AppSpacing.s16),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text('المزيد',
+                      style: AppTypography.size24.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary)),
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.s20),
+                  children: [
+                    _MoreRow(
+                        icon: AppAssets.svg.cash,
+                        label: 'تسوية نهاية اليوم',
+                        onTap: () => _push(context, const SettlementScreen())),
+                    _MoreRow(
+                        icon: AppAssets.svg.box,
+                        label: 'مرتجعات للفرع',
+                        onTap: () => _push(context, const ReturnsListScreen())),
+                    _MoreRow(
+                        icon: AppAssets.svg.note,
+                        label: 'استلام من الفرع',
+                        onTap: () => _push(context, const PickupScreen())),
+                    _MoreRow(
+                        icon: AppAssets.svg.user,
+                        label: 'الحساب وكلمة المرور',
+                        onTap: () =>
+                            _push(context, const ChangePasswordScreen())),
+                    _MoreRow(
+                        icon: AppAssets.svg.more,
+                        label: 'كل الشاشات (Dev)',
+                        onTap: () => _push(context, const DevGallery())),
+                  ],
+                ),
+              ),
+              BottomNav(
+                  active: NavTab.more,
+                  notificationsBadge: true,
+                  onTap: onSelectTab),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MoreRow extends StatelessWidget {
+  const _MoreRow(
+      {required this.icon, required this.label, required this.onTap});
+
+  final String icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.s12),
+      child: Material(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.s16),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                      color: AppColors.surfaceMuted,
+                      borderRadius: BorderRadius.circular(12)),
+                  child: Center(
+                      child: IconWidget(
+                          icon: icon,
+                          color: AppColors.textPrimary,
+                          height: 20,
+                          width: 20)),
+                ),
+                const SizedBox(width: AppSpacing.s12),
+                Expanded(
+                  child: Text(label,
+                      style: AppTypography.size16.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary)),
+                ),
+                IconWidget(
+                    icon: AppAssets.svg.chevronLeft,
+                    color: AppColors.textSecondary,
+                    height: 18,
+                    width: 18),
+              ],
+            ),
           ),
         ),
       ),

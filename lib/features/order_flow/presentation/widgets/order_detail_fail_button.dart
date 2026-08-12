@@ -11,7 +11,7 @@ class _FailButton extends StatelessWidget {
       height: AppSize.sH52,
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(15.r), // mockup radius
+        borderRadius: BorderRadius.circular(AppCircular.r15), // mockup radius
         border: Border.all(color: AppColors.failedBorder, width: 1.5),
       ),
       alignment: Alignment.center,
