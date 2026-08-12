@@ -77,6 +77,7 @@ abstract final class AppColors {
 
   // Hairline dividers between list items (lighter than borderHeader)
   static const itemDivider = Color(0xFFF5F4F1);
+  static const summaryDivider = Color(0xFFEAE9E5); // divider inside the result summary card
 
   // Dark COD payment card (Order Detail)
   static const paymentCardBg = Color(0xFF1A1919);
