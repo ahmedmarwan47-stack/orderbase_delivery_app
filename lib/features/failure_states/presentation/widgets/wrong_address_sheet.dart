@@ -1,23 +1,19 @@
 part of '../imports/failure_states_imports.dart';
 
-/// Result of the wrong-address step (1c): the corrected address is retried now
-/// or deferred to [slot].
+/// Result of the wrong-address step (1c): the courier's corrected address and
+/// the chosen outcome (try again now / return to branch).
 class WrongAddressResult {
-  const WrongAddressResult({required this.retry, this.slot});
-  final AddressRetry retry;
-  final String? slot;
+  const WrongAddressResult({required this.choice, this.correctedAddress});
+  final WrongAddressChoice choice;
+  final String? correctedAddress;
 }
 
-/// 1c · «عنوان خاطئ» — step 2 of 2 (retryable). The new address replaces the old
-/// one; the courier chooses to retry now or defer to a later slot today. The
-/// order is not closed either way.
+/// 1c · «عنوان خاطئ» — step 2 of 2 (retryable). The courier edits the corrected
+/// address, then picks one of two outcomes: retry the delivery now, or return
+/// the pieces to the branch.
 class _WrongAddressSheet extends StatefulWidget {
-  const _WrongAddressSheet({
-    required this.ctx,
-    this.initial = AddressRetry.now,
-  });
+  const _WrongAddressSheet({required this.ctx});
   final FailureContext ctx;
-  final AddressRetry initial;
 
   @override
   State<_WrongAddressSheet> createState() => _WrongAddressSheetState();
@@ -25,9 +21,7 @@ class _WrongAddressSheet extends StatefulWidget {
 
 class _WrongAddressSheetState extends State<_WrongAddressSheet> {
   late final WrongAddressController _c = WrongAddressController(
-    initial: widget.initial,
-    initialSlot:
-        widget.initial == AddressRetry.later ? widget.ctx.laterSlots.first : null,
+    correctedAddress: widget.ctx.correctedAddress,
   );
   final _note = TextEditingController(
     text: LocaleKeys.failureWrongAddressSampleNote.tr(),
@@ -53,26 +47,28 @@ class _WrongAddressSheetState extends State<_WrongAddressSheet> {
           8.szH,
           _FieldLabel(LocaleKeys.failureCorrectAddressLabel.tr(), strong: true),
           8.szH,
-          _correctedAddressBox(),
+          _correctedAddressField(),
           8.szH,
           _FieldLabel(LocaleKeys.failureConfirmedByPhone.tr()),
           16.szH,
           _FieldLabel(LocaleKeys.failureAfterCorrection.tr(), strong: true),
           8.szH,
-          AnimatedBuilder(
-            animation: Listenable.merge([_c.retry, _c.slot]),
-            builder: (context, _) {
-              final now = _c.retry.value == AddressRetry.now;
+          ValueListenableBuilder<WrongAddressChoice>(
+            valueListenable: _c.choice,
+            builder: (context, choice, _) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _RetryNowRow(selected: now, onTap: _c.chooseNow),
+                  _ChoiceRow(
+                    label: LocaleKeys.failureTryAgain.tr(),
+                    selected: choice == WrongAddressChoice.tryAgain,
+                    onTap: () => _c.choose(WrongAddressChoice.tryAgain),
+                  ),
                   8.szH,
-                  _RetryLaterBlock(
-                    selected: !now,
-                    slots: widget.ctx.laterSlots,
-                    selectedSlot: _c.slot.value,
-                    onPick: _c.chooseLater,
+                  _ChoiceRow(
+                    label: LocaleKeys.failureReturnToBranchTitle.tr(),
+                    selected: choice == WrongAddressChoice.returnToBranch,
+                    onTap: () => _c.choose(WrongAddressChoice.returnToBranch),
                   ),
                 ],
               );
@@ -83,12 +79,23 @@ class _WrongAddressSheetState extends State<_WrongAddressSheet> {
           8.szH,
           _NoteField(controller: _note, minHeight: AppSize.sH48),
           12.szH,
-          _PrimaryButton(
-            label: LocaleKeys.failureUpdateAddressRetry.tr(),
-            leadingIcon: FailureIcons.nav,
-            onTap: () => Navigator.of(context).pop(
-              WrongAddressResult(retry: _c.retry.value, slot: _c.slot.value),
-            ),
+          ValueListenableBuilder<WrongAddressChoice>(
+            valueListenable: _c.choice,
+            builder: (context, choice, _) {
+              final tryAgain = choice == WrongAddressChoice.tryAgain;
+              return _PrimaryButton(
+                label: tryAgain
+                    ? LocaleKeys.failureUpdateAddressRetry.tr()
+                    : LocaleKeys.failureReturnToBranchTitle.tr(),
+                leadingIcon: tryAgain ? FailureIcons.nav : FailureIcons.box,
+                onTap: () => Navigator.of(context).pop(
+                  WrongAddressResult(
+                    choice: choice,
+                    correctedAddress: _c.address.text.trim(),
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -130,7 +137,9 @@ class _WrongAddressSheetState extends State<_WrongAddressSheet> {
     );
   }
 
-  Widget _correctedAddressBox() {
+  /// The editable corrected-address field — a real RTL [TextField] prefilled
+  /// from the controller, with the pin glyph and the emphasised ink border.
+  Widget _correctedAddressField() {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -152,9 +161,22 @@ class _WrongAddressSheetState extends State<_WrongAddressSheet> {
           ),
           12.szW,
           Expanded(
-            child: Text(
-              widget.ctx.correctedAddress,
-              style: const TextStyle().setMainTextColor.s14.semiBold.withHeight(1.7),
+            child: TextField(
+              controller: _c.address,
+              maxLines: null,
+              textDirection: TextDirection.rtl,
+              textInputAction: TextInputAction.done,
+              cursorColor: AppColors.brand,
+              style: const TextStyle()
+                  .setMainTextColor
+                  .s14
+                  .semiBold
+                  .withHeight(1.7),
+              decoration: const InputDecoration(
+                isDense: true,
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+              ),
             ),
           ),
         ],
@@ -163,8 +185,15 @@ class _WrongAddressSheetState extends State<_WrongAddressSheet> {
   }
 }
 
-class _RetryNowRow extends StatelessWidget {
-  const _RetryNowRow({required this.selected, required this.onTap});
+/// A single-select outcome row for the wrong-address step — mirrors the reason
+/// row style: brand border + red wash + brand radio dot when selected.
+class _ChoiceRow extends StatelessWidget {
+  const _ChoiceRow({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+  final String label;
   final bool selected;
   final VoidCallback onTap;
 
@@ -172,137 +201,27 @@ class _RetryNowRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: selected ? AppColors.deliveredBg : AppColors.reasonRowBg,
+        color: selected ? AppColors.failedBg : AppColors.reasonRowBg,
         borderRadius: BorderRadius.circular(AppCircular.r14),
         border: Border.all(
-          color: selected ? AppColors.greenAccent : AppColors.borderHeader,
+          color: selected ? AppColors.brand : AppColors.borderHeader,
           width: 1.5,
         ),
       ),
       padding: EdgeInsets.all(AppPadding.pH16),
       child: Row(
         children: [
-          _RadioDot(selected: selected, color: AppColors.greenAccent),
+          _RadioDot(selected: selected),
           12.szW,
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(LocaleKeys.failureRetryNow.tr(),
-                    style: const TextStyle().setMainTextColor.s14.bold),
-                4.szH,
-                Text(
-                  LocaleKeys.failureRetryNowCaption.tr(),
-                  style: const TextStyle()
-                      .setColor(AppColors.retryNowSubtext)
-                      .s12
-                      .regular,
-                ),
-              ],
+            child: Text(
+              label,
+              style: selected
+                  ? const TextStyle().setMainTextColor.s14.bold
+                  : const TextStyle().setMainTextColor.s14.semiBold,
             ),
           ),
         ],
-      ),
-    ).onClick(onTap: onTap);
-  }
-}
-
-class _RetryLaterBlock extends StatelessWidget {
-  const _RetryLaterBlock({
-    required this.selected,
-    required this.slots,
-    required this.selectedSlot,
-    required this.onPick,
-  });
-  final bool selected;
-  final List<String> slots;
-  final String? selectedSlot;
-  final ValueChanged<String> onPick;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.reasonRowBg,
-        borderRadius: BorderRadius.circular(AppCircular.r14),
-        border: Border.all(color: AppColors.borderHeader, width: 1.5),
-      ),
-      padding: EdgeInsets.all(AppPadding.pH12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              _RadioDot(selected: selected, color: AppColors.textPrimary),
-              12.szW,
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(LocaleKeys.failurePostponeLaterToday.tr(),
-                        style: selected
-                            ? const TextStyle().setMainTextColor.s14.bold
-                            : const TextStyle().setMainTextColor.s14.semiBold),
-                    4.szH,
-                    Text(
-                      LocaleKeys.failurePostponeLaterCaption.tr(),
-                      style: const TextStyle().setSecondaryColor.s12.regular,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          8.szH,
-          Row(
-            children: [
-              for (final slot in slots) ...[
-                Expanded(
-                  child: _TimeChip(
-                    time: slot,
-                    selected: selected && slot == selectedSlot,
-                    onTap: () => onPick(slot),
-                  ),
-                ),
-                if (slot != slots.last) 8.szW,
-              ],
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TimeChip extends StatelessWidget {
-  const _TimeChip({
-    required this.time,
-    required this.selected,
-    required this.onTap,
-  });
-  final String time;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: AppSize.sH40,
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppCircular.r11),
-        border: Border.all(
-          color: selected ? AppColors.textPrimary : AppColors.borderDefault,
-        ),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        time,
-        textDirection: TextDirection.ltr,
-        style: const TextStyle()
-            .setColor(selected ? AppColors.textPrimary : AppColors.chipCountMuted)
-            .s14
-            .bold,
       ),
     ).onClick(onTap: onTap);
   }

@@ -38,15 +38,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return _AuthScaffold(
-      header: _AuthHeaderBar(
-        title: LocaleKeys.authChangeTitle.tr(),
-        back: LocaleKeys.authAccount.tr(),
-        onBack: () => Navigator.of(context).maybePop(),
-      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          8.szH,
+          _AuthBackLink(onTap: () => Navigator.of(context).maybePop()),
+          20.szH,
+          Text(LocaleKeys.authChangeTitle.tr(),
+              style: const TextStyle().setMainTextColor.s20.extraBold),
+          20.szH,
           _AuthProfileCard(
             initials: 'م ع',
             name: 'Mahmoud Ezzat',

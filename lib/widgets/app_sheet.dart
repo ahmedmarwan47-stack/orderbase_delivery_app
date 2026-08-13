@@ -68,26 +68,16 @@ class SheetShell extends StatelessWidget {
             ),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  if (onBack != null) ...[
-                    _SheetIconButton(
-                      icon: AppAssets.svg.chevronRight,
-                      label: LocaleKeys.a11yBack.tr(),
-                      onTap: onBack!,
-                    ),
-                    8.szW,
-                  ],
-                  Text(title, style: const TextStyle().setMainTextColor.s18.extraBold),
-                ],
-              ),
-              _SheetIconButton(
-                icon: AppAssets.svg.x,
-                label: LocaleKeys.a11yClose.tr(),
-                onTap: () => Navigator.of(context).maybePop(),
-              ),
+              if (onBack != null) ...[
+                _SheetIconButton(
+                  icon: AppAssets.svg.chevronRight,
+                  label: LocaleKeys.a11yBack.tr(),
+                  onTap: onBack!,
+                ),
+                8.szW,
+              ],
+              Text(title, style: const TextStyle().setMainTextColor.s18.extraBold),
             ],
           ),
           Flexible(

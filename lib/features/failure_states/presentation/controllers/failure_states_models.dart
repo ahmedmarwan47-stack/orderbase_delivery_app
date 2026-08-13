@@ -117,9 +117,6 @@ FailureContext sampleFailureContext() => FailureContext(
 /// Whether contact attempts (1b) can be skipped or block progress.
 enum CallAttemptGate { skippable, blocking }
 
-/// The wrong-address retry choice (1c).
-enum AddressRetry { now, later }
-
 /// Which of the 7 states the [FailureStatesHost] should open for preview.
 enum FailureStatePreview {
   reason, // 1a

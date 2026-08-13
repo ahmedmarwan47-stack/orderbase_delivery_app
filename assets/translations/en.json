@@ -256,6 +256,7 @@
   "failure_confirmed_by_phone": "Confirmed by the customer over the phone · 9:44",
   "failure_after_correction": "After correction",
   "failure_update_address_retry": "Update address and retry",
+  "failure_try_again": "Try again",
   "failure_retry_now": "Retry now",
   "failure_retry_now_caption": "The order stays in the route and the address updates immediately",
   "failure_postpone_later_today": "Postpone to later today",

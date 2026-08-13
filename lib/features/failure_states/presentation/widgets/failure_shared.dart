@@ -9,7 +9,6 @@ abstract final class FailureIcons {
   static String get whatsapp => AppAssets.svg.wa; // i-wa (whatsapp)
 
   // Exact matches.
-  static String get x => AppAssets.svg.x;
   static String get back => AppAssets.svg.chevronRight; // i-cr (RTL back)
   static String get chevronLeft => AppAssets.svg.chevronLeft; // i-cl
   static String get clock => AppAssets.svg.clock;
@@ -65,28 +64,16 @@ class _SheetScaffold extends StatelessWidget {
           if (title != null) ...[
             8.szH,
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                if (onBack != null) ...[
+                  _SheetIconTile(icon: FailureIcons.back, onTap: onBack!),
+                  8.szW,
+                ],
                 Flexible(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (onBack != null) ...[
-                        _SheetIconTile(icon: FailureIcons.back, onTap: onBack!),
-                        8.szW,
-                      ],
-                      Flexible(
-                        child: Text(
-                          title!,
-                          style: const TextStyle().setMainTextColor.s18.extraBold,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    title!,
+                    style: const TextStyle().setMainTextColor.s18.extraBold,
                   ),
-                ),
-                _SheetIconTile(
-                  icon: FailureIcons.x,
-                  onTap: () => Navigator.of(context).maybePop(),
                 ),
               ],
             ),
@@ -412,12 +399,11 @@ class _ReasonTag extends StatelessWidget {
   }
 }
 
-/// A 22×22 radio dot. Selected = filled [color] with a white tick; unselected =
+/// A 22×22 radio dot. Selected = filled brand with a white tick; unselected =
 /// a 2px ring.
 class _RadioDot extends StatelessWidget {
-  const _RadioDot({required this.selected, this.color = AppColors.brand});
+  const _RadioDot({required this.selected});
   final bool selected;
-  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -426,9 +412,9 @@ class _RadioDot extends StatelessWidget {
       height: AppSize.sH22,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: selected ? color : Colors.transparent,
+        color: selected ? AppColors.brand : Colors.transparent,
         border: Border.all(
-          color: selected ? color : AppColors.reasonDotBorder,
+          color: selected ? AppColors.brand : AppColors.reasonDotBorder,
           width: 2,
         ),
       ),

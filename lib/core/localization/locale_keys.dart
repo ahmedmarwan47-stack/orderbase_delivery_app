@@ -328,6 +328,7 @@ abstract final class LocaleKeys {
   static const String failureConfirmedByPhone = 'failure_confirmed_by_phone';
   static const String failureAfterCorrection = 'failure_after_correction';
   static const String failureUpdateAddressRetry = 'failure_update_address_retry';
+  static const String failureTryAgain = 'failure_try_again';
   static const String failureRetryNow = 'failure_retry_now';
   static const String failureRetryNowCaption = 'failure_retry_now_caption';
   static const String failurePostponeLaterToday = 'failure_postpone_later_today';

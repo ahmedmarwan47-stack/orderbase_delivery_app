@@ -1,30 +1,35 @@
 part of '../imports/failure_states_imports.dart';
 
-/// Ephemeral state for the wrong-address step (1c): the retry choice
-/// (now / later) and, when later, which time slot is picked. Mirrors the
-/// mockup's `addressRetry` prop (both / now / later).
+/// The courier's choice on the wrong-address step (1c), single-select.
+enum WrongAddressChoice {
+  /// «حاول مرة أخرى» — the corrected address is used for an immediate re-attempt;
+  /// the order stays active (→ [FailureResolution.retryNow]).
+  tryAgain,
+
+  /// «الإرجاع للفرع» — the pieces go back to the branch
+  /// (→ [FailureResolution.returnedToBranch]).
+  returnToBranch,
+}
+
+/// Ephemeral state for the wrong-address step (1c): the editable corrected
+/// address the courier types, plus the single-select outcome choice.
 class WrongAddressController {
   WrongAddressController({
-    AddressRetry initial = AddressRetry.now,
-    String? initialSlot,
-  })  : retry = ValueNotifier(initial),
-        slot = ValueNotifier(initialSlot);
+    required String correctedAddress,
+    WrongAddressChoice initial = WrongAddressChoice.tryAgain,
+  })  : address = TextEditingController(text: correctedAddress),
+        choice = ValueNotifier(initial);
 
-  final ValueNotifier<AddressRetry> retry;
-  final ValueNotifier<String?> slot;
+  /// The corrected address the courier edits (RTL, prefilled).
+  final TextEditingController address;
 
-  void chooseNow() {
-    retry.value = AddressRetry.now;
-    slot.value = null;
-  }
+  /// The currently selected outcome choice.
+  final ValueNotifier<WrongAddressChoice> choice;
 
-  void chooseLater(String time) {
-    retry.value = AddressRetry.later;
-    slot.value = time;
-  }
+  void choose(WrongAddressChoice value) => choice.value = value;
 
   void dispose() {
-    retry.dispose();
-    slot.dispose();
+    address.dispose();
+    choice.dispose();
   }
 }

@@ -5,10 +5,9 @@ part of '../imports/auth_imports.dart';
 /// optional sticky white [footer] bar (hairline top border) above the home
 /// indicator — the layout the mockups use across all six states.
 class _AuthScaffold extends StatelessWidget {
-  const _AuthScaffold({required this.body, this.header, this.footer});
+  const _AuthScaffold({required this.body, this.footer});
 
   final Widget body;
-  final Widget? header;
   final Widget? footer;
 
   @override
@@ -21,7 +20,6 @@ class _AuthScaffold extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              ?header,
               Expanded(
                 child: SingleChildScrollView(
                   padding: EdgeInsetsDirectional.only(
@@ -80,78 +78,6 @@ class _AuthBackLink extends StatelessWidget {
               style: const TextStyle().setSecondaryColor.s14.bold),
         ],
       ).onClick(onTap: onTap),
-    );
-  }
-}
-
-/// The change-password header bar (1e): a real app-bar row with a hairline
-/// bottom border — a back link ("حسابي") on the leading side and the screen
-/// title centered.
-class _AuthHeaderBar extends StatelessWidget {
-  const _AuthHeaderBar({required this.title, required this.back, this.onBack});
-  final String title;
-  final String back;
-  final VoidCallback? onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
-      ),
-      padding: EdgeInsetsDirectional.only(
-        start: AppPadding.pW16,
-        end: AppPadding.pW16,
-        top: AppPadding.pH12,
-        bottom: AppPadding.pH12,
-      ),
-      child: Row(
-        children: [
-          Semantics(
-            button: true,
-            label: back,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconWidget(
-                  icon: AppAssets.svg.chevronRight,
-                  color: AppColors.textSecondary,
-                  height: AppSize.sH20,
-                  width: AppSize.sW20,
-                ),
-                2.szW,
-                Text(back,
-                    style: const TextStyle().setSecondaryColor.s14.bold),
-              ],
-            ).onClick(onTap: onBack),
-          ),
-          Expanded(
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle().setMainTextColor.s24.extraBold,
-            ),
-          ),
-          // Balances the leading back link so the title stays optically centered.
-          Opacity(
-            opacity: 0,
-            child: IgnorePointer(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconWidget(
-                      icon: AppAssets.svg.chevronRight,
-                      height: AppSize.sH20,
-                      width: AppSize.sW20),
-                  2.szW,
-                  Text(back, style: const TextStyle().s14.bold),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

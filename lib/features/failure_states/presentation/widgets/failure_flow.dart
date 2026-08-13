@@ -46,11 +46,10 @@ Future<FailureOutcome?> showFailureFlow(
       if (r == SecondStepResult.back) continue;
       if (r is WrongAddressResult) {
         return FailureOutcome(
-          resolution: r.retry == AddressRetry.now
+          resolution: r.choice == WrongAddressChoice.tryAgain
               ? FailureResolution.retryNow
-              : FailureResolution.retryLater,
+              : FailureResolution.returnedToBranch,
           reason: reason,
-          retryTime: r.slot,
         );
       }
       return null; // dismissed

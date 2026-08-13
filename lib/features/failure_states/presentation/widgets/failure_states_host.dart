@@ -49,8 +49,7 @@ class _FailureStatesHostState extends State<FailureStatesHost> {
       FailureStatePreview.reason => _ReasonSheet(ctx: _ctx),
       FailureStatePreview.notPresent =>
         _NotPresentSheet(ctx: _ctx, gate: CallAttemptGate.skippable),
-      FailureStatePreview.wrongAddress =>
-        _WrongAddressSheet(ctx: _ctx, initial: AddressRetry.now),
+      FailureStatePreview.wrongAddress => _WrongAddressSheet(ctx: _ctx),
       FailureStatePreview.productMismatch => _ProductMismatchSheet(ctx: _ctx),
       FailureStatePreview.returnToBranch =>
         _ReturnToBranchSheet(ctx: _ctx, reason: FailureReason.notPresent),

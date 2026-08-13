@@ -51,23 +51,17 @@ class _PostponeSheetState extends State<_PostponeSheet> {
             style: const TextStyle().setSecondaryColor.s14.regular,
           ),
           16.szH,
-          Row(
-            children: [
-              _quickSlot(
-                LocaleKeys.postponeSlot1.tr(),
-                const TimeOfDay(hour: 13, minute: 30),
-              ),
-              8.szW,
-              _quickSlot(
-                LocaleKeys.postponeSlot2.tr(),
-                const TimeOfDay(hour: 14, minute: 30),
-              ),
-              8.szW,
-              _quickSlot(
-                LocaleKeys.postponeSlot3.tr(),
-                const TimeOfDay(hour: 18, minute: 0),
-              ),
-            ],
+          ValueListenableBuilder<int?>(
+            valueListenable: _controller.selectedSlot,
+            builder: (_, slot, _) => Row(
+              children: [
+                _quickSlot(LocaleKeys.postponeSlot1.tr(), 0, slot == 0),
+                8.szW,
+                _quickSlot(LocaleKeys.postponeSlot2.tr(), 1, slot == 1),
+                8.szW,
+                _quickSlot(LocaleKeys.postponeSlot3.tr(), 2, slot == 2),
+              ],
+            ),
           ),
           16.szH,
           Text(
@@ -134,21 +128,27 @@ class _PostponeSheetState extends State<_PostponeSheet> {
     );
   }
 
-  Widget _quickSlot(String label, TimeOfDay time) {
+  /// A single quick-slot chip. [selected] drives the brand fill/border/text of
+  /// the active choice (single-select — the controller owns which is active).
+  Widget _quickSlot(String label, int index, bool selected) {
     return Expanded(
       child: Container(
         height: AppSize.sH44,
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: selected ? AppColors.failedBg : AppColors.background,
           borderRadius: BorderRadius.circular(AppCircular.r12),
-          border: Border.all(color: AppColors.borderHeader),
+          border: Border.all(
+            color: selected ? AppColors.brand : AppColors.borderHeader,
+          ),
         ),
         alignment: Alignment.center,
         child: Text(
           label,
-          style: const TextStyle().setMainTextColor.s14.bold,
+          style: selected
+              ? const TextStyle().setColor(AppColors.brand).s14.bold
+              : const TextStyle().setMainTextColor.s14.bold,
         ),
-      ).onClick(onTap: () => _controller.setTime(time)),
+      ).onClick(onTap: () => _controller.selectSlot(index)),
     );
   }
 
@@ -175,6 +175,14 @@ class _PostponeSheetState extends State<_PostponeSheet> {
           Text(
             value,
             style: const TextStyle().setMainTextColor.s16.bold,
+          ),
+          const Spacer(),
+          // Edit affordance: signals the field opens a native picker on tap.
+          IconWidget(
+            icon: AppAssets.svg.chevronLeft,
+            color: AppColors.postponedText,
+            height: AppSize.sH18,
+            width: AppSize.sW18,
           ),
         ],
       ).paddingSymmetric(
