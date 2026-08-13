@@ -53,7 +53,7 @@ class OrderDetailScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              _OrderDetailHeader(orderNum: o.num),
+              _OrderDetailHeader(order: o),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(

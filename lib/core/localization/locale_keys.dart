@@ -131,8 +131,9 @@ abstract final class LocaleKeys {
 
   // ── order_flow ──
   static const String orderDetailBack = 'order_detail_back';
-  static const String orderDetailDate = 'order_detail_date';
   static const String orderDetailStatusTransit = 'order_detail_status_transit';
+  static const String orderDetailStatusDone = 'order_detail_status_done';
+  static const String orderDetailStatusFailed = 'order_detail_status_failed';
   static const String orderDetailCodNote = 'order_detail_cod_note';
   static const String orderDetailCustomer = 'order_detail_customer';
   static const String orderDetailCall = 'order_detail_call';

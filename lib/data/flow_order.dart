@@ -31,6 +31,7 @@ class FlowOrder {
     required this.address,
     required this.items,
     this.note,
+    required this.dateLabel,
     required this.assignedTime,
     required this.pickedTime,
   });
@@ -51,6 +52,10 @@ class FlowOrder {
 
   /// Customer note for the courier; `null` hides the notes card entirely.
   final String? note;
+
+  /// Human-readable order date shown in the detail header, e.g.
+  /// "13 سبتمبر 2024". A real per-order field, not a hardcoded UI string.
+  final String dateLabel;
 
   /// Timeline timestamps (LTR), oldest first: assigned to the courier, then
   /// picked up from the branch.
@@ -90,6 +95,7 @@ const List<FlowOrder> sampleFlowOrders = [
     ],
     note:
         'برجاء الاتصال قبل التوصيل بساعة على الأقل. العميل في الدور الخامس والمصعد معطّل، فيُرجى الصعود على السلّم. لو لم يردّ على الهاتف، جرّب الرقم البديل 0100 123 4567 أو اترك الطلب مع الأمن في البوابة الرئيسية وأبلغني برسالة.',
+    dateLabel: '13 سبتمبر 2024',
     assignedTime: '13 سبتمبر 2024 · 12:30pm',
     pickedTime: '13 سبتمبر 2024 · 01:30pm',
   ),
@@ -109,6 +115,7 @@ const List<FlowOrder> sampleFlowOrders = [
       ),
     ],
     note: 'الرجاء الاتصال قبل الوصول بـ 10 دقائق. البواب يستلم الطلب لو العميل غير موجود.',
+    dateLabel: '13 سبتمبر 2024',
     assignedTime: '13 سبتمبر 2024 · 12:45pm',
     pickedTime: '13 سبتمبر 2024 · 01:40pm',
   ),
@@ -132,6 +139,7 @@ const List<FlowOrder> sampleFlowOrders = [
         weight: '300 جم',
       ),
     ],
+    dateLabel: '13 سبتمبر 2024',
     assignedTime: '13 سبتمبر 2024 · 01:00pm',
     pickedTime: '13 سبتمبر 2024 · 01:55pm',
   ),
@@ -155,6 +163,7 @@ const List<FlowOrder> sampleFlowOrders = [
         weight: '400 جم',
       ),
     ],
+    dateLabel: '13 سبتمبر 2024',
     assignedTime: '13 سبتمبر 2024 · 09:15am',
     pickedTime: '13 سبتمبر 2024 · 10:05am',
   ),
@@ -179,6 +188,7 @@ const List<FlowOrder> sampleFlowOrders = [
         qty: 3,
       ),
     ],
+    dateLabel: '13 سبتمبر 2024',
     assignedTime: '13 سبتمبر 2024 · 08:20am',
     pickedTime: '13 سبتمبر 2024 · 09:10am',
   ),
@@ -198,6 +208,7 @@ const List<FlowOrder> sampleFlowOrders = [
       ),
     ],
     note: 'العميل طلب التأجيل ليوم آخر — لن يكون متواجدًا اليوم.',
+    dateLabel: '13 سبتمبر 2024',
     assignedTime: '13 سبتمبر 2024 · 07:40am',
     pickedTime: '13 سبتمبر 2024 · 08:30am',
   ),

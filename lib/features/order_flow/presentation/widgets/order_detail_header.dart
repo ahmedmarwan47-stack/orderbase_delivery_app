@@ -1,15 +1,39 @@
 part of '../imports/order_flow_imports.dart';
 
-/// White header — back row, order number + date, the transit status pill and
-/// the COD note.
+/// White header — back row, order number + date, a per-order status pill and
+/// (for COD orders only) the red COD note. Everything is driven by [order].
 class _OrderDetailHeader extends StatelessWidget {
-  const _OrderDetailHeader({required this.orderNum});
+  const _OrderDetailHeader({required this.order});
 
-  /// The order number label, including the leading '#'.
-  final String orderNum;
+  /// The order being shown; drives the number, date, status pill and COD note.
+  final FlowOrder order;
 
   @override
   Widget build(BuildContext context) {
+    // Status pill styling + label by order state. `active` keeps the mockup's
+    // solid-blue "transit" pill exactly; `done`/`failed` reuse the green/red
+    // pale-pill tokens shared with the orders list and result screen.
+    final (Color pillBg, Color pillFg, Color dotColor, String pillLabel) =
+        switch (order.state) {
+      FlowOrderState.active => (
+          AppColors.transitBg,
+          AppColors.transitText,
+          AppColors.surface,
+          LocaleKeys.orderDetailStatusTransit.tr(),
+        ),
+      FlowOrderState.done => (
+          AppColors.deliveredBg,
+          AppColors.deliveredText,
+          AppColors.deliveredText,
+          LocaleKeys.orderDetailStatusDone.tr(),
+        ),
+      FlowOrderState.failed => (
+          AppColors.failedBg,
+          AppColors.failedText,
+          AppColors.failedText,
+          LocaleKeys.orderDetailStatusFailed.tr(),
+        ),
+    };
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.surface,
@@ -53,7 +77,7 @@ class _OrderDetailHeader extends StatelessWidget {
                         ),
                         8.szW,
                         Text(
-                          orderNum,
+                          order.num,
                           textDirection: TextDirection.ltr,
                           style: const TextStyle()
                               .setMainTextColor
@@ -66,7 +90,7 @@ class _OrderDetailHeader extends StatelessWidget {
                     ),
                     4.szH,
                     Text(
-                      LocaleKeys.orderDetailDate.tr(),
+                      order.dateLabel,
                       textDirection: TextDirection.ltr,
                       style: const TextStyle().setSecondaryColor.s14.regular,
                     ),
@@ -78,17 +102,17 @@ class _OrderDetailHeader extends StatelessWidget {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: AppColors.transitBg,
+                      color: pillBg,
                       borderRadius: BorderRadius.circular(AppCircular.r8),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const _Dot(color: AppColors.surface, size: 7),
+                        _Dot(color: dotColor, size: 7),
                         8.szW,
                         Text(
-                          LocaleKeys.orderDetailStatusTransit.tr(),
-                          style: const TextStyle().setWhite.s12.bold,
+                          pillLabel,
+                          style: const TextStyle().setColor(pillFg).s12.bold,
                         ),
                       ],
                     ).paddingSymmetric(
@@ -96,14 +120,16 @@ class _OrderDetailHeader extends StatelessWidget {
                       vertical: AppPadding.pH4,
                     ),
                   ),
-                  8.szH,
-                  Text(
-                    LocaleKeys.orderDetailCodNote.tr(),
-                    style: const TextStyle()
-                        .setColor(AppColors.failedText)
-                        .s12
-                        .bold,
-                  ),
+                  if (order.cod) ...[
+                    8.szH,
+                    Text(
+                      LocaleKeys.orderDetailCodNote.tr(),
+                      style: const TextStyle()
+                          .setColor(AppColors.failedText)
+                          .s12
+                          .bold,
+                    ),
+                  ],
                 ],
               ),
             ],
