@@ -9,7 +9,7 @@
   "filter_results_count": "{count} orders · {label}",
   "clear_filter": "Clear filter",
   "notif_new_count": "{n} new",
-  "notif_minutes_ago": "{n} min",
+  "notif_minutes_ago": "{n} min ago",
   "notif_hour_ago": "1 hr ago",
   "notif_hours_ago": "{n} hrs ago",
   "notif_title_assigned": "Order #{num} assigned to you",

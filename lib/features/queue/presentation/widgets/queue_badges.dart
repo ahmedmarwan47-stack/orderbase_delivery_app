@@ -85,7 +85,8 @@ class _StatusBadge extends StatelessWidget {
   }
 }
 
-/// Pay label — COD (red) vs prepaid (green).
+/// Pay label — COD (amber, the COD semaphore) vs prepaid (green). Amber keeps
+/// red reserved as a locator (The One Red Rule) and matches the home hero pill.
 class _PayLabel extends StatelessWidget {
   const _PayLabel({required this.prepaid});
   final bool prepaid;
@@ -95,7 +96,7 @@ class _PayLabel extends StatelessWidget {
     return Text(
       (prepaid ? LocaleKeys.payPrepaid : LocaleKeys.payCod).tr(),
       style: const TextStyle()
-          .setColor(prepaid ? AppColors.deliveredText : AppColors.failedText)
+          .setColor(prepaid ? AppColors.deliveredText : AppColors.postponedText)
           .s12
           .bold,
     );

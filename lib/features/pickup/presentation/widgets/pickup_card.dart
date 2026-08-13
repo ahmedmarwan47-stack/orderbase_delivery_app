@@ -9,7 +9,7 @@ class _PickupCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final payLabel =
-        order.cod ? LocaleKeys.pickupPayCod.tr() : LocaleKeys.pickupPayPaid.tr();
+        order.cod ? LocaleKeys.payCod.tr() : LocaleKeys.pickupPayPaid.tr();
     final payFg = order.cod ? AppColors.postponedText : AppColors.deliveredText;
     final payBg = order.cod ? AppColors.heroCodPillBg : AppColors.deliveredBg;
 

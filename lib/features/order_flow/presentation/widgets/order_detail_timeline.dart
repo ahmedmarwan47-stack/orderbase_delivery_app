@@ -34,7 +34,7 @@ class _Timeline extends StatelessWidget {
                   ),
                   Expanded(
                     child: SizedBox(
-                      width: 2.w,
+                      width: 2.w, // 2px connector rule — off the 4px grid
                       child: const ColoredBox(color: AppColors.borderDefault),
                     ).paddingSymmetric(vertical: AppPadding.pH2),
                   ),

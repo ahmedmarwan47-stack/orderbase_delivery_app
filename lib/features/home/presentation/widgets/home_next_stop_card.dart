@@ -242,11 +242,12 @@ class _HomeNextStopCard extends StatelessWidget {
   }
 
   /// Progress-segment colour: delivered → green, failed → red, the current stop
-  /// → brand, upcoming stops → the faint track.
+  /// → ink (kept distinct from the failed red so two reds never sit on the same
+  /// bar), upcoming stops → the faint track.
   Color _segColor(Order stop, Order current) {
     if (stop.status == OrderStatus.delivered) return AppColors.greenAccent;
     if (stop.status == OrderStatus.failed) return AppColors.failedText;
-    if (stop.num == current.num) return AppColors.brand;
+    if (stop.num == current.num) return AppColors.inkFill;
     return AppColors.borderDefault;
   }
 }

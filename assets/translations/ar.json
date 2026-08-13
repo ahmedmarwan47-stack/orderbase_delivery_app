@@ -1,6 +1,6 @@
 {
   "queue_title": "طلبات اليوم",
-  "queue_subtitle": "١٣ سبتمبر · {count} طلبًا",
+  "queue_subtitle": "١٣ سبتمبر، {count} طلبًا",
   "filter_all": "الكل",
   "filter_transit": "في الطريق",
   "filter_postponed": "مؤجلة",
@@ -9,7 +9,7 @@
   "filter_results_count": "{count} طلبات · {label}",
   "clear_filter": "مسح الفلتر",
   "notif_new_count": "{n} جديدة",
-  "notif_minutes_ago": "{n} دقائق",
+  "notif_minutes_ago": "منذ {n} دقائق",
   "notif_hour_ago": "منذ ساعة",
   "notif_hours_ago": "منذ {n} ساعات",
   "notif_title_assigned": "تم اسناد طلب رقم {num}",

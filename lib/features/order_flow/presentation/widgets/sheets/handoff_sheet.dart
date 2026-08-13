@@ -189,7 +189,7 @@ class _HandoffSheetState extends State<_HandoffSheet> {
             Image.asset(AppAssets.img.fudgeCake, fit: BoxFit.cover),
             const ColoredBox(color: AppColors.photoGreenWash),
             PositionedDirectional(
-              top: 10.h,
+              top: 10.h, // 10px overlay inset (mockup) — off the 4px grid
               start: 10.w,
               // Confirm beat: the "captured" check settles in with a small
               // scale + fade the instant the photo lands. Instant under
@@ -224,7 +224,7 @@ class _HandoffSheetState extends State<_HandoffSheet> {
               ),
             ),
             PositionedDirectional(
-              bottom: 10.h,
+              bottom: 10.h, // 10px overlay inset (mockup) — off the 4px grid
               end: 10.w,
               child: Container(
                 height: 32.h,

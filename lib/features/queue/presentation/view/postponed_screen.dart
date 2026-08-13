@@ -13,10 +13,13 @@ class PostponedScreen extends StatefulWidget {
 }
 
 class _PostponedScreenState extends State<PostponedScreen> {
+  // Reads the live shift so the postponed list matches the postponed filter
+  // chip; falls back to the passed-in list only for DevGallery previews.
   late final ValueNotifier<List<Order>> _orders = ValueNotifier(
     List<Order>.from(
       widget.orders ??
-          sampleOrders.where((o) => o.status == OrderStatus.postponed),
+          ShiftController.instance.orders
+              .where((o) => o.status == OrderStatus.postponed),
     ),
   );
 
