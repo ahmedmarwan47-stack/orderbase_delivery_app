@@ -12,6 +12,7 @@ class QueueViewController {
     bool startSearching = false,
     String initialQuery = '',
   })  : isSearching = ValueNotifier(startSearching),
+        startedInSearch = startSearching,
         filter = ValueNotifier(QueueFilter.all),
         query = ValueNotifier(initialQuery.trim()),
         searchController = TextEditingController(text: initialQuery) {
@@ -22,6 +23,13 @@ class QueueViewController {
   }
 
   final List<Order> orders;
+
+  /// True when the screen was opened directly into search mode (pushed as a
+  /// route from Home/Orders). There's no browse mode to fall back to, so the
+  /// search-header back button must pop the route instead of just exiting
+  /// search. See [_QueueSearchHeader].
+  final bool startedInSearch;
+
   final TextEditingController searchController;
   final ValueNotifier<bool> isSearching;
   final ValueNotifier<QueueFilter> filter;

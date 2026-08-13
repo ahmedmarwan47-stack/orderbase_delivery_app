@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../config/res/config_imports.dart';
 import '../theme/shadows.dart';
 
-/// Static decorative map with a centered red pin. Used both as the short strip
-/// inside the Home hero card and as the taller rounded map in the order detail.
-/// The map itself is a placeholder illustration — swapped for a real map later.
+/// Interactive map with a centered red pin. Used both as the short strip inside
+/// the Home hero card and as the taller rounded map in the order detail.
+///
+/// Renders a real [FlutterMap] with OpenStreetMap raster tiles (pure-Dart, no
+/// native plugin — keeps the iOS build CocoaPods-free). Rotation is disabled and
+/// the pin sits at the map centre.
 class MapView extends StatelessWidget {
   const MapView({
     super.key,
@@ -16,6 +20,7 @@ class MapView extends StatelessWidget {
     this.pinDiameter = 36,
     this.pinIconSize = 19,
     this.pinVerticalAlignment = 0,
+    this.center,
   });
 
   final double height;
@@ -31,9 +36,31 @@ class MapView extends StatelessWidget {
   /// pin placement.
   final double pinVerticalAlignment;
 
+  /// Map focus point. Defaults to central Cairo.
+  final LatLng? center;
+
+  static const LatLng _defaultCenter = LatLng(30.0444, 31.2357);
+
   @override
   Widget build(BuildContext context) {
-    Widget map = SvgPicture.asset(AppAssets.img.mapStrip, fit: BoxFit.cover);
+    final LatLng focus = center ?? _defaultCenter;
+
+    Widget map = FlutterMap(
+      options: MapOptions(
+        initialCenter: focus,
+        initialZoom: 15,
+        interactionOptions: const InteractionOptions(
+          flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+        ),
+      ),
+      children: [
+        TileLayer(
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          userAgentPackageName: 'com.orderbase.orderbaseDeliveryApp',
+        ),
+      ],
+    );
+
     if (borderRadius > 0) {
       map = ClipRRect(borderRadius: BorderRadius.circular(borderRadius), child: map);
     }

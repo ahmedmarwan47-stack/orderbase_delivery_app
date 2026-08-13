@@ -109,8 +109,13 @@ class OrderFlowController {
   /// - **retry now / retry later** (wrong address corrected, or traffic) →
   ///   the order stays active on Order Detail for re-attempt; no result.
   /// - dismissed at any step → no result.
-  Future<void> fail(BuildContext context) async {
-    final outcome = await showFailureFlow(context);
+  ///
+  /// [order] is threaded through so the failure sheets surface *this* order's
+  /// customer / number / address (via [_failureContextFor]) instead of the
+  /// packaged sample — mirroring how [deliver] receives its per-order data.
+  Future<void> fail(BuildContext context, {required FlowOrder order}) async {
+    final outcome =
+        await showFailureFlow(context, context_: _failureContextFor(order));
     if (!context.mounted || outcome == null) return;
 
     switch (outcome.resolution) {
@@ -131,7 +136,7 @@ class OrderFlowController {
             postponeDisplay: p.display,
           );
         } else if (p.action == PostponeResult.back) {
-          fail(context); // reopen the failure flow
+          fail(context, order: order); // reopen the failure flow
         }
         break;
       case FailureResolution.retryNow:
@@ -142,4 +147,35 @@ class OrderFlowController {
         break;
     }
   }
+}
+
+/// Maps the real [FlowOrder] onto the failure flow's [FailureContext] so the
+/// not-delivered sheets show this order's own customer, number and address.
+///
+/// [FlowOrder] carries the number, name, address and a `meta` string
+/// (`<area> · <pieces> قطعة`) — the area and piece count are parsed out of it.
+/// Fields [FlowOrder] doesn't model (the address detail hint, the 1c corrected
+/// address, the branch, logged contact attempts and the retry-later slots) fall
+/// back to the shared [sampleFailureContext] values.
+FailureContext _failureContextFor(FlowOrder order) {
+  final sample = sampleFailureContext();
+  final parts = order.meta.split('·');
+  final area = parts.isNotEmpty ? parts.first.trim() : sample.area;
+  final piecesLabel = parts.length > 1 ? parts[1].trim() : sample.piecesLabel;
+  final pieces =
+      int.tryParse(RegExp(r'\d+').firstMatch(piecesLabel)?.group(0) ?? '') ??
+          sample.pieces;
+  return FailureContext(
+    orderNum: order.num,
+    customer: order.name,
+    area: area,
+    address: order.address,
+    addressDetail: sample.addressDetail,
+    correctedAddress: sample.correctedAddress,
+    pieces: pieces,
+    piecesLabel: piecesLabel,
+    branch: sample.branch,
+    attempts: sample.attempts,
+    laterSlots: sample.laterSlots,
+  );
 }

@@ -10,6 +10,7 @@ import '../features/home/presentation/imports/home_imports.dart';
 import '../features/order_flow/presentation/imports/order_flow_imports.dart';
 import '../features/orders/presentation/imports/orders_imports.dart';
 import '../features/pickup/presentation/imports/pickup_imports.dart';
+import '../features/queue/presentation/imports/queue_imports.dart';
 import '../features/settlement/presentation/imports/settlement_imports.dart';
 import '../theme/colors.dart';
 import '../theme/spacing.dart';
@@ -172,6 +173,10 @@ class _MoreTab extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: AppSpacing.s20),
                   children: [
+                    _MoreRow(
+                        icon: AppAssets.svg.orders,
+                        label: 'طلبات اليوم',
+                        onTap: () => _push(context, const QueueScreen())),
                     _MoreRow(
                         icon: AppAssets.svg.cash,
                         label: 'تسوية نهاية اليوم',

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../config/res/config_imports.dart';
+import '../../../../features/queue/presentation/imports/queue_imports.dart';
 import '../../../../theme/shadows.dart';
 import '../../../../widgets/bottom_nav.dart';
 import '../../../../widgets/map_view.dart';

@@ -47,6 +47,8 @@ dependencies:
   easy_localization: ^3.0.7   # LocaleKeys.*.tr() i18n
   flutter_screenutil: ^5.9.3  # responsive .h/.w/.sp/.r sizing
   rxdart: ^0.28.0             # debounce for search fields
+  flutter_map: ^8.3.1
+  latlong2: ^0.10.1
 
 dev_dependencies:
   flutter_test:

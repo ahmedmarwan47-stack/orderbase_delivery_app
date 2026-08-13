@@ -19,7 +19,7 @@ class _QueueSearchHeader extends StatelessWidget {
             children: [
               _SquareIconButton(
                 icon: AppAssets.svg.chevronRight,
-                onTap: vc.closeSearch,
+                onTap: () => _onBack(context),
                 size: AppSize.sH40,
                 label: LocaleKeys.a11yBack.tr(),
               ),
@@ -40,6 +40,20 @@ class _QueueSearchHeader extends StatelessWidget {
         bottom: AppPadding.pH16,
       ),
     );
+  }
+
+  /// Back/close behaviour: clear the query first if there's anything typed;
+  /// once it's empty, leave search. When the screen was opened straight into
+  /// search (pushed from Home/Orders) there's no browse mode to return to, so
+  /// pop the route; otherwise fall back to the browse header.
+  void _onBack(BuildContext context) {
+    if (vc.searchController.text.isNotEmpty) {
+      vc.clearSearch();
+    } else if (vc.startedInSearch) {
+      Navigator.of(context).maybePop();
+    } else {
+      vc.closeSearch();
+    }
   }
 }
 

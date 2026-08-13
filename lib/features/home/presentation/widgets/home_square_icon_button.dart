@@ -1,7 +1,9 @@
 part of '../imports/home_imports.dart';
 
-/// Square icon button — used for the header search and the hero call/chat
-/// actions. Decorative (no tap in the mockup).
+/// Square icon tile — used for the header search and the hero call/chat
+/// actions. Purely visual; callers add a tap via `.onClick` when the affordance
+/// is live (the header search opens the Queue search; the hero actions stay
+/// decorative per the mockup).
 class _HomeSquareIconButton extends StatelessWidget {
   const _HomeSquareIconButton({
     required this.icon,

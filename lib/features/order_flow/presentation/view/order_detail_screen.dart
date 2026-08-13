@@ -77,7 +77,7 @@ class OrderDetailScreen extends StatelessWidget {
                         _PaymentCard(amount: o.amount ?? ''),
                         16.szH,
                       ],
-                      _FailButton(onTap: () => controller.fail(context)),
+                      _FailButton(onTap: () => controller.fail(context, order: o)),
                       16.szH,
                       _Timeline(pickedTime: o.pickedTime, assignedTime: o.assignedTime),
                     ],

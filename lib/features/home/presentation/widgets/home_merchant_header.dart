@@ -36,13 +36,23 @@ class _HomeMerchantHeader extends StatelessWidget {
             ),
           ],
         ),
-        _HomeSquareIconButton(
-          icon: AppAssets.svg.search,
-          iconColor: AppColors.textPrimary,
-          size: AppSize.sH40,
-          iconSize: AppSize.sH20,
-          background: AppColors.surface,
-          border: AppColors.iconButtonBorder,
+        Semantics(
+          button: true,
+          label: LocaleKeys.a11ySearch.tr(),
+          child: _HomeSquareIconButton(
+            icon: AppAssets.svg.search,
+            iconColor: AppColors.textPrimary,
+            size: AppSize.sH40,
+            iconSize: AppSize.sH20,
+            background: AppColors.surface,
+            border: AppColors.iconButtonBorder,
+          ).onClick(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const QueueScreen(startSearching: true),
+              ),
+            ),
+          ),
         ),
       ],
     ).paddingOnly(
