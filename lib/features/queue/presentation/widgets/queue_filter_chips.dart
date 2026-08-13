@@ -97,7 +97,10 @@ class _FilterChip extends StatelessWidget {
           _CountBadge(count: count, selected: selected, postponedStyle: postponedStyle),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW12),
-    ).onClick(onTap: onTap);
+    ).onClick(onTap: () {
+      AppHaptics.tick();
+      onTap();
+    });
   }
 }
 

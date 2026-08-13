@@ -20,6 +20,8 @@ abstract final class LocaleKeys {
   // Notifications feed
   static const String notifNewCount = 'notif_new_count';
   static const String notifMinutesAgo = 'notif_minutes_ago';
+  static const String notifEmptyTitle = 'notif_empty_title';
+  static const String notifEmptySub = 'notif_empty_sub';
   static const String notifHourAgo = 'notif_hour_ago';
   static const String notifHoursAgo = 'notif_hours_ago';
   static const String notifTitleAssigned = 'notif_title_assigned';
@@ -103,6 +105,7 @@ abstract final class LocaleKeys {
   static const String homeViewOrder = 'home_view_order';
   static const String homeRouteCompleteTitle = 'home_route_complete_title';
   static const String homeRouteCompleteSub = 'home_route_complete_sub';
+  static const String homeRouteCompleteStats = 'home_route_complete_stats';
   static const String homeTodayOverview = 'home_today_overview';
   static const String homeStatInProgress = 'home_stat_in_progress';
   static const String homeStatDelivered = 'home_stat_delivered';

@@ -11,8 +11,9 @@ class SettlementScreen extends StatefulWidget {
     this.startStage = SettlementStage.open,
   });
 
-  /// Defaults to [sampleSettlement] (a runtime getter — the cashier name is
-  /// localized) when null.
+  /// Defaults to [shiftSettlement] (built live from today's shift) when null, so
+  /// the app shell shows real settlement data. Preview/DevGallery callers pass an
+  /// explicit [data] (e.g. [sampleSettlement]).
   final SettlementData? data;
   final SettlementStage startStage;
 
@@ -22,7 +23,7 @@ class SettlementScreen extends StatefulWidget {
 
 class _SettlementScreenState extends State<SettlementScreen> {
   late final SettlementController _vc = SettlementController(
-    data: widget.data ?? sampleSettlement,
+    data: widget.data ?? shiftSettlement,
     startStage: widget.startStage,
   );
 

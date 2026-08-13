@@ -9,8 +9,9 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../../../app/shift_controller.dart';
 import '../../../../config/res/config_imports.dart';
-import '../../../../data/order.dart' show formatThousands;
+import '../../../../data/order.dart' show formatThousands, OrderStatus;
 import '../../../../theme/shadows.dart';
 import '../../../../widgets/home_indicator.dart';
 

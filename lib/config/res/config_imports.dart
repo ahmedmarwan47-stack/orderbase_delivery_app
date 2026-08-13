@@ -17,4 +17,7 @@ export '../../core/extensions/widget_extension.dart';
 export '../../core/extensions/text_style_extensions.dart';
 export '../../core/widgets/icon_widget.dart';
 export '../../core/widgets/app_assets.dart';
+export '../../core/widgets/count_up_text.dart';
 export '../../core/localization/locale_keys.dart';
+export '../../core/utils/app_motion.dart';
+export '../../core/utils/app_haptics.dart';

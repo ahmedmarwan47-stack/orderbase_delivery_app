@@ -10,6 +10,17 @@ class PickupScreen extends StatelessWidget {
   /// Confirms pickup (all orders → "in transit"). Wired to the flow later.
   final VoidCallback? onConfirm;
 
+  /// Total time the entrance stagger is allowed to span across the whole batch.
+  static const Duration _totalStagger = Duration(milliseconds: 300);
+
+  /// Per-card lead-in: evenly spread across [_totalStagger] regardless of how
+  /// many cards there are, so a long list never crawls in.
+  static Duration _staggerDelay(int index, int count) {
+    if (count <= 1) return Duration.zero;
+    final step = _totalStagger.inMilliseconds / (count - 1);
+    return Duration(milliseconds: (step * index).round());
+  }
+
   @override
   Widget build(BuildContext context) {
     // The batch waiting at the branch = the shift's in-transit orders (the ones
@@ -38,14 +49,25 @@ class PickupScreen extends StatelessWidget {
                   ),
                   itemCount: orders.length,
                   separatorBuilder: (_, _) => 12.szH,
-                  itemBuilder: (_, i) => _PickupCard(order: orders[i]),
+                  itemBuilder: (_, i) => _PickupCard(
+                    order: orders[i],
+                    // Index-based lead-in so the batch reads as a list dropping
+                    // in top-to-bottom, but the TOTAL stagger is capped so a long
+                    // list never crawls (~300ms across the whole batch).
+                    entranceDelay: _staggerDelay(i, orders.length),
+                  ),
                 ),
               ),
               _PickupConfirmBar(
                 count: orders.length,
-                // From the More menu there's no flow to advance into yet, so
-                // confirming pops back rather than silently doing nothing.
-                onConfirm: onConfirm ?? () => Navigator.of(context).maybePop(),
+                onConfirm: () {
+                  // A decisive medium tap the instant the batch is accepted,
+                  // just before the real accept/navigation runs.
+                  AppHaptics.confirm();
+                  // From the More menu there's no flow to advance into yet, so
+                  // confirming pops back rather than silently doing nothing.
+                  (onConfirm ?? () => Navigator.of(context).maybePop())();
+                },
               ),
               const HomeIndicator(),
             ],

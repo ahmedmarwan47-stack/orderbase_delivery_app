@@ -21,6 +21,9 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
     with SingleTickerProviderStateMixin {
   late final AnimationController _reveal;
 
+  /// The success haptic (money landing) fires exactly once, on first settle.
+  bool _settledOnce = false;
+
   int get due => widget.due;
   int get amount => widget.amount;
   int get extra => amount > due ? amount - due : 0;
@@ -44,6 +47,12 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
       _reveal.value = 1;
     } else if (_reveal.status == AnimationStatus.dismissed) {
       _reveal.forward();
+    }
+    // Money landing: one success haptic on first settle. Feedback, not motion,
+    // so it fires under Reduce Motion too.
+    if (!_settledOnce) {
+      _settledOnce = true;
+      AppHaptics.success();
     }
   }
 
@@ -241,9 +250,12 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                    Text(
-                      formatThousands(amount),
+                    CountUpText(
+                      value: amount,
+                      format: formatThousands,
                       textDirection: TextDirection.ltr,
+                      duration: AppMotion.focal,
+                      animate: !AppMotion.reduced(context),
                       style: const TextStyle()
                           .setWhite
                           .s24
@@ -274,24 +286,43 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
             ),
           ),
           12.szW,
-          Container(
-            width: AppSize.sW44,
-            height: AppSize.sH44,
-            decoration: BoxDecoration(
-              color: AppColors.paymentTile,
-              borderRadius: BorderRadius.circular(AppCircular.r14),
-            ),
-            child: Center(
-              child: IconWidget(
-                icon: AppAssets.svg.cash,
-                color: AppColors.cashBright,
-                height: AppSize.sH22,
-                width: AppSize.sW22,
-              ),
-            ),
-          ),
+          _cashTile(),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW20, vertical: AppPadding.pH16),
+    );
+  }
+
+  /// The green cash tile. As the card settles it gives one subtle, confident
+  /// pulse (scale 1→1.12→1) over the tail of the reveal. No pulse under Reduce
+  /// Motion.
+  Widget _cashTile() {
+    final tile = Container(
+      width: AppSize.sW44,
+      height: AppSize.sH44,
+      decoration: BoxDecoration(
+        color: AppColors.paymentTile,
+        borderRadius: BorderRadius.circular(AppCircular.r14),
+      ),
+      child: Center(
+        child: IconWidget(
+          icon: AppAssets.svg.cash,
+          color: AppColors.cashBright,
+          height: AppSize.sH22,
+          width: AppSize.sW22,
+        ),
+      ),
+    );
+    if (AppMotion.reduced(context)) return tile;
+    const interval = Interval(0.66, 1.0, curve: Curves.easeOut);
+    return AnimatedBuilder(
+      animation: _reveal,
+      child: tile,
+      builder: (_, ch) {
+        final p = interval.transform(_reveal.value);
+        // Triangle: up to the peak at the midpoint, back down by the tail.
+        final tri = p < 0.5 ? p * 2 : (1 - p) * 2;
+        return Transform.scale(scale: 1 + 0.12 * tri, child: ch);
+      },
     );
   }
 }

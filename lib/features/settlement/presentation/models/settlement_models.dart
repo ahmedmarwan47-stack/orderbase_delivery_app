@@ -68,3 +68,24 @@ SettlementData get sampleSettlement => SettlementData(
         SettlementLine(num: '#89272', name: 'ياسمين عادل', order: 620, paid: 620),
       ],
     );
+
+/// Live settlement snapshot built from today's shift
+/// ([ShiftController.instance.orders]) — the cash orders the courier actually
+/// delivered. Only delivered, non-prepaid (COD) orders count toward the cash the
+/// cashier receives; `order` is the order value and `paid` is the cash collected
+/// (falling back to the order value when a specific figure wasn't recorded). Early
+/// in a shift there are no delivered cash orders, so [SettlementData.lines] is
+/// empty and every total derives to 0 — the views render that gracefully. The
+/// cashier name is localized at runtime, matching [sampleSettlement].
+SettlementData get shiftSettlement => SettlementData(
+      cashierName: LocaleKeys.settlementCashierDefault.tr(),
+      lines: ShiftController.instance.orders
+          .where((o) => o.status == OrderStatus.delivered && !o.prepaid)
+          .map((o) => SettlementLine(
+                num: o.num,
+                name: o.name,
+                order: o.cod ?? 0,
+                paid: o.collected ?? o.cod ?? 0,
+              ))
+          .toList(),
+    );

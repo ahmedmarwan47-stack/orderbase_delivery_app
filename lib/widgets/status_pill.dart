@@ -20,7 +20,16 @@ class StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    // When an order changes state (transit → delivered) the colours tween and
+    // the label cross-fades instead of hard-swapping. Shape / padding / size
+    // stay identical. Reduce Motion collapses every duration to zero for an
+    // instant swap.
+    final Duration duration =
+        AppMotion.reduced(context) ? Duration.zero : AppMotion.fill;
+
+    return AnimatedContainer(
+      duration: duration,
+      curve: AppMotion.ease,
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(AppCircular.r8),
@@ -30,9 +39,20 @@ class StatusPill extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[icon!, 4.szW],
-          Text(
-            label,
-            style: const TextStyle().setColor(foreground).s12.bold,
+          AnimatedSwitcher(
+            duration: duration,
+            switchInCurve: AppMotion.ease,
+            switchOutCurve: AppMotion.ease,
+            child: TweenAnimationBuilder<Color?>(
+              key: ValueKey<String>(label),
+              tween: ColorTween(begin: foreground, end: foreground),
+              duration: duration,
+              curve: AppMotion.ease,
+              builder: (context, color, child) => Text(
+                label,
+                style: const TextStyle().setColor(color ?? foreground).s12.bold,
+              ),
+            ),
           ),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),

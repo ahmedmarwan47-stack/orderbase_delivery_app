@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/utils/app_motion.dart';
 import '../core/widgets/app_assets.dart';
 import '../core/widgets/icon_widget.dart';
 import '../data/flow_order.dart';
@@ -38,8 +39,20 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppShellState extends State<AppShell>
+    with SingleTickerProviderStateMixin {
   NavTab _tab = NavTab.home;
+
+  /// Drives a quick fade-in of the newly-selected tab. The [IndexedStack] stays
+  /// in the tree (so every tab keeps its state); only the visible child is
+  /// dissolved in on switch. Held at 1.0 while idle / under Reduce Motion.
+  late final AnimationController _tabFade = AnimationController(
+    vsync: this,
+    duration: AppMotion.stamp,
+    value: 1,
+  );
+  late final Animation<double> _tabFadeCurve =
+      CurvedAnimation(parent: _tabFade, curve: AppMotion.ease);
 
   /// The Orders tab IS the "today's orders" queue (search + 5 filters +
   /// postponed). The shell owns its controller so a Home KPI tap can preselect
@@ -51,11 +64,21 @@ class _AppShellState extends State<AppShell> {
 
   @override
   void dispose() {
+    _tabFade.dispose();
     _ordersVc.dispose();
     super.dispose();
   }
 
-  void _select(NavTab t) => setState(() => _tab = t);
+  void _select(NavTab t) {
+    if (t == _tab) return;
+    setState(() => _tab = t);
+    // Cross-fade the incoming tab in; jump straight to it under Reduce Motion.
+    if (AppMotion.reduced(context)) {
+      _tabFade.value = 1;
+    } else {
+      _tabFade.forward(from: 0);
+    }
+  }
 
   /// Push the order-detail flow for [order], wiring its Result screen back to
   /// the shell.
@@ -106,20 +129,23 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: IndexedStack(
-        index: _tab.index,
-        children: [
-          HomeScreen(
-            onSelectTab: _select,
-            onOpenOrder: _openNextStop,
-            onOpenOrdersFilter: _openOrdersFilter,
-            onOpenSettlement: _openSettlement,
-          ),
-          QueueScreen(controller: _ordersVc),
-          NotificationsScreen(
-              onSelectTab: _select, onOpenOrder: _openOrderByNum),
-          _MoreTab(onSelectTab: _select),
-        ],
+      child: FadeTransition(
+        opacity: _tabFadeCurve,
+        child: IndexedStack(
+          index: _tab.index,
+          children: [
+            HomeScreen(
+              onSelectTab: _select,
+              onOpenOrder: _openNextStop,
+              onOpenOrdersFilter: _openOrdersFilter,
+              onOpenSettlement: _openSettlement,
+            ),
+            QueueScreen(controller: _ordersVc),
+            NotificationsScreen(
+                onSelectTab: _select, onOpenOrder: _openOrderByNum),
+            _MoreTab(onSelectTab: _select),
+          ],
+        ),
       ),
     );
   }

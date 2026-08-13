@@ -16,6 +16,21 @@ class _HomeNextStopCard extends StatelessWidget {
     if (order == null) return const _HomeRouteCompleteCard();
 
     final isCod = order.cod != null && !order.prepaid;
+
+    // Order the progress segments the way the route reads — closed stops
+    // (delivered/failed) first, then the current stop, then the upcoming ones —
+    // so the bar shows real sequence. In RTL the Row fills from the start
+    // (right), so progress runs right → left; raw list order didn't.
+    final closed = shift.routeStops
+        .where((s) =>
+            s.status == OrderStatus.delivered ||
+            s.status == OrderStatus.failed)
+        .toList();
+    final upcoming = shift.routeStops
+        .where((s) => s.status == OrderStatus.transit && s.num != order.num)
+        .toList();
+    final orderedStops = [...closed, order, ...upcoming];
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -73,11 +88,26 @@ class _HomeNextStopCard extends StatelessWidget {
             bottom: AppPadding.pH12,
           ),
           // ── progress segments (one per route stop) ──
+          // Each segment fades its colour when a stop closes (grey → green/red).
+          // Keyed by stop id so a closing stop animates *its own* segment even
+          // as the ordered list reshuffles; under Reduce Motion the colour just
+          // snaps (Duration.zero). The `_segColor` mapping is unchanged.
           Row(
             spacing: AppSize.sW8,
             children: [
-              for (final s in shift.routeStops)
-                _HomeProgressSeg(_segColor(s, order)),
+              for (final s in orderedStops)
+                TweenAnimationBuilder<Color?>(
+                  key: ValueKey(s.num),
+                  tween: ColorTween(
+                    begin: _segColor(s, order),
+                    end: _segColor(s, order),
+                  ),
+                  duration:
+                      AppMotion.reduced(context) ? Duration.zero : AppMotion.fill,
+                  curve: AppMotion.ease,
+                  builder: (context, color, _) =>
+                      _HomeProgressSeg(color ?? _segColor(s, order)),
+                ),
             ],
           ).paddingOnly(
             left: AppPadding.pW20,
@@ -284,6 +314,7 @@ class _HomeRouteCompleteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shift = ShiftController.instance;
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -297,19 +328,34 @@ class _HomeRouteCompleteCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Container(
-            width: AppSize.sW64,
-            height: AppSize.sH64,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.deliveredBg,
+          // The green check settles in once — a single scale + fade arrival.
+          // Reduce Motion starts (and stays) fully settled.
+          TweenAnimationBuilder<double>(
+            tween: Tween<double>(
+              begin: AppMotion.reduced(context) ? 1.0 : 0.0,
+              end: 1.0,
             ),
-            child: Center(
-              child: IconWidget(
-                icon: AppAssets.svg.check,
-                color: AppColors.greenAccent,
-                height: AppSize.sH32,
-                width: AppSize.sH32,
+            duration:
+                AppMotion.reduced(context) ? Duration.zero : AppMotion.settle,
+            curve: AppMotion.ease,
+            builder: (context, t, child) => Opacity(
+              opacity: t.clamp(0.0, 1.0),
+              child: Transform.scale(scale: t, child: child),
+            ),
+            child: Container(
+              width: AppSize.sW64,
+              height: AppSize.sH64,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.deliveredBg,
+              ),
+              child: Center(
+                child: IconWidget(
+                  icon: AppAssets.svg.check,
+                  color: AppColors.greenAccent,
+                  height: AppSize.sH32,
+                  width: AppSize.sH32,
+                ),
               ),
             ),
           ),
@@ -328,6 +374,17 @@ class _HomeRouteCompleteCard extends StatelessWidget {
                 .s14
                 .regular
                 .withHeight(1.6),
+          ),
+          // Warm end-of-day tally — how many stops and how much cash.
+          8.szH,
+          Text(
+            LocaleKeys.homeRouteCompleteStats.tr(namedArgs: {
+              'done': '${shift.deliveredCount}',
+              'total': '${shift.totalStops}',
+              'cash': formatThousands(shift.collectedEgp),
+            }),
+            textAlign: TextAlign.center,
+            style: const TextStyle().setTertiaryColor.s12.bold,
           ),
         ],
       ),

@@ -17,3 +17,4 @@ part '../view/notifications_screen.dart';
 // Widgets (private to the feature)
 part '../widgets/notifications_header.dart';
 part '../widgets/notification_tile.dart';
+part '../widgets/notifications_empty.dart';

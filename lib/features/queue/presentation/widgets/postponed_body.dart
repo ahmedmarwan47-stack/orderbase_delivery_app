@@ -10,29 +10,113 @@ class _PostponedBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<List<Order>>(
       valueListenable: orders,
-      builder: (_, list, _) => Column(
+      builder: (context, list, _) => Column(
         children: [
           _PostponedHeader(count: list.length),
           Expanded(
-            child: ListView(
-              padding: EdgeInsetsDirectional.only(
-                start: AppPadding.pW20,
-                end: AppPadding.pW20,
-                top: AppPadding.pH16,
-                bottom: AppPadding.pH20,
-              ),
-              children: [
-                const _PostponedInfoBanner(),
-                for (final o in list) ...[
-                  12.szH,
-                  _PostponedCard(order: o, onReturn: () => onReturn(o)),
-                ],
-              ],
+            child: _AnimatedPostponedList(
+              orders: list,
+              onReturn: onReturn,
+              reduced: AppMotion.reduced(context),
             ),
           ),
           const BottomNav(active: NavTab.orders, notificationsBadge: true),
         ],
       ),
+    );
+  }
+}
+
+/// The postponed cards, where returning an order to the queue collapses its row
+/// on-screen (reusing [_CollapsibleRow]) instead of the card just vanishing —
+/// this is the one place a stop leaves a *visible* list, so the row-departure
+/// motion lands here. Rows are keyed by order number and diffed on update; a
+/// returned order lingers marked `removing` until its collapse finishes, then is
+/// pruned. Instant under Reduce Motion.
+class _AnimatedPostponedList extends StatefulWidget {
+  const _AnimatedPostponedList({
+    required this.orders,
+    required this.onReturn,
+    required this.reduced,
+  });
+
+  final List<Order> orders;
+  final void Function(Order) onReturn;
+  final bool reduced;
+
+  @override
+  State<_AnimatedPostponedList> createState() => _AnimatedPostponedListState();
+}
+
+class _AnimatedPostponedListState extends State<_AnimatedPostponedList> {
+  final List<_QueueRow> _rows = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _rows.addAll(widget.orders.map((o) => _QueueRow(o)));
+  }
+
+  @override
+  void didUpdateWidget(covariant _AnimatedPostponedList old) {
+    super.didUpdateWidget(old);
+    final incoming = {for (final o in widget.orders) o.num: o};
+    final seen = <String>{};
+    final next = <_QueueRow>[];
+    for (final row in _rows) {
+      final fresh = incoming[row.order.num];
+      if (fresh != null) {
+        next.add(_QueueRow(fresh));
+        seen.add(fresh.num);
+      } else if (!widget.reduced) {
+        next.add(_QueueRow(row.order, removing: true));
+      }
+    }
+    for (final o in widget.orders) {
+      if (!seen.contains(o.num)) next.add(_QueueRow(o));
+    }
+    _rows
+      ..clear()
+      ..addAll(next);
+  }
+
+  void _prune(String orderNum) {
+    if (!mounted) return;
+    setState(() =>
+        _rows.removeWhere((r) => r.removing && r.order.num == orderNum));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final duration = widget.reduced ? Duration.zero : AppMotion.fill;
+    return ListView(
+      padding: EdgeInsetsDirectional.only(
+        start: AppPadding.pW20,
+        end: AppPadding.pW20,
+        top: AppPadding.pH16,
+        bottom: AppPadding.pH20,
+      ),
+      children: [
+        const _PostponedInfoBanner(),
+        for (final row in _rows)
+          _CollapsibleRow(
+            key: ValueKey(row.order.num),
+            removing: row.removing,
+            duration: duration,
+            onRemoved: () => _prune(row.order.num),
+            child: Padding(
+              padding: EdgeInsetsDirectional.only(top: AppPadding.pH12),
+              // A row that's collapsing away shouldn't take another tap.
+              child: IgnorePointer(
+                ignoring: row.removing,
+                child: _PostponedCard(
+                  order: row.order,
+                  onReturn: () => widget.onReturn(row.order),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

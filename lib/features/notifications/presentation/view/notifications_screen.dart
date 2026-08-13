@@ -27,22 +27,24 @@ class NotificationsScreen extends StatelessWidget {
             children: [
               _NotificationsHeader(unread: unread),
               Expanded(
-                child: ListView.separated(
-                  padding: EdgeInsetsDirectional.only(
-                    start: AppPadding.pW20,
-                    end: AppPadding.pW20,
-                    top: AppPadding.pH4,
-                    bottom: AppPadding.pH20,
-                  ),
-                  itemCount: items.length,
-                  separatorBuilder: (_, _) => 12.szH,
-                  itemBuilder: (_, i) => _NotificationTile(
-                    notification: items[i],
-                    onTap: onOpenOrder == null
-                        ? null
-                        : () => onOpenOrder!(items[i].orderNum),
-                  ),
-                ),
+                child: items.isEmpty
+                    ? const _NotificationsEmpty()
+                    : ListView.separated(
+                        padding: EdgeInsetsDirectional.only(
+                          start: AppPadding.pW20,
+                          end: AppPadding.pW20,
+                          top: AppPadding.pH4,
+                          bottom: AppPadding.pH20,
+                        ),
+                        itemCount: items.length,
+                        separatorBuilder: (_, _) => 12.szH,
+                        itemBuilder: (_, i) => _NotificationTile(
+                          notification: items[i],
+                          onTap: onOpenOrder == null
+                              ? null
+                              : () => onOpenOrder!(items[i].orderNum),
+                        ),
+                      ),
               ),
               BottomNav(
                 active: NavTab.notifications,

@@ -47,7 +47,7 @@ class _CustomerSection extends StatelessWidget {
                 border: AppColors.brand,
                 borderWidth: 1.5,
                 background: AppColors.surface,
-              ),
+              ).onClick(onTap: AppHaptics.tap),
             ),
             12.szW,
             Expanded(
@@ -57,7 +57,7 @@ class _CustomerSection extends StatelessWidget {
                 fg: AppColors.deliveredText,
                 border: AppColors.deliveredBorder,
                 background: AppColors.deliveredBg,
-              ),
+              ).onClick(onTap: AppHaptics.tap),
             ),
           ],
         ),

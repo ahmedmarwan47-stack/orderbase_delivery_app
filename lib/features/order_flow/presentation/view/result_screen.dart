@@ -115,12 +115,17 @@ class _ResultScreenState extends State<ResultScreen>
       };
 
   /// How far the photo/badge scales up on entry — a fuller settle for a
-  /// delivered handoff, barely any for a failed one.
+  /// delivered handoff, barely any for a failed one. Delivered starts a touch
+  /// lower so the press-in reads as a stamp.
   double get _badgeScaleFrom => switch (widget.kind) {
-        ResultKind.delivered => 0.90,
+        ResultKind.delivered => 0.88,
         ResultKind.postponed => 0.93,
         ResultKind.failed => 0.96,
       };
+
+  /// Fires the outcome haptic exactly once on arrival — the "stamp". Haptics
+  /// are feedback, so this runs regardless of Reduce Motion.
+  bool _stamped = false;
 
   @override
   void initState() {
@@ -131,6 +136,18 @@ class _ResultScreenState extends State<ResultScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // The stamp: one outcome haptic on first appearance, never on rebuild.
+    if (!_stamped) {
+      _stamped = true;
+      switch (widget.kind) {
+        case ResultKind.delivered:
+          AppHaptics.success();
+        case ResultKind.failed:
+          AppHaptics.warning();
+        case ResultKind.postponed:
+          AppHaptics.confirm();
+      }
+    }
     // Honor Reduce Motion: jump to the settled state instead of animating.
     if (MediaQuery.of(context).disableAnimations) {
       _entrance.value = 1;
@@ -177,6 +194,31 @@ class _ResultScreenState extends State<ResultScreen>
     );
   }
 
+  /// Badge-only stamp emphasis: scales up from [_badgeScaleFrom] through a
+  /// slight, capped overshoot (~1.04) and eases back to 1 — a brief press that
+  /// reads like stamping the manifest, not a bounce. Driven over the badge's
+  /// own window (matching the [_rise] interval below) on [AppMotion.ease]. The
+  /// settled value (t=1) is exactly 1.0, so Reduce Motion — which pins the
+  /// controller to 1 — lands on the badge at rest with no scaling.
+  Widget _badgeStamp(Widget child) {
+    const window = Interval(0, 0.55, curve: AppMotion.ease);
+    const overshoot = 1.04;
+    const settlePoint = 0.82; // fraction of the window spent growing in
+    return AnimatedBuilder(
+      animation: _entrance,
+      child: child,
+      builder: (_, ch) {
+        final t = window.transform(_entrance.value);
+        final double scale = t < settlePoint
+            ? _badgeScaleFrom +
+                (overshoot - _badgeScaleFrom) * (t / settlePoint)
+            : overshoot +
+                (1.0 - overshoot) * ((t - settlePoint) / (1 - settlePoint));
+        return Transform.scale(scale: scale, child: ch);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -197,8 +239,7 @@ class _ResultScreenState extends State<ResultScreen>
                         begin: 0,
                         end: 0.55,
                         dy: 6,
-                        scaleFrom: _badgeScaleFrom,
-                        child: widget._badge(),
+                        child: _badgeStamp(widget._badge()),
                       ),
                     ),
                     20.szH,
