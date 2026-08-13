@@ -8,12 +8,16 @@ enum QueueFilter { all, transit, delivered, failed }
 /// active filter, and the debounced query. No `setState`, no logic in the View.
 class QueueViewController {
   QueueViewController({
-    required this.orders,
+    List<Order>? orders,
+    this.onSelectTab,
+    this.onOpenOrder,
     bool startSearching = false,
     String initialQuery = '',
-  })  : isSearching = ValueNotifier(startSearching),
+    QueueFilter initialFilter = QueueFilter.all,
+  })  : _staticOrders = orders,
+        isSearching = ValueNotifier(startSearching),
         startedInSearch = startSearching,
-        filter = ValueNotifier(QueueFilter.all),
+        filter = ValueNotifier(initialFilter),
         query = ValueNotifier(initialQuery.trim()),
         searchController = TextEditingController(text: initialQuery) {
     _searchSub = _searchSubject
@@ -22,7 +26,17 @@ class QueueViewController {
         .listen((q) => query.value = q.trim());
   }
 
-  final List<Order> orders;
+  /// Static override (e.g. DevGallery's "cleared" set). When null, the queue
+  /// reads the **live** shift orders, so deliveries/failures reflect instantly.
+  final List<Order>? _staticOrders;
+
+  /// Shell mode: forward bottom-nav taps and open the detail *through* the app
+  /// shell (so the order flow pops back to the tab and mutates the shift).
+  /// Both null on the standalone `/queue` route (opens detail directly).
+  final void Function(NavTab)? onSelectTab;
+  final void Function(FlowOrder)? onOpenOrder;
+
+  List<Order> get orders => _staticOrders ?? ShiftController.instance.orders;
 
   /// True when the screen was opened directly into search mode (pushed as a
   /// route from Home/Orders). There's no browse mode to fall back to, so the
@@ -111,39 +125,21 @@ class QueueViewController {
 
   void openPostponed() => Modular.to.pushNamed('/queue/postponed');
 
-  /// Open the tapped order's detail. Prefers the richer per-order [FlowOrder]
-  /// (matched by number) so items/timeline/notes are real; falls back to
-  /// adapting the thinner queue [Order] when there's no match.
+  /// Open the tapped order's detail. In shell mode this hands the built
+  /// [FlowOrder] up to the shell (which pushes the flow over the tabs); on the
+  /// standalone route it pushes the detail directly.
   void openOrder(BuildContext context, Order order) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => OrderDetailScreen(order: _asFlowOrder(order)),
-      ),
-    );
+    final flow = _asFlowOrder(order);
+    if (onOpenOrder != null) {
+      onOpenOrder!(flow);
+    } else {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => OrderDetailScreen(order: flow)),
+      );
+    }
   }
 
-  FlowOrder _asFlowOrder(Order o) {
-    for (final f in sampleFlowOrders) {
-      if (f.num == o.num) return f;
-    }
-    return FlowOrder(
-      num: o.num,
-      name: o.name,
-      meta: o.area,
-      state: switch (o.status) {
-        OrderStatus.transit || OrderStatus.postponed => FlowOrderState.active,
-        OrderStatus.delivered => FlowOrderState.done,
-        OrderStatus.failed => FlowOrderState.failed,
-      },
-      cod: o.cod != null && !o.prepaid,
-      amount: o.cod != null ? formatThousands(o.cod!) : null,
-      address: '${o.addr} — ${o.area}',
-      items: const [],
-      assignedTime: o.due ?? '',
-      pickedTime: '',
-      dateLabel: '',
-    );
-  }
+  FlowOrder _asFlowOrder(Order o) => orderToFlow(o);
 
   String _toEnglishDigits(String s) {
     const eastern = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];

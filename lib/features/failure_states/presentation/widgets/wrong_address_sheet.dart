@@ -8,9 +8,9 @@ class WrongAddressResult {
   final String? correctedAddress;
 }
 
-/// 1c · «عنوان خاطئ» — step 2 of 2 (retryable). The courier edits the corrected
-/// address, then picks one of two outcomes: retry the delivery now, or return
-/// the pieces to the branch.
+/// 1c · «عنوان خاطئ» — step 2 of 2 (retryable). The courier just types the
+/// corrected address, then picks one of two outcomes: retry the delivery now,
+/// or return the pieces to the branch.
 class _WrongAddressSheet extends StatefulWidget {
   const _WrongAddressSheet({required this.ctx});
   final FailureContext ctx;
@@ -23,14 +23,10 @@ class _WrongAddressSheetState extends State<_WrongAddressSheet> {
   late final WrongAddressController _c = WrongAddressController(
     correctedAddress: widget.ctx.correctedAddress,
   );
-  final _note = TextEditingController(
-    text: LocaleKeys.failureWrongAddressSampleNote.tr(),
-  );
 
   @override
   void dispose() {
     _c.dispose();
-    _note.dispose();
     super.dispose();
   }
 
@@ -48,8 +44,6 @@ class _WrongAddressSheetState extends State<_WrongAddressSheet> {
           _FieldLabel(LocaleKeys.failureCorrectAddressLabel.tr(), strong: true),
           8.szH,
           _correctedAddressField(),
-          8.szH,
-          _FieldLabel(LocaleKeys.failureConfirmedByPhone.tr()),
           16.szH,
           _FieldLabel(LocaleKeys.failureAfterCorrection.tr(), strong: true),
           8.szH,
@@ -74,11 +68,7 @@ class _WrongAddressSheetState extends State<_WrongAddressSheet> {
               );
             },
           ),
-          16.szH,
-          _FieldLabel(LocaleKeys.failureNoteMandatory.tr()),
-          8.szH,
-          _NoteField(controller: _note, minHeight: AppSize.sH48),
-          12.szH,
+          20.szH,
           ValueListenableBuilder<WrongAddressChoice>(
             valueListenable: _c.choice,
             builder: (context, choice, _) {

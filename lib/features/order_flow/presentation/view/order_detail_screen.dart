@@ -39,6 +39,10 @@ class OrderDetailScreen extends StatelessWidget {
     // When a real order is threaded, its own flag drives COD; otherwise fall
     // back to the [cod] param (DevGallery's stand-alone prepaid/COD previews).
     final isCod = order != null ? o.cod : cod;
+    // Delivery actions only make sense while the order is still open — a closed
+    // (delivered / failed) order hides the "not delivered" button and the
+    // sticky "delivered" bar.
+    final isOpen = o.state == FlowOrderState.active;
     final controller = OrderFlowController(
       onFinishToNext: onFinishToNext,
       onFinishToHome: onFinishToHome,
@@ -77,8 +81,11 @@ class OrderDetailScreen extends StatelessWidget {
                         _PaymentCard(amount: o.amount ?? ''),
                         16.szH,
                       ],
-                      _FailButton(onTap: () => controller.fail(context, order: o)),
-                      16.szH,
+                      if (isOpen) ...[
+                        _FailButton(
+                            onTap: () => controller.fail(context, order: o)),
+                        16.szH,
+                      ],
                       _Timeline(pickedTime: o.pickedTime, assignedTime: o.assignedTime),
                     ],
                   ).paddingOnly(
@@ -89,13 +96,14 @@ class OrderDetailScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              _DeliverBar(
-                onDeliver: () => controller.deliver(
-                  context,
-                  cod: isCod,
-                  due: o.codDue,
+              if (isOpen)
+                _DeliverBar(
+                  onDeliver: () => controller.deliver(
+                    context,
+                    cod: isCod,
+                    due: o.codDue,
+                  ),
                 ),
-              ),
               BottomNav(
                 active: NavTab.orders,
                 notificationsBadge: true,

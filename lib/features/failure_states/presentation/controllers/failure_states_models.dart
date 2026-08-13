@@ -114,17 +114,13 @@ FailureContext sampleFailureContext() => FailureContext(
       laterSlots: const ['12:30', '1:30', '2:30'],
     );
 
-/// Whether contact attempts (1b) can be skipped or block progress.
-enum CallAttemptGate { skippable, blocking }
-
-/// Which of the 7 states the [FailureStatesHost] should open for preview.
+/// Which of the states the [FailureStatesHost] should open for preview.
 enum FailureStatePreview {
   reason, // 1a
   notPresent, // 1b
   wrongAddress, // 1c
   productMismatch, // 1d
   returnToBranch, // 1e
-  logged, // 1f
 }
 
 /// The terminal outcome the flow hands back to its caller (e.g. order_flow).

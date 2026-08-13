@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import '../core/widgets/app_assets.dart';
 import '../core/widgets/icon_widget.dart';
 import '../data/flow_order.dart';
+import '../data/order.dart';
 import '../dev/dev_gallery.dart';
+import 'shift_controller.dart';
 import '../features/auth/presentation/imports/auth_imports.dart';
 import '../features/failure_states/presentation/imports/failure_states_imports.dart';
 import '../features/home/presentation/imports/home_imports.dart';
+import '../features/notifications/presentation/imports/notifications_imports.dart';
 import '../features/order_flow/presentation/imports/order_flow_imports.dart';
-import '../features/orders/presentation/imports/orders_imports.dart';
 import '../features/pickup/presentation/imports/pickup_imports.dart';
 import '../features/queue/presentation/imports/queue_imports.dart';
 import '../features/settlement/presentation/imports/settlement_imports.dart';
@@ -39,6 +41,20 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   NavTab _tab = NavTab.home;
 
+  /// The Orders tab IS the "today's orders" queue (search + 5 filters +
+  /// postponed). The shell owns its controller so a Home KPI tap can preselect
+  /// a filter and switch tabs; card taps open the flow *through* the shell.
+  late final QueueViewController _ordersVc = QueueViewController(
+    onSelectTab: _select,
+    onOpenOrder: _openOrder,
+  );
+
+  @override
+  void dispose() {
+    _ordersVc.dispose();
+    super.dispose();
+  }
+
   void _select(NavTab t) => setState(() => _tab = t);
 
   /// Push the order-detail flow for [order], wiring its Result screen back to
@@ -63,6 +79,29 @@ class _AppShellState extends State<AppShell> {
     );
   }
 
+  /// Home hero "عرض الطلب" — open the current next-stop order.
+  void _openNextStop() {
+    final o = ShiftController.instance.nextStop;
+    if (o != null) _openOrder(orderToFlow(o));
+  }
+
+  /// A notification tap — open the order it refers to (resolved against the
+  /// shift by number; no-op if that order isn't in this shift).
+  void _openOrderByNum(String orderNum) {
+    final o = ShiftController.instance.orderByNum('#$orderNum');
+    if (o != null) _openOrder(orderToFlow(o));
+  }
+
+  /// A Home KPI tile → the Orders tab with that slice preselected.
+  void _openOrdersFilter(QueueFilter f) {
+    _ordersVc.closeSearch();
+    _ordersVc.selectFilter(f);
+    _select(NavTab.orders);
+  }
+
+  void _openSettlement() => Navigator.of(context)
+      .push(MaterialPageRoute(builder: (_) => const SettlementScreen()));
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -72,65 +111,15 @@ class _AppShellState extends State<AppShell> {
         children: [
           HomeScreen(
             onSelectTab: _select,
-            onOpenOrder: () => _openOrder(sampleFlowOrders.first),
+            onOpenOrder: _openNextStop,
+            onOpenOrdersFilter: _openOrdersFilter,
+            onOpenSettlement: _openSettlement,
           ),
-          OrdersListScreen(onSelectTab: _select, onOpenOrder: _openOrder),
-          _PlaceholderTab(
-              tab: NavTab.notifications,
-              title: 'الاشعارات',
-              onSelectTab: _select),
+          QueueScreen(controller: _ordersVc),
+          NotificationsScreen(
+              onSelectTab: _select, onOpenOrder: _openOrderByNum),
           _MoreTab(onSelectTab: _select),
         ],
-      ),
-    );
-  }
-}
-
-/// A minimal "coming soon" tab that still carries the shared bottom nav so the
-/// user can navigate back out. On the *more* tab it also exposes the DevGallery.
-class _PlaceholderTab extends StatelessWidget {
-  const _PlaceholderTab({
-    required this.tab,
-    required this.title,
-    required this.onSelectTab,
-  });
-
-  final NavTab tab;
-  final String title;
-  final ValueChanged<NavTab> onSelectTab;
-
-  @override
-  Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(title,
-                          style: AppTypography.size20.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary)),
-                      const SizedBox(height: AppSpacing.s8),
-                      Text('قريبًا',
-                          style: AppTypography.size14
-                              .copyWith(color: AppColors.textTertiary)),
-                    ],
-                  ),
-                ),
-              ),
-              BottomNav(
-                  active: tab, notificationsBadge: true, onTap: onSelectTab),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -173,10 +162,6 @@ class _MoreTab extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: AppSpacing.s20),
                   children: [
-                    _MoreRow(
-                        icon: AppAssets.svg.orders,
-                        label: 'طلبات اليوم',
-                        onTap: () => _push(context, const QueueScreen())),
                     _MoreRow(
                         icon: AppAssets.svg.cash,
                         label: 'تسوية نهاية اليوم',

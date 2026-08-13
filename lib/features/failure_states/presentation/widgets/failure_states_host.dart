@@ -47,24 +47,16 @@ class _FailureStatesHostState extends State<FailureStatesHost> {
   Future<void> _openPreview(FailureStatePreview state) {
     final child = switch (state) {
       FailureStatePreview.reason => _ReasonSheet(ctx: _ctx),
-      FailureStatePreview.notPresent =>
-        _NotPresentSheet(ctx: _ctx, gate: CallAttemptGate.skippable),
+      FailureStatePreview.notPresent => _NotPresentSheet(ctx: _ctx),
       FailureStatePreview.wrongAddress => _WrongAddressSheet(ctx: _ctx),
       FailureStatePreview.productMismatch => _ProductMismatchSheet(ctx: _ctx),
       FailureStatePreview.returnToBranch =>
         _ReturnToBranchSheet(ctx: _ctx, reason: FailureReason.notPresent),
-      FailureStatePreview.logged =>
-        _LoggedSheet(ctx: _ctx, reason: FailureReason.notPresent, undoSeconds: 10),
     };
     return showAppSheet<Object?>(context, child: child);
   }
 
   Widget? get _statusBadge => switch (widget.preview) {
-        FailureStatePreview.logged => _StatusPill(
-            label: LocaleKeys.failureStatusCouldNotDeliver.tr(),
-            bg: AppColors.failedBg,
-            fg: AppColors.failedText,
-          ),
         FailureStatePreview.reason || null => _StatusPill(
             label: LocaleKeys.failureStatusInTransit.tr(),
             bg: AppColors.transitPillBg,

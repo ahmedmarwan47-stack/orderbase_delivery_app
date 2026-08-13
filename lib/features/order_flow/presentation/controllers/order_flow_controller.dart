@@ -73,6 +73,7 @@ class OrderFlowController {
     if (photoOk != true || !context.mounted) return;
 
     if (!cod) {
+      ShiftController.instance.markDelivered(orderNum, collected: 0);
       _openResult(
         context,
         ResultKind.delivered,
@@ -87,6 +88,8 @@ class OrderFlowController {
       customerName: customer,
     );
     if (collected != null && context.mounted) {
+      ShiftController.instance
+          .markDelivered(orderNum, collected: collected.amount);
       final hasWalletChange = collected.walletChange > 0;
       final unit = LocaleKeys.orderDetailEgpSuffix.tr();
       _openResult(
@@ -120,6 +123,8 @@ class OrderFlowController {
 
     switch (outcome.resolution) {
       case FailureResolution.returnedToBranch:
+        ShiftController.instance
+            .markFailed(orderNum, reason: outcome.reason?.label);
         _openResult(
           context,
           ResultKind.failed,
@@ -130,6 +135,7 @@ class OrderFlowController {
         final p = await showPostponeSheet(context);
         if (!context.mounted || p == null) return;
         if (p.action == PostponeResult.confirm) {
+          ShiftController.instance.markPostponed(orderNum);
           _openResult(
             context,
             ResultKind.postponed,

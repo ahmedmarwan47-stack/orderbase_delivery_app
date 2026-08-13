@@ -19,7 +19,11 @@ class _QueueBody extends StatelessWidget {
           if (searching)
             const HomeIndicator()
           else
-            const BottomNav(active: NavTab.orders, notificationsBadge: true),
+            BottomNav(
+              active: NavTab.orders,
+              notificationsBadge: true,
+              onTap: vc.onSelectTab,
+            ),
         ],
       ),
     );

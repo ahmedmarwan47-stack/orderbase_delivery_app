@@ -1,73 +1,50 @@
 part of '../imports/failure_states_imports.dart';
 
-/// Body of the returns list (1g): header + filter chips, the dark returns
-/// banner, the active order cards, and the bottom nav.
+/// Body of the returns list (1g): header + filter chips, the dark "returns to
+/// branch" banner (the orders you actually returned via the failure flow), the
+/// order cards, and the bottom nav. All driven by [ShiftController].
 class _ReturnsListBody extends StatelessWidget {
   const _ReturnsListBody();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const _ReturnsHeader(),
-        Expanded(
-          child: ListView(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppPadding.pW20,
-              vertical: AppPadding.pH16,
+    return AnimatedBuilder(
+      animation: ShiftController.instance,
+      builder: (_, _) {
+        final shift = ShiftController.instance;
+        final returns = shift.returns;
+        final orders = shift.orders;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _ReturnsHeader(count: orders.length),
+            Expanded(
+              child: ListView.separated(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppPadding.pW20,
+                  vertical: AppPadding.pH16,
+                ),
+                itemCount: orders.length + (returns.isNotEmpty ? 1 : 0),
+                separatorBuilder: (_, _) => 12.szH,
+                itemBuilder: (_, i) {
+                  if (returns.isNotEmpty && i == 0) {
+                    return _ReturnsBanner(returns: returns);
+                  }
+                  final order = orders[i - (returns.isNotEmpty ? 1 : 0)];
+                  return _OrderMiniCard(order: order);
+                },
+              ),
             ),
-            children: [
-              const _ReturnsBanner(),
-              12.szH,
-              _OrderMiniCard(
-                icon: FailureIcons.nav,
-                tileBg: AppColors.transitPillBg,
-                tileIconColor: AppColors.transitBg,
-                orderNum: '#89290',
-                pill: _StatusPill(
-                  label: LocaleKeys.failureStatusInTransit.tr(),
-                  bg: AppColors.transitPillBg,
-                  fg: AppColors.transitBg,
-                ),
-                meta: LocaleKeys.failureSampleMetaSara.tr(),
-              ),
-              12.szH,
-              _OrderMiniCard(
-                icon: FailureIcons.clock,
-                tileBg: AppColors.heroCodPillBg,
-                tileIconColor: AppColors.postponedText,
-                orderNum: '#89283',
-                pill: _StatusPill(
-                  label: LocaleKeys.failureSampleMetaPostponed.tr(),
-                  bg: AppColors.heroCodPillBg,
-                  fg: AppColors.postponedText,
-                ),
-                meta: LocaleKeys.failureSampleMetaCorrected.tr(),
-              ),
-              12.szH,
-              _OrderMiniCard(
-                icon: FailureIcons.wallet,
-                tileBg: AppColors.surfaceMuted,
-                tileIconColor: AppColors.textTertiary,
-                orderNum: '#89285',
-                pill: _StatusPill(
-                  label: LocaleKeys.failureStatusDelivered.tr(),
-                  bg: AppColors.deliveredBg,
-                  fg: AppColors.deliveredText,
-                ),
-                meta: LocaleKeys.failureSampleMetaMona.tr(),
-              ),
-            ],
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }
 
 class _ReturnsHeader extends StatelessWidget {
-  const _ReturnsHeader();
+  const _ReturnsHeader({required this.count});
+  final int count;
 
   @override
   Widget build(BuildContext context) {
@@ -116,19 +93,9 @@ class _ReturnsHeader extends StatelessWidget {
                   horizontal: AppPadding.pW12,
                   vertical: AppPadding.pH4,
                 ),
-                child: Text(LocaleKeys.failureActiveCount.tr(),
-                    style: const TextStyle().setSecondaryColor.s12.bold),
+                child: Text('$count',
+                    style: const TextStyle().setSecondaryColor.s12.bold.tabular),
               ),
-            ],
-          ),
-          12.szH,
-          Row(
-            children: [
-              _FilterChip(label: LocaleKeys.failureFilterAll.tr(), selected: true),
-              8.szW,
-              _FilterChip(label: LocaleKeys.failureStatusInTransit.tr()),
-              8.szW,
-              _FilterChip(label: LocaleKeys.failureFilterFailed.tr()),
             ],
           ),
         ],
@@ -137,38 +104,14 @@ class _ReturnsHeader extends StatelessWidget {
   }
 }
 
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({required this.label, this.selected = false});
-  final String label;
-  final bool selected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: selected ? AppColors.inkFill : AppColors.surfaceMuted,
-        borderRadius: BorderRadius.circular(AppCircular.r10),
-      ),
-      padding: EdgeInsets.symmetric(
-        horizontal: AppPadding.pW12,
-        vertical: AppPadding.pH8,
-      ),
-      child: Text(
-        label,
-        style: const TextStyle()
-            .setColor(selected ? AppColors.surface : AppColors.textTertiary)
-            .s12
-            .bold,
-      ),
-    );
-  }
-}
-
+/// The dark "returns to branch" summary — one row per returned order.
 class _ReturnsBanner extends StatelessWidget {
-  const _ReturnsBanner();
+  const _ReturnsBanner({required this.returns});
+  final List<Order> returns;
 
   @override
   Widget build(BuildContext context) {
+    final totalPieces = returns.fold(0, (sum, o) => sum + o.pieces);
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paymentCardBg,
@@ -200,23 +143,19 @@ class _ReturnsBanner extends StatelessWidget {
                   horizontal: AppPadding.pW8,
                   vertical: AppPadding.pH4,
                 ),
-                child: Text(LocaleKeys.failurePiecesCount3.tr(),
+                child: Text('$totalPieces قطعة',
                     style: const TextStyle().setMainTextColor.s12.bold),
               ),
             ],
           ),
-          12.szH,
-          _ReturnItemRow(
-            orderNum: '#89289',
-            reason: LocaleKeys.failureReasonNotPresent.tr(),
-            pieces: LocaleKeys.failureSamplePiecesLabel.tr(),
-          ),
-          8.szH,
-          _ReturnItemRow(
-            orderNum: '#89276',
-            reason: LocaleKeys.failureReasonMismatch.tr(),
-            pieces: LocaleKeys.failurePieces1.tr(),
-          ),
+          for (final o in returns) ...[
+            12.szH,
+            _ReturnItemRow(
+              orderNum: o.num,
+              reason: o.reason ?? LocaleKeys.failureReasonOther.tr(),
+              pieces: '${o.pieces} قطعة',
+            ),
+          ],
           12.szH,
           _OutlineButton(
             label: LocaleKeys.failureHandReturns.tr(),
@@ -268,24 +207,50 @@ class _ReturnItemRow extends StatelessWidget {
   }
 }
 
+/// A compact order row on the returns screen — status tile + number + pill +
+/// customer/area, derived from the order's live status.
 class _OrderMiniCard extends StatelessWidget {
-  const _OrderMiniCard({
-    required this.icon,
-    required this.tileBg,
-    required this.tileIconColor,
-    required this.orderNum,
-    required this.pill,
-    required this.meta,
-  });
-  final String icon;
-  final Color tileBg;
-  final Color tileIconColor;
-  final String orderNum;
-  final Widget pill;
-  final String meta;
+  const _OrderMiniCard({required this.order});
+  final Order order;
 
   @override
   Widget build(BuildContext context) {
+    final (String icon, Color tileBg, Color tileIcon, String pillLabel,
+            Color pillBg, Color pillFg) =
+        switch (order.status) {
+      OrderStatus.transit => (
+          FailureIcons.nav,
+          AppColors.transitPillBg,
+          AppColors.transitBg,
+          LocaleKeys.failureStatusInTransit.tr(),
+          AppColors.transitPillBg,
+          AppColors.transitBg,
+        ),
+      OrderStatus.postponed => (
+          FailureIcons.clock,
+          AppColors.heroCodPillBg,
+          AppColors.postponedText,
+          LocaleKeys.filterPostponed.tr(),
+          AppColors.heroCodPillBg,
+          AppColors.postponedText,
+        ),
+      OrderStatus.delivered => (
+          FailureIcons.wallet,
+          AppColors.deliveredBg,
+          AppColors.deliveredText,
+          LocaleKeys.failureStatusDelivered.tr(),
+          AppColors.deliveredBg,
+          AppColors.deliveredText,
+        ),
+      OrderStatus.failed => (
+          FailureIcons.box,
+          AppColors.failedBg,
+          AppColors.failedText,
+          LocaleKeys.failureStatusCouldNotDeliver.tr(),
+          AppColors.failedBg,
+          AppColors.failedText,
+        ),
+    };
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -305,7 +270,7 @@ class _OrderMiniCard extends StatelessWidget {
             child: Center(
               child: IconWidget(
                 icon: icon,
-                color: tileIconColor,
+                color: tileIcon,
                 height: AppSize.sH20,
                 width: AppSize.sW20,
               ),
@@ -319,16 +284,17 @@ class _OrderMiniCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      orderNum,
+                      order.num,
                       textDirection: TextDirection.ltr,
                       style: const TextStyle().setMainTextColor.s16.extraBold,
                     ),
                     8.szW,
-                    pill,
+                    _StatusPill(label: pillLabel, bg: pillBg, fg: pillFg),
                   ],
                 ),
                 4.szH,
-                Text(meta, style: const TextStyle().setSecondaryColor.s12.regular),
+                Text('${order.name} · ${order.area}',
+                    style: const TextStyle().setSecondaryColor.s12.regular),
               ],
             ),
           ),
@@ -337,4 +303,3 @@ class _OrderMiniCard extends StatelessWidget {
     );
   }
 }
-

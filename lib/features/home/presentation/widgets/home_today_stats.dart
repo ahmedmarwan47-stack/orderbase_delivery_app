@@ -1,11 +1,18 @@
 part of '../imports/home_imports.dart';
 
-/// "Today's overview" — a 2×2 grid of stat cards.
+/// "Today's overview" — a 2×2 grid of KPI tiles, each reading a live shift
+/// counter and linking to the page it summarises (Orders slice / settlement).
 class _HomeTodayStats extends StatelessWidget {
-  const _HomeTodayStats();
+  const _HomeTodayStats({this.onOpenOrdersFilter, this.onOpenSettlement});
+
+  final void Function(QueueFilter)? onOpenOrdersFilter;
+  final VoidCallback? onOpenSettlement;
+
+  static String _pad(int n) => n.toString().padLeft(2, '0');
 
   @override
   Widget build(BuildContext context) {
+    final shift = ShiftController.instance;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -24,8 +31,9 @@ class _HomeTodayStats extends StatelessWidget {
                   icon: AppAssets.svg.bike,
                   iconColor: AppColors.textPrimary,
                   tile: AppColors.iconTileNeutral,
-                  value: '10',
+                  value: _pad(shift.inProgress),
                   labelKey: LocaleKeys.homeStatInProgress,
+                  onTap: () => onOpenOrdersFilter?.call(QueueFilter.transit),
                 ),
               ),
               Expanded(
@@ -33,8 +41,9 @@ class _HomeTodayStats extends StatelessWidget {
                   icon: AppAssets.svg.check,
                   iconColor: AppColors.greenAccent,
                   tile: AppColors.deliveredBg,
-                  value: '05',
+                  value: _pad(shift.deliveredCount),
                   labelKey: LocaleKeys.homeStatDelivered,
+                  onTap: () => onOpenOrdersFilter?.call(QueueFilter.delivered),
                 ),
               ),
             ],
@@ -51,8 +60,9 @@ class _HomeTodayStats extends StatelessWidget {
                   icon: AppAssets.svg.fail,
                   iconColor: AppColors.brand,
                   tile: AppColors.failedBg,
-                  value: '02',
+                  value: _pad(shift.failedCount),
                   labelKey: LocaleKeys.homeStatFailed,
+                  onTap: () => onOpenOrdersFilter?.call(QueueFilter.failed),
                 ),
               ),
               Expanded(
@@ -60,11 +70,12 @@ class _HomeTodayStats extends StatelessWidget {
                   icon: AppAssets.svg.cash,
                   iconColor: AppColors.greenAccent,
                   tile: AppColors.deliveredBg,
-                  value: '22,500',
+                  value: formatThousands(shift.collectedEgp),
                   suffixKey: LocaleKeys.homeEgp,
                   valueColor: AppColors.greenAccent,
                   valueSize: FontSizeManager.s24,
                   labelKey: LocaleKeys.homeStatTotalCollected,
+                  onTap: onOpenSettlement,
                 ),
               ),
             ],

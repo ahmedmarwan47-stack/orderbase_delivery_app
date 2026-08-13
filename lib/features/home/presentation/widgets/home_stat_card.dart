@@ -11,6 +11,7 @@ class _HomeStatCard extends StatelessWidget {
     this.suffixKey,
     this.valueColor = AppColors.textPrimary,
     this.valueSize,
+    this.onTap,
   });
 
   final String icon;
@@ -21,6 +22,9 @@ class _HomeStatCard extends StatelessWidget {
   final String? suffixKey;
   final Color valueColor;
   final double? valueSize;
+
+  /// Opens the page this KPI summarises (Orders slice / settlement).
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +83,6 @@ class _HomeStatCard extends StatelessWidget {
           ),
         ],
       ).paddingAll(AppPadding.pH16),
-    );
+    ).onClick(onTap: onTap);
   }
 }

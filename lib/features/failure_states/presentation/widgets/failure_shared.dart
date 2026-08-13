@@ -286,27 +286,6 @@ class _OutlineButton extends StatelessWidget {
   }
 }
 
-/// Borderless text button (1b "skip attempts").
-class _GhostButton extends StatelessWidget {
-  const _GhostButton({required this.label, required this.onTap});
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      child: SizedBox(
-        height: AppSize.sH44,
-        child: Center(
-          child: Text(label, style: const TextStyle().setSecondaryColor.s14.bold),
-        ),
-      ).onClick(onTap: onTap),
-    );
-  }
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Fields, tags, callouts
 // ─────────────────────────────────────────────────────────────────────────────
@@ -334,14 +313,17 @@ class _FieldLabel extends StatelessWidget {
 /// The mandatory-note field (1b/1c/1d). Editable, prefilled with the mockup's
 /// sample text; brand-red cursor per the design.
 class _NoteField extends StatelessWidget {
-  const _NoteField({required this.controller, this.minHeight});
+  const _NoteField({required this.controller, this.hint});
   final TextEditingController controller;
-  final double? minHeight;
+
+  /// Optional placeholder shown when the field is empty (used by the optional
+  /// «سبب آخر» details field).
+  final String? hint;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(minHeight: minHeight ?? AppSize.sH56),
+      constraints: BoxConstraints(minHeight: AppSize.sH56),
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(AppCircular.r13),
@@ -356,10 +338,12 @@ class _NoteField extends StatelessWidget {
         maxLines: null,
         cursorColor: AppColors.brand,
         style: const TextStyle().setMainTextColor.s14.regular.withHeight(1.7),
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           isDense: true,
           border: InputBorder.none,
           contentPadding: EdgeInsets.zero,
+          hintText: hint,
+          hintStyle: const TextStyle().setHintColor.s14.regular.withHeight(1.7),
         ),
       ),
     );

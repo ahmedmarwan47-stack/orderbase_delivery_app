@@ -10,15 +10,15 @@ class PickupScreen extends StatelessWidget {
   /// Confirms pickup (all orders → "in transit"). Wired to the flow later.
   final VoidCallback? onConfirm;
 
-  /// The active orders waiting at the branch, ordered by number to match the
-  /// mockup (#89289, #89290, #89291).
-  static final List<FlowOrder> _orders = sampleFlowOrders
-      .where((o) => o.state == FlowOrderState.active)
-      .toList()
-    ..sort((a, b) => a.num.compareTo(b.num));
-
   @override
   Widget build(BuildContext context) {
+    // The batch waiting at the branch = the shift's in-transit orders (the ones
+    // still to deliver), so pickup shows the same orders as the rest of the app.
+    final orders = ShiftController.instance.orders
+        .where((o) => o.status == OrderStatus.transit)
+        .map(orderToFlow)
+        .toList()
+      ..sort((a, b) => a.num.compareTo(b.num));
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -27,7 +27,7 @@ class PickupScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              _PickupHeader(count: _orders.length),
+              _PickupHeader(count: orders.length),
               Expanded(
                 child: ListView.separated(
                   padding: EdgeInsetsDirectional.only(
@@ -36,13 +36,13 @@ class PickupScreen extends StatelessWidget {
                     top: AppPadding.pH16,
                     bottom: AppPadding.pH20,
                   ),
-                  itemCount: _orders.length,
+                  itemCount: orders.length,
                   separatorBuilder: (_, _) => 12.szH,
-                  itemBuilder: (_, i) => _PickupCard(order: _orders[i]),
+                  itemBuilder: (_, i) => _PickupCard(order: orders[i]),
                 ),
               ),
               _PickupConfirmBar(
-                count: _orders.length,
+                count: orders.length,
                 // From the More menu there's no flow to advance into yet, so
                 // confirming pops back rather than silently doing nothing.
                 onConfirm: onConfirm ?? () => Navigator.of(context).maybePop(),

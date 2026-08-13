@@ -7,10 +7,10 @@ enum SecondStepResult { next, back }
 /// Runs the not-delivered flow end to end over the current screen, mirroring
 /// the mockup's state machine:
 ///
-///   reason (1a) → per-reason second step (1b/1c/1d) → return-to-branch (1e)
-///   → logged with undo (1f)
+///   reason (1a) → per-reason second step (1b/1c/1d) → return-to-branch (1e),
+///   which logs the non-delivery immediately (no interim countdown sheet).
 ///
-/// Retryable reasons (wrong address) resolve at their own step and skip 1e/1f.
+/// Retryable reasons (wrong address) resolve at their own step and skip 1e.
 /// Returns the terminal [FailureOutcome], or `null` if fully dismissed.
 ///
 /// This is the intended replacement for order_flow's single "fail sheet": that
@@ -34,6 +34,7 @@ Future<FailureOutcome?> showFailureFlow(
       return const FailureOutcome(resolution: FailureResolution.postpone);
     }
     final reason = step.reason ?? FailureReason.notPresent;
+    final note = step.note; // optional free-text, only for «سبب آخر»
     initial = reason;
     if (!context.mounted) return null;
 
@@ -55,15 +56,10 @@ Future<FailureOutcome?> showFailureFlow(
       return null; // dismissed
     }
 
-    // ── retryable: traffic has no dedicated screen — retry now ──
-    if (reason == FailureReason.traffic) {
-      return FailureOutcome(
-        resolution: FailureResolution.retryNow,
-        reason: reason,
-      );
-    }
-
-    // ── final reasons: optional per-reason step, then 1e → 1f ──
+    // ── final reasons + traffic: optional per-reason step, then the
+    //    return-to-branch confirm. Traffic used to short-circuit to a silent
+    //    retry; it now flows into the same confirm so the courier can *choose*
+    //    to send the pieces back to the branch (or back out to keep retrying).
     if (reason == FailureReason.notPresent) {
       final r = await showAppSheet<SecondStepResult>(
         context,
@@ -79,31 +75,30 @@ Future<FailureOutcome?> showFailureFlow(
       if (r == null) return null;
       if (r == SecondStepResult.back) continue;
     }
-    // refused / other: straight to the return-to-branch confirm.
+    // refused / other / traffic: straight to the return-to-branch confirm.
     if (!context.mounted) return null;
 
-    // ── 1e · return-to-branch confirm ──
+    // ── return-to-branch confirm — the final step. Confirming logs the
+    //    non-delivery immediately and hands back to the failed result screen
+    //    (no interim countdown/undo sheet). ──
     final confirm = await showAppSheet<Object?>(
       context,
       child: _ReturnToBranchSheet(ctx: ctx, reason: reason),
     );
     if (confirm == SecondStepResult.back) continue;
-    if (confirm != true) return null; // dismissed
+    if (confirm != true) {
+      // Dismissed. Traffic is retryable — keep the order active for another
+      // attempt; the final reasons simply cancel.
+      return reason == FailureReason.traffic
+          ? const FailureOutcome(resolution: FailureResolution.retryNow)
+          : null;
+    }
     if (!context.mounted) return null;
 
-    // ── 1f · logged with undo ──
-    final logged = await showAppSheet<LoggedResult>(
-      context,
-      child: _LoggedSheet(ctx: ctx, reason: reason),
-    );
-    if (logged == LoggedResult.undo) {
-      initial = reason;
-      if (!context.mounted) return null;
-      continue; // undo → back to the reason list
-    }
     return FailureOutcome(
       resolution: FailureResolution.returnedToBranch,
       reason: reason,
+      note: note,
     );
   }
 }

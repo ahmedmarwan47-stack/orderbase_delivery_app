@@ -5,6 +5,7 @@ import '../features/auth/presentation/imports/auth_imports.dart';
 import '../features/cod/presentation/imports/cod_imports.dart';
 import '../features/failure_states/presentation/imports/failure_states_imports.dart';
 import '../features/home/presentation/imports/home_imports.dart';
+import '../features/notifications/presentation/imports/notifications_imports.dart';
 import '../features/order_flow/presentation/imports/order_flow_imports.dart';
 import '../features/orders/presentation/imports/orders_imports.dart';
 import '../features/pickup/presentation/imports/pickup_imports.dart';
@@ -21,6 +22,7 @@ class DevGallery extends StatelessWidget {
 
   static final _screens = <String, WidgetBuilder>{
     'الرئيسية · Home (1a)': (_) => const HomeScreen(),
+    'الاشعارات · Notifications': (_) => const NotificationsScreen(),
     'طلبات اليوم · Orders list': (context) => OrdersListScreen(
           onOpenOrder: (_) => Navigator.of(context)
               .push(MaterialPageRoute(builder: (_) => const OrderDetailScreen())),
@@ -71,8 +73,6 @@ class DevGallery extends StatelessWidget {
         const FailureStatesHost(preview: FailureStatePreview.productMismatch),
     'تعذّر · 1e — الإرجاع للفرع': (_) =>
         const FailureStatesHost(preview: FailureStatePreview.returnToBranch),
-    'تعذّر · 1f — تم التسجيل': (_) =>
-        const FailureStatesHost(preview: FailureStatePreview.logged),
     'تعذّر · 1g — مرتجعات للفرع': (_) => const ReturnsListScreen(),
     'التسوية · Settlement (open)': (_) => const SettlementScreen(),
     'التسوية · Settlement (settled)': (_) =>

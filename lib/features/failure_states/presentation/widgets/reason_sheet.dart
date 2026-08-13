@@ -2,12 +2,16 @@ part of '../imports/failure_states_imports.dart';
 
 /// What the reason step (1a) resolves to.
 class ReasonStepResult {
-  const ReasonStepResult.next(this.reason) : postpone = false;
+  const ReasonStepResult.next(this.reason, {this.note}) : postpone = false;
   const ReasonStepResult.postpone()
       : reason = null,
+        note = null,
         postpone = true;
 
   final FailureReason? reason;
+
+  /// Optional free-text the courier typed for «سبب آخر» (null otherwise).
+  final String? note;
   final bool postpone;
 }
 
@@ -27,9 +31,13 @@ class _ReasonSheetState extends State<_ReasonSheet> {
   late final ReasonStepController _c =
       ReasonStepController(initial: widget.initial);
 
+  /// Optional free-text, revealed only when «سبب آخر» is selected.
+  final _otherNote = TextEditingController();
+
   @override
   void dispose() {
     _c.dispose();
+    _otherNote.dispose();
     super.dispose();
   }
 
@@ -52,12 +60,29 @@ class _ReasonSheetState extends State<_ReasonSheet> {
                 ),
                 if (reason != FailureReason.values.last) 8.szH,
               ],
+              // «سبب آخر» reveals an optional details field (not required).
+              if (selected == FailureReason.other) ...[
+                16.szH,
+                _FieldLabel(LocaleKeys.failureOtherReasonLabel.tr()),
+                8.szH,
+                _NoteField(
+                  controller: _otherNote,
+                  hint: LocaleKeys.failureOtherReasonHint.tr(),
+                ),
+              ],
               20.szH,
               _PrimaryButton(
                 label: LocaleKeys.failureNext.tr(),
                 trailingIcon: FailureIcons.chevronLeft,
-                onTap: () => Navigator.of(context)
-                    .pop(ReasonStepResult.next(selected)),
+                onTap: () => Navigator.of(context).pop(
+                  ReasonStepResult.next(
+                    selected,
+                    note: selected == FailureReason.other &&
+                            _otherNote.text.trim().isNotEmpty
+                        ? _otherNote.text.trim()
+                        : null,
+                  ),
+                ),
               ),
               8.szH,
               _OutlineButton(

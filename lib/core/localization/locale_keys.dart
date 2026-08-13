@@ -17,6 +17,20 @@ abstract final class LocaleKeys {
   static const String filterResultsCount = 'filter_results_count';
   static const String clearFilter = 'clear_filter';
 
+  // Notifications feed
+  static const String notifNewCount = 'notif_new_count';
+  static const String notifMinutesAgo = 'notif_minutes_ago';
+  static const String notifHourAgo = 'notif_hour_ago';
+  static const String notifHoursAgo = 'notif_hours_ago';
+  static const String notifTitleAssigned = 'notif_title_assigned';
+  static const String notifBodyAssigned = 'notif_body_assigned';
+  static const String notifTitleCancelled = 'notif_title_cancelled';
+  static const String notifBodyCancelled = 'notif_body_cancelled';
+  static const String notifTitleNote = 'notif_title_note';
+  static const String notifBodyNote = 'notif_body_note';
+  static const String notifTitleWallet = 'notif_title_wallet';
+  static const String notifBodyWallet = 'notif_body_wallet';
+
   // Search
   static const String searchHint = 'search_hint';
   static const String searchScope = 'search_scope';
@@ -87,6 +101,8 @@ abstract final class LocaleKeys {
   static const String homeEtaMinutes = 'home_eta_minutes';
   static const String homeDistanceKm = 'home_distance_km';
   static const String homeViewOrder = 'home_view_order';
+  static const String homeRouteCompleteTitle = 'home_route_complete_title';
+  static const String homeRouteCompleteSub = 'home_route_complete_sub';
   static const String homeTodayOverview = 'home_today_overview';
   static const String homeStatInProgress = 'home_stat_in_progress';
   static const String homeStatDelivered = 'home_stat_delivered';
@@ -312,6 +328,8 @@ abstract final class LocaleKeys {
   // Failure States — 1a reason step
   static const String failureReasonTitle = 'failure_reason_title';
   static const String failureCustomerAskedPostpone = 'failure_customer_asked_postpone';
+  static const String failureOtherReasonLabel = 'failure_other_reason_label';
+  static const String failureOtherReasonHint = 'failure_other_reason_hint';
 
   // Failure States — 1b not present
   static const String failureNotPresentSampleNote = 'failure_not_present_sample_note';

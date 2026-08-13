@@ -1,7 +1,9 @@
 part of '../imports/home_imports.dart';
 
-/// The next-stop hero card — progress, a map strip, the current order's
-/// details, and the primary "view order" + call/chat actions.
+/// The next-stop hero card — progress, a map strip, the *current* order's
+/// details, and the primary "view order" + call/chat actions. Everything is
+/// driven by [ShiftController.nextStop]; when the route is finished it collapses
+/// to a "route complete" state.
 class _HomeNextStopCard extends StatelessWidget {
   const _HomeNextStopCard({this.onViewOrder});
 
@@ -9,6 +11,11 @@ class _HomeNextStopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shift = ShiftController.instance;
+    final order = shift.nextStop;
+    if (order == null) return const _HomeRouteCompleteCard();
+
+    final isCod = order.cod != null && !order.prepaid;
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -45,10 +52,14 @@ class _HomeNextStopCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppCircular.r20),
                 ),
                 child: Text(
-                  LocaleKeys.homeStopCount
-                      .tr(namedArgs: {'current': '2', 'total': '5'}),
-                  style:
-                      const TextStyle().setColor(AppColors.stopCountText).s12.semiBold,
+                  LocaleKeys.homeStopCount.tr(namedArgs: {
+                    'current': '${shift.currentStopNumber}',
+                    'total': '${shift.totalStops}',
+                  }),
+                  style: const TextStyle()
+                      .setColor(AppColors.stopCountText)
+                      .s12
+                      .semiBold,
                 ).paddingSymmetric(
                   horizontal: AppPadding.pW12,
                   vertical: AppPadding.pH4,
@@ -61,15 +72,12 @@ class _HomeNextStopCard extends StatelessWidget {
             right: AppPadding.pW20,
             bottom: AppPadding.pH12,
           ),
-          // ── progress segments ──
+          // ── progress segments (one per route stop) ──
           Row(
             spacing: AppSize.sW8,
-            children: const [
-              _HomeProgressSeg(AppColors.greenAccent),
-              _HomeProgressSeg(AppColors.brand),
-              _HomeProgressSeg(AppColors.borderDefault),
-              _HomeProgressSeg(AppColors.borderDefault),
-              _HomeProgressSeg(AppColors.borderDefault),
+            children: [
+              for (final s in shift.routeStops)
+                _HomeProgressSeg(_segColor(s, order)),
             ],
           ).paddingOnly(
             left: AppPadding.pW20,
@@ -86,32 +94,22 @@ class _HomeNextStopCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    LocaleKeys.homeOrderNo.tr(namedArgs: {'num': '89289'}),
+                    LocaleKeys.homeOrderNo.tr(
+                      namedArgs: {'num': order.num.replaceAll('#', '')},
+                    ),
                     style: const TextStyle().setMainTextColor.s16.bold.tabular,
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.heroCodPillBg,
-                      borderRadius: BorderRadius.circular(AppCircular.r8),
-                    ),
-                    child: Text(
-                      LocaleKeys.payCod.tr(),
-                      style:
-                          const TextStyle().setColor(AppColors.postponedText).s12.bold,
-                    ).paddingSymmetric(
-                      horizontal: AppPadding.pW12,
-                      vertical: AppPadding.pH4,
-                    ),
-                  ),
+                  _PayPill(isCod: isCod),
                 ],
               ),
               8.szH,
               Text(
-                LocaleKeys.homeCustomerName.tr(),
+                order.name,
                 style: const TextStyle().setMainTextColor.s18.bold,
               ),
               8.szH,
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   IconWidget(
                     icon: AppAssets.svg.pin,
@@ -120,21 +118,23 @@ class _HomeNextStopCard extends StatelessWidget {
                     width: AppSize.sW16,
                   ),
                   8.szW,
-                  Text(
-                    LocaleKeys.homeCustomerAddress.tr(),
-                    style: const TextStyle()
-                        .setTertiaryColor
-                        .s14
-                        .regular
-                        .withHeight(1.5),
+                  Expanded(
+                    child: Text(
+                      order.fullAddress,
+                      style: const TextStyle()
+                          .setTertiaryColor
+                          .s14
+                          .regular
+                          .withHeight(1.5),
+                    ),
                   ),
                 ],
               ),
-              8.szH,
-              Row(
-                children: [
-                  Row(
-                    children: [
+              if (order.due != null || order.dist != null) ...[
+                8.szH,
+                Row(
+                  children: [
+                    if (order.due != null) ...[
                       IconWidget(
                         icon: AppAssets.svg.clock,
                         color: AppColors.textTertiary,
@@ -143,27 +143,34 @@ class _HomeNextStopCard extends StatelessWidget {
                       ),
                       4.szW,
                       Text(
-                        LocaleKeys.homeEtaMinutes.tr(namedArgs: {'mins': '15'}),
+                        LocaleKeys.promisedAt.tr(namedArgs: {'time': order.due!}),
                         style: const TextStyle().setTertiaryColor.s12.regular,
                       ),
                     ],
-                  ),
-                  12.szW,
-                  Container(
-                    width: 3.w, // 3px separator dot (off the 4px grid)
-                    height: 3.h,
-                    decoration: const BoxDecoration(
-                      color: AppColors.textSecondary,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  12.szW,
-                  Text(
-                    LocaleKeys.homeDistanceKm.tr(namedArgs: {'dist': '1.2'}),
-                    style: const TextStyle().setTertiaryColor.s12.regular.tabular,
-                  ),
-                ],
-              ),
+                    if (order.due != null && order.dist != null) ...[
+                      12.szW,
+                      Container(
+                        width: 3.w, // 3px separator dot (off the 4px grid)
+                        height: 3.h,
+                        decoration: const BoxDecoration(
+                          color: AppColors.textSecondary,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      12.szW,
+                    ],
+                    if (order.dist != null)
+                      Text(
+                        order.dist!,
+                        style: const TextStyle()
+                            .setTertiaryColor
+                            .s12
+                            .regular
+                            .tabular,
+                      ),
+                  ],
+                ),
+              ],
             ],
           ).paddingOnly(
             left: AppPadding.pW20,
@@ -228,6 +235,98 @@ class _HomeNextStopCard extends StatelessWidget {
             top: AppPadding.pH16,
             right: AppPadding.pW20,
             bottom: AppPadding.pH16,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Progress-segment colour: delivered → green, failed → red, the current stop
+  /// → brand, upcoming stops → the faint track.
+  Color _segColor(Order stop, Order current) {
+    if (stop.status == OrderStatus.delivered) return AppColors.greenAccent;
+    if (stop.status == OrderStatus.failed) return AppColors.failedText;
+    if (stop.num == current.num) return AppColors.brand;
+    return AppColors.borderDefault;
+  }
+}
+
+/// The COD / prepaid pill in the hero header.
+class _PayPill extends StatelessWidget {
+  const _PayPill({required this.isCod});
+  final bool isCod;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isCod ? AppColors.heroCodPillBg : AppColors.deliveredBg,
+        borderRadius: BorderRadius.circular(AppCircular.r8),
+      ),
+      child: Text(
+        (isCod ? LocaleKeys.payCod : LocaleKeys.payPrepaid).tr(),
+        style: const TextStyle()
+            .setColor(isCod ? AppColors.postponedText : AppColors.deliveredText)
+            .s12
+            .bold,
+      ).paddingSymmetric(
+        horizontal: AppPadding.pW12,
+        vertical: AppPadding.pH4,
+      ),
+    );
+  }
+}
+
+/// Shown in place of the hero once every stop on the route is closed.
+class _HomeRouteCompleteCard extends StatelessWidget {
+  const _HomeRouteCompleteCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppCircular.r22),
+        border: Border.all(color: AppColors.borderCardFaint),
+        boxShadow: AppShadows.heroCard,
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppPadding.pW20,
+        vertical: AppPadding.pH32,
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: AppSize.sW64,
+            height: AppSize.sH64,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.deliveredBg,
+            ),
+            child: Center(
+              child: IconWidget(
+                icon: AppAssets.svg.check,
+                color: AppColors.greenAccent,
+                height: AppSize.sH32,
+                width: AppSize.sH32,
+              ),
+            ),
+          ),
+          16.szH,
+          Text(
+            LocaleKeys.homeRouteCompleteTitle.tr(),
+            textAlign: TextAlign.center,
+            style: const TextStyle().setMainTextColor.s18.extraBold,
+          ),
+          8.szH,
+          Text(
+            LocaleKeys.homeRouteCompleteSub.tr(),
+            textAlign: TextAlign.center,
+            style: const TextStyle()
+                .setSecondaryColor
+                .s14
+                .regular
+                .withHeight(1.6),
           ),
         ],
       ),
