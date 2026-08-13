@@ -41,7 +41,12 @@ class PickupScreen extends StatelessWidget {
                   itemBuilder: (_, i) => _PickupCard(order: _orders[i]),
                 ),
               ),
-              _PickupConfirmBar(count: _orders.length, onConfirm: onConfirm),
+              _PickupConfirmBar(
+                count: _orders.length,
+                // From the More menu there's no flow to advance into yet, so
+                // confirming pops back rather than silently doing nothing.
+                onConfirm: onConfirm ?? () => Navigator.of(context).maybePop(),
+              ),
               const HomeIndicator(),
             ],
           ),

@@ -61,7 +61,6 @@ class _ReturnsListBody extends StatelessWidget {
             ],
           ),
         ),
-        const _ReturnsBottomNav(),
       ],
     );
   }
@@ -86,6 +85,23 @@ class _ReturnsHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconWidget(
+                icon: FailureIcons.back,
+                color: AppColors.textPrimary,
+                height: AppSize.sH20,
+                width: AppSize.sW20,
+              ),
+              4.szW,
+              Text(
+                LocaleKeys.back.tr(),
+                style: const TextStyle().setMainTextColor.s14.semiBold,
+              ),
+            ],
+          ).onClick(onTap: () => Navigator.of(context).maybePop()),
+          12.szH,
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -322,81 +338,3 @@ class _OrderMiniCard extends StatelessWidget {
   }
 }
 
-/// The mockup's 1g bottom nav differs from the shared [BottomNav] (it shows
-/// التحصيل / الحساب instead of notifications / more), so it's rendered locally
-/// here to stay faithful. Reconcile with the app's real nav at integration.
-class _ReturnsBottomNav extends StatelessWidget {
-  const _ReturnsBottomNav();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(top: BorderSide(color: AppColors.borderHeader)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(
-              left: AppPadding.pW16,
-              right: AppPadding.pW16,
-              top: AppPadding.pH12,
-              bottom: AppPadding.pH8,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _NavItem(icon: FailureIcons.home, label: LocaleKeys.failureNavHome.tr()),
-                _NavItem(
-                    icon: FailureIcons.orders,
-                    label: LocaleKeys.failureOrders.tr(),
-                    active: true),
-                _NavItem(icon: FailureIcons.wallet, label: LocaleKeys.failureNavCollection.tr()),
-                _NavItem(icon: FailureIcons.note, label: LocaleKeys.failureNavAccount.tr()),
-              ],
-            ),
-          ),
-          // Home-indicator pill.
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: AppPadding.pH8),
-            child: Container(
-              width: 135.w, // home-indicator pill — no token
-              height: AppSize.sH4,
-              decoration: BoxDecoration(
-                color: AppColors.textPrimary.withValues(alpha: 0.85),
-                borderRadius: BorderRadius.circular(AppCircular.r3),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  const _NavItem({required this.icon, required this.label, this.active = false});
-  final String icon;
-  final String label;
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = active ? AppColors.textPrimary : AppColors.chipCountMuted;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconWidget(icon: icon, color: color, height: AppSize.sH22, width: AppSize.sW22),
-        4.szH,
-        Text(
-          label,
-          style: active
-              ? const TextStyle().setColor(color).s12.bold
-              : const TextStyle().setColor(color).s12.semiBold,
-        ),
-      ],
-    );
-  }
-}

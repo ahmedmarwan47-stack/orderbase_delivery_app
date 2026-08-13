@@ -11,7 +11,6 @@ class _SettlementOpenView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        bottom: false,
         child: Column(
           children: [
             const _SettlementHeader(),
@@ -31,13 +30,10 @@ class _SettlementOpenView extends StatelessWidget {
                     _CollectionsSection(data: vc.data),
                     16.szH,
                     const _LockedNote(),
-                    20.szH,
-                    _SettleButton(onTap: vc.settle),
                   ],
                 ),
               ),
             ),
-            const BottomNav(active: NavTab.more),
           ],
         ),
       ),
@@ -143,39 +139,3 @@ class _NotSettledPill extends StatelessWidget {
   }
 }
 
-/// Ink primary CTA that hands the cash to the cashier (OPEN → SETTLED).
-class _SettleButton extends StatelessWidget {
-  const _SettleButton({required this.onTap});
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      child: Container(
-        height: AppSize.sH56,
-        decoration: BoxDecoration(
-          color: AppColors.inkFill,
-          borderRadius: BorderRadius.circular(AppCircular.r16),
-        ),
-        alignment: Alignment.center,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconWidget(
-              icon: AppAssets.svg.check,
-              color: AppColors.surface,
-              height: AppSize.sH20,
-              width: AppSize.sW20,
-            ),
-            8.szW,
-            Text(
-              LocaleKeys.settlementSettleCta.tr(),
-              style: const TextStyle().setWhite.s16.bold,
-            ),
-          ],
-        ),
-      ).onClick(onTap: onTap),
-    );
-  }
-}

@@ -15,7 +15,7 @@ class ReturnsListScreen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: AppColors.background,
-        body: SafeArea(bottom: false, child: const _ReturnsListBody()),
+        body: const SafeArea(child: _ReturnsListBody()),
       ),
     );
   }
