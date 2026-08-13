@@ -185,17 +185,6 @@ abstract final class LocaleKeys {
   static const String handoffEgpSuffix = 'handoff_egp_suffix';
   static const String handoffWalletToggle = 'handoff_wallet_toggle';
   static const String handoffCollectNext = 'handoff_collect_next';
-  static const String failTitle = 'fail_title';
-  static const String failReason1 = 'fail_reason_1';
-  static const String failReason2 = 'fail_reason_2';
-  static const String failReason3 = 'fail_reason_3';
-  static const String failReason4 = 'fail_reason_4';
-  static const String failReason5 = 'fail_reason_5';
-  static const String failReason6 = 'fail_reason_6';
-  static const String failNoteLabel = 'fail_note_label';
-  static const String failNoteHint = 'fail_note_hint';
-  static const String failSubmit = 'fail_submit';
-  static const String failPostpone = 'fail_postpone';
   static const String postponeTitle = 'postpone_title';
   static const String postponeDesc = 'postpone_desc';
   static const String postponeSlot1 = 'postpone_slot_1';

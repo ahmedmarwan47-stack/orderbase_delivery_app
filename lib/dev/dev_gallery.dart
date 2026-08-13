@@ -54,7 +54,6 @@ class DevGallery extends StatelessWidget {
         ),
     'ورقة · Handoff sheet': (_) =>
         SheetPreviewHost(label: 'تأكيد التسليم', open: showHandoffSheet),
-    'ورقة · Fail sheet': (_) => SheetPreviewHost(label: 'سبب عدم التسليم', open: showFailSheet),
     'ورقة · Postpone sheet': (_) =>
         SheetPreviewHost(label: 'تأجيل التسليم', open: showPostponeSheet),
     // Auth flow (Auth.dc.html 1a–1f). Login walks the whole reset flow

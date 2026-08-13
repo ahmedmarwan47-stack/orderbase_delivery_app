@@ -24,13 +24,13 @@ disagree, the mockup wins; update this file instead.
 
 | `.dc.html` file | Contains | Ported? |
 |---|---|---|
-| `Home Directions.dc.html` | Home explorations: **1a** (Airy), 1b (Glance), 1c (Compact), 2a (Flat) | **1a done**; others not built |
-| `Order Flow.dc.html` | The delivery flow state machine: `pickup` → `orders` → `order` (detail) → `result`, plus 3 sheets (`handoff`, `fail`, `postpone`) | **pickup / orders / detail / result done**; **sheets not built** |
-| `Queue States.dc.html` | Orders queue: list, search, filters, postponed sub-list, empty/no-results states | not built |
-| `Settlement.dc.html` | End-of-day settlement | not built |
-| `COD Collection.dc.html` | Cash-on-delivery collection | not built |
-| `Failure States.dc.html` | Failure/error states | not built |
-| `Auth.dc.html` | Auth / sign-in | not built |
+| `Home Directions.dc.html` | Home explorations: **1a** (Airy), 1b (Glance), 1c (Compact), 2a (Flat) | **all four built** (1a is the shell's Home; 1b/1c/2a via DevGallery) |
+| `Order Flow.dc.html` | The delivery flow state machine: `pickup` → `orders` → `order` (detail) → `result`, plus 3 sheets (`handoff`, `fail`, `postpone`) | **all built** (pickup / orders / detail / result + handoff & postpone sheets). The `fail` sheet was **superseded by the standalone Failure States flow** — see that row |
+| `Queue States.dc.html` | Orders queue: list, search, filters, postponed sub-list, empty/no-results states | **built** (1a–1e — the Flutter_Base pilot) |
+| `Settlement.dc.html` | End-of-day settlement | **built** (`features/settlement/`, open + settled; `/settlement`) |
+| `COD Collection.dc.html` | Cash-on-delivery collection | **built** — COD 2a keypad entry → wallet confirmation (`features/cod/`), wired into the delivery flow |
+| `Failure States.dc.html` | Failure/error states | **built** (`features/failure_states/`, 1a–1g; `/failure-states` + `/returns`) — **this is now the app's one fail flow**, driven from Order Detail |
+| `Auth.dc.html` | Auth / sign-in | **built** (`features/auth/`, 6 states; gates app entry via `AuthGate`) |
 
 Each `.dc.html` is ONE interactive screen that drives multiple **states** via a
 `class Component extends DCLogic` script (a `state` object + a `renderVals()` method) and
@@ -47,28 +47,43 @@ and/or `DevGallery`:
 
 | Screen | Feature folder | From |
 |---|---|---|
-| Home (option 1a) | `features/home/` | `Home Directions.dc.html` #1a |
+| Home (1a Airy + 1b Glance / 1c Compact / 2a Flat) | `features/home/` | `Home Directions.dc.html` |
 | Orders list | `features/orders/` | `Order Flow.dc.html` `isOrders` |
-| Order detail / Result / Handoff·Fail·Postpone sheets | `features/order_flow/` | `Order Flow.dc.html` `isOrder`/`isResult`/`showHandoff`/`showFail`/`showPostpone` |
+| Order detail / Result / Handoff·Postpone sheets | `features/order_flow/` | `Order Flow.dc.html` `isOrder`/`isResult`/`showHandoff`/`showPostpone` |
 | Pickup | `features/pickup/` | `Order Flow.dc.html` `isPickup` |
 | Queue States (1a–1e) — the pilot | `features/queue/` | `Queue States.dc.html` |
+| COD 2a (keypad entry → wallet confirm) | `features/cod/` | `COD Collection.dc.html` |
+| Failure States (1a–1g) — the app's fail flow | `features/failure_states/` | `Failure States.dc.html` |
+| Settlement (open + settled) | `features/settlement/` | `Settlement.dc.html` |
+| Auth (6 states, gates entry) | `features/auth/` | `Auth.dc.html` |
 
 Shared widgets (`lib/widgets/bottom_nav`, `home_indicator`, `map_view`, `status_pill`, `app_sheet`)
 were also converted in place (same public APIs, Flutter_Base internals).
 
-**The Order Flow is now navigable end-to-end.** In `OrderDetailScreen`: the sticky "delivered"
-bar opens the **handoff** sheet → *delivered* result; the "لم يتم التسليم" button opens the
-**fail** sheet → *failed* result, and its "تأجيل" button hands off to the **postpone** sheet →
-*postponed* result (its back arrow returns to fail). Sheets are shown via `showAppSheet` /
-`SheetShell` (`lib/widgets/app_sheet.dart`) and previewed standalone through `SheetPreviewHost`
+**The Order Flow is now navigable end-to-end** and payment-/outcome-aware (see
+`OrderFlowController`). In `OrderDetailScreen`: the sticky "delivered" bar opens the **handoff**
+sheet (proof photo enforced) → for COD orders, the **COD 2a** collection flow
+(`showCodCollectionSheet`) → *delivered* result showing the real collected cash + any wallet
+change; prepaid skips cash. The "لم يتم التسليم" button opens the **standalone Failure States
+flow** (`showFailureFlow` — reason → per-reason step → return-to-branch → logged), mapped onto the
+Order Flow outcomes: *returned-to-branch* → *failed* result; *postpone* hands off to the
+**postpone** sheet → *postponed* result (back arrow reopens the failure flow); *retry now/later*
+keeps the order active. Sheets are shown via `showAppSheet` / `SheetShell`
+(`lib/widgets/app_sheet.dart`) and previewed standalone through `SheetPreviewHost`
 (`lib/dev/sheet_preview_host.dart`). The list→detail tap is wired via `OrdersListScreen.onOpenOrder`.
+
+> The old inline `fail_sheet.dart` (a simple reason-picker + note) has been **retired** — the
+> Failure States flow fully replaces it, so there is exactly one fail flow in the app.
 
 **The app is now wired into a real tab shell** (`lib/app/app_shell.dart`) — Home + Orders tabs,
 Home/Orders → detail → flow → result → back to a tab. See the *App shell* section below. Verified
 on the iOS Simulator.
 
-**Next up:** the not-yet-built screens (Settlement, COD Collection, Failure States, Auth) and the
-remaining Home variants (1b / 1c / 2a) — build these in the Flutter_Base style described below.
+**All `.dc.html` mockups are now built** (9 features under `lib/features/`; every screen reachable
+via `DevGallery`, most also from the app shell / routes). Remaining work is integration polish, not
+new screens — e.g. modelling deep per-order detail content (address/items/notes/timeline are still
+sample copy on `FlowOrder`), and deciding whether standalone routes (`/settlement`, `/returns`)
+belong in the tab shell.
 
 ---
 
@@ -94,8 +109,9 @@ The `features/queue/` pilot is the canonical reference — copy its patterns. Fo
 - **Core widgets** `lib/core/widgets/` — `IconWidget(icon: AppAssets.svg.x, color:)` + `AppAssets`.
 - **i18n** — `easy_localization` in `main.dart`; keys in `lib/core/localization/locale_keys.dart`
   (hand-authored — no `generate/strings` codegen), strings in `assets/translations/{ar,en}.json`.
-- **Routing/DI** — `flutter_modular`: `AppModule` (`lib/app_module.dart`) routes `/` (shell),
-  `/queue`, `/queue/postponed`, `/order-detail`, `/pickup`; `main.dart` is `ModularApp` +
+- **Routing/DI** — `flutter_modular`: `AppModule` (`lib/app_module.dart`) routes `/` (the
+  `AuthGate` → login until authed, then the tab shell), `/auth`, `/queue`, `/queue/postponed`,
+  `/order-detail`, `/pickup`, `/settlement`, `/failure-states`, `/returns`; `main.dart` is `ModularApp` +
   `EasyLocalization` + `ScreenUtilInit(designSize: 368×812)` + `MaterialApp.router`. `app_shell.dart`
   hosts the Home/Orders tabs and pushes the order-detail flow (imports the feature hubs).
 - **Feature layout** (every `features/<name>/presentation/`) — `imports/<name>_imports.dart` hub

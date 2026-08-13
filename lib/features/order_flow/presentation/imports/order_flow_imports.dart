@@ -19,7 +19,6 @@ import '../../../../widgets/map_view.dart';
 // Controllers (flow orchestration + ephemeral sheet state)
 part '../controllers/order_flow_controller.dart';
 part '../controllers/handoff_sheet_controller.dart';
-part '../controllers/fail_sheet_controller.dart';
 part '../controllers/postpone_sheet_controller.dart';
 
 // Views (public route entry points)
@@ -42,5 +41,4 @@ part '../widgets/result_actions.dart';
 
 // Sheets (Order Flow overlays)
 part '../widgets/sheets/handoff_sheet.dart';
-part '../widgets/sheets/fail_sheet.dart';
 part '../widgets/sheets/postpone_sheet.dart';
