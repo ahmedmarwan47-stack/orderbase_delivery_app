@@ -130,6 +130,41 @@ class _SettlementButton extends StatelessWidget {
   }
 }
 
+/// Empty search prompt (1a, before typing) — a designed empty state (badge +
+/// prompt + scope card) rather than a bare line of text.
+class _QueueSearchPrompt extends StatelessWidget {
+  const _QueueSearchPrompt();
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(
+            child: _EmptyBadge(
+              bg: AppColors.surfaceSubtle,
+              icon: AppAssets.svg.search,
+              iconColor: AppColors.chipCountMuted,
+            ),
+          ),
+          24.szH,
+          Text(LocaleKeys.searchPrompt.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle().setMainTextColor.s20.extraBold),
+          24.szH,
+          _ScopeCard(),
+        ],
+      ).paddingOnlyDirectional(
+        start: AppPadding.pW32,
+        end: AppPadding.pW32,
+        top: AppPadding.pH64,
+        bottom: AppPadding.pH24,
+      ),
+    );
+  }
+}
+
 /// No search results (1c) — states the search scope so a postponed order doesn't
 /// read as "lost".
 class _QueueNoResults extends StatelessWidget {

@@ -111,7 +111,39 @@ class QueueViewController {
 
   void openPostponed() => Modular.to.pushNamed('/queue/postponed');
 
-  void openOrder() => Modular.to.pushNamed('/order-detail');
+  /// Open the tapped order's detail. Prefers the richer per-order [FlowOrder]
+  /// (matched by number) so items/timeline/notes are real; falls back to
+  /// adapting the thinner queue [Order] when there's no match.
+  void openOrder(BuildContext context, Order order) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => OrderDetailScreen(order: _asFlowOrder(order)),
+      ),
+    );
+  }
+
+  FlowOrder _asFlowOrder(Order o) {
+    for (final f in sampleFlowOrders) {
+      if (f.num == o.num) return f;
+    }
+    return FlowOrder(
+      num: o.num,
+      name: o.name,
+      meta: o.area,
+      state: switch (o.status) {
+        OrderStatus.transit || OrderStatus.postponed => FlowOrderState.active,
+        OrderStatus.delivered => FlowOrderState.done,
+        OrderStatus.failed => FlowOrderState.failed,
+      },
+      cod: o.cod != null && !o.prepaid,
+      amount: o.cod != null ? formatThousands(o.cod!) : null,
+      address: '${o.addr} — ${o.area}',
+      items: const [],
+      assignedTime: o.due ?? '',
+      pickedTime: '',
+      dateLabel: '',
+    );
+  }
 
   String _toEnglishDigits(String s) {
     const eastern = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];

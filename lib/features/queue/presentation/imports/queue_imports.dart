@@ -10,6 +10,9 @@ import 'package:rxdart/rxdart.dart';
 
 import '../../../../config/res/config_imports.dart';
 import '../../../../data/order.dart';
+import '../../../../data/flow_order.dart';
+import '../../../order_flow/presentation/imports/order_flow_imports.dart'
+    show OrderDetailScreen;
 import '../../../../widgets/bottom_nav.dart';
 import '../../../../widgets/home_indicator.dart';
 

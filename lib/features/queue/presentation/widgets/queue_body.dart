@@ -55,7 +55,8 @@ class _QueueBrowseList extends StatelessWidget {
                 ),
                 itemCount: items.length,
                 separatorBuilder: (_, _) => 12.szH,
-                itemBuilder: (_, i) => _QueueCard(order: items[i], onTap: vc.openOrder),
+                itemBuilder: (context, i) =>
+                    _QueueCard(order: items[i], onTap: () => vc.openOrder(context, items[i])),
               ),
             ),
           ],
@@ -75,14 +76,7 @@ class _QueueSearchResults extends StatelessWidget {
     return ValueListenableBuilder<String>(
       valueListenable: vc.query,
       builder: (_, query, _) {
-        if (query.trim().isEmpty) {
-          return Center(
-            child: Text(
-              LocaleKeys.searchPrompt.tr(),
-              style: const TextStyle().setHintColor.s14.regular,
-            ),
-          );
-        }
+        if (query.trim().isEmpty) return const _QueueSearchPrompt();
         final matches = vc.searchMatches;
         if (matches.isEmpty) return _QueueNoResults(vc: vc, query: query);
         return Column(
@@ -99,11 +93,11 @@ class _QueueSearchResults extends StatelessWidget {
                 ),
                 itemCount: matches.length,
                 separatorBuilder: (_, _) => 12.szH,
-                itemBuilder: (_, i) => _SearchResultCard(
+                itemBuilder: (context, i) => _SearchResultCard(
                   order: matches[i],
                   query: query,
                   reasonKey: vc.matchKey(matches[i]),
-                  onTap: vc.openOrder,
+                  onTap: () => vc.openOrder(context, matches[i]),
                 ),
               ),
             ),
