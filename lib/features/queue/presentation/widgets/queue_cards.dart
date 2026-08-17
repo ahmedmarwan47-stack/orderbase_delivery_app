@@ -197,7 +197,7 @@ class _SearchResultCard extends StatelessWidget {
             8.szH,
             Text(
               LocaleKeys.outsideActive.tr(),
-              style: const TextStyle().setColor(AppColors.postponedText).s12.regular.withHeight(1.7),
+              style: const TextStyle().setColor(AppColors.postponedText).s12.regular.withHeight(1.5),
             ),
           ],
         ],

@@ -5,10 +5,14 @@ part of '../imports/pickup_imports.dart';
 /// it's a focused task screen with a sticky confirm bar. Fully static, so no
 /// ViewController is needed.
 class PickupScreen extends StatelessWidget {
-  const PickupScreen({super.key, this.onConfirm});
+  const PickupScreen({super.key, this.onConfirm, this.onSelectTab});
 
   /// Confirms pickup (all orders → "in transit"). Wired to the flow later.
   final VoidCallback? onConfirm;
+
+  /// When provided the screen is a shell tab: it renders the shared bottom nav
+  /// (instead of a bare home-indicator) so it behaves like a normal tab page.
+  final ValueChanged<NavTab>? onSelectTab;
 
   /// Total time the entrance stagger is allowed to span across the whole batch.
   static const Duration _totalStagger = Duration(milliseconds: 300);
@@ -38,7 +42,7 @@ class PickupScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              _PickupHeader(count: orders.length),
+              _PickupHeader(count: orders.length, showBack: onSelectTab == null),
               Expanded(
                 child: ListView.separated(
                   padding: EdgeInsetsDirectional.only(
@@ -69,7 +73,10 @@ class PickupScreen extends StatelessWidget {
                   (onConfirm ?? () => Navigator.of(context).maybePop())();
                 },
               ),
-              const HomeIndicator(),
+              if (onSelectTab != null)
+                BottomNav(active: NavTab.pickup, onTap: onSelectTab)
+              else
+                const HomeIndicator(),
             ],
           ),
         ),

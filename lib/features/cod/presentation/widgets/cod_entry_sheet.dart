@@ -128,7 +128,7 @@ class _AmountField extends StatelessWidget {
 
     final amountStyle = const TextStyle()
         .setColor(amountColor)
-        .s36
+        .s28
         .extraBold
         .withHeight(1)
         .tabular;

@@ -44,7 +44,7 @@ class _CashInHandCard extends StatelessWidget {
                           textDirection: TextDirection.ltr,
                           style: const TextStyle()
                               .setWhite
-                              .s36
+                              .s28
                               .extraBold
                               .tabular,
                         ),

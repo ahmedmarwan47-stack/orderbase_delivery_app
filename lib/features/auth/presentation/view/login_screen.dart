@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
           24.szH,
           Text(LocaleKeys.authLoginTitle.tr(),
               textAlign: TextAlign.center,
-              style: const TextStyle().setMainTextColor.s24.extraBold),
+              style: const TextStyle().setMainTextColor.s20.extraBold),
           8.szH,
           Text(LocaleKeys.authLoginSubtitle.tr(),
               textAlign: TextAlign.center,

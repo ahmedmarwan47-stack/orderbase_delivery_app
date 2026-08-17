@@ -9,6 +9,7 @@ class SettlementScreen extends StatefulWidget {
     super.key,
     this.data,
     this.startStage = SettlementStage.open,
+    this.onSelectTab,
   });
 
   /// Defaults to [shiftSettlement] (built live from today's shift) when null, so
@@ -16,6 +17,10 @@ class SettlementScreen extends StatefulWidget {
   /// explicit [data] (e.g. [sampleSettlement]).
   final SettlementData? data;
   final SettlementStage startStage;
+
+  /// When provided the screen is a shell tab: it renders the shared bottom nav
+  /// and drops the standalone back link so it behaves like a normal tab page.
+  final ValueChanged<NavTab>? onSelectTab;
 
   @override
   State<SettlementScreen> createState() => _SettlementScreenState();
@@ -40,8 +45,10 @@ class _SettlementScreenState extends State<SettlementScreen> {
       child: ValueListenableBuilder<SettlementStage>(
         valueListenable: _vc.stage,
         builder: (_, stage, _) => switch (stage) {
-          SettlementStage.open => _SettlementOpenView(vc: _vc),
-          SettlementStage.settled => _SettlementSettledView(vc: _vc),
+          SettlementStage.open =>
+            _SettlementOpenView(vc: _vc, onSelectTab: widget.onSelectTab),
+          SettlementStage.settled =>
+            _SettlementSettledView(vc: _vc, onSelectTab: widget.onSelectTab),
         },
       ),
     );

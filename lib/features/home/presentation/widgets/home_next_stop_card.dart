@@ -115,7 +115,7 @@ class _HomeNextStopCard extends StatelessWidget {
             bottom: AppPadding.pH16,
           ),
           // ── map strip ──
-          MapView(height: AppSize.sH96, showHairlines: true),
+          MapView(height: AppSize.sH120, showHairlines: true),
           // ── order info ──
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,7 +373,7 @@ class _HomeRouteCompleteCard extends StatelessWidget {
                 .setSecondaryColor
                 .s14
                 .regular
-                .withHeight(1.6),
+                .withHeight(1.5),
           ),
           // Warm end-of-day tally — how many stops and how much cash.
           8.szH,

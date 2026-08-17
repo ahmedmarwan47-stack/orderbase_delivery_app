@@ -337,13 +337,13 @@ class _NoteField extends StatelessWidget {
         controller: controller,
         maxLines: null,
         cursorColor: AppColors.brand,
-        style: const TextStyle().setMainTextColor.s14.regular.withHeight(1.7),
+        style: const TextStyle().setMainTextColor.s14.regular.withHeight(1.5),
         decoration: InputDecoration(
           isDense: true,
           border: InputBorder.none,
           contentPadding: EdgeInsets.zero,
           hintText: hint,
-          hintStyle: const TextStyle().setHintColor.s14.regular.withHeight(1.7),
+          hintStyle: const TextStyle().setHintColor.s14.regular.withHeight(1.5),
         ),
       ),
     );
@@ -459,7 +459,7 @@ class _Callout extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle().setColor(textColor).s12.regular.withHeight(1.7),
+              style: const TextStyle().setColor(textColor).s12.regular.withHeight(1.5),
             ),
           ),
         ],

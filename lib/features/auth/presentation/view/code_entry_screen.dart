@@ -44,7 +44,7 @@ class _CodeEntryScreenState extends State<CodeEntryScreen> {
           _AuthBackLink(onTap: () => Navigator.of(context).maybePop()),
           20.szH,
           Text(LocaleKeys.authCodeTitle.tr(),
-              style: const TextStyle().setMainTextColor.s24.extraBold),
+              style: const TextStyle().setMainTextColor.s20.extraBold),
           8.szH,
           Text(
             LocaleKeys.authCodeSubtitle.tr(namedArgs: {'phone': phone}),

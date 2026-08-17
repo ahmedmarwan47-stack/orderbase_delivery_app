@@ -132,7 +132,7 @@ class _ReasonBox extends StatelessWidget {
               'reason': order.reason ?? '',
               'time': order.postponedAt ?? '',
             }),
-            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.7),
+            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.5),
           ),
         ],
       ).paddingAll(AppPadding.pH12),

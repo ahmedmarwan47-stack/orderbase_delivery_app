@@ -4,8 +4,9 @@ part of '../imports/settlement_imports.dart';
 /// badge, headline, a plain-language summary, the delivered/wallet summary card,
 /// the now-zero balance card, and an ink "back home" button that reopens (reset).
 class _SettlementSettledView extends StatelessWidget {
-  const _SettlementSettledView({required this.vc});
+  const _SettlementSettledView({required this.vc, this.onSelectTab});
   final SettlementController vc;
+  final ValueChanged<NavTab>? onSelectTab;
 
   @override
   Widget build(BuildContext context) {
@@ -13,6 +14,7 @@ class _SettlementSettledView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
+        bottom: onSelectTab == null,
         child: Column(
           children: [
             Expanded(
@@ -30,7 +32,7 @@ class _SettlementSettledView extends StatelessWidget {
                     Text(
                       LocaleKeys.settlementSettledTitle.tr(),
                       textAlign: TextAlign.center,
-                      style: const TextStyle().setMainTextColor.s24.extraBold,
+                      style: const TextStyle().setMainTextColor.s20.extraBold,
                     ),
                     12.szH,
                     Text(
@@ -43,7 +45,7 @@ class _SettlementSettledView extends StatelessWidget {
                           .setSecondaryColor
                           .s14
                           .regular
-                          .withHeight(1.6),
+                          .withHeight(1.5),
                     ),
                     24.szH,
                     _SummaryCard(data: data),
@@ -60,7 +62,10 @@ class _SettlementSettledView extends StatelessWidget {
               ),
               child: _BackHomeButton(onTap: vc.reset),
             ),
-            const HomeIndicator(),
+            if (onSelectTab != null)
+              BottomNav(active: NavTab.settlement, onTap: onSelectTab)
+            else
+              const HomeIndicator(),
           ],
         ),
       ),
@@ -229,7 +234,7 @@ class _BalanceCard extends StatelessWidget {
                     '0',
                     textDirection: TextDirection.ltr,
                     style:
-                        const TextStyle().setMainTextColor.s24.extraBold.tabular,
+                        const TextStyle().setMainTextColor.s20.extraBold.tabular,
                   ),
                   6.szW,
                   Text(

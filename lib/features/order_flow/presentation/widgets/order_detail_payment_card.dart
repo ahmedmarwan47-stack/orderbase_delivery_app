@@ -33,7 +33,7 @@ class _PaymentCard extends StatelessWidget {
                   text: amount,
                   style: const TextStyle()
                       .setWhite
-                      .s24
+                      .s20
                       .extraBold
                       .withHeight(1)
                       .tabular,

@@ -27,7 +27,7 @@ class _QueueClearState extends StatelessWidget {
           8.szH,
           Text(LocaleKeys.queueClearDesc.tr(),
               textAlign: TextAlign.center,
-              style: const TextStyle().setSecondaryColor.s14.regular.withHeight(1.7)),
+              style: const TextStyle().setSecondaryColor.s14.regular.withHeight(1.5)),
           24.szH,
           if (postponed.isNotEmpty) ...[
             _PostponedHandoffCard(postponed: postponed, onView: vc.openPostponed),
@@ -97,7 +97,7 @@ class _PostponedHandoffCard extends StatelessWidget {
                   .setColor(AppColors.postponedTextStrong)
                   .s12
                   .regular
-                  .withHeight(1.7)),
+                  .withHeight(1.5)),
           12.szH,
           _OutlinedPillButton(
             labelKey: LocaleKeys.viewPostponed,
@@ -192,7 +192,7 @@ class _QueueNoResults extends StatelessWidget {
           8.szH,
           Text(LocaleKeys.noResultsDesc.tr(),
               textAlign: TextAlign.center,
-              style: const TextStyle().setSecondaryColor.s14.regular.withHeight(1.7)),
+              style: const TextStyle().setSecondaryColor.s14.regular.withHeight(1.5)),
           24.szH,
           Center(
             child: _ClearSearchButton(onTap: vc.clearSearch),
@@ -260,7 +260,7 @@ class _ScopeCard extends StatelessWidget {
               style: const TextStyle().setMainTextColor.s12.bold),
           8.szH,
           Text(LocaleKeys.searchScopeDesc.tr(),
-              style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.7)),
+              style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.5)),
         ],
       ).paddingAll(AppPadding.pH16),
     );

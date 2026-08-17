@@ -8,10 +8,8 @@ import '../../theme/colors.dart';
 /// Flutter scale (`extraBold` = w800 for the mockup headings). Font family is
 /// inherited from the theme (Noto Kufi Arabic).
 extension TextStyleEx on TextStyle {
-  // ── sizes ──
-  TextStyle get s10 => copyWith(fontSize: FontSizeManager.s10);
+  // ── sizes ── (floor is 14px; 12px used occasionally for dense meta)
   TextStyle get s12 => copyWith(fontSize: FontSizeManager.s12);
-  TextStyle get s13 => copyWith(fontSize: FontSizeManager.s13);
   TextStyle get s14 => copyWith(fontSize: FontSizeManager.s14);
   TextStyle get s16 => copyWith(fontSize: FontSizeManager.s16);
   TextStyle get s18 => copyWith(fontSize: FontSizeManager.s18);

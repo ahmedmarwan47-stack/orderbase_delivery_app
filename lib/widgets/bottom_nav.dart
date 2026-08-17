@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../app/shift_controller.dart';
 import '../config/res/config_imports.dart';
 import 'home_indicator.dart';
 
-enum NavTab { home, orders, notifications, more }
+enum NavTab { home, orders, pickup, settlement, more }
 
 /// Shared bottom tab bar used across screens. The active tab renders in the
 /// brand-red accent; the rest are muted. The notifications tab can show a red
@@ -45,10 +46,12 @@ class BottomNav extends StatelessWidget {
                 _item(NavTab.orders, AppAssets.svg.orders,
                     LocaleKeys.navOrders.tr(),
                     activeIcon: AppAssets.svg.ordersFilled),
-                _item(NavTab.notifications, AppAssets.svg.bell,
-                    LocaleKeys.navNotifications.tr(),
-                    activeIcon: AppAssets.svg.bellFilled,
-                    badge: notificationsBadge),
+                _item(NavTab.pickup, AppAssets.svg.store,
+                    LocaleKeys.navPickup.tr(),
+                    // Red dot while there are orders waiting at the branch.
+                    badge: ShiftController.instance.inProgress > 0),
+                _item(NavTab.settlement, AppAssets.svg.wallet,
+                    LocaleKeys.navSettlement.tr()),
                 _item(NavTab.more, AppAssets.svg.more, LocaleKeys.navMore.tr(),
                     activeIcon: AppAssets.svg.moreFilled),
               ],

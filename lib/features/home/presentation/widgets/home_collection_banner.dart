@@ -39,7 +39,7 @@ class _HomeCollectionBanner extends StatelessWidget {
                       .extraBold
                       .tabular
                       .withHeight(1)
-                      .copyWith(fontSize: FontSizeManager.s36),
+                      .copyWith(fontSize: FontSizeManager.s28),
                   children: [
                     TextSpan(
                       text: ' ${LocaleKeys.homeEgp.tr()}',

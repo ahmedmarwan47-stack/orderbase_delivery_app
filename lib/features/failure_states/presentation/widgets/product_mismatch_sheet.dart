@@ -37,7 +37,7 @@ class _ProductMismatchSheetState extends State<_ProductMismatchSheet> {
           8.szH,
           Text(
             LocaleKeys.failurePhotoHint.tr(),
-            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.7),
+            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.5),
           ),
           16.szH,
           _FieldLabel(LocaleKeys.failureDiffNoteLabel.tr()),

@@ -10,10 +10,14 @@ class HomeScreen extends StatelessWidget {
     this.onOpenOrder,
     this.onOpenOrdersFilter,
     this.onOpenSettlement,
+    this.onOpenNotifications,
   });
 
   /// Forwarded to the bottom nav so the app shell can switch tabs.
   final ValueChanged<NavTab>? onSelectTab;
+
+  /// Opens the notifications screen (the header bell).
+  final VoidCallback? onOpenNotifications;
 
   /// Opens the current next-stop order's detail ("عرض الطلب" on the hero).
   final VoidCallback? onOpenOrder;
@@ -35,7 +39,7 @@ class HomeScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              const _HomeMerchantHeader(),
+              _HomeMerchantHeader(onOpenNotifications: onOpenNotifications),
               Expanded(
                 child: AnimatedBuilder(
                   animation: ShiftController.instance,

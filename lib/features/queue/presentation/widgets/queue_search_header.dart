@@ -30,7 +30,7 @@ class _QueueSearchHeader extends StatelessWidget {
           12.szH,
           Text(
             LocaleKeys.searchScope.tr(),
-            style: const TextStyle().setHintColor.s12.regular.withHeight(1.7),
+            style: const TextStyle().setHintColor.s12.regular.withHeight(1.5),
           ),
         ],
       ).paddingOnlyDirectional(

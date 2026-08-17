@@ -3,8 +3,11 @@ part of '../imports/pickup_imports.dart';
 /// Pickup header: a back link, the branch identity (logo + name), and a banner
 /// summarising how many orders are ready to collect in one action.
 class _PickupHeader extends StatelessWidget {
-  const _PickupHeader({required this.count});
+  const _PickupHeader({required this.count, this.showBack = true});
   final int count;
+
+  /// Hidden when Pickup is a shell tab (a root tab has nowhere to go back).
+  final bool showBack;
 
   @override
   Widget build(BuildContext context) {
@@ -16,24 +19,26 @@ class _PickupHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              IconWidget(
-                icon: AppAssets.svg.chevronRight,
-                color: AppColors.textTertiary,
-                height: AppSize.sH18,
-                width: AppSize.sW18,
-              ),
-              8.szW,
-              Text(
-                LocaleKeys.back.tr(),
-                style: const TextStyle().setTertiaryColor.s14.semiBold,
-              ),
-            ],
-          ).paddingSymmetric(vertical: AppPadding.pH8).onClick(
-                onTap: () => Navigator.of(context).maybePop(),
-              ),
-          12.szH,
+          if (showBack) ...[
+            Row(
+              children: [
+                IconWidget(
+                  icon: AppAssets.svg.chevronRight,
+                  color: AppColors.textTertiary,
+                  height: AppSize.sH18,
+                  width: AppSize.sW18,
+                ),
+                8.szW,
+                Text(
+                  LocaleKeys.back.tr(),
+                  style: const TextStyle().setTertiaryColor.s14.semiBold,
+                ),
+              ],
+            ).paddingSymmetric(vertical: AppPadding.pH8).onClick(
+                  onTap: () => Navigator.of(context).maybePop(),
+                ),
+            12.szH,
+          ],
           Row(
             children: [
               ClipRRect(

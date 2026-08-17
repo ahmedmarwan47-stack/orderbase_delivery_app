@@ -27,7 +27,11 @@ class _QueueFilterChips extends StatelessWidget {
               selected: selected == QueueFilter.transit,
               onTap: () => vc.selectFilter(QueueFilter.transit),
             ),
-            _FilterChip.postponed(count: vc.postponed.length, onTap: vc.openPostponed),
+            _FilterChip.postponed(
+              count: vc.postponed.length,
+              selected: selected == QueueFilter.postponed,
+              onTap: () => vc.selectFilter(QueueFilter.postponed),
+            ),
             _FilterChip(
               labelKey: LocaleKeys.filterDelivered,
               count: vc.countFor(QueueFilter.delivered),
@@ -55,9 +59,11 @@ class _FilterChip extends StatelessWidget {
     required this.onTap,
   }) : postponedStyle = false;
 
-  const _FilterChip.postponed({required this.count, required this.onTap})
-      : labelKey = LocaleKeys.filterPostponed,
-        selected = false,
+  const _FilterChip.postponed({
+    required this.count,
+    required this.onTap,
+    this.selected = false,
+  })  : labelKey = LocaleKeys.filterPostponed,
         postponedStyle = true;
 
   final String labelKey;
@@ -72,9 +78,14 @@ class _FilterChip extends StatelessWidget {
     final Color fg;
     Border? border;
     if (postponedStyle) {
-      bg = AppColors.postponedBg;
-      fg = AppColors.postponedText;
-      border = Border.all(color: AppColors.postponedBorder);
+      if (selected) {
+        bg = AppColors.postponedText;
+        fg = AppColors.surface;
+      } else {
+        bg = AppColors.postponedBg;
+        fg = AppColors.postponedText;
+        border = Border.all(color: AppColors.postponedBorder);
+      }
     } else if (selected) {
       bg = AppColors.inkFill;
       fg = AppColors.surface;

@@ -87,7 +87,7 @@ class _AuthCodeBox extends StatelessWidget {
       child: Text(
         char,
         textDirection: TextDirection.ltr,
-        style: const TextStyle().setMainTextColor.s24.extraBold.tabular,
+        style: const TextStyle().setMainTextColor.s20.extraBold.tabular,
       ),
     );
   }

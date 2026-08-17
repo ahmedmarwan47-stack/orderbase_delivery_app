@@ -25,7 +25,7 @@ class _OrdersHeader extends StatelessWidget {
                 children: [
                   Text(
                     LocaleKeys.queueTitle.tr(),
-                    style: const TextStyle().setMainTextColor.s24.extraBold,
+                    style: const TextStyle().setMainTextColor.s20.extraBold,
                   ),
                   4.szH,
                   Text(
@@ -37,7 +37,7 @@ class _OrdersHeader extends StatelessWidget {
               _SearchButton(onTap: () => _openQueueSearch(context)),
             ],
           ),
-          16.szH,
+          12.szH,
           _OrdersFilterChips(vc: vc),
         ],
       ).paddingOnlyDirectional(

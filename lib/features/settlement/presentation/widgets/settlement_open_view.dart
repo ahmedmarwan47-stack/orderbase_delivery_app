@@ -3,17 +3,19 @@ part of '../imports/settlement_imports.dart';
 /// State A — OPEN ("تسوية نهاية اليوم"): white header + scrolling paper body
 /// (dark cash card, today's collections, locked note, settle CTA) + bottom nav.
 class _SettlementOpenView extends StatelessWidget {
-  const _SettlementOpenView({required this.vc});
+  const _SettlementOpenView({required this.vc, this.onSelectTab});
   final SettlementController vc;
+  final ValueChanged<NavTab>? onSelectTab;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
+        bottom: onSelectTab == null,
         child: Column(
           children: [
-            const _SettlementHeader(),
+            _SettlementHeader(showBack: onSelectTab == null),
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsetsDirectional.only(
@@ -34,6 +36,8 @@ class _SettlementOpenView extends StatelessWidget {
                 ),
               ),
             ),
+            if (onSelectTab != null)
+              BottomNav(active: NavTab.settlement, onTap: onSelectTab),
           ],
         ),
       ),
@@ -41,9 +45,13 @@ class _SettlementOpenView extends StatelessWidget {
   }
 }
 
-/// White header: back link, title + subtitle, and the amber "not settled" pill.
+/// White header: back link (standalone only), title + subtitle, and the amber
+/// "not settled" pill.
 class _SettlementHeader extends StatelessWidget {
-  const _SettlementHeader();
+  const _SettlementHeader({this.showBack = true});
+
+  /// Hidden when Settlement is a shell tab (a root tab has nowhere to go back).
+  final bool showBack;
 
   @override
   Widget build(BuildContext context) {
@@ -55,23 +63,25 @@ class _SettlementHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconWidget(
-                icon: AppAssets.svg.chevronRight,
-                color: AppColors.textPrimary,
-                height: AppSize.sH20,
-                width: AppSize.sW20,
-              ),
-              4.szW,
-              Text(
-                LocaleKeys.settlementBack.tr(),
-                style: const TextStyle().setMainTextColor.s14.semiBold,
-              ),
-            ],
-          ).onClick(onTap: () => Navigator.of(context).maybePop()),
-          12.szH,
+          if (showBack) ...[
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconWidget(
+                  icon: AppAssets.svg.chevronRight,
+                  color: AppColors.textPrimary,
+                  height: AppSize.sH20,
+                  width: AppSize.sW20,
+                ),
+                4.szW,
+                Text(
+                  LocaleKeys.settlementBack.tr(),
+                  style: const TextStyle().setMainTextColor.s14.semiBold,
+                ),
+              ],
+            ).onClick(onTap: () => Navigator.of(context).maybePop()),
+            12.szH,
+          ],
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -81,7 +91,7 @@ class _SettlementHeader extends StatelessWidget {
                   children: [
                     Text(
                       LocaleKeys.settlementTitle.tr(),
-                      style: const TextStyle().setMainTextColor.s24.extraBold,
+                      style: const TextStyle().setMainTextColor.s20.extraBold,
                     ),
                     4.szH,
                     Text(

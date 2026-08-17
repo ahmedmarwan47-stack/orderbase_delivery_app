@@ -73,7 +73,7 @@ class _HomeTodayStats extends StatelessWidget {
                   value: formatThousands(shift.collectedEgp),
                   suffixKey: LocaleKeys.homeEgp,
                   valueColor: AppColors.greenAccent,
-                  valueSize: FontSizeManager.s24,
+                  valueSize: FontSizeManager.s20,
                   labelKey: LocaleKeys.homeStatTotalCollected,
                   onTap: onOpenSettlement,
                 ),

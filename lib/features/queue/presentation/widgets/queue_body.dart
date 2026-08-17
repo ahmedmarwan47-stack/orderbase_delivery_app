@@ -50,31 +50,54 @@ class _QueueBrowseList extends StatelessWidget {
       builder: (context, filter, _) {
         final reduced = AppMotion.reduced(context);
         final items = vc.filtered;
-        final showBar = filter != QueueFilter.all;
 
-        final Widget content = items.isEmpty
-            ? _QueueClearState(vc: vc)
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (showBar)
-                    _FilterResultsBar(vc: vc, filter: filter, count: items.length)
-                        .paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH12),
-                  Expanded(
-                    child: _AnimatedQueueList(
-                      orders: items,
-                      vc: vc,
-                      reduced: reduced,
-                      padding: EdgeInsetsDirectional.only(
-                        start: AppPadding.pW20,
-                        end: AppPadding.pW20,
-                        top: showBar ? 0 : AppPadding.pH16,
-                        bottom: AppPadding.pH20,
+        // Postponed is filtered inline: the rich postponed cards (return time,
+        // reason, "return to queue") render in place instead of a separate page.
+        final Widget content;
+        if (filter == QueueFilter.postponed) {
+          content = items.isEmpty
+              ? const _QueuePostponedEmpty()
+              : _AnimatedPostponedList(
+                  orders: items,
+                  reduced: reduced,
+                  onReturn: (o) {
+                    vc.returnOrderToQueue(o);
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(
+                        SnackBar(
+                          content: Text(LocaleKeys.returnedToQueue
+                              .tr(namedArgs: {'num': o.num})),
+                        ),
+                      );
+                  },
+                );
+        } else {
+          final showBar = filter != QueueFilter.all;
+          content = items.isEmpty
+              ? _QueueClearState(vc: vc)
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (showBar)
+                      _FilterResultsBar(vc: vc, filter: filter, count: items.length)
+                          .paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH12),
+                    Expanded(
+                      child: _AnimatedQueueList(
+                        orders: items,
+                        vc: vc,
+                        reduced: reduced,
+                        padding: EdgeInsetsDirectional.only(
+                          start: AppPadding.pW20,
+                          end: AppPadding.pW20,
+                          top: showBar ? 0 : AppPadding.pH16,
+                          bottom: AppPadding.pH20,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              );
+                  ],
+                );
+        }
 
         return AnimatedSwitcher(
           duration: reduced ? Duration.zero : AppMotion.fill,
@@ -360,6 +383,47 @@ class _FilterResultsBar extends StatelessWidget {
         ).onClick(onTap: vc.clearFilter),
       ],
     ).paddingSymmetric(horizontal: AppPadding.pW20);
+  }
+}
+
+/// Empty state for the postponed filter — no orders currently postponed.
+class _QueuePostponedEmpty extends StatelessWidget {
+  const _QueuePostponedEmpty();
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(
+            child: _EmptyBadge(
+              bg: AppColors.postponedBg,
+              icon: AppAssets.svg.clock,
+              iconColor: AppColors.postponedText,
+            ),
+          ),
+          24.szH,
+          Text(LocaleKeys.postponedEmptyTitle.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle().setMainTextColor.s20.extraBold),
+          8.szH,
+          Text(LocaleKeys.postponedEmptyDesc.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle()
+                  .setSecondaryColor
+                  .s14
+                  .regular
+                  .withHeight(1.5)),
+        ],
+      ).paddingOnlyDirectional(
+        start: AppPadding.pW32,
+        end: AppPadding.pW32,
+        top: AppPadding.pH64,
+        bottom: AppPadding.pH24,
+      ),
+    );
   }
 }
 

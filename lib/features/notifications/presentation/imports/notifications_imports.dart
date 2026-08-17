@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../config/res/config_imports.dart';
 import '../../../../widgets/bottom_nav.dart';
+import '../../../../widgets/home_indicator.dart';
 
 // Models & sample data
 part '../controllers/notification_models.dart';

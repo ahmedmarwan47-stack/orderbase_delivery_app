@@ -80,6 +80,18 @@ class _AppShellState extends State<AppShell>
     }
   }
 
+  void _openNotifications() => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => NotificationsScreen(
+            onSelectTab: (t) {
+              Navigator.of(context).pop();
+              _select(t);
+            },
+            onOpenOrder: _openOrderByNum,
+          ),
+        ),
+      );
+
   /// Push the order-detail flow for [order], wiring its Result screen back to
   /// the shell.
   void _openOrder(FlowOrder order) {
@@ -122,8 +134,8 @@ class _AppShellState extends State<AppShell>
     _select(NavTab.orders);
   }
 
-  void _openSettlement() => Navigator.of(context)
-      .push(MaterialPageRoute(builder: (_) => const SettlementScreen()));
+  /// Home "collected today" KPI → the Settlement tab.
+  void _openSettlement() => _select(NavTab.settlement);
 
   @override
   Widget build(BuildContext context) {
@@ -139,10 +151,14 @@ class _AppShellState extends State<AppShell>
               onOpenOrder: _openNextStop,
               onOpenOrdersFilter: _openOrdersFilter,
               onOpenSettlement: _openSettlement,
+              onOpenNotifications: _openNotifications,
             ),
             QueueScreen(controller: _ordersVc),
-            NotificationsScreen(
-                onSelectTab: _select, onOpenOrder: _openOrderByNum),
+            PickupScreen(
+              onSelectTab: _select,
+              onConfirm: () => _select(NavTab.home),
+            ),
+            SettlementScreen(onSelectTab: _select),
             _MoreTab(onSelectTab: _select),
           ],
         ),
@@ -178,7 +194,7 @@ class _MoreTab extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Text('المزيد',
-                      style: AppTypography.size24.copyWith(
+                      style: AppTypography.size20.copyWith(
                           fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary)),
                 ),
@@ -189,17 +205,9 @@ class _MoreTab extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: AppSpacing.s20),
                   children: [
                     _MoreRow(
-                        icon: AppAssets.svg.cash,
-                        label: 'تسوية نهاية اليوم',
-                        onTap: () => _push(context, const SettlementScreen())),
-                    _MoreRow(
                         icon: AppAssets.svg.box,
                         label: 'مرتجعات للفرع',
                         onTap: () => _push(context, const ReturnsListScreen())),
-                    _MoreRow(
-                        icon: AppAssets.svg.note,
-                        label: 'استلام من الفرع',
-                        onTap: () => _push(context, const PickupScreen())),
                     _MoreRow(
                         icon: AppAssets.svg.user,
                         label: 'الحساب وكلمة المرور',

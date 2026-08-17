@@ -250,7 +250,7 @@ class _ResultScreenState extends State<ResultScreen>
                         widget._title,
                         textAlign: TextAlign.center,
                         style:
-                            const TextStyle().setMainTextColor.s24.extraBold,
+                            const TextStyle().setMainTextColor.s20.extraBold,
                       ),
                     ),
                     8.szH,
@@ -264,7 +264,7 @@ class _ResultScreenState extends State<ResultScreen>
                             .setSecondaryColor
                             .s14
                             .regular
-                            .withHeight(1.6),
+                            .withHeight(1.5),
                       ),
                     ),
                     20.szH,

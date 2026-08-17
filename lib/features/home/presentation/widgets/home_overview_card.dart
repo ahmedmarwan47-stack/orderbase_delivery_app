@@ -79,7 +79,7 @@ class _HomeOverviewCard extends StatelessWidget {
                     text: '22,500',
                     style: const TextStyle()
                         .setColor(AppColors.flatBlack)
-                        .s28
+                        .s24
                         .extraBold
                         .tabular
                         .withHeight(1),
@@ -143,7 +143,7 @@ class _HomeOverviewCard extends StatelessWidget {
             value,
             style: const TextStyle()
                 .setColor(valueColor)
-                .s24
+                .s20
                 .extraBold
                 .tabular
                 .withHeight(1),

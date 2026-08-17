@@ -9,6 +9,7 @@ import '../../../../config/res/config_imports.dart';
 import '../../../../data/flow_order.dart';
 import '../../../../data/order.dart';
 import '../../../../theme/shadows.dart';
+import '../../../../widgets/bottom_nav.dart';
 import '../../../../widgets/home_indicator.dart';
 
 // Views (public route entry point)

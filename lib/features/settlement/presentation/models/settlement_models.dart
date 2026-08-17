@@ -80,7 +80,12 @@ SettlementData get sampleSettlement => SettlementData(
 SettlementData get shiftSettlement => SettlementData(
       cashierName: LocaleKeys.settlementCashierDefault.tr(),
       lines: ShiftController.instance.orders
-          .where((o) => o.status == OrderStatus.delivered && !o.prepaid)
+          .where((o) =>
+              o.status == OrderStatus.delivered &&
+              !o.prepaid &&
+              // Only real cash orders belong in the settlement — a delivered
+              // order with no cash collected (prepaid/zero COD) isn't a line.
+              (o.collected ?? o.cod ?? 0) > 0)
           .map((o) => SettlementLine(
                 num: o.num,
                 name: o.name,

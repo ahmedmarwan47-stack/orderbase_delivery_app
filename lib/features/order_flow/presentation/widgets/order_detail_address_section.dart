@@ -28,28 +28,18 @@ class _AddressSection extends StatelessWidget {
                     .setColor(AppColors.textBody)
                     .s14
                     .regular
-                    .withHeight(1.7),
+                    .withHeight(1.5),
               ),
             ),
           ],
         ),
         12.szH,
         MapView(
-          height: 140.h,
+          height: AppSize.sH180,
           borderRadius: AppCircular.r16,
           pinDiameter: 34.w,
           pinIconSize: 18.w,
           pinVerticalAlignment: -0.04,
-        ),
-        12.szH,
-        _OutlineActionButton(
-          icon: AppAssets.svg.nav,
-          iconColor: AppColors.brand,
-          label: LocaleKeys.orderDetailOpenMap.tr(),
-          fg: AppColors.textPrimary,
-          border: AppColors.borderDefault,
-          background: AppColors.surface,
-          height: AppSize.sH48,
         ),
       ],
     );

@@ -85,16 +85,22 @@ abstract final class LocaleKeys {
   static const String postponeReasonValue = 'postpone_reason_value';
   static const String returnToQueue = 'return_to_queue';
   static const String returnedToQueue = 'returned_to_queue';
+  static const String postponedEmptyTitle = 'postponed_empty_title';
+  static const String postponedEmptyDesc = 'postponed_empty_desc';
 
   // ── shared_widgets ──
   static const String navHome = 'nav_home';
   static const String navOrders = 'nav_orders';
   static const String navNotifications = 'nav_notifications';
+  static const String navPickup = 'nav_pickup';
+  static const String navSettlement = 'nav_settlement';
   static const String navMore = 'nav_more';
 
   // ── home ──
   static const String homeCourierName = 'home_courier_name';
   static const String homeMerchantName = 'home_merchant_name';
+  static const String homeShiftRemaining = 'home_shift_remaining';
+  static const String homeShiftToCollect = 'home_shift_to_collect';
   static const String homeNextStop = 'home_next_stop';
   static const String homeStopCount = 'home_stop_count';
   static const String homeOrderNo = 'home_order_no';

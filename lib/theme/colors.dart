@@ -85,12 +85,13 @@ abstract final class AppColors {
   static const itemDivider = Color(0xFFF5F4F1);
   static const summaryDivider = Color(0xFFEAE9E5); // divider inside the result summary card
 
-  // Dark COD payment card (Order Detail)
-  static const paymentCardBg = Color(0xFF1A1919);
-  static const paymentLabel = Color(0xFFA6A6AD); // muted label on dark card
-  static const paymentSuffix = Color(0xFFC9C9CE); // "جم" suffix on dark card
-  static const paymentTile = Color(0x1AFFFFFF); // rgba(255,255,255,.1) icon tile
-  static const cashBright = Color(0xFF3BD07A); // bright cash green on dark card
+  // Cash / COD payment card — deep cash-green (NOT black; full black `inkFill`
+  // is reserved for primary buttons so the two never compete).
+  static const paymentCardBg = Color(0xFF4E6B60); // soft, low-impact muted green
+  static const paymentLabel = Color(0xFFB7D9C4); // soft green label on the card
+  static const paymentSuffix = Color(0xFFCDEBDA); // "جم" suffix on the card
+  static const paymentTile = Color(0x26FFFFFF); // rgba(255,255,255,.15) icon tile
+  static const cashBright = Color(0xFFEAFBF1); // near-white cash glyph on green
 
   // Timeline (order route)
   static const timelineRing = Color(0xFFF7D7D6); // ring around the active red dot

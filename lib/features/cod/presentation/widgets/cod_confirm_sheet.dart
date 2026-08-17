@@ -163,7 +163,7 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
                         .setSecondaryColor
                         .s14
                         .regular
-                        .withHeight(1.7),
+                        .withHeight(1.5),
                   ),
                   20.szH,
                   _reveals(begin: 0, end: 0.6, dy: 6, child: _summaryCard()),
@@ -258,7 +258,7 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
                       animate: !AppMotion.reduced(context),
                       style: const TextStyle()
                           .setWhite
-                          .s24
+                          .s20
                           .extraBold
                           .withHeight(1)
                           .tabular,

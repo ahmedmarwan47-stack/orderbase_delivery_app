@@ -78,7 +78,7 @@ class _NotificationTile extends StatelessWidget {
                       .setSecondaryColor
                       .s12
                       .regular
-                      .withHeight(1.6),
+                      .withHeight(1.5),
                 ),
               ],
             ),

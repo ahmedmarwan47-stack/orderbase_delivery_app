@@ -62,6 +62,11 @@ class ShiftController extends ChangeNotifier {
       .where((o) => o.status == OrderStatus.delivered && !o.prepaid)
       .fold(0, (sum, o) => sum + (o.collected ?? o.cod ?? 0));
 
+  /// Cash still to collect = COD due on the orders still in transit (not prepaid).
+  int get toCollectEgp => _orders
+      .where((o) => o.status == OrderStatus.transit && !o.prepaid)
+      .fold(0, (sum, o) => sum + (o.cod ?? 0));
+
   /// Orders returned to the branch (a failed delivery sends the pieces back).
   List<Order> get returns =>
       _orders.where((o) => o.status == OrderStatus.failed).toList();
@@ -93,6 +98,10 @@ class ShiftController extends ChangeNotifier {
 
   void markPostponed(String number) =>
       _update(number, (o) => o.copyWith(status: OrderStatus.postponed));
+
+  /// Return a postponed order to the active queue (status → transit).
+  void returnToQueue(String number) =>
+      _update(number, (o) => o.copyWith(status: OrderStatus.transit));
 
   /// Reset the shift (used on logout) — re-seed the batch, un-accept it.
   void reset() {

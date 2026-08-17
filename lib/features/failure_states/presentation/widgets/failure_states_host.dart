@@ -127,7 +127,7 @@ class _AddressCard extends StatelessWidget {
           8.szH,
           Text(
             ctx.addressDetail,
-            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.7),
+            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.5),
           ),
         ],
       ),

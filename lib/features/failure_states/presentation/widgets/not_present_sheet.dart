@@ -75,7 +75,7 @@ class _NotPresentSheetState extends State<_NotPresentSheet> {
                       .setColor(AppColors.failWarnAmberText)
                       .s12
                       .regular
-                      .withHeight(1.7),
+                      .withHeight(1.5),
                 ),
               ),
             ],

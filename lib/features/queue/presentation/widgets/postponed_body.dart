@@ -150,7 +150,7 @@ class _PostponedHeader extends StatelessWidget {
             ],
           ).paddingSymmetric(vertical: AppPadding.pH8).onClick(onTap: () => Modular.to.pop()),
           Text(LocaleKeys.postponedTitle.tr(),
-              style: const TextStyle().setMainTextColor.s24.extraBold),
+              style: const TextStyle().setMainTextColor.s20.extraBold),
           4.szH,
           Text(
             LocaleKeys.postponedSubtitle
@@ -197,7 +197,7 @@ class _PostponedInfoBanner extends StatelessWidget {
                   .setColor(AppColors.postponedTextStrong)
                   .s12
                   .regular
-                  .withHeight(1.7),
+                  .withHeight(1.5),
             ),
           ),
         ],

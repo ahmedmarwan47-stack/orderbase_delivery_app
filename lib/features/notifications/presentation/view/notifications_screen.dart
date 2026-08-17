@@ -46,11 +46,7 @@ class NotificationsScreen extends StatelessWidget {
                         ),
                       ),
               ),
-              BottomNav(
-                active: NavTab.notifications,
-                notificationsBadge: unread > 0,
-                onTap: onSelectTab,
-              ),
+              const HomeIndicator(),
             ],
           ),
         ),

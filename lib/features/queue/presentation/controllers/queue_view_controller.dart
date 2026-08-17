@@ -1,8 +1,8 @@
 part of '../imports/queue_imports.dart';
 
-/// Which slice of the active queue is shown. Postponed orders sit outside this
-/// filter — they have their own list ([PostponedScreen]).
-enum QueueFilter { all, transit, delivered, failed }
+/// Which slice of the queue is shown. `postponed` is filtered inline like the
+/// others (it renders the postponed cards in place, not a separate screen).
+enum QueueFilter { all, transit, delivered, failed, postponed }
 
 /// Ephemeral UI state for the Queue screen — search field, search/browse mode,
 /// active filter, and the debounced query. No `setState`, no logic in the View.
@@ -67,6 +67,7 @@ class QueueViewController {
           active.where((o) => o.status == OrderStatus.delivered).length,
         QueueFilter.failed =>
           active.where((o) => o.status == OrderStatus.failed).length,
+        QueueFilter.postponed => postponed.length,
       };
 
   List<Order> get filtered => switch (filter.value) {
@@ -77,6 +78,7 @@ class QueueViewController {
           active.where((o) => o.status == OrderStatus.delivered).toList(),
         QueueFilter.failed =>
           active.where((o) => o.status == OrderStatus.failed).toList(),
+        QueueFilter.postponed => postponed,
       };
 
   List<Order> get searchMatches =>
@@ -101,6 +103,7 @@ class QueueViewController {
         QueueFilter.transit => LocaleKeys.filterTransit,
         QueueFilter.delivered => LocaleKeys.filterDelivered,
         QueueFilter.failed => LocaleKeys.filterFailed,
+        QueueFilter.postponed => LocaleKeys.filterPostponed,
       };
 
   // ── handlers ──
@@ -123,7 +126,12 @@ class QueueViewController {
 
   void clearFilter() => filter.value = QueueFilter.all;
 
-  void openPostponed() => Modular.to.pushNamed('/queue/postponed');
+  /// Show the postponed orders inline (they used to live on a separate route).
+  void openPostponed() => selectFilter(QueueFilter.postponed);
+
+  /// Send a postponed order back into the active queue (rejoins "في الطريق").
+  void returnOrderToQueue(Order order) =>
+      ShiftController.instance.returnToQueue(order.num);
 
   /// Open the tapped order's detail. In shell mode this hands the built
   /// [FlowOrder] up to the shell (which pushes the flow over the tabs); on the

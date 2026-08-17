@@ -12,31 +12,55 @@ class _NotificationsHeader extends StatelessWidget {
       padding: EdgeInsets.only(
         left: AppPadding.pW20,
         right: AppPadding.pW20,
-        top: AppPadding.pH12,
+        top: AppPadding.pH8,
         bottom: AppPadding.pH16,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            LocaleKeys.navNotifications.tr(),
-            style: const TextStyle().setMainTextColor.s24.extraBold,
-          ),
-          if (unread > 0)
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.failedBg,
-                borderRadius: BorderRadius.circular(AppCircular.r20),
+          Row(
+            children: [
+              IconWidget(
+                icon: AppAssets.svg.chevronRight,
+                color: AppColors.textTertiary,
+                height: AppSize.sH18,
+                width: AppSize.sW18,
               ),
-              padding: EdgeInsets.symmetric(
-                horizontal: AppPadding.pW12,
-                vertical: AppPadding.pH4,
-              ),
-              child: Text(
-                LocaleKeys.notifNewCount.tr(namedArgs: {'n': '$unread'}),
-                style: const TextStyle().setColor(AppColors.failedText).s12.bold,
-              ),
+              8.szW,
+              Text(LocaleKeys.orderDetailBack.tr(),
+                  style: const TextStyle().setTertiaryColor.s14.semiBold),
+            ],
+          )
+              .paddingSymmetric(vertical: AppPadding.pH8)
+              .onClick(onTap: () => Navigator.of(context).maybePop()),
+          SizedBox(
+            height: 56.h,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  LocaleKeys.navNotifications.tr(),
+                  style: const TextStyle().setMainTextColor.s20.extraBold,
+                ),
+                if (unread > 0)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.failedBg,
+                      borderRadius: BorderRadius.circular(AppCircular.r20),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppPadding.pW12,
+                      vertical: AppPadding.pH4,
+                    ),
+                    child: Text(
+                      LocaleKeys.notifNewCount.tr(namedArgs: {'n': '$unread'}),
+                      style:
+                          const TextStyle().setColor(AppColors.failedText).s12.bold,
+                    ),
+                  ),
+              ],
             ),
+          ),
         ],
       ),
     );

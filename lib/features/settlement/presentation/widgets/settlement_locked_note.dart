@@ -29,7 +29,7 @@ class _LockedNote extends StatelessWidget {
                   .setColor(AppColors.textMuted)
                   .s12
                   .regular
-                  .withHeight(1.6),
+                  .withHeight(1.5),
             ),
           ),
         ],

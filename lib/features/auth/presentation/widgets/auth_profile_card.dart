@@ -50,7 +50,7 @@ class _AuthProfileCard extends StatelessWidget {
                   '$username · $merchant',
                   textDirection: TextDirection.ltr,
                   textAlign: TextAlign.start,
-                  style: const TextStyle().setSecondaryColor.s13.regular.tabular,
+                  style: const TextStyle().setSecondaryColor.s14.regular.tabular,
                 ),
               ],
             ),

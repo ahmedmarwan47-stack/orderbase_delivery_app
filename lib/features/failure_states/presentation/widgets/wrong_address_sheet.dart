@@ -161,7 +161,7 @@ class _WrongAddressSheetState extends State<_WrongAddressSheet> {
                   .setMainTextColor
                   .s14
                   .semiBold
-                  .withHeight(1.7),
+                  .withHeight(1.5),
               decoration: const InputDecoration(
                 isDense: true,
                 border: InputBorder.none,

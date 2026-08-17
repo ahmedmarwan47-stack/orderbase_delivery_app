@@ -42,7 +42,7 @@ class _NotesCard extends StatelessWidget {
                 .setColor(AppColors.postponedTextStrong)
                 .s14
                 .regular
-                .withHeight(1.6),
+                .withHeight(1.5),
           ),
         ],
       ).paddingAll(AppPadding.pH16),

@@ -33,6 +33,8 @@ abstract final class AppSize {
   static double get sH72 => 72.h;
   static double get sH88 => 88.h;
   static double get sH96 => 96.h;
+  static double get sH120 => 120.h; // Home hero map strip
+  static double get sH180 => 180.h; // Order-detail map preview
 
   static double get sW4 => 4.w;
   static double get sW6 => 6.w;
@@ -118,9 +120,8 @@ abstract final class AppCircular {
 
 /// Font sizes (`.sp`). The mockups use a 4-multiple scale plus 14/18.
 abstract final class FontSizeManager {
-  static double get s10 => 10.sp;
+  // Floor is 14sp; 12sp only for dense meta/counts. Nothing smaller.
   static double get s12 => 12.sp;
-  static double get s13 => 13.sp;
   static double get s14 => 14.sp;
   static double get s16 => 16.sp;
   static double get s18 => 18.sp;

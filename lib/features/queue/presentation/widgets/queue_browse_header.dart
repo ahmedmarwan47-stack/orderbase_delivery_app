@@ -15,33 +15,38 @@ class _QueueBrowseHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    LocaleKeys.queueTitle.tr(),
-                    style: const TextStyle().setMainTextColor.s24.extraBold,
-                  ),
-                  4.szH,
-                  Text(
-                    LocaleKeys.queueSubtitle
-                        .tr(namedArgs: {'count': arabicDigits(vc.active.length)}),
-                    style: const TextStyle().setSecondaryColor.s14.regular,
-                  ),
-                ],
-              ),
-              _SquareIconButton(
-                icon: AppAssets.svg.search,
-                onTap: vc.openSearch,
-                size: AppSize.sH44,
-                label: LocaleKeys.a11ySearch.tr(),
-              ),
-            ],
+          // Fixed 56pt title row (iOS large-title convention).
+          SizedBox(
+            height: 56.h,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      LocaleKeys.queueTitle.tr(),
+                      style: const TextStyle().setMainTextColor.s20.extraBold,
+                    ),
+                    4.szH,
+                    Text(
+                      LocaleKeys.queueSubtitle.tr(
+                          namedArgs: {'count': arabicDigits(vc.active.length)}),
+                      style: const TextStyle().setSecondaryColor.s14.regular,
+                    ),
+                  ],
+                ),
+                _SquareIconButton(
+                  icon: AppAssets.svg.search,
+                  onTap: vc.openSearch,
+                  size: AppSize.sH44,
+                  label: LocaleKeys.a11ySearch.tr(),
+                ),
+              ],
+            ),
           ),
-          16.szH,
+          12.szH,
           _QueueFilterChips(vc: vc),
         ],
       ).paddingOnlyDirectional(
