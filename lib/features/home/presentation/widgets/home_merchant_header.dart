@@ -4,10 +4,14 @@ part of '../imports/home_imports.dart';
 /// right, and the notifications + search actions on the left. Rebuilds with the
 /// shift so the numbers stay current as stops close.
 class _HomeMerchantHeader extends StatelessWidget {
-  const _HomeMerchantHeader({this.onOpenNotifications});
+  const _HomeMerchantHeader({this.onOpenNotifications, this.scrolled = false});
 
   /// Opens the notifications screen (the bell moved here off the tab bar).
   final VoidCallback? onOpenNotifications;
+
+  /// True once the page has scrolled under the header — the header then fades
+  /// in its surface background + hairline (transparent while at the top).
+  final bool scrolled;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +19,21 @@ class _HomeMerchantHeader extends StatelessWidget {
       animation: ShiftController.instance,
       builder: (context, _) {
         final shift = ShiftController.instance;
-        return Row(
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          decoration: BoxDecoration(
+            // Fade the SAME white in/out (transparent-white, never transparent-
+            // black) so the transition never flashes a dark tint.
+            color: AppColors.surface.withValues(alpha: scrolled ? 1 : 0),
+            border: Border(
+              bottom: BorderSide(
+                color: AppColors.borderHeader
+                    .withValues(alpha: scrolled ? 1 : 0),
+              ),
+            ),
+          ),
+          child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -98,11 +116,12 @@ class _HomeMerchantHeader extends StatelessWidget {
               ],
             ),
           ],
-        ).paddingOnly(
-          left: AppPadding.pW20,
-          top: AppPadding.pH12,
-          right: AppPadding.pW20,
-          bottom: AppPadding.pH16,
+          ).paddingOnly(
+            left: AppPadding.pW20,
+            top: AppPadding.pH12,
+            right: AppPadding.pW20,
+            bottom: AppPadding.pH16,
+          ),
         );
       },
     );

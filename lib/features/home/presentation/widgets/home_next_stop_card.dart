@@ -127,7 +127,7 @@ class _HomeNextStopCard extends StatelessWidget {
                     LocaleKeys.homeOrderNo.tr(
                       namedArgs: {'num': order.num.replaceAll('#', '')},
                     ),
-                    style: const TextStyle().setMainTextColor.s16.bold.tabular,
+                    style: const TextStyle().setMainTextColor.s16.semiBold.tabular,
                   ),
                   _PayPill(isCod: isCod),
                 ],

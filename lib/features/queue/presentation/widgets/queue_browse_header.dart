@@ -1,13 +1,16 @@
 part of '../imports/queue_imports.dart';
 
-/// Browse header (1b/1d): title + count + search button, then the filter chips.
+/// Browse header (1b/1d): count subtitle + search button, then the filter chips.
+/// The page-name title is dropped here — this is the Orders *tab*, already named
+/// by the tab bar. The header is transparent while pinned and fades in its
+/// surface background + hairline once the browse list scrolls beneath it.
 class _QueueBrowseHeader extends StatelessWidget {
   const _QueueBrowseHeader({required this.vc});
   final QueueViewController vc;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return DecoratedBox(
       decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
@@ -15,28 +18,21 @@ class _QueueBrowseHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Fixed 56pt title row (iOS large-title convention).
+          // Fixed 56pt row (iOS large-title convention): title + search.
           SizedBox(
             height: 56.h,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      LocaleKeys.queueTitle.tr(),
-                      style: const TextStyle().setMainTextColor.s16.extraBold,
-                    ),
-                    4.szH,
-                    Text(
-                      LocaleKeys.queueSubtitle.tr(
-                          namedArgs: {'count': arabicDigits(vc.active.length)}),
-                      style: const TextStyle().setSecondaryColor.s14.regular,
-                    ),
-                  ],
+                Expanded(
+                  child: Text(
+                    LocaleKeys.queueSubtitle.tr(
+                        namedArgs: {'count': arabicDigits(vc.active.length)}),
+                    style: const TextStyle().setMainTextColor.s16.extraBold,
+                  ),
                 ),
+                12.szW,
                 _SquareIconButton(
                   icon: AppAssets.svg.search,
                   onTap: vc.openSearch,

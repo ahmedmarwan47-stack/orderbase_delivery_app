@@ -1,12 +1,18 @@
 part of '../imports/order_flow_imports.dart';
 
-/// White header — back row, order number + date, a per-order status pill and
+/// Header — back button, order number + date, a per-order status pill and
 /// (for COD orders only) the red COD note. Everything is driven by [order].
+/// Transparent at the top; fades in the surface background + hairline bottom
+/// border once the detail content scrolls beneath it ([scrolled]).
 class _OrderDetailHeader extends StatelessWidget {
-  const _OrderDetailHeader({required this.order});
+  const _OrderDetailHeader({required this.order, this.scrolled = false});
 
   /// The order being shown; drives the number, date, status pill and COD note.
   final FlowOrder order;
+
+  /// True once the page has scrolled under the header — the header then fades
+  /// in its surface background + hairline (transparent while at the top).
+  final bool scrolled;
 
   @override
   Widget build(BuildContext context) {
@@ -34,104 +40,92 @@ class _OrderDetailHeader extends StatelessWidget {
           LocaleKeys.orderDetailStatusFailed.tr(),
         ),
     };
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
+      decoration: BoxDecoration(
+        // Fade the SAME white in/out (transparent-white, never transparent-
+        // black) so the transition never flashes a dark tint.
+        color: AppColors.surface.withValues(alpha: scrolled ? 1 : 0),
+        border: Border(
+          bottom: BorderSide(
+            color: AppColors.borderHeader.withValues(alpha: scrolled ? 1 : 0),
+          ),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              IconWidget(
-                icon: AppAssets.svg.chevronRight,
-                color: AppColors.textTertiary,
-                height: AppSize.sH18,
-                width: AppSize.sW18,
-              ),
-              8.szW,
-              Text(
-                LocaleKeys.orderDetailBack.tr(),
-                style: const TextStyle().setTertiaryColor.s14.semiBold,
-              ),
-            ],
-          )
-              .paddingSymmetric(vertical: AppPadding.pH8)
-              .onClick(onTap: () => Navigator.of(context).maybePop()),
-          4.szH,
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          const HeaderBackButton(),
+          12.szW,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        IconWidget(
-                          icon: AppAssets.svg.chat,
-                          color: AppColors.textSecondary,
-                          height: 19.h, // between the 18/20 tokens
-                          width: 19.w,
-                        ),
-                        8.szW,
-                        Text(
-                          order.num,
-                          textDirection: TextDirection.ltr,
-                          style: const TextStyle()
-                              .setMainTextColor
-                              .s16
-                              .extraBold
-                              .withHeight(20 / 16)
-                              .tabular,
-                        ),
-                      ],
+                    IconWidget(
+                      icon: AppAssets.svg.chat,
+                      color: AppColors.textSecondary,
+                      height: 19.h, // between the 18/20 tokens
+                      width: 19.w,
                     ),
-                    4.szH,
+                    8.szW,
                     Text(
-                      order.dateLabel,
+                      order.num,
                       textDirection: TextDirection.ltr,
-                      style: const TextStyle().setSecondaryColor.s14.regular,
+                      style: const TextStyle()
+                          .setMainTextColor
+                          .s16
+                          .extraBold
+                          .withHeight(20 / 16)
+                          .tabular,
                     ),
                   ],
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: pillBg,
-                      borderRadius: BorderRadius.circular(AppCircular.r8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _Dot(color: dotColor, size: 7),
-                        8.szW,
-                        Text(
-                          pillLabel,
-                          style: const TextStyle().setColor(pillFg).s12.bold,
-                        ),
-                      ],
-                    ).paddingSymmetric(
-                      horizontal: AppPadding.pW8,
-                      vertical: AppPadding.pH4,
-                    ),
-                  ),
-                  if (order.cod) ...[
-                    8.szH,
+                4.szH,
+                Text(
+                  order.dateLabel,
+                  textDirection: TextDirection.ltr,
+                  style: const TextStyle().setSecondaryColor.s14.regular,
+                ),
+              ],
+            ),
+          ),
+          12.szW,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: pillBg,
+                  borderRadius: BorderRadius.circular(AppCircular.r8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _Dot(color: dotColor, size: 7),
+                    8.szW,
                     Text(
-                      LocaleKeys.orderDetailCodNote.tr(),
-                      style: const TextStyle()
-                          .setColor(AppColors.failedText)
-                          .s12
-                          .bold,
+                      pillLabel,
+                      style: const TextStyle().setColor(pillFg).s12.bold,
                     ),
                   ],
-                ],
+                ).paddingSymmetric(
+                  horizontal: AppPadding.pW8,
+                  vertical: AppPadding.pH4,
+                ),
               ),
+              if (order.cod) ...[
+                8.szH,
+                Text(
+                  LocaleKeys.orderDetailCodNote.tr(),
+                  style: const TextStyle()
+                      .setColor(AppColors.failedText)
+                      .s12
+                      .bold,
+                ),
+              ],
             ],
           ),
         ],

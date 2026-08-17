@@ -24,6 +24,7 @@ class QueueViewController {
         .debounceTime(const Duration(milliseconds: 300))
         .distinct()
         .listen((q) => query.value = q.trim());
+    scrollController.addListener(_onScroll);
   }
 
   /// Static override (e.g. DevGallery's "cleared" set). When null, the queue
@@ -48,6 +49,21 @@ class QueueViewController {
   final ValueNotifier<bool> isSearching;
   final ValueNotifier<QueueFilter> filter;
   final ValueNotifier<String> query;
+
+  /// Drives the scroll-reactive browse header: attached to the browse list's
+  /// [ListView] so the header can fade in its surface + hairline once content
+  /// scrolls beneath it (transparent while pinned at the top).
+  final ScrollController scrollController = ScrollController();
+  final ValueNotifier<bool> scrolled = ValueNotifier(false);
+
+  void _onScroll() {
+    // Guard the offset read: during a filter cross-fade two browse lists can be
+    // momentarily attached to this controller, and `offset` asserts a single
+    // attached position.
+    if (scrollController.positions.length != 1) return;
+    final v = scrollController.offset > 2;
+    if (v != scrolled.value) scrolled.value = v;
+  }
 
   final PublishSubject<String> _searchSubject = PublishSubject<String>();
   late final StreamSubscription<String> _searchSub;
@@ -162,6 +178,9 @@ class QueueViewController {
     isSearching.dispose();
     filter.dispose();
     query.dispose();
+    scrollController.removeListener(_onScroll);
+    scrollController.dispose();
+    scrolled.dispose();
     _searchSub.cancel();
     _searchSubject.close();
   }

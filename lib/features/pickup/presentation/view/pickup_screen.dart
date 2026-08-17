@@ -4,7 +4,7 @@ part of '../imports/pickup_imports.dart';
 /// batch of ready orders from the branch, confirmed in one action. No tab bar;
 /// it's a focused task screen with a sticky confirm bar. Fully static, so no
 /// ViewController is needed.
-class PickupScreen extends StatelessWidget {
+class PickupScreen extends StatefulWidget {
   const PickupScreen({super.key, this.onConfirm, this.onSelectTab});
 
   /// Confirms pickup (all orders → "in transit"). Wired to the flow later.
@@ -26,7 +26,38 @@ class PickupScreen extends StatelessWidget {
   }
 
   @override
+  State<PickupScreen> createState() => _PickupScreenState();
+}
+
+class _PickupScreenState extends State<PickupScreen> {
+  final ScrollController _scroll = ScrollController();
+
+  // The header is transparent at the top and gains its surface background once
+  // content scrolls beneath it.
+  final ValueNotifier<bool> _scrolled = ValueNotifier(false);
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final v = _scroll.offset > 2;
+    if (v != _scrolled.value) _scrolled.value = v;
+  }
+
+  @override
+  void dispose() {
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
+    _scrolled.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final onSelectTab = widget.onSelectTab;
     // The batch waiting at the branch = the shift's in-transit orders (the ones
     // still to deliver), so pickup shows the same orders as the rest of the app.
     final orders = ShiftController.instance.orders
@@ -42,24 +73,39 @@ class PickupScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              _PickupHeader(count: orders.length, showBack: onSelectTab == null),
+              ValueListenableBuilder<bool>(
+                valueListenable: _scrolled,
+                builder: (_, scrolled, _) => _PickupHeader(
+                  count: orders.length,
+                  showBack: onSelectTab == null,
+                  scrolled: scrolled,
+                ),
+              ),
               Expanded(
                 child: ListView.separated(
+                  controller: _scroll,
                   padding: EdgeInsetsDirectional.only(
                     start: AppPadding.pW20,
                     end: AppPadding.pW20,
                     top: AppPadding.pH16,
                     bottom: AppPadding.pH20,
                   ),
-                  itemCount: orders.length,
+                  // +1 leading item = the "ready for pickup" banner, now on top
+                  // of the orders (moved out of the header) so it scrolls away.
+                  itemCount: orders.length + 1,
                   separatorBuilder: (_, _) => 12.szH,
-                  itemBuilder: (_, i) => _PickupCard(
-                    order: orders[i],
-                    // Index-based lead-in so the batch reads as a list dropping
-                    // in top-to-bottom, but the TOTAL stagger is capped so a long
-                    // list never crawls (~300ms across the whole batch).
-                    entranceDelay: _staggerDelay(i, orders.length),
-                  ),
+                  itemBuilder: (_, i) {
+                    if (i == 0) return _PickupBanner(count: orders.length);
+                    final order = orders[i - 1];
+                    return _PickupCard(
+                      order: order,
+                      // Index-based lead-in so the batch reads as a list dropping
+                      // in top-to-bottom, but the TOTAL stagger is capped so a long
+                      // list never crawls (~300ms across the whole batch).
+                      entranceDelay:
+                          PickupScreen._staggerDelay(i - 1, orders.length),
+                    );
+                  },
                 ),
               ),
               _PickupConfirmBar(
@@ -70,7 +116,8 @@ class PickupScreen extends StatelessWidget {
                   AppHaptics.confirm();
                   // From the More menu there's no flow to advance into yet, so
                   // confirming pops back rather than silently doing nothing.
-                  (onConfirm ?? () => Navigator.of(context).maybePop())();
+                  (widget.onConfirm ??
+                      () => Navigator.of(context).maybePop())();
                 },
               ),
               if (onSelectTab != null)

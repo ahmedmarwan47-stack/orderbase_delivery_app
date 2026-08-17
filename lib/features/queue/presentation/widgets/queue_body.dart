@@ -213,6 +213,9 @@ class _AnimatedQueueListState extends State<_AnimatedQueueList> {
       color: AppColors.brand,
       backgroundColor: AppColors.surface,
       child: ListView(
+        // Drives the scroll-reactive browse header (offset > 2 ⇒ header fades
+        // in its surface + hairline). Only this browse list attaches it.
+        controller: widget.vc.scrollController,
         // Always scrollable so the pull works even with a short list.
         physics: const AlwaysScrollableScrollPhysics(),
         padding: widget.padding,

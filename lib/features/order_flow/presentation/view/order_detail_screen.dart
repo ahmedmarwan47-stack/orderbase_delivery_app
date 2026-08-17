@@ -4,7 +4,7 @@ part of '../imports/order_flow_imports.dart';
 /// The header order number, customer name, cash-card amount, address, items,
 /// notes and timeline are all driven by [order] (see [FlowOrder]). Reached
 /// via the '/order-detail' route.
-class OrderDetailScreen extends StatelessWidget {
+class OrderDetailScreen extends StatefulWidget {
   const OrderDetailScreen({
     super.key,
     this.order,
@@ -34,18 +34,48 @@ class OrderDetailScreen extends StatelessWidget {
   final ValueChanged<NavTab>? onSelectTab;
 
   @override
+  State<OrderDetailScreen> createState() => _OrderDetailScreenState();
+}
+
+class _OrderDetailScreenState extends State<OrderDetailScreen> {
+  final ScrollController _scroll = ScrollController();
+
+  // The header is transparent at the top and gains its surface background once
+  // the detail content scrolls beneath it.
+  final ValueNotifier<bool> _scrolled = ValueNotifier(false);
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final v = _scroll.offset > 2;
+    if (v != _scrolled.value) _scrolled.value = v;
+  }
+
+  @override
+  void dispose() {
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
+    _scrolled.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final o = order ?? sampleFlowOrders.first;
+    final o = widget.order ?? sampleFlowOrders.first;
     // When a real order is threaded, its own flag drives COD; otherwise fall
     // back to the [cod] param (DevGallery's stand-alone prepaid/COD previews).
-    final isCod = order != null ? o.cod : cod;
+    final isCod = widget.order != null ? o.cod : widget.cod;
     // Delivery actions only make sense while the order is still open — a closed
     // (delivered / failed) order hides the "not delivered" button and the
     // sticky "delivered" bar.
     final isOpen = o.state == FlowOrderState.active;
     final controller = OrderFlowController(
-      onFinishToNext: onFinishToNext,
-      onFinishToHome: onFinishToHome,
+      onFinishToNext: widget.onFinishToNext,
+      onFinishToHome: widget.onFinishToHome,
       orderNum: o.num,
       customer: o.name,
     );
@@ -57,9 +87,14 @@ class OrderDetailScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              _OrderDetailHeader(order: o),
+              ValueListenableBuilder<bool>(
+                valueListenable: _scrolled,
+                builder: (_, scrolled, _) =>
+                    _OrderDetailHeader(order: o, scrolled: scrolled),
+              ),
               Expanded(
                 child: SingleChildScrollView(
+                  controller: _scroll,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -107,7 +142,7 @@ class OrderDetailScreen extends StatelessWidget {
               BottomNav(
                 active: NavTab.orders,
                 notificationsBadge: true,
-                onTap: onSelectTab,
+                onTap: widget.onSelectTab,
               ),
             ],
           ),

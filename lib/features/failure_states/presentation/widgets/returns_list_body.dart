@@ -3,8 +3,38 @@ part of '../imports/failure_states_imports.dart';
 /// Body of the returns list (1g): header + filter chips, the dark "returns to
 /// branch" banner (the orders you actually returned via the failure flow), the
 /// order cards, and the bottom nav. All driven by [ShiftController].
-class _ReturnsListBody extends StatelessWidget {
+class _ReturnsListBody extends StatefulWidget {
   const _ReturnsListBody();
+
+  @override
+  State<_ReturnsListBody> createState() => _ReturnsListBodyState();
+}
+
+class _ReturnsListBodyState extends State<_ReturnsListBody> {
+  final ScrollController _scroll = ScrollController();
+
+  // The header is transparent at the top and gains its surface background once
+  // the list scrolls beneath it (iOS large-title behaviour).
+  final ValueNotifier<bool> _scrolled = ValueNotifier(false);
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final v = _scroll.offset > 2;
+    if (v != _scrolled.value) _scrolled.value = v;
+  }
+
+  @override
+  void dispose() {
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
+    _scrolled.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +47,14 @@ class _ReturnsListBody extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _ReturnsHeader(count: orders.length),
+            ValueListenableBuilder<bool>(
+              valueListenable: _scrolled,
+              builder: (_, scrolled, _) =>
+                  _ReturnsHeader(count: orders.length, scrolled: scrolled),
+            ),
             Expanded(
               child: ListView.separated(
+                controller: _scroll,
                 padding: EdgeInsets.symmetric(
                   horizontal: AppPadding.pW20,
                   vertical: AppPadding.pH16,
@@ -43,15 +78,27 @@ class _ReturnsListBody extends StatelessWidget {
 }
 
 class _ReturnsHeader extends StatelessWidget {
-  const _ReturnsHeader({required this.count});
+  const _ReturnsHeader({required this.count, this.scrolled = false});
   final int count;
+
+  /// True once the list has scrolled under the header — the header then fades
+  /// in its surface background + hairline (transparent while at the top).
+  final bool scrolled;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
+      decoration: BoxDecoration(
+        // Fade the SAME white in/out (transparent-white, never transparent-
+        // black) so the transition never flashes a dark tint.
+        color: AppColors.surface.withValues(alpha: scrolled ? 1 : 0),
+        border: Border(
+          bottom: BorderSide(
+            color: AppColors.borderHeader.withValues(alpha: scrolled ? 1 : 0),
+          ),
+        ),
       ),
       padding: EdgeInsets.only(
         left: AppPadding.pW20,
@@ -59,44 +106,24 @@ class _ReturnsHeader extends StatelessWidget {
         top: AppPadding.pH8,
         bottom: AppPadding.pH16,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconWidget(
-                icon: FailureIcons.back,
-                color: AppColors.textPrimary,
-                height: AppSize.sH20,
-                width: AppSize.sW20,
-              ),
-              4.szW,
-              Text(
-                LocaleKeys.back.tr(),
-                style: const TextStyle().setMainTextColor.s14.semiBold,
-              ),
-            ],
-          ).onClick(onTap: () => Navigator.of(context).maybePop()),
-          12.szH,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(LocaleKeys.failureOrders.tr(),
-                  style: const TextStyle().setMainTextColor.s20.extraBold),
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceMuted,
-                  borderRadius: BorderRadius.circular(AppCircular.r8),
-                ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppPadding.pW12,
-                  vertical: AppPadding.pH4,
-                ),
-                child: Text('$count',
-                    style: const TextStyle().setSecondaryColor.s12.bold.tabular),
-              ),
-            ],
+          const HeaderBackButton(),
+          12.szW,
+          Text(LocaleKeys.failureOrders.tr(),
+              style: const TextStyle().setMainTextColor.s20.extraBold),
+          const Spacer(),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceMuted,
+              borderRadius: BorderRadius.circular(AppCircular.r8),
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: AppPadding.pW12,
+              vertical: AppPadding.pH4,
+            ),
+            child: Text('$count',
+                style: const TextStyle().setSecondaryColor.s12.bold.tabular),
           ),
         ],
       ),

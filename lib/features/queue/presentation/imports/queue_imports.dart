@@ -5,7 +5,6 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../../../app/shift_controller.dart';
@@ -15,6 +14,7 @@ import '../../../../data/flow_order.dart';
 import '../../../order_flow/presentation/imports/order_flow_imports.dart'
     show OrderDetailScreen;
 import '../../../../widgets/bottom_nav.dart';
+import '../../../../widgets/header_back_button.dart';
 import '../../../../widgets/home_indicator.dart';
 
 // Controllers (ephemeral UI state)

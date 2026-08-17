@@ -1,23 +1,59 @@
 part of '../imports/queue_imports.dart';
 
 /// Layout for the postponed list (1e): header + info banner + cards + nav.
-class _PostponedBody extends StatelessWidget {
+///
+/// Owns the scroll-reactive header state: the header is transparent while the
+/// list is pinned at the top and fades in its surface + hairline once content
+/// scrolls beneath it (matching the Home / browse-header behaviour).
+class _PostponedBody extends StatefulWidget {
   const _PostponedBody({required this.orders, required this.onReturn});
   final ValueNotifier<List<Order>> orders;
   final void Function(Order) onReturn;
 
   @override
+  State<_PostponedBody> createState() => _PostponedBodyState();
+}
+
+class _PostponedBodyState extends State<_PostponedBody> {
+  final ScrollController _scroll = ScrollController();
+  final ValueNotifier<bool> _scrolled = ValueNotifier(false);
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final v = _scroll.offset > 2;
+    if (v != _scrolled.value) _scrolled.value = v;
+  }
+
+  @override
+  void dispose() {
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
+    _scrolled.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<List<Order>>(
-      valueListenable: orders,
+      valueListenable: widget.orders,
       builder: (context, list, _) => Column(
         children: [
-          _PostponedHeader(count: list.length),
+          ValueListenableBuilder<bool>(
+            valueListenable: _scrolled,
+            builder: (_, scrolled, _) =>
+                _PostponedHeader(count: list.length, scrolled: scrolled),
+          ),
           Expanded(
             child: _AnimatedPostponedList(
               orders: list,
-              onReturn: onReturn,
+              onReturn: widget.onReturn,
               reduced: AppMotion.reduced(context),
+              scrollController: _scroll,
             ),
           ),
           const BottomNav(active: NavTab.orders, notificationsBadge: true),
@@ -38,11 +74,17 @@ class _AnimatedPostponedList extends StatefulWidget {
     required this.orders,
     required this.onReturn,
     required this.reduced,
+    this.scrollController,
   });
 
   final List<Order> orders;
   final void Function(Order) onReturn;
   final bool reduced;
+
+  /// Optional external controller (the standalone [PostponedScreen] passes one
+  /// to drive its scroll-reactive header). Null for the inline postponed filter,
+  /// which keeps its own default scrollable.
+  final ScrollController? scrollController;
 
   @override
   State<_AnimatedPostponedList> createState() => _AnimatedPostponedListState();
@@ -90,6 +132,7 @@ class _AnimatedPostponedListState extends State<_AnimatedPostponedList> {
   Widget build(BuildContext context) {
     final duration = widget.reduced ? Duration.zero : AppMotion.fill;
     return ListView(
+      controller: widget.scrollController,
       padding: EdgeInsetsDirectional.only(
         start: AppPadding.pW20,
         end: AppPadding.pW20,
@@ -121,41 +164,48 @@ class _AnimatedPostponedListState extends State<_AnimatedPostponedList> {
   }
 }
 
-/// White header — back to orders, title, count subtitle.
+/// Header — a back button leading the title + count subtitle. Transparent while
+/// pinned, fading in its surface + hairline once the list scrolls beneath it.
 class _PostponedHeader extends StatelessWidget {
-  const _PostponedHeader({required this.count});
+  const _PostponedHeader({required this.count, this.scrolled = false});
   final int count;
+
+  /// True once the postponed list has scrolled under the header.
+  final bool scrolled;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: scrolled ? 1 : 0),
+        border: Border(
+          bottom: BorderSide(
+            color: AppColors.borderHeader.withValues(alpha: scrolled ? 1 : 0),
+          ),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              IconWidget(
-                icon: AppAssets.svg.chevronRight,
-                color: AppColors.textTertiary,
-                height: AppSize.sH18,
-                width: AppSize.sW18,
-              ),
-              8.szW,
-              Text(LocaleKeys.backToOrders.tr(),
-                  style: const TextStyle().setTertiaryColor.s14.semiBold),
-            ],
-          ).paddingSymmetric(vertical: AppPadding.pH8).onClick(onTap: () => Modular.to.pop()),
-          Text(LocaleKeys.postponedTitle.tr(),
-              style: const TextStyle().setMainTextColor.s16.extraBold),
-          4.szH,
-          Text(
-            LocaleKeys.postponedSubtitle
-                .tr(namedArgs: {'count': arabicDigits(count)}),
-            style: const TextStyle().setSecondaryColor.s14.regular,
+          const HeaderBackButton(),
+          12.szW,
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(LocaleKeys.postponedTitle.tr(),
+                    style: const TextStyle().setMainTextColor.s16.extraBold),
+                4.szH,
+                Text(
+                  LocaleKeys.postponedSubtitle
+                      .tr(namedArgs: {'count': arabicDigits(count)}),
+                  style: const TextStyle().setSecondaryColor.s14.regular,
+                ),
+              ],
+            ),
           ),
         ],
       ).paddingOnlyDirectional(

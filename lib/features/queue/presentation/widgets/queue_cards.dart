@@ -32,7 +32,7 @@ class _QueueCard extends StatelessWidget {
                         Text(
                           order.num,
                           textDirection: TextDirection.ltr,
-                          style: const TextStyle().setMainTextColor.s16.extraBold,
+                          style: const TextStyle().setMainTextColor.s14.extraBold,
                         ),
                         8.szW,
                         if (isTransit)
@@ -42,7 +42,7 @@ class _QueueCard extends StatelessWidget {
                       ],
                     ),
                     4.szH,
-                    Text(order.name, style: const TextStyle().setMainTextColor.s18.bold),
+                    Text(order.name, style: const TextStyle().setMainTextColor.s16.bold),
                     if (isTransit && order.due != null) ...[
                       4.szH,
                       Row(
@@ -103,7 +103,7 @@ class _CodRow extends StatelessWidget {
               style: const TextStyle().setSecondaryColor.s12.regular),
           Text(
             LocaleKeys.amountEgp.tr(namedArgs: {'amount': formatThousands(amount)}),
-            style: const TextStyle().setMainTextColor.s16.extraBold.tabular,
+            style: const TextStyle().setMainTextColor.s14.extraBold.tabular,
           ),
         ],
       ).paddingOnly(top: AppPadding.pH12),

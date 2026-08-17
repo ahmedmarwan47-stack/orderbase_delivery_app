@@ -3,7 +3,7 @@ part of '../imports/home_imports.dart';
 /// Home / الرئيسية — design option 1a ("Airy": next-stop hero + 2×2 stats).
 /// Ported from Home Directions.dc.html (#1a). Reads the live [ShiftController]
 /// so the next-stop hero advances and the KPI tiles update as stops close.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
     this.onSelectTab,
@@ -30,6 +30,36 @@ class HomeScreen extends StatelessWidget {
   final VoidCallback? onOpenSettlement;
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scroll = ScrollController();
+
+  // The header is transparent at the top and gains its surface background once
+  // content scrolls beneath it (iOS large-title behaviour).
+  final ValueNotifier<bool> _scrolled = ValueNotifier(false);
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final v = _scroll.offset > 2;
+    if (v != _scrolled.value) _scrolled.value = v;
+  }
+
+  @override
+  void dispose() {
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
+    _scrolled.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -39,19 +69,26 @@ class HomeScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              _HomeMerchantHeader(onOpenNotifications: onOpenNotifications),
+              ValueListenableBuilder<bool>(
+                valueListenable: _scrolled,
+                builder: (_, scrolled, _) => _HomeMerchantHeader(
+                  onOpenNotifications: widget.onOpenNotifications,
+                  scrolled: scrolled,
+                ),
+              ),
               Expanded(
                 child: AnimatedBuilder(
                   animation: ShiftController.instance,
                   builder: (_, _) => SingleChildScrollView(
+                    controller: _scroll,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _HomeNextStopCard(onViewOrder: onOpenOrder),
+                        _HomeNextStopCard(onViewOrder: widget.onOpenOrder),
                         20.szH,
                         _HomeTodayStats(
-                          onOpenOrdersFilter: onOpenOrdersFilter,
-                          onOpenSettlement: onOpenSettlement,
+                          onOpenOrdersFilter: widget.onOpenOrdersFilter,
+                          onOpenSettlement: widget.onOpenSettlement,
                         ),
                       ],
                     ).paddingOnly(
@@ -66,7 +103,7 @@ class HomeScreen extends StatelessWidget {
               BottomNav(
                 active: NavTab.home,
                 notificationsBadge: true,
-                onTap: onSelectTab,
+                onTap: widget.onSelectTab,
               ),
             ],
           ),

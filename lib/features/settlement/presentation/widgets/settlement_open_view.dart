@@ -2,22 +2,62 @@ part of '../imports/settlement_imports.dart';
 
 /// State A — OPEN ("تسوية نهاية اليوم"): white header + scrolling paper body
 /// (dark cash card, today's collections, locked note, settle CTA) + bottom nav.
-class _SettlementOpenView extends StatelessWidget {
+/// Stateful so the header can fade its surface background in as the body scrolls
+/// beneath it (iOS large-title behaviour; see [HomeScreen]).
+class _SettlementOpenView extends StatefulWidget {
   const _SettlementOpenView({required this.vc, this.onSelectTab});
   final SettlementController vc;
   final ValueChanged<NavTab>? onSelectTab;
 
   @override
+  State<_SettlementOpenView> createState() => _SettlementOpenViewState();
+}
+
+class _SettlementOpenViewState extends State<_SettlementOpenView> {
+  final ScrollController _scroll = ScrollController();
+
+  // The header is transparent at the top and gains its surface background once
+  // content scrolls beneath it.
+  final ValueNotifier<bool> _scrolled = ValueNotifier(false);
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final v = _scroll.offset > 2;
+    if (v != _scrolled.value) _scrolled.value = v;
+  }
+
+  @override
+  void dispose() {
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
+    _scrolled.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final onSelectTab = widget.onSelectTab;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         bottom: onSelectTab == null,
         child: Column(
           children: [
-            _SettlementHeader(showBack: onSelectTab == null),
+            ValueListenableBuilder<bool>(
+              valueListenable: _scrolled,
+              builder: (_, scrolled, _) => _SettlementHeader(
+                showBack: onSelectTab == null,
+                scrolled: scrolled,
+              ),
+            ),
             Expanded(
               child: SingleChildScrollView(
+                controller: _scroll,
                 padding: EdgeInsetsDirectional.only(
                   start: AppPadding.pW20,
                   end: AppPadding.pW20,
@@ -27,9 +67,9 @@ class _SettlementOpenView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _CashInHandCard(vc: vc),
+                    _CashInHandCard(vc: widget.vc),
                     20.szH,
-                    _CollectionsSection(data: vc.data),
+                    _CollectionsSection(data: widget.vc.data),
                     16.szH,
                     const _LockedNote(),
                   ],
@@ -45,66 +85,63 @@ class _SettlementOpenView extends StatelessWidget {
   }
 }
 
-/// White header: back link (standalone only), title + subtitle, and the amber
-/// "not settled" pill.
+/// White header: back button (standalone only), title (standalone only) +
+/// subtitle, and the amber "not settled" pill. Transparent at the top of the
+/// scroll and fades in its surface background + hairline once scrolled.
 class _SettlementHeader extends StatelessWidget {
-  const _SettlementHeader({this.showBack = true});
+  const _SettlementHeader({this.showBack = true, this.scrolled = false});
 
-  /// Hidden when Settlement is a shell tab (a root tab has nowhere to go back).
+  /// Standalone mode: shows the back button + the big page-name title. Hidden
+  /// when Settlement is a shell tab (a root tab has nowhere to go back, and the
+  /// tab bar already names the page).
   final bool showBack;
+
+  /// True once the page has scrolled under the header — the header then fades
+  /// in its surface background + hairline (transparent while at the top).
+  final bool scrolled;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
+      decoration: BoxDecoration(
+        // Fade the SAME white in/out (transparent-white, never transparent-
+        // black) so the transition never flashes a dark tint.
+        color: AppColors.surface.withValues(alpha: scrolled ? 1 : 0),
+        border: Border(
+          bottom: BorderSide(
+            color: AppColors.borderHeader.withValues(alpha: scrolled ? 1 : 0),
+          ),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (showBack) ...[
-            Row(
-              mainAxisSize: MainAxisSize.min,
+            const HeaderBackButton(),
+            12.szW,
+          ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconWidget(
-                  icon: AppAssets.svg.chevronRight,
-                  color: AppColors.textPrimary,
-                  height: AppSize.sH20,
-                  width: AppSize.sW20,
-                ),
-                4.szW,
+                if (showBack) ...[
+                  Text(
+                    LocaleKeys.settlementTitle.tr(),
+                    style: const TextStyle().setMainTextColor.s16.extraBold,
+                  ),
+                  4.szH,
+                ],
                 Text(
-                  LocaleKeys.settlementBack.tr(),
-                  style: const TextStyle().setMainTextColor.s14.semiBold,
+                  LocaleKeys.settlementSubtitle.tr(),
+                  style: const TextStyle().setMainTextColor.s16.extraBold,
                 ),
               ],
-            ).onClick(onTap: () => Navigator.of(context).maybePop()),
-            12.szH,
-          ],
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      LocaleKeys.settlementTitle.tr(),
-                      style: const TextStyle().setMainTextColor.s16.extraBold,
-                    ),
-                    4.szH,
-                    Text(
-                      LocaleKeys.settlementSubtitle.tr(),
-                      style: const TextStyle().setSecondaryColor.s14.regular,
-                    ),
-                  ],
-                ),
-              ),
-              12.szW,
-              const _NotSettledPill(),
-            ],
+            ),
           ),
+          12.szW,
+          const _NotSettledPill(),
         ],
       ).paddingOnlyDirectional(
         start: AppPadding.pW20,
