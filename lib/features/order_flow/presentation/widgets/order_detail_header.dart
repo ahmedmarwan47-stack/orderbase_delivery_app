@@ -81,9 +81,9 @@ class _OrderDetailHeader extends StatelessWidget {
                           textDirection: TextDirection.ltr,
                           style: const TextStyle()
                               .setMainTextColor
-                              .s20
+                              .s16
                               .extraBold
-                              .withHeight(28 / 20)
+                              .withHeight(20 / 16)
                               .tabular,
                         ),
                       ],

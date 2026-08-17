@@ -194,7 +194,7 @@ class _MoreTab extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Text('المزيد',
-                      style: AppTypography.size20.copyWith(
+                      style: AppTypography.size16.copyWith(
                           fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary)),
                 ),

@@ -27,7 +27,7 @@ class _QueueBrowseHeader extends StatelessWidget {
                   children: [
                     Text(
                       LocaleKeys.queueTitle.tr(),
-                      style: const TextStyle().setMainTextColor.s20.extraBold,
+                      style: const TextStyle().setMainTextColor.s16.extraBold,
                     ),
                     4.szH,
                     Text(

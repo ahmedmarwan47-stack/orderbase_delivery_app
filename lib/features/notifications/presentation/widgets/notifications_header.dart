@@ -40,7 +40,7 @@ class _NotificationsHeader extends StatelessWidget {
               children: [
                 Text(
                   LocaleKeys.navNotifications.tr(),
-                  style: const TextStyle().setMainTextColor.s20.extraBold,
+                  style: const TextStyle().setMainTextColor.s16.extraBold,
                 ),
                 if (unread > 0)
                   Container(

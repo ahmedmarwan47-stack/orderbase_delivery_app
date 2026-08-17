@@ -55,7 +55,7 @@ class _PickupHeader extends StatelessWidget {
                 children: [
                   Text(
                     LocaleKeys.pickupTitle.tr(),
-                    style: const TextStyle().setMainTextColor.s18.extraBold,
+                    style: const TextStyle().setMainTextColor.s16.extraBold,
                   ),
                   4.szH,
                   Text(

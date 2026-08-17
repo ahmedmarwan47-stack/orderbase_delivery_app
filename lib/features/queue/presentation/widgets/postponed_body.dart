@@ -150,7 +150,7 @@ class _PostponedHeader extends StatelessWidget {
             ],
           ).paddingSymmetric(vertical: AppPadding.pH8).onClick(onTap: () => Modular.to.pop()),
           Text(LocaleKeys.postponedTitle.tr(),
-              style: const TextStyle().setMainTextColor.s20.extraBold),
+              style: const TextStyle().setMainTextColor.s16.extraBold),
           4.szH,
           Text(
             LocaleKeys.postponedSubtitle
