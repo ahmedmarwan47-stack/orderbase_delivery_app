@@ -36,7 +36,7 @@ class _QueueBrowseHeader extends StatelessWidget {
                 _SquareIconButton(
                   icon: AppAssets.svg.search,
                   onTap: vc.openSearch,
-                  size: AppSize.sH44,
+                  size: AppSize.sH40,
                   label: LocaleKeys.a11ySearch.tr(),
                 ),
               ],
@@ -52,7 +52,8 @@ class _QueueBrowseHeader extends StatelessWidget {
   }
 }
 
-/// Reused square icon button (search / back). Neutral muted tile.
+/// Reused square icon button (search / back) — white tile + hairline border,
+/// matching the home header icons and the shared back tile (one icon-button look).
 class _SquareIconButton extends StatelessWidget {
   const _SquareIconButton({
     required this.icon,
@@ -78,8 +79,9 @@ class _SquareIconButton extends StatelessWidget {
             width: size,
             height: size,
             decoration: BoxDecoration(
-              color: AppColors.surfaceMuted,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(AppCircular.r12),
+              border: Border.all(color: AppColors.iconButtonBorder),
             ),
             child: Center(
               child: IconWidget(
