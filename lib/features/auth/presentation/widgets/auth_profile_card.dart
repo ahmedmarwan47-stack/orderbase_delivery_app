@@ -36,7 +36,7 @@ class _AuthProfileCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppCircular.r14),
             ),
             child: Text(initials,
-                style: const TextStyle().setWhite.s16.bold),
+                style: const TextStyle().setWhite.s14.bold),
           ),
           12.szW,
           Expanded(

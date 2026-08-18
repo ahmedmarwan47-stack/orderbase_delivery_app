@@ -44,12 +44,12 @@ class _AuthPrimaryButton extends StatelessWidget {
               IconWidget(
                 icon: icon!,
                 color: iconColor ?? fg,
-                height: AppSize.sH20,
-                width: AppSize.sW20,
+                height: AppSize.sH18,
+                width: AppSize.sW18,
               ),
               8.szW,
             ],
-            Text(label, style: const TextStyle().setColor(fg).s16.bold),
+            Text(label, style: const TextStyle().setColor(fg).s14.bold),
           ],
         ),
       ).onClick(onTap: enabled ? onTap : null),
@@ -77,7 +77,7 @@ class _AuthOutlinedButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppCircular.r16),
           border: Border.all(color: AppColors.borderDefault),
         ),
-        child: Text(label, style: const TextStyle().setMainTextColor.s16.bold),
+        child: Text(label, style: const TextStyle().setMainTextColor.s14.bold),
       ).onClick(onTap: onTap),
     );
   }

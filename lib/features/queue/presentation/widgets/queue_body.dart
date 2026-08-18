@@ -107,7 +107,7 @@ class _QueueBrowseList extends StatelessWidget {
                         padding: EdgeInsetsDirectional.only(
                           start: AppPadding.pW20,
                           end: AppPadding.pW20,
-                          top: showBar ? 0 : AppPadding.pH16,
+                          top: showBar ? 0 : AppPadding.pH8,
                           bottom: AppPadding.pH20,
                         ),
                       ),

@@ -232,7 +232,7 @@ class _ConfirmButton extends StatelessWidget {
               width: AppSize.sW20,
             ),
             8.szW,
-            Text(label, style: const TextStyle().setColor(fg).s16.bold),
+            Text(label, style: const TextStyle().setColor(fg).s14.bold),
           ],
         ),
       ).onClick(onTap: enabled ? onConfirm : null),

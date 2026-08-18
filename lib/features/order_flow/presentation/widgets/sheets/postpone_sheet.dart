@@ -111,7 +111,7 @@ class _PostponeSheetState extends State<_PostponeSheet> {
                 8.szW,
                 Text(
                   LocaleKeys.postponeConfirm.tr(),
-                  style: const TextStyle().setWhite.s16.bold,
+                  style: const TextStyle().setWhite.s14.bold,
                 ),
               ],
             ),

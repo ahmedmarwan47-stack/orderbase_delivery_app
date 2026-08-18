@@ -23,7 +23,7 @@ class _QueueBrowseHeader extends StatelessWidget {
         // chip bleeds past the edge, signalling there's more to scroll.
         _QueueFilterChips(vc: vc),
       ],
-    ).paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH16);
+    ).paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH8);
   }
 }
 

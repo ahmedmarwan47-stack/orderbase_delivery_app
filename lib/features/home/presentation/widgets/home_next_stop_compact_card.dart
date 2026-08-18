@@ -89,7 +89,7 @@ class _HomeNextStopCompactCard extends StatelessWidget {
                       children: [
                         Text(
                           LocaleKeys.homeViewOrder.tr(),
-                          style: const TextStyle().setWhite.s16.bold,
+                          style: const TextStyle().setWhite.s14.bold,
                         ),
                         8.szW,
                         IconWidget(

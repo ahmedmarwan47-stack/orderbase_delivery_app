@@ -292,7 +292,7 @@ class _BackHomeButton extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           LocaleKeys.settlementBackHome.tr(),
-          style: const TextStyle().setWhite.s16.bold,
+          style: const TextStyle().setWhite.s14.bold,
         ),
       ).onClick(onTap: onTap),
     );

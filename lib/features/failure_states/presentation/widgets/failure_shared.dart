@@ -200,7 +200,7 @@ class _PrimaryButton extends StatelessWidget {
               child: Text(
                 label,
                 textAlign: TextAlign.center,
-                style: const TextStyle().setWhite.s16.bold,
+                style: const TextStyle().setWhite.s14.bold,
               ),
             ),
             if (trailingIcon != null) ...[

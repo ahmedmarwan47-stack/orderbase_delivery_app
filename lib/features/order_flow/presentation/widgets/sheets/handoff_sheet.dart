@@ -121,7 +121,7 @@ class _HandoffSheetState extends State<_HandoffSheet> {
                       widget.cod
                           ? LocaleKeys.handoffCollectNext.tr()
                           : LocaleKeys.handoffTitle.tr(),
-                      style: const TextStyle().setColor(fg).s16.bold,
+                      style: const TextStyle().setColor(fg).s14.bold,
                     ),
                   ],
                 ),

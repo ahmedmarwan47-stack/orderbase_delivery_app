@@ -31,7 +31,7 @@ class _ResultActions extends StatelessWidget {
               8.szW,
               Text(
                 LocaleKeys.resultContinue.tr(),
-                style: const TextStyle().setWhite.s16.bold,
+                style: const TextStyle().setWhite.s14.bold,
               ),
             ],
           ),

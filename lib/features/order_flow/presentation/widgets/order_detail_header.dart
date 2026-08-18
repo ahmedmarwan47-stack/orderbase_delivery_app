@@ -22,8 +22,10 @@ class _OrderDetailHeader extends StatelessWidget {
     final (Color pillBg, Color pillFg, String pillLabel) =
         switch (order.state) {
       FlowOrderState.active => (
+          // Light pill (matching the pale delivered/failed pills) instead of the
+          // loud solid blue.
+          AppColors.transitPillBg,
           AppColors.transitBg,
-          AppColors.transitText,
           LocaleKeys.orderDetailStatusTransit.tr(),
         ),
       FlowOrderState.done => (
@@ -37,18 +39,12 @@ class _OrderDetailHeader extends StatelessWidget {
           LocaleKeys.orderDetailStatusFailed.tr(),
         ),
     };
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOut,
-      decoration: BoxDecoration(
-        // Fade the SAME white in/out (transparent-white, never transparent-
-        // black) so the transition never flashes a dark tint.
-        color: AppColors.surface.withValues(alpha: scrolled ? 1 : 0),
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.borderHeader.withValues(alpha: scrolled ? 1 : 0),
-          ),
-        ),
+    return DecoratedBox(
+      // Always solid white with a hairline — a proper header bar (matching the
+      // unified tab-page header), not the old transparent-until-scrolled fade.
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

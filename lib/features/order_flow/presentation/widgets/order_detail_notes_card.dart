@@ -40,7 +40,7 @@ class _NotesCard extends StatelessWidget {
             note,
             style: const TextStyle()
                 .setColor(AppColors.postponedTextStrong)
-                .s14
+                .s12
                 .regular
                 .withHeight(1.5),
           ),

@@ -404,7 +404,7 @@ class _PrimaryButton extends StatelessWidget {
               width: AppSize.sW20,
             ),
             8.szW,
-            Text(label, style: const TextStyle().setWhite.s16.bold),
+            Text(label, style: const TextStyle().setWhite.s14.bold),
           ],
         ),
       ).onClick(onTap: onTap),

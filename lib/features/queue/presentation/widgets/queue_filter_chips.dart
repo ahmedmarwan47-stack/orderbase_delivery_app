@@ -94,11 +94,14 @@ class _FilterChip extends StatelessWidget {
       bg = AppColors.inkFill;
       fg = AppColors.surface;
     } else {
-      bg = AppColors.surfaceMuted;
+      // White tile + hairline so the unselected chip stays visible now that the
+      // filters sit on the paper page (surfaceMuted was invisible against it).
+      bg = AppColors.surface;
       fg = AppColors.textTertiary;
+      border = Border.all(color: AppColors.borderDefault);
     }
     return Container(
-      height: AppSize.sH36,
+      height: AppSize.sH28,
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(AppCircular.r12),
@@ -107,7 +110,7 @@ class _FilterChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(labelKey.tr(), style: const TextStyle().setColor(fg).s16.bold),
+          Text(labelKey.tr(), style: const TextStyle().setColor(fg).s12.bold),
           8.szW,
           _CountBadge(
             count: count,
@@ -146,7 +149,7 @@ class _CountBadge extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: const TextStyle().setWhite.s16.bold,
+          style: const TextStyle().setWhite.s12.bold,
         ).paddingSymmetric(horizontal: AppPadding.pW8),
       );
     }
@@ -156,7 +159,7 @@ class _CountBadge extends StatelessWidget {
           .setColor(
             postponedStyle ? AppColors.postponedText : AppColors.textSecondary,
           )
-          .s16
+          .s12
           .bold,
     );
   }

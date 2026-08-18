@@ -32,13 +32,13 @@ class _DeliverBar extends StatelessWidget {
             IconWidget(
               icon: AppAssets.svg.check,
               color: AppColors.surface,
-              height: AppSize.sH20,
-              width: AppSize.sW20,
+              height: AppSize.sH18,
+              width: AppSize.sW18,
             ),
             8.szW,
             Text(
               LocaleKeys.orderDetailDeliver.tr(),
-              style: const TextStyle().setWhite.s16.bold,
+              style: const TextStyle().setWhite.s14.bold,
             ),
           ],
         ),
