@@ -18,6 +18,7 @@ import '../features/settlement/presentation/imports/settlement_imports.dart';
 import '../theme/colors.dart';
 import '../theme/spacing.dart';
 import '../theme/typography.dart';
+import '../widgets/app_header.dart';
 import '../widgets/bottom_nav.dart';
 
 /// The signed-in app: a tabbed shell hosting the built screens and wiring the
@@ -51,8 +52,10 @@ class _AppShellState extends State<AppShell>
     duration: AppMotion.stamp,
     value: 1,
   );
-  late final Animation<double> _tabFadeCurve =
-      CurvedAnimation(parent: _tabFade, curve: AppMotion.ease);
+  late final Animation<double> _tabFadeCurve = CurvedAnimation(
+    parent: _tabFade,
+    curve: AppMotion.ease,
+  );
 
   /// The Orders tab IS the "today's orders" queue (search + 5 filters +
   /// postponed). The shell owns its controller so a Home KPI tap can preselect
@@ -60,7 +63,32 @@ class _AppShellState extends State<AppShell>
   late final QueueViewController _ordersVc = QueueViewController(
     onSelectTab: _select,
     onOpenOrder: _openOrder,
+    onOpenNotifications: _openNotifications,
   );
+
+  @override
+  void initState() {
+    super.initState();
+    // Greet the courier with the dispatched batch once the shell is on screen —
+    // informative, not a gate (see [_announceDispatch]).
+    WidgetsBinding.instance.addPostFrameCallback((_) => _announceDispatch());
+  }
+
+  /// If a branch batch is waiting and hasn't been carried yet, pop the
+  /// dismissible "new batch at the branch" sheet. Choosing "carry from branch"
+  /// jumps to the Pickup tab; dismissing just leaves the batch waiting.
+  Future<void> _announceDispatch() async {
+    if (!mounted) return;
+    final shift = ShiftController.instance;
+    if (shift.accepted) return;
+    final orders = shift.orders
+        .where((o) => o.status == OrderStatus.transit)
+        .map(orderToFlow)
+        .toList();
+    if (orders.isEmpty) return;
+    final carry = await showPickupDispatchSheet(context, orders: orders);
+    if (carry == true && mounted) _select(NavTab.pickup);
+  }
 
   @override
   void dispose() {
@@ -81,16 +109,16 @@ class _AppShellState extends State<AppShell>
   }
 
   void _openNotifications() => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => NotificationsScreen(
-            onSelectTab: (t) {
-              Navigator.of(context).pop();
-              _select(t);
-            },
-            onOpenOrder: _openOrderByNum,
-          ),
-        ),
-      );
+    MaterialPageRoute(
+      builder: (_) => NotificationsScreen(
+        onSelectTab: (t) {
+          Navigator.of(context).pop();
+          _select(t);
+        },
+        onOpenOrder: _openOrderByNum,
+      ),
+    ),
+  );
 
   /// Push the order-detail flow for [order], wiring its Result screen back to
   /// the shell.
@@ -137,6 +165,12 @@ class _AppShellState extends State<AppShell>
   /// Home "collected today" KPI → the Settlement tab.
   void _openSettlement() => _select(NavTab.settlement);
 
+  /// The unified header's search (from any tab) → the Orders tab, in search mode.
+  void _openOrdersSearch() {
+    _ordersVc.openSearch();
+    _select(NavTab.orders);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -152,14 +186,30 @@ class _AppShellState extends State<AppShell>
               onOpenOrdersFilter: _openOrdersFilter,
               onOpenSettlement: _openSettlement,
               onOpenNotifications: _openNotifications,
+              onOpenSearch: _openOrdersSearch,
             ),
             QueueScreen(controller: _ordersVc),
             PickupScreen(
               onSelectTab: _select,
-              onConfirm: () => _select(NavTab.home),
+              onOpenNotifications: _openNotifications,
+              onOpenSearch: _openOrdersSearch,
+              onConfirm: () {
+                // Carrying from the Pickup tab records the batch as collected
+                // (flips Pickup to its empty state) and returns to Home.
+                ShiftController.instance.acceptBatch();
+                _select(NavTab.home);
+              },
             ),
-            SettlementScreen(onSelectTab: _select),
-            _MoreTab(onSelectTab: _select),
+            SettlementScreen(
+              onSelectTab: _select,
+              onOpenNotifications: _openNotifications,
+              onOpenSearch: _openOrdersSearch,
+            ),
+            _MoreTab(
+              onSelectTab: _select,
+              onOpenNotifications: _openNotifications,
+              onOpenSearch: _openOrdersSearch,
+            ),
           ],
         ),
       ),
@@ -171,9 +221,15 @@ class _AppShellState extends State<AppShell>
 /// (settlement, returns, pickup, account) plus the DevGallery, so everything is
 /// reachable from the running app rather than only through dev tooling.
 class _MoreTab extends StatelessWidget {
-  const _MoreTab({required this.onSelectTab});
+  const _MoreTab({
+    required this.onSelectTab,
+    this.onOpenNotifications,
+    this.onOpenSearch,
+  });
 
   final ValueChanged<NavTab> onSelectTab;
+  final VoidCallback? onOpenNotifications;
+  final VoidCallback? onOpenSearch;
 
   void _push(BuildContext context, Widget screen) =>
       Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
@@ -188,42 +244,58 @@ class _MoreTab extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
+              AppHeader(
+                onSearch: onOpenSearch,
+                onOpenNotifications: onOpenNotifications,
+              ),
+              // "المزيد" title moved into the body beneath the unified header.
               Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.s20, AppSpacing.s12,
-                    AppSpacing.s20, AppSpacing.s16),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.s20,
+                  AppSpacing.s16,
+                  AppSpacing.s20,
+                  AppSpacing.s12,
+                ),
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: Text('المزيد',
-                      style: AppTypography.size16.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary)),
+                  child: Text(
+                    'المزيد',
+                    style: AppTypography.size16.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
                 ),
               ),
               Expanded(
                 child: ListView(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: AppSpacing.s20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.s20,
+                  ),
                   children: [
                     _MoreRow(
-                        icon: AppAssets.svg.box,
-                        label: 'مرتجعات للفرع',
-                        onTap: () => _push(context, const ReturnsListScreen())),
+                      icon: AppAssets.svg.box,
+                      label: 'مرتجعات للفرع',
+                      onTap: () => _push(context, const ReturnsListScreen()),
+                    ),
                     _MoreRow(
-                        icon: AppAssets.svg.user,
-                        label: 'الحساب وكلمة المرور',
-                        onTap: () =>
-                            _push(context, const ChangePasswordScreen())),
+                      icon: AppAssets.svg.user,
+                      label: 'الحساب وكلمة المرور',
+                      onTap: () => _push(context, const ChangePasswordScreen()),
+                    ),
                     _MoreRow(
-                        icon: AppAssets.svg.more,
-                        label: 'كل الشاشات (Dev)',
-                        onTap: () => _push(context, const DevGallery())),
+                      icon: AppAssets.svg.more,
+                      label: 'كل الشاشات (Dev)',
+                      onTap: () => _push(context, const DevGallery()),
+                    ),
                   ],
                 ),
               ),
               BottomNav(
-                  active: NavTab.more,
-                  notificationsBadge: true,
-                  onTap: onSelectTab),
+                active: NavTab.more,
+                notificationsBadge: true,
+                onTap: onSelectTab,
+              ),
             ],
           ),
         ),
@@ -233,8 +305,11 @@ class _MoreTab extends StatelessWidget {
 }
 
 class _MoreRow extends StatelessWidget {
-  const _MoreRow(
-      {required this.icon, required this.label, required this.onTap});
+  const _MoreRow({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   final String icon;
   final String label;
@@ -258,27 +333,34 @@ class _MoreRow extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                      color: AppColors.surfaceMuted,
-                      borderRadius: BorderRadius.circular(12)),
+                    color: AppColors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: Center(
-                      child: IconWidget(
-                          icon: icon,
-                          color: AppColors.textPrimary,
-                          height: 20,
-                          width: 20)),
+                    child: IconWidget(
+                      icon: icon,
+                      color: AppColors.textPrimary,
+                      height: 20,
+                      width: 20,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: AppSpacing.s12),
                 Expanded(
-                  child: Text(label,
-                      style: AppTypography.size16.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary)),
+                  child: Text(
+                    label,
+                    style: AppTypography.size16.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
                 ),
                 IconWidget(
-                    icon: AppAssets.svg.chevronLeft,
-                    color: AppColors.textSecondary,
-                    height: 18,
-                    width: 18),
+                  icon: AppAssets.svg.chevronLeft,
+                  color: AppColors.textSecondary,
+                  height: 18,
+                  width: 18,
+                ),
               ],
             ),
           ),

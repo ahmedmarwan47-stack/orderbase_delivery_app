@@ -30,67 +30,93 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _openForgot() => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const ForgotPasswordScreen()),
-      );
+  void _openForgot() => Navigator.of(
+    context,
+  ).push(MaterialPageRoute<void>(builder: (_) => const ForgotPasswordScreen()));
 
   @override
   Widget build(BuildContext context) {
+    // Logo sits on the paper ground; the form (title → button) lives inside a
+    // single white card, mirroring the reference layout.
     return _AuthScaffold(
+      centered: true,
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          24.szH,
-          const _AuthBrandLockup(),
-          24.szH,
-          Text(LocaleKeys.authLoginTitle.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle().setMainTextColor.s20.extraBold),
-          8.szH,
-          Text(LocaleKeys.authLoginSubtitle.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle().setSecondaryColor.s14.regular),
-          32.szH,
-          _AuthField(
-            label: LocaleKeys.authMerchant.tr(),
-            controller: _vc.merchant,
-            icon: _kStoreIcon,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            ltr: true,
-            tabular: true,
-          ),
-          16.szH,
-          _AuthField(
-            label: LocaleKeys.authUsername.tr(),
-            controller: _vc.username,
-            icon: AppAssets.svg.user,
-            ltr: true,
-          ),
-          16.szH,
-          _AuthField(
-            label: LocaleKeys.authPassword.tr(),
-            controller: _vc.password,
-            icon: _kLockIcon,
-            obscure: true,
-            showToggle: true,
-          ),
-          12.szH,
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: _AuthLink(
-                label: LocaleKeys.authForgotLink.tr(), onTap: _openForgot),
-          ),
-        ],
-      ),
-      footer: AnimatedBuilder(
-        animation: _vc.formListenable,
-        builder: (context, _) => _AuthPrimaryButton(
-          label: LocaleKeys.authLoginSubmit.tr(),
-          enabled: _vc.canSubmit,
-          onTap: _submit,
-        ),
+        children: [const _AuthBrandLockup(), 24.szH, _card()],
       ),
     );
   }
+
+  Widget _card() => Container(
+    decoration: BoxDecoration(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(AppCircular.r22),
+      border: Border.all(color: AppColors.borderCardFaint),
+      boxShadow: AppShadows.card,
+    ),
+    padding: EdgeInsets.all(AppPadding.pW20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          LocaleKeys.authLoginTitle.tr(),
+          textAlign: TextAlign.center,
+          style: const TextStyle().setMainTextColor.s18.extraBold,
+        ),
+        8.szH,
+        Text(
+          LocaleKeys.authLoginSubtitle.tr(),
+          textAlign: TextAlign.center,
+          style: const TextStyle().setSecondaryColor.s12.regular,
+        ),
+        24.szH,
+        _AuthField(
+          label: LocaleKeys.authMerchant.tr(),
+          controller: _vc.merchant,
+          icon: _kStoreIcon,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ltr: true,
+          tabular: true,
+          compact: true,
+        ),
+        16.szH,
+        _AuthField(
+          label: LocaleKeys.authUsername.tr(),
+          controller: _vc.username,
+          icon: AppAssets.svg.user,
+          ltr: true,
+          compact: true,
+        ),
+        16.szH,
+        _AuthField(
+          label: LocaleKeys.authPassword.tr(),
+          controller: _vc.password,
+          icon: _kLockIcon,
+          obscure: true,
+          showToggle: true,
+          compact: true,
+        ),
+        12.szH,
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: _AuthLink(
+            label: LocaleKeys.authForgotLink.tr(),
+            onTap: _openForgot,
+            compact: true,
+          ),
+        ),
+        20.szH,
+        AnimatedBuilder(
+          animation: _vc.formListenable,
+          builder: (context, _) => _AuthPrimaryButton(
+            label: LocaleKeys.authLoginSubmit.tr(),
+            enabled: _vc.canSubmit,
+            onTap: _submit,
+          ),
+        ),
+      ],
+    ),
+  );
 }

@@ -13,6 +13,7 @@ import '../../../../app/shift_controller.dart';
 import '../../../../config/res/config_imports.dart';
 import '../../../../data/order.dart' show formatThousands, OrderStatus;
 import '../../../../theme/shadows.dart';
+import '../../../../widgets/app_header.dart';
 import '../../../../widgets/bottom_nav.dart';
 import '../../../../widgets/header_back_button.dart';
 import '../../../../widgets/home_indicator.dart';

@@ -1,6 +1,6 @@
 part of '../imports/settlement_imports.dart';
 
-/// State B — SETTLED ("تمت التسوية"): a full white confirmation screen. Green
+/// State B — SETTLED ("تمت التسوية"): a full white confirmation screen. Slate
 /// badge, headline, a plain-language summary, the delivered/wallet summary card,
 /// the now-zero balance card, and an ink "back home" button that reopens (reset).
 class _SettlementSettledView extends StatelessWidget {
@@ -36,15 +36,14 @@ class _SettlementSettledView extends StatelessWidget {
                     ),
                     12.szH,
                     Text(
-                      LocaleKeys.settlementSettledBody.tr(namedArgs: {
-                        'cash': formatThousands(data.cashTotal),
-                        'count': formatThousands(data.rowCount),
-                      }),
+                      LocaleKeys.settlementSettledBody.tr(
+                        namedArgs: {
+                          'cash': formatThousands(data.cashTotal),
+                          'count': formatThousands(data.rowCount),
+                        },
+                      ),
                       textAlign: TextAlign.center,
-                      style: const TextStyle()
-                          .setSecondaryColor
-                          .s14
-                          .regular
+                      style: const TextStyle().setSecondaryColor.s14.regular
                           .withHeight(1.5),
                     ),
                     24.szH,
@@ -73,7 +72,9 @@ class _SettlementSettledView extends StatelessWidget {
   }
 }
 
-/// 96px green circle with a large green check.
+/// 96px slate circle with a large white check. Deliberately slate (settlement's
+/// own "cash" hue, matching the open-state cash card) — NOT green, so the
+/// end-of-day "settled" screen never competes with the delivered-success state.
 class _SettledBadge extends StatelessWidget {
   const _SettledBadge();
 
@@ -84,13 +85,13 @@ class _SettledBadge extends StatelessWidget {
         width: 96.w, // 96px success badge — no matching AppSize token
         height: AppSize.sH96,
         decoration: const BoxDecoration(
-          color: AppColors.deliveredBg,
+          color: AppColors.paymentCardBg,
           shape: BoxShape.circle,
         ),
         child: Center(
           child: IconWidget(
             icon: AppAssets.svg.check,
-            color: AppColors.greenAccent,
+            color: AppColors.surface,
             height: AppSize.sH52,
             width: 52.w, // 52px check glyph — no matching AppSize token
           ),
@@ -121,7 +122,7 @@ class _SummaryCard extends StatelessWidget {
           _SummaryRow(
             label: LocaleKeys.settlementSummaryDelivered.tr(),
             value: '${formatThousands(data.cashTotal)} جم',
-            valueColor: AppColors.deliveredText,
+            valueColor: AppColors.textPrimary,
           ),
           12.szH,
           _SummaryRow(
@@ -183,10 +184,7 @@ class _SummaryRow extends StatelessWidget {
               ),
               8.szW,
             ],
-            Text(
-              label,
-              style: const TextStyle().setSecondaryColor.s14.regular,
-            ),
+            Text(label, style: const TextStyle().setSecondaryColor.s14.regular),
           ],
         ),
         Text(
@@ -233,8 +231,11 @@ class _BalanceCard extends StatelessWidget {
                   Text(
                     '0',
                     textDirection: TextDirection.ltr,
-                    style:
-                        const TextStyle().setMainTextColor.s20.extraBold.tabular,
+                    style: const TextStyle()
+                        .setMainTextColor
+                        .s20
+                        .extraBold
+                        .tabular,
                   ),
                   6.szW,
                   Text(
@@ -252,7 +253,8 @@ class _BalanceCard extends StatelessWidget {
   }
 }
 
-/// Green "مُغلقة" (closed) pill.
+/// Neutral "مُغلقة" (closed) pill — grey, not green, so it doesn't echo the
+/// delivered-success status.
 class _ClosedPill extends StatelessWidget {
   const _ClosedPill();
 
@@ -260,13 +262,13 @@ class _ClosedPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.deliveredBg,
+        color: AppColors.surfaceMuted,
         borderRadius: BorderRadius.circular(AppCircular.r8),
-        border: Border.all(color: AppColors.deliveredBorder),
+        border: Border.all(color: AppColors.borderDefault),
       ),
       child: Text(
         LocaleKeys.settlementClosed.tr(),
-        style: const TextStyle().setColor(AppColors.deliveredText).s12.bold,
+        style: const TextStyle().setColor(AppColors.textSecondary).s12.bold,
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
   }

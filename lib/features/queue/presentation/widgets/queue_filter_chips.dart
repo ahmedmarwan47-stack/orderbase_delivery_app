@@ -13,7 +13,9 @@ class _QueueFilterChips extends StatelessWidget {
       builder: (_, selected, _) => SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsetsDirectional.only(
-            start: AppPadding.pW20, end: AppPadding.pW20),
+          start: AppPadding.pW20,
+          end: AppPadding.pW20,
+        ),
         child: Row(
           spacing: AppSize.sW8,
           children: [
@@ -65,8 +67,8 @@ class _FilterChip extends StatelessWidget {
     required this.count,
     required this.onTap,
     this.selected = false,
-  })  : labelKey = LocaleKeys.filterPostponed,
-        postponedStyle = true;
+  }) : labelKey = LocaleKeys.filterPostponed,
+       postponedStyle = true;
 
   final String labelKey;
   final int count;
@@ -105,15 +107,21 @@ class _FilterChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(labelKey.tr(), style: const TextStyle().setColor(fg).s14.bold),
+          Text(labelKey.tr(), style: const TextStyle().setColor(fg).s16.bold),
           8.szW,
-          _CountBadge(count: count, selected: selected, postponedStyle: postponedStyle),
+          _CountBadge(
+            count: count,
+            selected: selected,
+            postponedStyle: postponedStyle,
+          ),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW12),
-    ).onClick(onTap: () {
-      AppHaptics.tick();
-      onTap();
-    });
+    ).onClick(
+      onTap: () {
+        AppHaptics.tick();
+        onTap();
+      },
+    );
   }
 }
 
@@ -136,15 +144,19 @@ class _CountBadge extends StatelessWidget {
           color: AppColors.surface.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(AppCircular.r8),
         ),
-        child: Text(text, style: const TextStyle().setWhite.s12.bold)
-            .paddingSymmetric(horizontal: AppPadding.pW8),
+        child: Text(
+          text,
+          style: const TextStyle().setWhite.s16.bold,
+        ).paddingSymmetric(horizontal: AppPadding.pW8),
       );
     }
     return Text(
       text,
       style: const TextStyle()
-          .setColor(postponedStyle ? AppColors.postponedText : AppColors.textSecondary)
-          .s12
+          .setColor(
+            postponedStyle ? AppColors.postponedText : AppColors.textSecondary,
+          )
+          .s16
           .bold,
     );
   }

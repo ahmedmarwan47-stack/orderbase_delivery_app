@@ -71,6 +71,10 @@ abstract final class AppColors {
   // Selected / high-emphasis fill (chips, primary buttons)
   static const inkFill = Color(0xFF1A1919);
 
+  // Muted (70%) white for secondary text on a dark surface (e.g. the progress
+  // tooltip's order-number line over the ink bubble).
+  static const onInkMuted = Color(0xB3FFFFFF);
+
   // Muted count text inside an unselected filter chip
   static const chipCountMuted = Color(0xFF9A9994);
 

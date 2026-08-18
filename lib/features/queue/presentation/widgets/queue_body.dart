@@ -11,10 +11,18 @@ class _QueueBody extends StatelessWidget {
       valueListenable: vc.isSearching,
       builder: (_, searching, _) => Column(
         children: [
+          // The unified app header (shift status + search + bell) tops every
+          // page. In search mode the search bar takes over, so it's hidden then.
+          if (!searching)
+            AppHeader(
+              onSearch: vc.openSearch,
+              onOpenNotifications: vc.onOpenNotifications,
+            ),
           searching ? _QueueSearchHeader(vc: vc) : _QueueBrowseHeader(vc: vc),
           Expanded(
-            child:
-                searching ? _QueueSearchResults(vc: vc) : _QueueBrowseList(vc: vc),
+            child: searching
+                ? _QueueSearchResults(vc: vc)
+                : _QueueBrowseList(vc: vc),
           ),
           if (searching)
             const HomeIndicator()
@@ -66,8 +74,11 @@ class _QueueBrowseList extends StatelessWidget {
                       ..hideCurrentSnackBar()
                       ..showSnackBar(
                         SnackBar(
-                          content: Text(LocaleKeys.returnedToQueue
-                              .tr(namedArgs: {'num': o.num})),
+                          content: Text(
+                            LocaleKeys.returnedToQueue.tr(
+                              namedArgs: {'num': o.num},
+                            ),
+                          ),
                         ),
                       );
                   },
@@ -80,8 +91,14 @@ class _QueueBrowseList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     if (showBar)
-                      _FilterResultsBar(vc: vc, filter: filter, count: items.length)
-                          .paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH12),
+                      _FilterResultsBar(
+                        vc: vc,
+                        filter: filter,
+                        count: items.length,
+                      ).paddingOnly(
+                        top: AppPadding.pH16,
+                        bottom: AppPadding.pH12,
+                      ),
                     Expanded(
                       child: _AnimatedQueueList(
                         orders: items,
@@ -193,8 +210,9 @@ class _AnimatedQueueListState extends State<_AnimatedQueueList> {
 
   void _prune(String orderNum) {
     if (!mounted) return;
-    setState(() =>
-        _rows.removeWhere((r) => r.removing && r.order.num == orderNum));
+    setState(
+      () => _rows.removeWhere((r) => r.removing && r.order.num == orderNum),
+    );
   }
 
   /// Pull-to-refresh re-checks today's orders. The queue reads live, in-memory
@@ -297,8 +315,10 @@ class _QueueSearchResults extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _SearchResultsCountBar(count: matches.length, total: vc.orders.length)
-                .paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH12),
+            _SearchResultsCountBar(
+              count: matches.length,
+              total: vc.orders.length,
+            ).paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH12),
             Expanded(
               child: ListView.separated(
                 padding: EdgeInsetsDirectional.only(
@@ -336,7 +356,10 @@ class _SearchResultsCountBar extends StatelessWidget {
       children: [
         Text(
           LocaleKeys.searchResultsCount.tr(
-            namedArgs: {'count': arabicDigits(count), 'total': arabicDigits(total)},
+            namedArgs: {
+              'count': arabicDigits(count),
+              'total': arabicDigits(total),
+            },
           ),
           style: const TextStyle().setSecondaryColor.s12.bold,
         ),
@@ -351,7 +374,11 @@ class _SearchResultsCountBar extends StatelessWidget {
 
 /// "N orders · `filter` · clear filter" (shown when a filter ≠ all is active).
 class _FilterResultsBar extends StatelessWidget {
-  const _FilterResultsBar({required this.vc, required this.filter, required this.count});
+  const _FilterResultsBar({
+    required this.vc,
+    required this.filter,
+    required this.count,
+  });
   final QueueViewController vc;
   final QueueFilter filter;
   final int count;
@@ -362,10 +389,12 @@ class _FilterResultsBar extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          LocaleKeys.filterResultsCount.tr(namedArgs: {
-            'count': arabicDigits(count),
-            'label': vc.filterLabelKey(filter).tr(),
-          }),
+          LocaleKeys.filterResultsCount.tr(
+            namedArgs: {
+              'count': arabicDigits(count),
+              'label': vc.filterLabelKey(filter).tr(),
+            },
+          ),
           style: const TextStyle().setSecondaryColor.s12.bold,
         ),
         Row(
@@ -380,7 +409,10 @@ class _FilterResultsBar extends StatelessWidget {
             4.szW,
             Text(
               LocaleKeys.clearFilter.tr(),
-              style: const TextStyle().setColor(AppColors.dangerAccent).s12.bold,
+              style: const TextStyle()
+                  .setColor(AppColors.dangerAccent)
+                  .s12
+                  .bold,
             ),
           ],
         ).onClick(onTap: vc.clearFilter),
@@ -397,45 +429,39 @@ class _QueuePostponedEmpty extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(
-            child: _EmptyBadge(
-              bg: AppColors.postponedBg,
-              icon: AppAssets.svg.clock,
-              iconColor: AppColors.postponedText,
-            ),
+      child:
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: _EmptyBadge(
+                  bg: AppColors.postponedBg,
+                  icon: AppAssets.svg.clock,
+                  iconColor: AppColors.postponedText,
+                ),
+              ),
+              24.szH,
+              Text(
+                LocaleKeys.postponedEmptyTitle.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle().setMainTextColor.s20.extraBold,
+              ),
+              8.szH,
+              Text(
+                LocaleKeys.postponedEmptyDesc.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle().setSecondaryColor.s14.regular
+                    .withHeight(1.5),
+              ),
+            ],
+          ).paddingOnlyDirectional(
+            start: AppPadding.pW32,
+            end: AppPadding.pW32,
+            top: AppPadding.pH64,
+            bottom: AppPadding.pH24,
           ),
-          24.szH,
-          Text(LocaleKeys.postponedEmptyTitle.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle().setMainTextColor.s20.extraBold),
-          8.szH,
-          Text(LocaleKeys.postponedEmptyDesc.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle()
-                  .setSecondaryColor
-                  .s14
-                  .regular
-                  .withHeight(1.5)),
-        ],
-      ).paddingOnlyDirectional(
-        start: AppPadding.pW32,
-        end: AppPadding.pW32,
-        top: AppPadding.pH64,
-        bottom: AppPadding.pH24,
-      ),
     );
   }
 }
 
-/// Western → Eastern-Arabic digits for counts shown in Arabic copy.
-String arabicDigits(Object value) {
-  const eastern = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-  var s = value.toString();
-  for (var i = 0; i < 10; i++) {
-    s = s.replaceAll('$i', eastern[i]);
-  }
-  return s;
-}
+// arabicDigits moved to lib/data/order.dart (shared with the app header).

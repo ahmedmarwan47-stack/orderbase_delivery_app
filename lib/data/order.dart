@@ -268,3 +268,13 @@ String formatThousands(int n) {
   }
   return buf.toString();
 }
+
+/// Western → Eastern-Arabic digits for counts shown in Arabic copy.
+String arabicDigits(Object value) {
+  const eastern = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  var s = value.toString();
+  for (var i = 0; i < 10; i++) {
+    s = s.replaceAll('$i', eastern[i]);
+  }
+  return s;
+}

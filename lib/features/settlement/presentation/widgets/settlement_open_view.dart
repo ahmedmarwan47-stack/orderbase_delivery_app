@@ -5,9 +5,16 @@ part of '../imports/settlement_imports.dart';
 /// Stateful so the header can fade its surface background in as the body scrolls
 /// beneath it (iOS large-title behaviour; see [HomeScreen]).
 class _SettlementOpenView extends StatefulWidget {
-  const _SettlementOpenView({required this.vc, this.onSelectTab});
+  const _SettlementOpenView({
+    required this.vc,
+    this.onSelectTab,
+    this.onOpenNotifications,
+    this.onOpenSearch,
+  });
   final SettlementController vc;
   final ValueChanged<NavTab>? onSelectTab;
+  final VoidCallback? onOpenNotifications;
+  final VoidCallback? onOpenSearch;
 
   @override
   State<_SettlementOpenView> createState() => _SettlementOpenViewState();
@@ -48,20 +55,27 @@ class _SettlementOpenViewState extends State<_SettlementOpenView> {
         bottom: onSelectTab == null,
         child: Column(
           children: [
-            ValueListenableBuilder<bool>(
-              valueListenable: _scrolled,
-              builder: (_, scrolled, _) => _SettlementHeader(
-                showBack: onSelectTab == null,
-                scrolled: scrolled,
+            // Shell tab: unified header on top, the date/branch + "not settled"
+            // pill become a transparent sub-head. Standalone: keep back + fade.
+            if (onSelectTab != null) ...[
+              AppHeader(
+                onSearch: widget.onOpenSearch,
+                onOpenNotifications: widget.onOpenNotifications,
               ),
-            ),
+              const _SettlementHeader(showBack: false, scrolled: false),
+            ] else
+              ValueListenableBuilder<bool>(
+                valueListenable: _scrolled,
+                builder: (_, scrolled, _) =>
+                    _SettlementHeader(showBack: true, scrolled: scrolled),
+              ),
             Expanded(
               child: SingleChildScrollView(
                 controller: _scroll,
                 padding: EdgeInsetsDirectional.only(
                   start: AppPadding.pW20,
                   end: AppPadding.pW20,
-                  top: AppPadding.pH20,
+                  top: AppPadding.pH8,
                   bottom: AppPadding.pH24,
                 ),
                 child: Column(
@@ -115,40 +129,38 @@ class _SettlementHeader extends StatelessWidget {
           ),
         ),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (showBack) ...[
-            const HeaderBackButton(),
-            12.szW,
-          ],
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (showBack) ...[
-                  Text(
-                    LocaleKeys.settlementTitle.tr(),
-                    style: const TextStyle().setMainTextColor.s16.extraBold,
-                  ),
-                  4.szH,
-                ],
-                Text(
-                  LocaleKeys.settlementSubtitle.tr(),
-                  style: const TextStyle().setMainTextColor.s16.extraBold,
+      child:
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (showBack) ...[const HeaderBackButton(), 12.szW],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (showBack) ...[
+                      Text(
+                        LocaleKeys.settlementTitle.tr(),
+                        style: const TextStyle().setMainTextColor.s16.extraBold,
+                      ),
+                      4.szH,
+                    ],
+                    Text(
+                      LocaleKeys.settlementSubtitle.tr(),
+                      style: const TextStyle().setMainTextColor.s16.extraBold,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              12.szW,
+              const _NotSettledPill(),
+            ],
+          ).paddingOnlyDirectional(
+            start: AppPadding.pW20,
+            end: AppPadding.pW20,
+            top: AppPadding.pH8,
+            bottom: AppPadding.pH16,
           ),
-          12.szW,
-          const _NotSettledPill(),
-        ],
-      ).paddingOnlyDirectional(
-        start: AppPadding.pW20,
-        end: AppPadding.pW20,
-        top: AppPadding.pH8,
-        bottom: AppPadding.pH16,
-      ),
     );
   }
 }
@@ -171,4 +183,3 @@ class _NotSettledPill extends StatelessWidget {
     );
   }
 }
-

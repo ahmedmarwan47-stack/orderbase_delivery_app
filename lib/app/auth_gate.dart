@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../core/session/auth_session.dart';
 import '../features/auth/presentation/imports/auth_imports.dart';
-import '../features/pickup/presentation/imports/pickup_imports.dart';
 import 'app_shell.dart';
-import 'shift_controller.dart';
 
 /// The app's entry route ('/'): shows the login screen until [AuthSession]
-/// reports a signed-in courier. Once signed in, the courier first lands on the
-/// "collect from branch" pickup screen for the freshly dispatched batch;
-/// confirming the pickup ([ShiftController.acceptBatch]) reveals the real
-/// tabbed shell with the first stop ready on Home.
+/// reports a signed-in courier, then hands straight to the tabbed shell (Home).
+///
+/// The freshly dispatched branch batch is no longer a blocking gate — the shell
+/// greets the courier with a *dismissible* "new batch at the branch" sheet
+/// instead, so they're informed without being forced to carry it before they
+/// can use the app (see [AppShell]).
 ///
 /// Logging out (More tab → account → "تسجيل الخروج") pops back here, which
 /// reactively falls back to the login screen since it listens to the same
@@ -26,12 +26,7 @@ class AuthGate extends StatelessWidget {
         if (!loggedIn) {
           return LoginScreen(onSubmit: AuthSession.instance.logIn);
         }
-        return AnimatedBuilder(
-          animation: ShiftController.instance,
-          builder: (_, _) => ShiftController.instance.accepted
-              ? const AppShell()
-              : PickupScreen(onConfirm: ShiftController.instance.acceptBatch),
-        );
+        return const AppShell();
       },
     );
   }

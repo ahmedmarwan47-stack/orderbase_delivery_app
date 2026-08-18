@@ -11,6 +11,7 @@ class HomeScreen extends StatefulWidget {
     this.onOpenOrdersFilter,
     this.onOpenSettlement,
     this.onOpenNotifications,
+    this.onOpenSearch,
   });
 
   /// Forwarded to the bottom nav so the app shell can switch tabs.
@@ -18,6 +19,9 @@ class HomeScreen extends StatefulWidget {
 
   /// Opens the notifications screen (the header bell).
   final VoidCallback? onOpenNotifications;
+
+  /// Opens search (the header search icon) — routed to the Orders tab.
+  final VoidCallback? onOpenSearch;
 
   /// Opens the current next-stop order's detail ("عرض الطلب" on the hero).
   final VoidCallback? onOpenOrder;
@@ -34,31 +38,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ScrollController _scroll = ScrollController();
-
-  // The header is transparent at the top and gains its surface background once
-  // content scrolls beneath it (iOS large-title behaviour).
-  final ValueNotifier<bool> _scrolled = ValueNotifier(false);
-
-  @override
-  void initState() {
-    super.initState();
-    _scroll.addListener(_onScroll);
-  }
-
-  void _onScroll() {
-    final v = _scroll.offset > 2;
-    if (v != _scrolled.value) _scrolled.value = v;
-  }
-
-  @override
-  void dispose() {
-    _scroll.removeListener(_onScroll);
-    _scroll.dispose();
-    _scrolled.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -69,34 +48,31 @@ class _HomeScreenState extends State<HomeScreen> {
           bottom: false,
           child: Column(
             children: [
-              ValueListenableBuilder<bool>(
-                valueListenable: _scrolled,
-                builder: (_, scrolled, _) => _HomeMerchantHeader(
-                  onOpenNotifications: widget.onOpenNotifications,
-                  scrolled: scrolled,
-                ),
+              AppHeader(
+                onSearch: widget.onOpenSearch,
+                onOpenNotifications: widget.onOpenNotifications,
               ),
               Expanded(
                 child: AnimatedBuilder(
                   animation: ShiftController.instance,
                   builder: (_, _) => SingleChildScrollView(
-                    controller: _scroll,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _HomeNextStopCard(onViewOrder: widget.onOpenOrder),
-                        20.szH,
-                        _HomeTodayStats(
-                          onOpenOrdersFilter: widget.onOpenOrdersFilter,
-                          onOpenSettlement: widget.onOpenSettlement,
+                    child:
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _HomeNextStopCard(onViewOrder: widget.onOpenOrder),
+                            20.szH,
+                            _HomeTodayStats(
+                              onOpenOrdersFilter: widget.onOpenOrdersFilter,
+                              onOpenSettlement: widget.onOpenSettlement,
+                            ),
+                          ],
+                        ).paddingOnly(
+                          left: AppPadding.pW20,
+                          top: AppPadding.pH4,
+                          right: AppPadding.pW20,
+                          bottom: AppPadding.pH20,
                         ),
-                      ],
-                    ).paddingOnly(
-                      left: AppPadding.pW20,
-                      top: AppPadding.pH4,
-                      right: AppPadding.pW20,
-                      bottom: AppPadding.pH20,
-                    ),
                   ),
                 ),
               ),

@@ -19,26 +19,27 @@ class HomeGlanceScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              const _HomeMerchantHeader(),
+              const AppHeader(),
               Expanded(
                 child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const _HomeOnlineBar(),
-                      16.szH,
-                      const _HomeCollectionBanner(),
-                      16.szH,
-                      const _HomeStatStrip(),
-                      16.szH,
-                      _HomeNextStopCompactCard(onViewOrder: onOpenOrder),
-                    ],
-                  ).paddingOnly(
-                    left: AppPadding.pW20,
-                    top: AppPadding.pH4,
-                    right: AppPadding.pW20,
-                    bottom: AppPadding.pH20,
-                  ),
+                  child:
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const _HomeOnlineBar(),
+                          16.szH,
+                          const _HomeCollectionBanner(),
+                          16.szH,
+                          const _HomeStatStrip(),
+                          16.szH,
+                          _HomeNextStopCompactCard(onViewOrder: onOpenOrder),
+                        ],
+                      ).paddingOnly(
+                        left: AppPadding.pW20,
+                        top: AppPadding.pH4,
+                        right: AppPadding.pW20,
+                        bottom: AppPadding.pH20,
+                      ),
                 ),
               ),
               BottomNav(

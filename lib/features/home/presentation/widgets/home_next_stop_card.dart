@@ -22,9 +22,11 @@ class _HomeNextStopCard extends StatelessWidget {
     // so the bar shows real sequence. In RTL the Row fills from the start
     // (right), so progress runs right → left; raw list order didn't.
     final closed = shift.routeStops
-        .where((s) =>
-            s.status == OrderStatus.delivered ||
-            s.status == OrderStatus.failed)
+        .where(
+          (s) =>
+              s.status == OrderStatus.delivered ||
+              s.status == OrderStatus.failed,
+        )
         .toList();
     final upcoming = shift.routeStops
         .where((s) => s.status == OrderStatus.transit && s.num != order.num)
@@ -66,54 +68,36 @@ class _HomeNextStopCard extends StatelessWidget {
                   color: AppColors.failedBg,
                   borderRadius: BorderRadius.circular(AppCircular.r20),
                 ),
-                child: Text(
-                  LocaleKeys.homeStopCount.tr(namedArgs: {
-                    'current': '${shift.currentStopNumber}',
-                    'total': '${shift.totalStops}',
-                  }),
-                  style: const TextStyle()
-                      .setColor(AppColors.stopCountText)
-                      .s12
-                      .semiBold,
-                ).paddingSymmetric(
-                  horizontal: AppPadding.pW12,
-                  vertical: AppPadding.pH4,
-                ),
+                child:
+                    Text(
+                      LocaleKeys.homeStopCount.tr(
+                        namedArgs: {
+                          'current': '${shift.currentStopNumber}',
+                          'total': '${shift.totalStops}',
+                        },
+                      ),
+                      style: const TextStyle()
+                          .setColor(AppColors.stopCountText)
+                          .s12
+                          .semiBold,
+                    ).paddingSymmetric(
+                      horizontal: AppPadding.pW12,
+                      vertical: AppPadding.pH4,
+                    ),
               ),
             ],
           ).paddingOnly(
             left: AppPadding.pW20,
             top: AppPadding.pH16,
             right: AppPadding.pW20,
-            bottom: AppPadding.pH12,
+            // 8px less than before — [_HomeStopProgress] pads its tap target by
+            // 8px on top, so the bar keeps its original 12px gap from the header.
+            bottom: AppPadding.pH4,
           ),
           // ── progress segments (one per route stop) ──
-          // Each segment fades its colour when a stop closes (grey → green/red).
-          // Keyed by stop id so a closing stop animates *its own* segment even
-          // as the ordered list reshuffles; under Reduce Motion the colour just
-          // snaps (Duration.zero). The `_segColor` mapping is unchanged.
-          Row(
-            spacing: AppSize.sW8,
-            children: [
-              for (final s in orderedStops)
-                TweenAnimationBuilder<Color?>(
-                  key: ValueKey(s.num),
-                  tween: ColorTween(
-                    begin: _segColor(s, order),
-                    end: _segColor(s, order),
-                  ),
-                  duration:
-                      AppMotion.reduced(context) ? Duration.zero : AppMotion.fill,
-                  curve: AppMotion.ease,
-                  builder: (context, color, _) =>
-                      _HomeProgressSeg(color ?? _segColor(s, order)),
-                ),
-            ],
-          ).paddingOnly(
-            left: AppPadding.pW20,
-            right: AppPadding.pW20,
-            bottom: AppPadding.pH16,
-          ),
+          // Each segment fades its colour when a stop closes (grey → green/red),
+          // and a tap explains the colour in a small tooltip. See the widget.
+          _HomeStopProgress(stops: orderedStops, current: order),
           // ── map strip ──
           MapView(height: AppSize.sH120, showHairlines: true),
           // ── order info ──
@@ -127,7 +111,8 @@ class _HomeNextStopCard extends StatelessWidget {
                     LocaleKeys.homeOrderNo.tr(
                       namedArgs: {'num': order.num.replaceAll('#', '')},
                     ),
-                    style: const TextStyle().setMainTextColor.s16.semiBold.tabular,
+                    style:
+                        const TextStyle().setMainTextColor.s16.semiBold.tabular,
                   ),
                   _PayPill(isCod: isCod),
                 ],
@@ -151,10 +136,7 @@ class _HomeNextStopCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       order.fullAddress,
-                      style: const TextStyle()
-                          .setTertiaryColor
-                          .s14
-                          .regular
+                      style: const TextStyle().setTertiaryColor.s14.regular
                           .withHeight(1.5),
                     ),
                   ),
@@ -173,7 +155,9 @@ class _HomeNextStopCard extends StatelessWidget {
                       ),
                       4.szW,
                       Text(
-                        LocaleKeys.promisedAt.tr(namedArgs: {'time': order.due!}),
+                        LocaleKeys.promisedAt.tr(
+                          namedArgs: {'time': order.due!},
+                        ),
                         style: const TextStyle().setTertiaryColor.s12.regular,
                       ),
                     ],
@@ -217,7 +201,9 @@ class _HomeNextStopCard extends StatelessWidget {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: AppColors.inkFill,
-                      borderRadius: BorderRadius.circular(AppCircular.r15), // radii exempt
+                      borderRadius: BorderRadius.circular(
+                        AppCircular.r15,
+                      ), // radii exempt
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -239,25 +225,27 @@ class _HomeNextStopCard extends StatelessWidget {
                 ).onClick(onTap: onViewOrder),
               ),
               12.szW,
+              // Neutral tiles (ink glyph, white fill, hairline) matching the
+              // header actions — kept off the status hues so call/chat never read
+              // as the failed-red / delivered-green states.
               _HomeSquareIconButton(
                 icon: AppAssets.svg.phone,
-                iconColor: AppColors.brand,
+                iconColor: AppColors.textPrimary,
                 size: AppSize.sH52,
                 iconSize: 21.h, // mockup glyph 21px (off the 4px grid)
                 radius: AppCircular.r15,
                 background: AppColors.surface,
-                border: AppColors.brand,
-                borderWidth: 1.5,
+                border: AppColors.iconButtonBorder,
               ),
               12.szW,
               _HomeSquareIconButton(
                 icon: AppAssets.svg.chat,
-                iconColor: AppColors.greenAccent,
+                iconColor: AppColors.textPrimary,
                 size: AppSize.sH52,
                 iconSize: 21.h,
                 radius: AppCircular.r15,
-                background: AppColors.deliveredBg,
-                border: AppColors.deliveredBorder,
+                background: AppColors.surface,
+                border: AppColors.iconButtonBorder,
               ),
             ],
           ).paddingOnly(
@@ -269,16 +257,6 @@ class _HomeNextStopCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  /// Progress-segment colour: delivered → green, failed → red, the current stop
-  /// → ink (kept distinct from the failed red so two reds never sit on the same
-  /// bar), upcoming stops → the faint track.
-  Color _segColor(Order stop, Order current) {
-    if (stop.status == OrderStatus.delivered) return AppColors.greenAccent;
-    if (stop.status == OrderStatus.failed) return AppColors.failedText;
-    if (stop.num == current.num) return AppColors.inkFill;
-    return AppColors.borderDefault;
   }
 }
 
@@ -300,10 +278,7 @@ class _PayPill extends StatelessWidget {
             .setColor(isCod ? AppColors.postponedText : AppColors.deliveredText)
             .s12
             .bold,
-      ).paddingSymmetric(
-        horizontal: AppPadding.pW12,
-        vertical: AppPadding.pH4,
-      ),
+      ).paddingSymmetric(horizontal: AppPadding.pW12, vertical: AppPadding.pH4),
     );
   }
 }
@@ -335,8 +310,9 @@ class _HomeRouteCompleteCard extends StatelessWidget {
               begin: AppMotion.reduced(context) ? 1.0 : 0.0,
               end: 1.0,
             ),
-            duration:
-                AppMotion.reduced(context) ? Duration.zero : AppMotion.settle,
+            duration: AppMotion.reduced(context)
+                ? Duration.zero
+                : AppMotion.settle,
             curve: AppMotion.ease,
             builder: (context, t, child) => Opacity(
               opacity: t.clamp(0.0, 1.0),
@@ -369,20 +345,20 @@ class _HomeRouteCompleteCard extends StatelessWidget {
           Text(
             LocaleKeys.homeRouteCompleteSub.tr(),
             textAlign: TextAlign.center,
-            style: const TextStyle()
-                .setSecondaryColor
-                .s14
-                .regular
-                .withHeight(1.5),
+            style: const TextStyle().setSecondaryColor.s14.regular.withHeight(
+              1.5,
+            ),
           ),
           // Warm end-of-day tally — how many stops and how much cash.
           8.szH,
           Text(
-            LocaleKeys.homeRouteCompleteStats.tr(namedArgs: {
-              'done': '${shift.deliveredCount}',
-              'total': '${shift.totalStops}',
-              'cash': formatThousands(shift.collectedEgp),
-            }),
+            LocaleKeys.homeRouteCompleteStats.tr(
+              namedArgs: {
+                'done': '${shift.deliveredCount}',
+                'total': '${shift.totalStops}',
+                'cash': formatThousands(shift.collectedEgp),
+              },
+            ),
             textAlign: TextAlign.center,
             style: const TextStyle().setTertiaryColor.s12.bold,
           ),

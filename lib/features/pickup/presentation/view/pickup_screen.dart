@@ -5,7 +5,13 @@ part of '../imports/pickup_imports.dart';
 /// it's a focused task screen with a sticky confirm bar. Fully static, so no
 /// ViewController is needed.
 class PickupScreen extends StatefulWidget {
-  const PickupScreen({super.key, this.onConfirm, this.onSelectTab});
+  const PickupScreen({
+    super.key,
+    this.onConfirm,
+    this.onSelectTab,
+    this.onOpenNotifications,
+    this.onOpenSearch,
+  });
 
   /// Confirms pickup (all orders → "in transit"). Wired to the flow later.
   final VoidCallback? onConfirm;
@@ -13,6 +19,10 @@ class PickupScreen extends StatefulWidget {
   /// When provided the screen is a shell tab: it renders the shared bottom nav
   /// (instead of a bare home-indicator) so it behaves like a normal tab page.
   final ValueChanged<NavTab>? onSelectTab;
+
+  /// Unified-header actions (shell-tab mode).
+  final VoidCallback? onOpenNotifications;
+  final VoidCallback? onOpenSearch;
 
   /// Total time the entrance stagger is allowed to span across the whole batch.
   static const Duration _totalStagger = Duration(milliseconds: 300);
@@ -72,11 +82,12 @@ class _PickupScreenState extends State<PickupScreen> {
     final onSelectTab = widget.onSelectTab;
     // The batch waiting at the branch = the shift's in-transit orders (the ones
     // still to deliver), so pickup shows the same orders as the rest of the app.
-    final orders = ShiftController.instance.orders
-        .where((o) => o.status == OrderStatus.transit)
-        .map(orderToFlow)
-        .toList()
-      ..sort((a, b) => a.num.compareTo(b.num));
+    final orders =
+        ShiftController.instance.orders
+            .where((o) => o.status == OrderStatus.transit)
+            .map(orderToFlow)
+            .toList()
+          ..sort((a, b) => a.num.compareTo(b.num));
     // Once the batch has been carried (accepted) there is nothing left at the
     // branch — the page becomes an empty state instead of the list + CTA.
     final carried = ShiftController.instance.accepted || orders.isEmpty;
@@ -88,14 +99,23 @@ class _PickupScreenState extends State<PickupScreen> {
           bottom: false,
           child: Column(
             children: [
-              ValueListenableBuilder<bool>(
-                valueListenable: _scrolled,
-                builder: (_, scrolled, _) => _PickupHeader(
-                  count: carried ? 0 : orders.length,
-                  showBack: onSelectTab == null,
-                  scrolled: scrolled,
+              // Shell tab: just the unified header (branch identity dropped —
+              // the header already carries the shift context). Standalone: the
+              // branch identity keeps its back button + scroll-fade.
+              if (onSelectTab != null)
+                AppHeader(
+                  onSearch: widget.onOpenSearch,
+                  onOpenNotifications: widget.onOpenNotifications,
+                )
+              else
+                ValueListenableBuilder<bool>(
+                  valueListenable: _scrolled,
+                  builder: (_, scrolled, _) => _PickupHeader(
+                    count: carried ? 0 : orders.length,
+                    showBack: true,
+                    scrolled: scrolled,
+                  ),
                 ),
-              ),
               if (carried)
                 const Expanded(child: _PickupEmptyState())
               else ...[
@@ -117,8 +137,10 @@ class _PickupScreenState extends State<PickupScreen> {
                       final order = orders[i - 1];
                       return _PickupCard(
                         order: order,
-                        entranceDelay:
-                            PickupScreen._staggerDelay(i - 1, orders.length),
+                        entranceDelay: PickupScreen._staggerDelay(
+                          i - 1,
+                          orders.length,
+                        ),
                       );
                     },
                   ),
@@ -153,18 +175,18 @@ class _PickupEmptyState extends StatelessWidget {
         children: [
           Image.asset(AppAssets.img.pickupEmpty, width: 180.w, height: 180.w),
           8.szH,
-          Text(LocaleKeys.pickupEmptyTitle.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle().setMainTextColor.s16.extraBold),
+          Text(
+            LocaleKeys.pickupEmptyTitle.tr(),
+            textAlign: TextAlign.center,
+            style: const TextStyle().setMainTextColor.s16.extraBold,
+          ),
           8.szH,
           Text(
             LocaleKeys.pickupEmptyDesc.tr(),
             textAlign: TextAlign.center,
-            style: const TextStyle()
-                .setSecondaryColor
-                .s14
-                .regular
-                .withHeight(1.5),
+            style: const TextStyle().setSecondaryColor.s14.regular.withHeight(
+              1.5,
+            ),
           ),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW32),
@@ -186,11 +208,9 @@ class _PickupCarrySheet extends StatelessWidget {
         children: [
           Text(
             LocaleKeys.pickupCarryBody.tr(namedArgs: {'count': '$count'}),
-            style: const TextStyle()
-                .setSecondaryColor
-                .s14
-                .regular
-                .withHeight(1.5),
+            style: const TextStyle().setSecondaryColor.s14.regular.withHeight(
+              1.5,
+            ),
           ),
           20.szH,
           Container(
@@ -210,8 +230,10 @@ class _PickupCarrySheet extends StatelessWidget {
                   width: AppSize.sW20,
                 ),
                 8.szW,
-                Text(LocaleKeys.pickupCarryConfirm.tr(),
-                    style: const TextStyle().setWhite.s16.bold),
+                Text(
+                  LocaleKeys.pickupCarryConfirm.tr(),
+                  style: const TextStyle().setWhite.s16.bold,
+                ),
               ],
             ),
           ).onClick(onTap: () => Navigator.of(context).pop(true)),
@@ -219,8 +241,10 @@ class _PickupCarrySheet extends StatelessWidget {
           Container(
             height: AppSize.sH52,
             alignment: Alignment.center,
-            child: Text(LocaleKeys.pickupCarryCancel.tr(),
-                style: const TextStyle().setSecondaryColor.s14.bold),
+            child: Text(
+              LocaleKeys.pickupCarryCancel.tr(),
+              style: const TextStyle().setSecondaryColor.s14.bold,
+            ),
           ).onClick(onTap: () => Navigator.of(context).pop(false)),
         ],
       ),

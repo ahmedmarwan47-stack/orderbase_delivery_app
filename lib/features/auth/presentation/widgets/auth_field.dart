@@ -8,11 +8,11 @@ const String _kEyeIcon = 'eye';
 
 /// Resolves an Auth glyph sentinel to its real AppAssets path.
 String _authGlyph(String name) => switch (name) {
-      _kStoreIcon => AppAssets.svg.store,
-      _kLockIcon => AppAssets.svg.lock,
-      _kEyeIcon => AppAssets.svg.eye,
-      _ => name,
-    };
+  _kStoreIcon => AppAssets.svg.store,
+  _kLockIcon => AppAssets.svg.lock,
+  _kEyeIcon => AppAssets.svg.eye,
+  _ => name,
+};
 
 /// The signature Orderbase input (DESIGN.md): a labeled field on a muted surface
 /// (#F4F3F0), 14px radius, 52px tall, a leading stroke glyph, and a **2px ink
@@ -34,6 +34,7 @@ class _AuthField extends StatefulWidget {
     this.tabular = false,
     this.trailing,
     this.labelTrailing,
+    this.compact = false,
   });
 
   final String label;
@@ -58,6 +59,10 @@ class _AuthField extends StatefulWidget {
   /// Widget aligned to the label row's end, e.g. a "نسيتها؟" link.
   final Widget? labelTrailing;
 
+  /// Tighter type scale (label 12 / input 14 instead of 14 / 16) for the
+  /// carded login form; leaves the field height untouched.
+  final bool compact;
+
   @override
   State<_AuthField> createState() => _AuthFieldState();
 }
@@ -80,8 +85,12 @@ class _AuthFieldState extends State<_AuthField> {
       children: [
         Row(
           children: [
-            Text(widget.label,
-                style: const TextStyle().setTertiaryColor.s14.bold),
+            Text(
+              widget.label,
+              style: widget.compact
+                  ? const TextStyle().setTertiaryColor.s12.bold
+                  : const TextStyle().setTertiaryColor.s14.bold,
+            ),
             if (widget.labelTrailing != null) ...[
               const Spacer(),
               widget.labelTrailing!,
@@ -93,10 +102,12 @@ class _AuthFieldState extends State<_AuthField> {
           listenable: Listenable.merge([_focus, _obscured]),
           builder: (context, _) {
             final active = _focus.hasFocus;
-            final obscureText =
-                widget.showToggle ? _obscured.value : widget.obscure;
-            var textStyle =
-                const TextStyle().setMainTextColor.s16.semiBold;
+            final obscureText = widget.showToggle
+                ? _obscured.value
+                : widget.obscure;
+            var textStyle = widget.compact
+                ? const TextStyle().setMainTextColor.s14.semiBold
+                : const TextStyle().setMainTextColor.s16.semiBold;
             if (widget.tabular) textStyle = textStyle.tabular;
             if (obscureText) textStyle = textStyle.copyWith(letterSpacing: 4);
 
@@ -111,7 +122,9 @@ class _AuthFieldState extends State<_AuthField> {
                 ),
               ),
               padding: EdgeInsetsDirectional.only(
-                  start: AppPadding.pW12, end: AppPadding.pW12),
+                start: AppPadding.pW12,
+                end: AppPadding.pW12,
+              ),
               child: Row(
                 children: [
                   IconWidget(
@@ -138,10 +151,15 @@ class _AuthFieldState extends State<_AuthField> {
                         isCollapsed: true,
                         border: InputBorder.none,
                         hintText: widget.hint,
-                        hintStyle: const TextStyle()
-                            .setColor(AppColors.chipCountMuted)
-                            .s16
-                            .regular,
+                        hintStyle: widget.compact
+                            ? const TextStyle()
+                                  .setColor(AppColors.chipCountMuted)
+                                  .s14
+                                  .regular
+                            : const TextStyle()
+                                  .setColor(AppColors.chipCountMuted)
+                                  .s16
+                                  .regular,
                       ),
                     ),
                   ),
@@ -189,16 +207,24 @@ class _EyeToggle extends StatelessWidget {
   }
 }
 
-/// A small danger-red text link ("نسيت كلمة المرور؟" / "نسيتها؟").
+/// A small danger-red text link ("نسيت كلمة المرور؟" / "نسيتها؟"). [compact]
+/// drops it to 12px for the tighter carded login form.
 class _AuthLink extends StatelessWidget {
-  const _AuthLink({required this.label, required this.onTap});
+  const _AuthLink({
+    required this.label,
+    required this.onTap,
+    this.compact = false,
+  });
   final String label;
   final VoidCallback onTap;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    return Text(label,
-            style: const TextStyle().setColor(AppColors.dangerAccent).s14.bold)
-        .onClick(onTap: onTap);
+    final base = const TextStyle().setColor(AppColors.dangerAccent).bold;
+    return Text(
+      label,
+      style: compact ? base.s12 : base.s14,
+    ).onClick(onTap: onTap);
   }
 }

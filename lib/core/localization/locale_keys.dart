@@ -118,6 +118,11 @@ abstract final class LocaleKeys {
   static const String homeStatFailed = 'home_stat_failed';
   static const String homeStatTotalCollected = 'home_stat_total_collected';
   static const String homeEgp = 'home_egp';
+  // Progress-bar segment tooltips (why a bar is green / red / black / grey).
+  static const String homeProgressDelivered = 'home_progress_delivered';
+  static const String homeProgressFailed = 'home_progress_failed';
+  static const String homeProgressCurrent = 'home_progress_current';
+  static const String homeProgressUpcoming = 'home_progress_upcoming';
 
   // Home variants (1b Glance / 1c Compact / 2a Flat)
   static const String homeOnline = 'home_online';
@@ -159,6 +164,12 @@ abstract final class LocaleKeys {
   static const String pickupCarryCancel = 'pickup_carry_cancel';
   static const String pickupEmptyTitle = 'pickup_empty_title';
   static const String pickupEmptyDesc = 'pickup_empty_desc';
+  // Dispatch announcement sheet (shown once on app open — dismissible).
+  static const String pickupDispatchTitle = 'pickup_dispatch_title';
+  static const String pickupDispatchBanner = 'pickup_dispatch_banner';
+  static const String pickupDispatchBody = 'pickup_dispatch_body';
+  static const String pickupDispatchCarry = 'pickup_dispatch_carry';
+  static const String pickupDispatchLater = 'pickup_dispatch_later';
 
   // ── order_flow ──
   static const String orderDetailBack = 'order_detail_back';

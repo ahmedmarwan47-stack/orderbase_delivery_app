@@ -12,6 +12,7 @@ class _HomeStatCard extends StatelessWidget {
     this.valueColor = AppColors.textPrimary,
     this.valueSize,
     this.onTap,
+    this.dark = false,
   });
 
   final String icon;
@@ -26,6 +27,10 @@ class _HomeStatCard extends StatelessWidget {
   /// Opens the page this KPI summarises (Orders slice / settlement).
   final VoidCallback? onTap;
 
+  /// Slate "cash" treatment (matching the settlement cash card) — used for the
+  /// money KPI so it reads as cash, not the green delivered-success state.
+  final bool dark;
+
   @override
   Widget build(BuildContext context) {
     final valueStyle = const TextStyle()
@@ -33,14 +38,18 @@ class _HomeStatCard extends StatelessWidget {
         .extraBold
         .tabular
         .withHeight(1)
-        .copyWith(fontSize: valueSize ?? 28.sp); // 28px is on the 4px grid, no token
+        .copyWith(
+          fontSize: valueSize ?? 24.sp,
+        ); // was 28px — big-font trim sweep
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppCircular.r18), // radii exempt from 4px rule
-        border: Border.all(color: AppColors.borderCardFaint),
-        boxShadow: AppShadows.card,
+        color: dark ? AppColors.paymentCardBg : AppColors.surface,
+        borderRadius: BorderRadius.circular(
+          AppCircular.r18,
+        ), // radii exempt from 4px rule
+        border: dark ? null : Border.all(color: AppColors.borderCardFaint),
+        boxShadow: dark ? null : AppShadows.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,7 +80,12 @@ class _HomeStatCard extends StatelessWidget {
                   : [
                       TextSpan(
                         text: ' ${suffixKey!.tr()}',
-                        style: const TextStyle().s14.bold,
+                        style: const TextStyle()
+                            .setColor(
+                              dark ? AppColors.paymentSuffix : valueColor,
+                            )
+                            .s14
+                            .bold,
                       ),
                     ],
             ),
@@ -79,7 +93,12 @@ class _HomeStatCard extends StatelessWidget {
           4.szH,
           Text(
             labelKey.tr(),
-            style: const TextStyle().setSecondaryColor.s12.regular,
+            style: const TextStyle()
+                .setColor(
+                  dark ? AppColors.paymentLabel : AppColors.textSecondary,
+                )
+                .s12
+                .regular,
           ),
         ],
       ).paddingAll(AppPadding.pH16),

@@ -1,54 +1,29 @@
 part of '../imports/queue_imports.dart';
 
-/// Browse header (1b/1d): count subtitle + search button, then the filter chips.
-/// The page-name title is dropped here — this is the Orders *tab*, already named
-/// by the tab bar. The header is transparent while pinned and fades in its
-/// surface background + hairline once the browse list scrolls beneath it.
+/// Browse sub-head (1b/1d): the "date · N orders" heading, then the filter
+/// chips — placed in the page body, directly beneath the unified [AppHeader]
+/// (search now lives in that header). Sits on the page ground (no bar/border).
 class _QueueBrowseHeader extends StatelessWidget {
   const _QueueBrowseHeader({required this.vc});
   final QueueViewController vc;
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Fixed 56pt row (iOS large-title convention): title + search.
-          SizedBox(
-            height: 56.h,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Text(
-                    LocaleKeys.queueSubtitle.tr(
-                        namedArgs: {'count': arabicDigits(vc.active.length)}),
-                    style: const TextStyle().setMainTextColor.s16.extraBold,
-                  ),
-                ),
-                12.szW,
-                _SquareIconButton(
-                  icon: AppAssets.svg.search,
-                  onTap: vc.openSearch,
-                  size: AppSize.sH40,
-                  label: LocaleKeys.a11ySearch.tr(),
-                ),
-              ],
-            ),
-          ).paddingOnlyDirectional(start: AppPadding.pW20, end: AppPadding.pW20),
-          12.szH,
-          // Chips run edge-to-edge (their own internal padding) so an off-screen
-          // chip bleeds past the edge, signalling there's more to scroll.
-          _QueueFilterChips(vc: vc),
-        ],
-      ).paddingOnly(top: AppPadding.pH8, bottom: AppPadding.pH16),
-    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          LocaleKeys.queueSubtitle.tr(
+            namedArgs: {'count': arabicDigits(vc.active.length)},
+          ),
+          style: const TextStyle().setMainTextColor.s14.extraBold,
+        ).paddingOnlyDirectional(start: AppPadding.pW20, end: AppPadding.pW20),
+        12.szH,
+        // Chips run edge-to-edge (their own internal padding) so an off-screen
+        // chip bleeds past the edge, signalling there's more to scroll.
+        _QueueFilterChips(vc: vc),
+      ],
+    ).paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH16);
   }
 }
 

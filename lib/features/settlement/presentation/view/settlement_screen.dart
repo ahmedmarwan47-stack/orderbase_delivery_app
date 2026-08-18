@@ -10,6 +10,8 @@ class SettlementScreen extends StatefulWidget {
     this.data,
     this.startStage = SettlementStage.open,
     this.onSelectTab,
+    this.onOpenNotifications,
+    this.onOpenSearch,
   });
 
   /// Defaults to [shiftSettlement] (built live from today's shift) when null, so
@@ -21,6 +23,10 @@ class SettlementScreen extends StatefulWidget {
   /// When provided the screen is a shell tab: it renders the shared bottom nav
   /// and drops the standalone back link so it behaves like a normal tab page.
   final ValueChanged<NavTab>? onSelectTab;
+
+  /// Unified-header actions (shell-tab mode).
+  final VoidCallback? onOpenNotifications;
+  final VoidCallback? onOpenSearch;
 
   @override
   State<SettlementScreen> createState() => _SettlementScreenState();
@@ -49,10 +55,16 @@ class _SettlementScreenState extends State<SettlementScreen> {
         builder: (_, _) => ValueListenableBuilder<SettlementStage>(
           valueListenable: _vc.stage,
           builder: (_, stage, _) => switch (stage) {
-            SettlementStage.open =>
-              _SettlementOpenView(vc: _vc, onSelectTab: widget.onSelectTab),
-            SettlementStage.settled =>
-              _SettlementSettledView(vc: _vc, onSelectTab: widget.onSelectTab),
+            SettlementStage.open => _SettlementOpenView(
+              vc: _vc,
+              onSelectTab: widget.onSelectTab,
+              onOpenNotifications: widget.onOpenNotifications,
+              onOpenSearch: widget.onOpenSearch,
+            ),
+            SettlementStage.settled => _SettlementSettledView(
+              vc: _vc,
+              onSelectTab: widget.onSelectTab,
+            ),
           },
         ),
       ),

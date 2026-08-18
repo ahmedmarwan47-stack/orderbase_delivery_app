@@ -11,6 +11,7 @@ class QueueViewController {
     List<Order>? orders,
     this.onSelectTab,
     this.onOpenOrder,
+    this.onOpenNotifications,
     bool startSearching = false,
     String initialQuery = '',
     QueueFilter initialFilter = QueueFilter.all,
@@ -36,6 +37,9 @@ class QueueViewController {
   /// Both null on the standalone `/queue` route (opens detail directly).
   final void Function(NavTab)? onSelectTab;
   final void Function(FlowOrder)? onOpenOrder;
+
+  /// Opens the notifications screen from the unified header's bell (shell mode).
+  final VoidCallback? onOpenNotifications;
 
   List<Order> get orders => _staticOrders ?? ShiftController.instance.orders;
 

@@ -110,7 +110,7 @@ class _PickupBanner extends StatelessWidget {
               LocaleKeys.pickupBanner.tr(namedArgs: {'count': '$count'}),
               style: const TextStyle()
                   .setColor(AppColors.pickupBannerText)
-                  .s14
+                  .s12
                   .semiBold
                   .withHeight(1.5),
             ),

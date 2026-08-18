@@ -67,12 +67,13 @@ class _HomeTodayStats extends StatelessWidget {
               ),
               Expanded(
                 child: _HomeStatCard(
+                  dark: true, // slate "cash" card, not green success
                   icon: AppAssets.svg.cash,
-                  iconColor: AppColors.greenAccent,
-                  tile: AppColors.deliveredBg,
+                  iconColor: AppColors.cashBright,
+                  tile: AppColors.paymentTile,
                   value: formatThousands(shift.collectedEgp),
                   suffixKey: LocaleKeys.homeEgp,
-                  valueColor: AppColors.greenAccent,
+                  valueColor: AppColors.surface,
                   valueSize: FontSizeManager.s20,
                   labelKey: LocaleKeys.homeStatTotalCollected,
                   onTap: onOpenSettlement,

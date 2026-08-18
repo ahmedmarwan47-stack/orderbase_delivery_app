@@ -36,7 +36,6 @@ class _OutlineActionButton extends StatelessWidget {
     required this.fg,
     required this.border,
     required this.background,
-    this.borderWidth = 1,
   });
 
   final String icon;
@@ -44,7 +43,6 @@ class _OutlineActionButton extends StatelessWidget {
   final Color fg;
   final Color border;
   final Color background;
-  final double borderWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +51,7 @@ class _OutlineActionButton extends StatelessWidget {
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(AppCircular.r13),
-        border: Border.all(color: border, width: borderWidth),
+        border: Border.all(color: border),
       ),
       alignment: Alignment.center,
       child: Row(
