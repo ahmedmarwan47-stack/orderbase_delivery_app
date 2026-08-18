@@ -153,7 +153,7 @@ class _SettlementHeader extends StatelessWidget {
   }
 }
 
-/// Amber "غير مُسوّاة" (not settled) status pill with a leading amber dot.
+/// Amber "غير مُسوّاة" (not settled) status pill.
 class _NotSettledPill extends StatelessWidget {
   const _NotSettledPill();
 
@@ -164,23 +164,9 @@ class _NotSettledPill extends StatelessWidget {
         color: AppColors.heroCodPillBg,
         borderRadius: BorderRadius.circular(AppCircular.r8),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 7.w, // 7px status dot — no matching AppSize token
-            height: 7.h,
-            decoration: const BoxDecoration(
-              color: AppColors.postponedText,
-              shape: BoxShape.circle,
-            ),
-          ),
-          6.szW,
-          Text(
-            LocaleKeys.settlementNotSettled.tr(),
-            style: const TextStyle().setColor(AppColors.postponedText).s12.bold,
-          ),
-        ],
+      child: Text(
+        LocaleKeys.settlementNotSettled.tr(),
+        style: const TextStyle().setColor(AppColors.postponedText).s12.bold,
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
   }

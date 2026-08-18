@@ -12,12 +12,6 @@ class _StatusBadge extends StatelessWidget {
       OrderStatus.transit => _pill(
           bg: AppColors.transitBg,
           fg: AppColors.transitText,
-          leading: Container(
-            width: AppSize.sW8,
-            height: AppSize.sH8,
-            decoration: const BoxDecoration(
-                color: AppColors.transitText, shape: BoxShape.circle),
-          ),
           text: LocaleKeys.statusTransit.tr(),
         ),
       OrderStatus.postponed => _pill(
@@ -64,7 +58,7 @@ class _StatusBadge extends StatelessWidget {
     required Color bg,
     required Color fg,
     Color? border,
-    required Widget leading,
+    Widget? leading,
     required String text,
   }) {
     return Container(
@@ -76,8 +70,7 @@ class _StatusBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          leading,
-          8.szW,
+          if (leading != null) ...[leading, 8.szW],
           Text(text, style: const TextStyle().setColor(fg).s12.bold),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),

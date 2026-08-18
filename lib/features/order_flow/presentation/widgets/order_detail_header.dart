@@ -19,23 +19,20 @@ class _OrderDetailHeader extends StatelessWidget {
     // Status pill styling + label by order state. `active` keeps the mockup's
     // solid-blue "transit" pill exactly; `done`/`failed` reuse the green/red
     // pale-pill tokens shared with the orders list and result screen.
-    final (Color pillBg, Color pillFg, Color dotColor, String pillLabel) =
+    final (Color pillBg, Color pillFg, String pillLabel) =
         switch (order.state) {
       FlowOrderState.active => (
           AppColors.transitBg,
           AppColors.transitText,
-          AppColors.surface,
           LocaleKeys.orderDetailStatusTransit.tr(),
         ),
       FlowOrderState.done => (
           AppColors.deliveredBg,
           AppColors.deliveredText,
-          AppColors.deliveredText,
           LocaleKeys.orderDetailStatusDone.tr(),
         ),
       FlowOrderState.failed => (
           AppColors.failedBg,
-          AppColors.failedText,
           AppColors.failedText,
           LocaleKeys.orderDetailStatusFailed.tr(),
         ),
@@ -83,50 +80,43 @@ class _OrderDetailHeader extends StatelessWidget {
                     ),
                   ],
                 ),
-                4.szH,
-                Text(
-                  order.dateLabel,
-                  textDirection: TextDirection.ltr,
-                  style: const TextStyle().setSecondaryColor.s14.regular,
-                ),
+                // COD note sits directly under the order ID (red).
+                if (order.cod) ...[
+                  4.szH,
+                  Text(
+                    LocaleKeys.orderDetailCodNote.tr(),
+                    style: const TextStyle()
+                        .setColor(AppColors.failedText)
+                        .s12
+                        .bold,
+                  ),
+                ],
+                // Appointment time, only when present, sits below.
+                if (order.dateLabel.isNotEmpty) ...[
+                  4.szH,
+                  Text(
+                    order.dateLabel,
+                    textDirection: TextDirection.ltr,
+                    style: const TextStyle().setSecondaryColor.s14.regular,
+                  ),
+                ],
               ],
             ),
           ),
           12.szW,
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: pillBg,
-                  borderRadius: BorderRadius.circular(AppCircular.r8),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _Dot(color: dotColor, size: 7),
-                    8.szW,
-                    Text(
-                      pillLabel,
-                      style: const TextStyle().setColor(pillFg).s12.bold,
-                    ),
-                  ],
-                ).paddingSymmetric(
-                  horizontal: AppPadding.pW8,
-                  vertical: AppPadding.pH4,
-                ),
-              ),
-              if (order.cod) ...[
-                8.szH,
-                Text(
-                  LocaleKeys.orderDetailCodNote.tr(),
-                  style: const TextStyle()
-                      .setColor(AppColors.failedText)
-                      .s12
-                      .bold,
-                ),
-              ],
-            ],
+          // Status badge — a single element (no dot), vertically centered.
+          Container(
+            decoration: BoxDecoration(
+              color: pillBg,
+              borderRadius: BorderRadius.circular(AppCircular.r8),
+            ),
+            child: Text(
+              pillLabel,
+              style: const TextStyle().setColor(pillFg).s12.bold,
+            ).paddingSymmetric(
+              horizontal: AppPadding.pW12,
+              vertical: AppPadding.pH4,
+            ),
           ),
         ],
       ).paddingOnly(
