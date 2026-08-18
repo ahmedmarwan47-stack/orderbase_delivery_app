@@ -104,6 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: _AuthLink(
             label: LocaleKeys.authForgotLink.tr(),
             onTap: _openForgot,
+            compact: true,
           ),
         ),
         20.szH,
