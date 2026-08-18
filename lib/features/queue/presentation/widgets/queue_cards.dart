@@ -10,7 +10,7 @@ class _QueueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isTransit = order.status == OrderStatus.transit;
-    return Container(
+    final Widget card = Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppCircular.r16),
@@ -75,13 +75,18 @@ class _QueueCard extends StatelessWidget {
               ),
             ],
           ),
-          if (order.cod != null) ...[
+          // Cash-to-collect only matters while the order is still out for
+          // delivery; once handed off it's already collected, so drop the row.
+          if (order.cod != null && isTransit) ...[
             12.szH,
             _CodRow(amount: order.cod!),
           ],
         ],
       ).paddingAll(AppPadding.pH16),
     ).onClick(onTap: onTap);
+    // Completed (handed off / closed) orders are de-emphasised — just the status
+    // check badge, dimmed a little.
+    return isTransit ? card : Opacity(opacity: 0.6, child: card);
   }
 }
 

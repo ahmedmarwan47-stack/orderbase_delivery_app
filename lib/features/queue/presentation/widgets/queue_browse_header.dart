@@ -41,16 +41,13 @@ class _QueueBrowseHeader extends StatelessWidget {
                 ),
               ],
             ),
-          ),
+          ).paddingOnlyDirectional(start: AppPadding.pW20, end: AppPadding.pW20),
           12.szH,
+          // Chips run edge-to-edge (their own internal padding) so an off-screen
+          // chip bleeds past the edge, signalling there's more to scroll.
           _QueueFilterChips(vc: vc),
         ],
-      ).paddingOnlyDirectional(
-        start: AppPadding.pW20,
-        end: AppPadding.pW20,
-        top: AppPadding.pH8,
-        bottom: AppPadding.pH16,
-      ),
+      ).paddingOnly(top: AppPadding.pH8, bottom: AppPadding.pH16),
     );
   }
 }

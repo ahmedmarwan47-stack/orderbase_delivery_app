@@ -12,6 +12,8 @@ class _QueueFilterChips extends StatelessWidget {
       valueListenable: vc.filter,
       builder: (_, selected, _) => SingleChildScrollView(
         scrollDirection: Axis.horizontal,
+        padding: EdgeInsetsDirectional.only(
+            start: AppPadding.pW20, end: AppPadding.pW20),
         child: Row(
           spacing: AppSize.sW8,
           children: [

@@ -28,7 +28,7 @@ class SettlementScreen extends StatefulWidget {
 
 class _SettlementScreenState extends State<SettlementScreen> {
   late final SettlementController _vc = SettlementController(
-    data: widget.data ?? shiftSettlement,
+    data: widget.data,
     startStage: widget.startStage,
   );
 
@@ -42,14 +42,19 @@ class _SettlementScreenState extends State<SettlementScreen> {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: ValueListenableBuilder<SettlementStage>(
-        valueListenable: _vc.stage,
-        builder: (_, stage, _) => switch (stage) {
-          SettlementStage.open =>
-            _SettlementOpenView(vc: _vc, onSelectTab: widget.onSelectTab),
-          SettlementStage.settled =>
-            _SettlementSettledView(vc: _vc, onSelectTab: widget.onSelectTab),
-        },
+      // Rebuild as the shift mutates so the live settlement figures stay current
+      // (the controller reads shift data live; this drives the redraw).
+      child: AnimatedBuilder(
+        animation: ShiftController.instance,
+        builder: (_, _) => ValueListenableBuilder<SettlementStage>(
+          valueListenable: _vc.stage,
+          builder: (_, stage, _) => switch (stage) {
+            SettlementStage.open =>
+              _SettlementOpenView(vc: _vc, onSelectTab: widget.onSelectTab),
+            SettlementStage.settled =>
+              _SettlementSettledView(vc: _vc, onSelectTab: widget.onSelectTab),
+          },
+        ),
       ),
     );
   }

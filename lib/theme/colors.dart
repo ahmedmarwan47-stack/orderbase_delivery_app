@@ -85,13 +85,14 @@ abstract final class AppColors {
   static const itemDivider = Color(0xFFF5F4F1);
   static const summaryDivider = Color(0xFFEAE9E5); // divider inside the result summary card
 
-  // Cash / COD payment card — deep cash-green (NOT black; full black `inkFill`
-  // is reserved for primary buttons so the two never compete).
-  static const paymentCardBg = Color(0xFF4E6B60); // soft, low-impact muted green
-  static const paymentLabel = Color(0xFFB7D9C4); // soft green label on the card
-  static const paymentSuffix = Color(0xFFCDEBDA); // "جم" suffix on the card
+  // Cash / COD payment card — neutral slate. NOT black (reserved for primary
+  // buttons) and deliberately OUTSIDE the four status hues so "money" never
+  // reads as the green "delivered" status.
+  static const paymentCardBg = Color(0xFF4C535D); // neutral slate
+  static const paymentLabel = Color(0xFFB8BDC6); // soft light-slate label
+  static const paymentSuffix = Color(0xFFD2D6DD); // "جم" suffix on the card
   static const paymentTile = Color(0x26FFFFFF); // rgba(255,255,255,.15) icon tile
-  static const cashBright = Color(0xFFEAFBF1); // near-white cash glyph on green
+  static const cashBright = Color(0xFFEDEFF3); // near-white cash glyph on slate
 
   // Timeline (order route)
   static const timelineRing = Color(0xFFF7D7D6); // ring around the active red dot

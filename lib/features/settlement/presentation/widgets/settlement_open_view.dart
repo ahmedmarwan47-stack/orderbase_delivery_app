@@ -116,7 +116,7 @@ class _SettlementHeader extends StatelessWidget {
         ),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (showBack) ...[
             const HeaderBackButton(),

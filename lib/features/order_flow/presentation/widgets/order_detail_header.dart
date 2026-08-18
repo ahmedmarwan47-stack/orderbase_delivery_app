@@ -54,7 +54,7 @@ class _OrderDetailHeader extends StatelessWidget {
         ),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const HeaderBackButton(),
           12.szW,
@@ -132,8 +132,8 @@ class _OrderDetailHeader extends StatelessWidget {
       ).paddingOnly(
         left: AppPadding.pW20,
         right: AppPadding.pW20,
-        top: AppPadding.pH8,
-        bottom: AppPadding.pH16,
+        top: AppPadding.pH12,
+        bottom: AppPadding.pH12,
       ),
     );
   }

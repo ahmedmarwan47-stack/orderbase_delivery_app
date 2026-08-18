@@ -153,6 +153,12 @@ abstract final class LocaleKeys {
   static const String pickupPayPaid = 'pickup_pay_paid';
   static const String pickupConfirm = 'pickup_confirm';
   static const String pickupConfirmHint = 'pickup_confirm_hint';
+  static const String pickupCarryTitle = 'pickup_carry_title';
+  static const String pickupCarryBody = 'pickup_carry_body';
+  static const String pickupCarryConfirm = 'pickup_carry_confirm';
+  static const String pickupCarryCancel = 'pickup_carry_cancel';
+  static const String pickupEmptyTitle = 'pickup_empty_title';
+  static const String pickupEmptyDesc = 'pickup_empty_desc';
 
   // ── order_flow ──
   static const String orderDetailBack = 'order_detail_back';

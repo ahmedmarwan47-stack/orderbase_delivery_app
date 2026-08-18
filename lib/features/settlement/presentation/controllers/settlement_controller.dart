@@ -8,13 +8,21 @@ enum SettlementStage { open, settled }
 /// View. `settle()` closes the day (open → settled); `reset()` reopens it.
 class SettlementController {
   SettlementController({
-    required this.data,
+    SettlementData? data,
     SettlementStage startStage = SettlementStage.open,
     bool showBreakdown = true,
-  })  : stage = ValueNotifier(startStage),
+  })  : _override = data,
+        stage = ValueNotifier(startStage),
         showBreakdown = ValueNotifier(showBreakdown);
 
-  final SettlementData data;
+  /// Static override (DevGallery/preview). When null the data is recomputed
+  /// live from today's shift on every read, so the settlement tab stays current
+  /// as deliveries land (it used to be pushed fresh each time; as a persistent
+  /// tab it must read live instead of snapshotting once at construction).
+  final SettlementData? _override;
+
+  SettlementData get data => _override ?? shiftSettlement;
+
   final ValueNotifier<SettlementStage> stage;
 
   /// Whether the dark cash card renders its 3-column breakdown row.

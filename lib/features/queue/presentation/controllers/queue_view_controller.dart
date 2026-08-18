@@ -72,8 +72,27 @@ class QueueViewController {
   List<Order> get postponed =>
       orders.where((o) => o.status == OrderStatus.postponed).toList();
 
-  List<Order> get active =>
-      orders.where((o) => o.status != OrderStatus.postponed).toList();
+  /// Active orders, sorted by priority so in-progress ("في الطريق") rise to the
+  /// top and handed-off / closed orders sink to the bottom of the "all" list
+  /// (delivered last). Stable within a status group (keeps the source order).
+  List<Order> get active {
+    final list =
+        orders.where((o) => o.status != OrderStatus.postponed).toList();
+    final indexed = list.indexed.toList()
+      ..sort((a, b) {
+        final r = _statusRank(a.$2.status).compareTo(_statusRank(b.$2.status));
+        return r != 0 ? r : a.$1.compareTo(b.$1);
+      });
+    return [for (final e in indexed) e.$2];
+  }
+
+  /// Lower ranks list first: in-progress → failed → delivered (handed off last).
+  int _statusRank(OrderStatus s) => switch (s) {
+        OrderStatus.transit => 0,
+        OrderStatus.failed => 1,
+        OrderStatus.delivered => 2,
+        OrderStatus.postponed => 3,
+      };
 
   int countFor(QueueFilter f) => switch (f) {
         QueueFilter.all => active.length,

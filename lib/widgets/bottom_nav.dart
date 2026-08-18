@@ -48,8 +48,10 @@ class BottomNav extends StatelessWidget {
                     activeIcon: AppAssets.svg.ordersFilled),
                 _item(NavTab.pickup, AppAssets.svg.store,
                     LocaleKeys.navPickup.tr(),
-                    // Red dot while there are orders waiting at the branch.
-                    badge: ShiftController.instance.inProgress > 0),
+                    // Red dot only while there's still a batch to carry from the
+                    // branch (cleared once picked up / accepted).
+                    badge: !ShiftController.instance.accepted &&
+                        ShiftController.instance.inProgress > 0),
                 _item(NavTab.settlement, AppAssets.svg.wallet,
                     LocaleKeys.navSettlement.tr()),
                 _item(NavTab.more, AppAssets.svg.more, LocaleKeys.navMore.tr(),

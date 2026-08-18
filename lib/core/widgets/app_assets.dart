@@ -63,4 +63,5 @@ class _AppImages {
   String get mapStrip => 'assets/images/map_strip.svg';
   String get resultSuccess => 'assets/images/result/success.png';
   String get resultFailure => 'assets/images/result/failure.png';
+  String get pickupEmpty => 'assets/images/pickup_empty.png';
 }
