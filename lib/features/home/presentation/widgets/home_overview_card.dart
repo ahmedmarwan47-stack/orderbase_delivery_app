@@ -79,7 +79,7 @@ class _HomeOverviewCard extends StatelessWidget {
                     text: '22,500',
                     style: const TextStyle()
                         .setColor(AppColors.flatBlack)
-                        .s24
+                        .s20 // was s24 — big-font trim sweep
                         .extraBold
                         .tabular
                         .withHeight(1),

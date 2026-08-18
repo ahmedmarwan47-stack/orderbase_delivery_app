@@ -128,7 +128,7 @@ class _AmountField extends StatelessWidget {
 
     final amountStyle = const TextStyle()
         .setColor(amountColor)
-        .s28
+        .s24 // was s28 — big-font trim sweep
         .extraBold
         .withHeight(1)
         .tabular;
