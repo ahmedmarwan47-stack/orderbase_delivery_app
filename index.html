@@ -36,6 +36,22 @@
 
   <title>orderbase_delivery_app</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- This build ships no service worker. Proactively unregister any stale SW
+       (and drop its caches) left by an earlier deploy, so returning visitors
+       always load the latest version instead of a cached old build. -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (rs) {
+        rs.forEach(function (r) { r.unregister(); });
+      }).catch(function () {});
+      if (window.caches && caches.keys) {
+        caches.keys().then(function (ks) {
+          ks.forEach(function (k) { caches.delete(k); });
+        }).catch(function () {});
+      }
+    }
+  </script>
 </head>
 <body>
   <!--
