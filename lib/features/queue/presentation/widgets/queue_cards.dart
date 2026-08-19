@@ -35,10 +35,17 @@ class _QueueCard extends StatelessWidget {
                           style: const TextStyle().setMainTextColor.s14.semiBold,
                         ),
                         8.szW,
-                        // Payment type only — never a status pill. The delivery
-                        // status is already conveyed by the active filter and the
-                        // dimmed (completed) card, so the badge is dropped here.
-                        _PayLabel(prepaid: order.prepaid),
+                        // Payment type while the order is still out for delivery;
+                        // once it's closed, show its outcome instead (delivered =
+                        // success, failed = could-not-deliver) so a dimmed card
+                        // explains *why* it's dimmed.
+                        if (isTransit)
+                          _PayLabel(prepaid: order.prepaid)
+                        else
+                          _StatusBadge(
+                            status: order.status,
+                            returns: order.returns,
+                          ),
                       ],
                     ),
                     4.szH,
