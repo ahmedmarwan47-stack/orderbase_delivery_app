@@ -392,7 +392,7 @@
   "settlement_cash_in_hand": "The cash you're holding now",
   "settlement_breakdown_orders": "Orders value",
   "settlement_breakdown_wallet": "Change to wallet",
-  "settlement_breakdown_count": "Cash orders",
+  "settlement_breakdown_count": "Number of COD orders",
   "settlement_settled_title": "Settled",
   "settlement_settled_body": "The cashier received {cash} EGP and {count} orders were closed. The collection balance is now zero.",
   "settlement_summary_delivered": "Cash delivered",
