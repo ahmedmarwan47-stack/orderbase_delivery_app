@@ -12,31 +12,21 @@ class _QueueSearchHeader extends StatelessWidget {
         color: AppColors.surface,
         border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
         children: [
-          Row(
-            children: [
-              _SquareIconButton(
-                icon: AppAssets.svg.chevronRight,
-                onTap: () => _onBack(context),
-                size: AppSize.sH40,
-                label: LocaleKeys.a11yBack.tr(),
-              ),
-              12.szW,
-              Expanded(child: _SearchField(vc: vc)),
-            ],
+          _SquareIconButton(
+            icon: AppAssets.svg.chevronRight,
+            onTap: () => _onBack(context),
+            size: AppSize.sH40,
+            label: LocaleKeys.a11yBack.tr(),
           ),
-          12.szH,
-          Text(
-            LocaleKeys.searchScope.tr(),
-            style: const TextStyle().setHintColor.s12.regular.withHeight(1.5),
-          ),
+          12.szW,
+          Expanded(child: _SearchField(vc: vc)),
         ],
       ).paddingOnlyDirectional(
         start: AppPadding.pW20,
         end: AppPadding.pW20,
-        top: AppPadding.pH8,
+        top: AppPadding.pH12,
         bottom: AppPadding.pH16,
       ),
     );
@@ -87,13 +77,13 @@ class _SearchField extends StatelessWidget {
               onChanged: vc.onSearchChanged,
               textInputAction: TextInputAction.search,
               cursorColor: AppColors.brand,
-              style: const TextStyle().setMainTextColor.s16.bold,
+              style: const TextStyle().setMainTextColor.s16.semiBold,
               decoration: InputDecoration(
                 isCollapsed: true,
                 border: InputBorder.none,
                 hintText: LocaleKeys.searchHint.tr(),
                 hintStyle:
-                    const TextStyle().setColor(AppColors.chipCountMuted).s16.bold,
+                    const TextStyle().setColor(AppColors.chipCountMuted).s16.semiBold,
               ),
             ),
           ),

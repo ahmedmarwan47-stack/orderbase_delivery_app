@@ -431,6 +431,25 @@ abstract final class LocaleKeys {
   static const String failureNavCollection = 'failure_nav_collection';
   static const String failureNavAccount = 'failure_nav_account';
 
+  // ── returns-to-branch page (dedicated) ──
+  static const String failureReturnsPageTitle = 'failure_returns_page_title';
+  static const String failureReturnsInCustody = 'failure_returns_in_custody';
+  static const String failureReturnsHandedTo = 'failure_returns_handed_to';
+  static const String failureReturnsListLabel = 'failure_returns_list_label';
+  static const String failureReturnsConfirmTitle = 'failure_returns_confirm_title';
+  static const String failureReturnsConfirmIntro = 'failure_returns_confirm_intro';
+  static const String failureReturnsConfirmOrders = 'failure_returns_confirm_orders';
+  static const String failureReturnsConfirmPieces = 'failure_returns_confirm_pieces';
+  static const String failureReturnsConfirmBranch = 'failure_returns_confirm_branch';
+  static const String failureReturnsConfirmCta = 'failure_returns_confirm_cta';
+  static const String failureReturnsConfirmCancel = 'failure_returns_confirm_cancel';
+  static const String failureReturnsDoneTitle = 'failure_returns_done_title';
+  static const String failureReturnsDoneBody = 'failure_returns_done_body';
+  static const String failureOrdersUnitSingular = 'failure_orders_unit_singular';
+  static const String failureOrdersUnitPlural = 'failure_orders_unit_plural';
+  static const String failurePiecesUnitSingular = 'failure_pieces_unit_singular';
+  static const String failurePiecesUnitPlural = 'failure_pieces_unit_plural';
+
   // ── settlement (Settlement.dc.html) ──
   static const String settlementCashierDefault = 'settlement_cashier_default';
   static const String settlementBack = 'settlement_back';

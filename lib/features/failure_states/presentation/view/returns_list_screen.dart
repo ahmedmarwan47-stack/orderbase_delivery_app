@@ -1,11 +1,12 @@
 part of '../imports/failure_states_imports.dart';
 
-/// 1g · «الطلبات» with a «مرتجعات للفرع» banner — the active orders list showing
-/// what's in the courier's custody at the top (not in settlement). The banner
-/// disappears once the returns are handed to the branch. This lives in the
-/// active queue, not the settlement screen.
+/// The dedicated «مرتجعات للفرع» (returns to branch) page — a returns-focused
+/// screen showing what's in the courier's custody: a prominent count of orders
+/// to return, the list of returned orders, and the handover action. Confirming
+/// the handover (a confirmation sheet) hands the batch to the branch and flips
+/// the page to its empty state. Custody lives here, not in settlement.
 ///
-/// Public route entry point for the returns list state.
+/// Public route entry point for the returns page.
 class ReturnsListScreen extends StatelessWidget {
   const ReturnsListScreen({super.key});
 

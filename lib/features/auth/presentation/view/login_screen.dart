@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Text(
           LocaleKeys.authLoginTitle.tr(),
           textAlign: TextAlign.center,
-          style: const TextStyle().setMainTextColor.s18.extraBold,
+          style: const TextStyle().setMainTextColor.s18.bold,
         ),
         8.szH,
         Text(

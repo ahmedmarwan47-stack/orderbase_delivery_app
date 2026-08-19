@@ -32,7 +32,7 @@ class _SettlementSettledView extends StatelessWidget {
                     Text(
                       LocaleKeys.settlementSettledTitle.tr(),
                       textAlign: TextAlign.center,
-                      style: const TextStyle().setMainTextColor.s20.extraBold,
+                      style: const TextStyle().setMainTextColor.s20.bold,
                     ),
                     12.szH,
                     Text(
@@ -192,7 +192,7 @@ class _SummaryRow extends StatelessWidget {
           style: const TextStyle()
               .setColor(valueColor ?? AppColors.textPrimary)
               .s14
-              .bold,
+              .semiBold,
         ),
       ],
     );
@@ -234,13 +234,13 @@ class _BalanceCard extends StatelessWidget {
                     style: const TextStyle()
                         .setMainTextColor
                         .s20
-                        .extraBold
+                        .bold
                         .tabular,
                   ),
                   6.szW,
                   Text(
                     LocaleKeys.settlementCurrency.tr(),
-                    style: const TextStyle().setSecondaryColor.s14.bold,
+                    style: const TextStyle().setSecondaryColor.s14.semiBold,
                   ),
                 ],
               ),
@@ -268,7 +268,7 @@ class _ClosedPill extends StatelessWidget {
       ),
       child: Text(
         LocaleKeys.settlementClosed.tr(),
-        style: const TextStyle().setColor(AppColors.textSecondary).s12.bold,
+        style: const TextStyle().setColor(AppColors.textSecondary).s12.semiBold,
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
   }
@@ -292,7 +292,7 @@ class _BackHomeButton extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           LocaleKeys.settlementBackHome.tr(),
-          style: const TextStyle().setWhite.s14.bold,
+          style: const TextStyle().setWhite.s14.semiBold,
         ),
       ).onClick(onTap: onTap),
     );

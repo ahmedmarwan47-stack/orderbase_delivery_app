@@ -70,13 +70,15 @@ class _OrderDetailHeader extends StatelessWidget {
                       style: const TextStyle()
                           .setMainTextColor
                           .s16
-                          .extraBold
+                          .bold
                           .withHeight(20 / 16)
                           .tabular,
                     ),
                   ],
                 ),
-                // COD note sits directly under the order ID (red).
+                // COD note sits directly under the order ID (red). Capped at a
+                // single secondary line so the bar matches the unified header
+                // height (the appointment time lives in the detail body).
                 if (order.cod) ...[
                   4.szH,
                   Text(
@@ -84,16 +86,7 @@ class _OrderDetailHeader extends StatelessWidget {
                     style: const TextStyle()
                         .setColor(AppColors.failedText)
                         .s12
-                        .bold,
-                  ),
-                ],
-                // Appointment time, only when present, sits below.
-                if (order.dateLabel.isNotEmpty) ...[
-                  4.szH,
-                  Text(
-                    order.dateLabel,
-                    textDirection: TextDirection.ltr,
-                    style: const TextStyle().setSecondaryColor.s14.regular,
+                        .semiBold,
                   ),
                 ],
               ],
@@ -108,7 +101,7 @@ class _OrderDetailHeader extends StatelessWidget {
             ),
             child: Text(
               pillLabel,
-              style: const TextStyle().setColor(pillFg).s12.bold,
+              style: const TextStyle().setColor(pillFg).s12.semiBold,
             ).paddingSymmetric(
               horizontal: AppPadding.pW12,
               vertical: AppPadding.pH4,
@@ -119,7 +112,7 @@ class _OrderDetailHeader extends StatelessWidget {
         left: AppPadding.pW20,
         right: AppPadding.pW20,
         top: AppPadding.pH12,
-        bottom: AppPadding.pH12,
+        bottom: AppPadding.pH16,
       ),
     );
   }

@@ -64,7 +64,7 @@ class _HandoffSheetState extends State<_HandoffSheet> {
               children: [
                 TextSpan(
                   text: widget.orderNum,
-                  style: const TextStyle().setTertiaryColor.bold,
+                  style: const TextStyle().setTertiaryColor.semiBold,
                 ),
                 // i18n: " — " separator between order number and customer name.
                 TextSpan(text: ' — ${widget.customerName}'),
@@ -75,7 +75,7 @@ class _HandoffSheetState extends State<_HandoffSheet> {
           Text.rich(
             TextSpan(
               text: LocaleKeys.handoffPhotoLabel.tr(),
-              style: const TextStyle().setMainTextColor.s14.bold,
+              style: const TextStyle().setMainTextColor.s14.semiBold,
               children: [
                 TextSpan(
                   text: '*',
@@ -121,7 +121,7 @@ class _HandoffSheetState extends State<_HandoffSheet> {
                       widget.cod
                           ? LocaleKeys.handoffCollectNext.tr()
                           : LocaleKeys.handoffTitle.tr(),
-                      style: const TextStyle().setColor(fg).s14.bold,
+                      style: const TextStyle().setColor(fg).s14.semiBold,
                     ),
                   ],
                 ),
@@ -167,7 +167,7 @@ class _HandoffSheetState extends State<_HandoffSheet> {
           4.szH,
           Text(
             LocaleKeys.handoffCaptureTitle.tr(),
-            style: const TextStyle().setMainTextColor.s14.bold,
+            style: const TextStyle().setMainTextColor.s14.semiBold,
           ),
           Text(
             LocaleKeys.handoffCaptureSub.tr(),

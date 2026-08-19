@@ -34,7 +34,7 @@ class _PaymentCard extends StatelessWidget {
                   style: const TextStyle()
                       .setWhite
                       .s20
-                      .extraBold
+                      .bold
                       .withHeight(1)
                       .tabular,
                   children: [
@@ -43,7 +43,7 @@ class _PaymentCard extends StatelessWidget {
                       style: const TextStyle()
                           .setColor(AppColors.paymentSuffix)
                           .s14
-                          .bold,
+                          .semiBold,
                     ),
                   ],
                 ),

@@ -151,7 +151,7 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
                         ? LocaleKeys.codSheetTitleExtra
                             .tr(namedArgs: {'amount': formatThousands(extra)})
                         : LocaleKeys.codSheetTitleMatch.tr(),
-                    style: const TextStyle().setMainTextColor.s20.extraBold,
+                    style: const TextStyle().setMainTextColor.s20.bold,
                   ),
                   8.szH,
                   Text(
@@ -259,7 +259,7 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
                       style: const TextStyle()
                           .setWhite
                           .s20
-                          .extraBold
+                          .bold
                           .withHeight(1)
                           .tabular,
                     ),
@@ -269,7 +269,7 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
                       style: const TextStyle()
                           .setColor(AppColors.paymentSuffix)
                           .s14
-                          .bold,
+                          .semiBold,
                     ),
                   ],
                 ),
@@ -368,8 +368,8 @@ class _SummaryRow extends StatelessWidget {
           value,
           textDirection: TextDirection.ltr,
           style: emphasize
-              ? const TextStyle().setColor(valueColor).s16.extraBold.tabular
-              : const TextStyle().setColor(valueColor).s14.bold.tabular,
+              ? const TextStyle().setColor(valueColor).s16.bold.tabular
+              : const TextStyle().setColor(valueColor).s14.semiBold.tabular,
         ),
       ],
     );
@@ -404,7 +404,7 @@ class _PrimaryButton extends StatelessWidget {
               width: AppSize.sW20,
             ),
             8.szW,
-            Text(label, style: const TextStyle().setWhite.s14.bold),
+            Text(label, style: const TextStyle().setWhite.s14.semiBold),
           ],
         ),
       ).onClick(onTap: onTap),
@@ -427,7 +427,7 @@ class _GhostButton extends StatelessWidget {
         child: Center(
           child: Text(
             label,
-            style: const TextStyle().setTertiaryColor.s14.bold,
+            style: const TextStyle().setTertiaryColor.s14.semiBold,
           ),
         ),
       ).onClick(onTap: onTap),

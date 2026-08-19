@@ -41,14 +41,14 @@ class _OrderCard extends StatelessWidget {
                         Text(
                           order.num,
                           textDirection: TextDirection.ltr,
-                          style: const TextStyle().setMainTextColor.s16.extraBold,
+                          style: const TextStyle().setMainTextColor.s16.bold,
                         ),
                         _PayPill(labelKey: payKey, fg: payFg, bg: payBg),
                       ],
                     ),
                     4.szH,
                     Text(order.name,
-                        style: const TextStyle().setMainTextColor.s18.bold),
+                        style: const TextStyle().setMainTextColor.s18.semiBold),
                     4.szH,
                     Text(order.meta,
                         style: const TextStyle().setHintColor.s14.regular),
@@ -82,7 +82,7 @@ class _PayPill extends StatelessWidget {
         color: bg,
         borderRadius: BorderRadius.circular(AppCircular.r7), // 7px pill (radii exempt from 4px rule)
       ),
-      child: Text(labelKey.tr(), style: const TextStyle().setColor(fg).s12.bold)
+      child: Text(labelKey.tr(), style: const TextStyle().setColor(fg).s12.semiBold)
           .paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
   }
@@ -106,7 +106,7 @@ class _CodRow extends StatelessWidget {
               style: const TextStyle().setSecondaryColor.s12.regular),
           Text(
             LocaleKeys.amountEgp.tr(namedArgs: {'amount': amount}),
-            style: const TextStyle().setMainTextColor.s16.extraBold.tabular,
+            style: const TextStyle().setMainTextColor.s16.bold.tabular,
           ),
         ],
       ).paddingOnly(top: AppPadding.pH12),

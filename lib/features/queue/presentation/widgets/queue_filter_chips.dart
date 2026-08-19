@@ -104,13 +104,13 @@ class _FilterChip extends StatelessWidget {
       height: AppSize.sH28,
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(AppCircular.r12),
+        borderRadius: BorderRadius.circular(100), // full pill (radii 4px-exempt)
         border: border,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(labelKey.tr(), style: const TextStyle().setColor(fg).s12.bold),
+          Text(labelKey.tr(), style: const TextStyle().setColor(fg).s12.semiBold),
           8.szW,
           _CountBadge(
             count: count,
@@ -140,27 +140,13 @@ class _CountBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = arabicDigits(count);
-    if (selected) {
-      return Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface.withValues(alpha: 0.2),
-          borderRadius: BorderRadius.circular(AppCircular.r8),
-        ),
-        child: Text(
-          text,
-          style: const TextStyle().setWhite.s12.bold,
-        ).paddingSymmetric(horizontal: AppPadding.pW8),
-      );
-    }
+    // Plain count — no circle/badge, even when the chip is active.
+    final Color color = selected
+        ? AppColors.surface
+        : (postponedStyle ? AppColors.postponedText : AppColors.textSecondary);
     return Text(
-      text,
-      style: const TextStyle()
-          .setColor(
-            postponedStyle ? AppColors.postponedText : AppColors.textSecondary,
-          )
-          .s12
-          .bold,
+      arabicDigits(count),
+      style: const TextStyle().setColor(color).s12.semiBold,
     );
   }
 }

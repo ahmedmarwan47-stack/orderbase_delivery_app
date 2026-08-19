@@ -31,7 +31,7 @@ class _ResultActions extends StatelessWidget {
               8.szW,
               Text(
                 LocaleKeys.resultContinue.tr(),
-                style: const TextStyle().setWhite.s14.bold,
+                style: const TextStyle().setWhite.s14.semiBold,
               ),
             ],
           ),
@@ -47,7 +47,7 @@ class _ResultActions extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             LocaleKeys.resultHome.tr(),
-            style: const TextStyle().setTertiaryColor.s14.bold,
+            style: const TextStyle().setTertiaryColor.s14.semiBold,
           ),
         ).onClick(onTap: onHome ?? () => Navigator.of(context).maybePop()),
       ],

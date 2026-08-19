@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../../config/res/app_sizes.dart';
 import '../../theme/colors.dart';
 
-/// Text styling as a fluent chain — `const TextStyle().setMainTextColor.s14.bold`.
+/// Text styling as a fluent chain — `const TextStyle().setMainTextColor.s14.semiBold`.
 /// Size getters are screenutil-scaled (`.sp`); weights follow the standard
 /// Flutter scale (`extraBold` = w800 for the mockup headings). Font family is
 /// inherited from the theme (Noto Kufi Arabic).
@@ -23,8 +23,8 @@ extension TextStyleEx on TextStyle {
   TextStyle get regular => copyWith(fontWeight: FontWeightManager.regular);
   TextStyle get medium => copyWith(fontWeight: FontWeightManager.medium);
   TextStyle get semiBold => copyWith(fontWeight: FontWeightManager.semiBold);
-  TextStyle get bold => copyWith(fontWeight: FontWeightManager.bold);
-  TextStyle get extraBold => copyWith(fontWeight: FontWeightManager.extraBold);
+  TextStyle get bold => copyWith(fontWeight: FontWeightManager.semiBold);
+  TextStyle get extraBold => copyWith(fontWeight: FontWeightManager.bold);
 
   // ── colors (semantic — mapped to the mockup palette in AppColors) ──
   TextStyle setColor(Color color) => copyWith(color: color);

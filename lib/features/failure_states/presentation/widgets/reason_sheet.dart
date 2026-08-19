@@ -132,7 +132,7 @@ class _ReasonRow extends StatelessWidget {
             child: Text(
               reason.label,
               style: selected
-                  ? const TextStyle().setMainTextColor.s14.bold
+                  ? const TextStyle().setMainTextColor.s14.semiBold
                   : const TextStyle().setMainTextColor.s14.semiBold,
             ),
           ),

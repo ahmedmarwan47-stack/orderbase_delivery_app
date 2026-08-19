@@ -46,11 +46,11 @@ class _PickupHeader extends StatelessWidget {
                 12.szW,
               ],
               ClipRRect(
-                borderRadius: BorderRadius.circular(AppCircular.r13),
+                borderRadius: BorderRadius.circular(AppCircular.r12),
                 child: IconWidget(
                   icon: AppAssets.img.saleSucre,
-                  height: AppSize.sH48,
-                  width: AppSize.sW48,
+                  height: AppSize.sH40,
+                  width: AppSize.sW40,
                 ),
               ),
               12.szW,
@@ -60,13 +60,13 @@ class _PickupHeader extends StatelessWidget {
                   if (showBack) ...[
                     Text(
                       LocaleKeys.pickupTitle.tr(),
-                      style: const TextStyle().setMainTextColor.s16.extraBold,
+                      style: const TextStyle().setMainTextColor.s16.bold,
                     ),
                     4.szH,
                   ],
                   Text(
                     LocaleKeys.pickupMerchant.tr(),
-                    style: const TextStyle().setMainTextColor.s16.extraBold,
+                    style: const TextStyle().setMainTextColor.s16.bold,
                   ),
                 ],
               ),
@@ -76,7 +76,7 @@ class _PickupHeader extends StatelessWidget {
       ).paddingOnlyDirectional(
         start: AppPadding.pW20,
         end: AppPadding.pW20,
-        top: AppPadding.pH8,
+        top: AppPadding.pH12,
         bottom: AppPadding.pH16,
       ),
     );

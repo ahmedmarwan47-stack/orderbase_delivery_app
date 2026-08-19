@@ -42,5 +42,6 @@ part '../widgets/return_to_branch_sheet.dart';
 // Shared private widgets (buttons, note field, order-context background, …)
 part '../widgets/failure_shared.dart';
 
-// 1g body
+// Returns-to-branch page (dedicated) — hero count, list, handover confirm sheet
 part '../widgets/returns_list_body.dart';
+part '../widgets/returns_handover_sheet.dart';

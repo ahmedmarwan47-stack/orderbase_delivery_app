@@ -37,7 +37,7 @@ class _ResultSummaryCard extends StatelessWidget {
             label: LocaleKeys.resultOrderNumLabel.tr(),
             value: orderNum,
             valueLtr: true,
-            valueWeight: FontWeightManager.extraBold,
+            valueWeight: FontWeightManager.bold,
           ),
           12.szH,
           _ResultRow(
@@ -61,7 +61,7 @@ class _ResultSummaryCard extends StatelessWidget {
             value: codAmount,
             valueColor: AppColors.deliveredText,
             valueBig: true,
-            valueWeight: FontWeightManager.extraBold,
+            valueWeight: FontWeightManager.bold,
             tabular: true,
           ),
           if (showWalletChange) ...[
@@ -104,7 +104,7 @@ class _ResultRow extends StatelessWidget {
     required this.value,
     this.valueColor = AppColors.textPrimary,
     this.valueBig = false,
-    this.valueWeight = FontWeightManager.bold,
+    this.valueWeight = FontWeightManager.semiBold,
     this.valueLtr = false,
     this.tabular = false,
     this.topDivider = false,

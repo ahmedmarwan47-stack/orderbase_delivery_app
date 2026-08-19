@@ -65,7 +65,7 @@ class AppHeader extends StatelessWidget {
                               style: const TextStyle()
                                   .setMainTextColor
                                   .s16
-                                  .extraBold,
+                                  .bold,
                             ),
                             4.szH,
                             Text(

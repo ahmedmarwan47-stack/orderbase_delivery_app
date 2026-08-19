@@ -207,7 +207,7 @@ class _ChoiceRow extends StatelessWidget {
             child: Text(
               label,
               style: selected
-                  ? const TextStyle().setMainTextColor.s14.bold
+                  ? const TextStyle().setMainTextColor.s14.semiBold
                   : const TextStyle().setMainTextColor.s14.semiBold,
             ),
           ),

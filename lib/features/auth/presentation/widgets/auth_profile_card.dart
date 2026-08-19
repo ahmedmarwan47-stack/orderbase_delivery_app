@@ -36,7 +36,7 @@ class _AuthProfileCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppCircular.r14),
             ),
             child: Text(initials,
-                style: const TextStyle().setWhite.s14.bold),
+                style: const TextStyle().setWhite.s14.semiBold),
           ),
           12.szW,
           Expanded(
@@ -44,7 +44,7 @@ class _AuthProfileCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name,
-                    style: const TextStyle().setMainTextColor.s18.bold),
+                    style: const TextStyle().setMainTextColor.s18.semiBold),
                 4.szH,
                 Text(
                   '$username · $merchant',

@@ -78,7 +78,7 @@ class _HomeCompactStatRow extends StatelessWidget {
             style: const TextStyle()
                 .setColor(valueColor)
                 .s18
-                .extraBold
+                .bold
                 .tabular
                 .withHeight(1),
           ),
@@ -112,7 +112,7 @@ class _HomeCompactStatRow extends StatelessWidget {
             style: const TextStyle()
                 .setColor(AppColors.cashBright)
                 .s18
-                .extraBold
+                .bold
                 .tabular
                 .withHeight(1),
           ),

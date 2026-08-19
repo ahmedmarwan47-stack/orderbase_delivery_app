@@ -77,7 +77,7 @@ class SheetShell extends StatelessWidget {
                 ),
                 8.szW,
               ],
-              Text(title, style: const TextStyle().setMainTextColor.s18.extraBold),
+              Text(title, style: const TextStyle().setMainTextColor.s18.bold),
             ],
           ),
           Flexible(

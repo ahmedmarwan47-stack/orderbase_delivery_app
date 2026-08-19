@@ -23,7 +23,7 @@ class _QueueClearState extends StatelessWidget {
           24.szH,
           Text(LocaleKeys.queueClearTitle.tr(),
               textAlign: TextAlign.center,
-              style: const TextStyle().setMainTextColor.s20.extraBold),
+              style: const TextStyle().setMainTextColor.s20.bold),
           8.szH,
           Text(LocaleKeys.queueClearDesc.tr(),
               textAlign: TextAlign.center,
@@ -78,7 +78,7 @@ class _PostponedHandoffCard extends StatelessWidget {
                   Text(
                     LocaleKeys.postponedWithYou
                         .tr(namedArgs: {'count': arabicDigits(postponed.length)}),
-                    style: const TextStyle().setColor(AppColors.postponedText).s14.bold,
+                    style: const TextStyle().setColor(AppColors.postponedText).s14.semiBold,
                   ),
                 ],
               ),
@@ -87,7 +87,7 @@ class _PostponedHandoffCard extends StatelessWidget {
                   LocaleKeys.nearestReturns
                       .tr(namedArgs: {'time': postponed.first.returns!}),
                   style:
-                      const TextStyle().setColor(AppColors.postponedTextStrong).s12.bold,
+                      const TextStyle().setColor(AppColors.postponedTextStrong).s12.semiBold,
                 ),
             ],
           ),
@@ -151,7 +151,7 @@ class _QueueSearchPrompt extends StatelessWidget {
           24.szH,
           Text(LocaleKeys.searchPrompt.tr(),
               textAlign: TextAlign.center,
-              style: const TextStyle().setMainTextColor.s20.extraBold),
+              style: const TextStyle().setMainTextColor.s20.bold),
           24.szH,
           _ScopeCard(),
         ],
@@ -188,7 +188,7 @@ class _QueueNoResults extends StatelessWidget {
           24.szH,
           Text(LocaleKeys.noResultsTitle.tr(namedArgs: {'query': query.trim()}),
               textAlign: TextAlign.center,
-              style: const TextStyle().setMainTextColor.s20.extraBold),
+              style: const TextStyle().setMainTextColor.s20.bold),
           8.szH,
           Text(LocaleKeys.noResultsDesc.tr(),
               textAlign: TextAlign.center,
@@ -234,7 +234,7 @@ class _ClearSearchButton extends StatelessWidget {
           ),
           8.szW,
           Text(LocaleKeys.clearSearch.tr(),
-              style: const TextStyle().setWhite.s14.bold),
+              style: const TextStyle().setWhite.s14.semiBold),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW20),
     ).onClick(onTap: onTap);
@@ -257,7 +257,7 @@ class _ScopeCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(LocaleKeys.searchScopeTitle.tr(),
-              style: const TextStyle().setMainTextColor.s12.bold),
+              style: const TextStyle().setMainTextColor.s12.semiBold),
           8.szH,
           Text(LocaleKeys.searchScopeDesc.tr(),
               style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.5)),
@@ -322,7 +322,7 @@ class _OutlinedPillButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var style = const TextStyle().setColor(labelColor).s14.bold;
+    var style = const TextStyle().setColor(labelColor).s14.semiBold;
     if (tabular) style = style.tabular;
     return Container(
       height: AppSize.sH48,

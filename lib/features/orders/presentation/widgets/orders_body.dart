@@ -17,6 +17,14 @@ class _OrdersBody extends StatelessWidget {
     return Column(
       children: [
         _OrdersHeader(vc: vc),
+        // Filter chips sit in the page body, directly beneath the header bar
+        // (keeps the bar the same height as the unified AppHeader).
+        _OrdersFilterChips(vc: vc).paddingOnlyDirectional(
+          start: AppPadding.pW20,
+          end: AppPadding.pW20,
+          top: AppPadding.pH16,
+          bottom: AppPadding.pH8,
+        ),
         Expanded(
           // Rebuild when the active filter changes.
           child: ValueListenableBuilder<OrdersFilter>(

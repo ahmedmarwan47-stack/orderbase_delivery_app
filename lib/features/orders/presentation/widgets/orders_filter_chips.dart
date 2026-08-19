@@ -45,7 +45,7 @@ class _OrdersFilterChip extends StatelessWidget {
       height: AppSize.sH40,
       decoration: BoxDecoration(
         color: selected ? AppColors.inkFill : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppCircular.r20),
+        borderRadius: BorderRadius.circular(100), // full pill (radii 4px-exempt)
         border: Border.all(
           color: selected ? AppColors.inkFill : AppColors.borderDefault,
         ),
@@ -58,7 +58,7 @@ class _OrdersFilterChip extends StatelessWidget {
             style: const TextStyle()
                 .setColor(selected ? AppColors.surface : AppColors.textTertiary)
                 .s14
-                .bold,
+                .semiBold,
           ),
           8.szW,
           Text(
@@ -67,7 +67,7 @@ class _OrdersFilterChip extends StatelessWidget {
                 .setColor(
                     selected ? AppColors.surface : AppColors.chipCountMuted)
                 .s12
-                .bold
+                .semiBold
                 .tabular,
           ),
         ],

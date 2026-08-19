@@ -105,7 +105,7 @@ class _PhotoCaptureButton extends StatelessWidget {
               ),
               4.szH,
               Text(LocaleKeys.failureCaptureWrongProduct.tr(),
-                  style: const TextStyle().setMainTextColor.s14.bold),
+                  style: const TextStyle().setMainTextColor.s14.semiBold),
               4.szH,
               Text(LocaleKeys.failureCaptureHint.tr(),
                   style: const TextStyle().setSecondaryColor.s12.regular),

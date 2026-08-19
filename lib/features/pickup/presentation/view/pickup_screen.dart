@@ -178,7 +178,7 @@ class _PickupEmptyState extends StatelessWidget {
           Text(
             LocaleKeys.pickupEmptyTitle.tr(),
             textAlign: TextAlign.center,
-            style: const TextStyle().setMainTextColor.s16.extraBold,
+            style: const TextStyle().setMainTextColor.s16.bold,
           ),
           8.szH,
           Text(
@@ -232,7 +232,7 @@ class _PickupCarrySheet extends StatelessWidget {
                 8.szW,
                 Text(
                   LocaleKeys.pickupCarryConfirm.tr(),
-                  style: const TextStyle().setWhite.s14.bold,
+                  style: const TextStyle().setWhite.s14.semiBold,
                 ),
               ],
             ),
@@ -243,7 +243,7 @@ class _PickupCarrySheet extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               LocaleKeys.pickupCarryCancel.tr(),
-              style: const TextStyle().setSecondaryColor.s14.bold,
+              style: const TextStyle().setSecondaryColor.s14.semiBold,
             ),
           ).onClick(onTap: () => Navigator.of(context).pop(false)),
         ],

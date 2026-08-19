@@ -28,7 +28,7 @@ class _HomeFlatNextStop extends StatelessWidget {
                 ),
                 Text(
                   LocaleKeys.homeNextStop.tr(),
-                  style: const TextStyle().setColor(AppColors.flatMuted).s14.bold,
+                  style: const TextStyle().setColor(AppColors.flatMuted).s14.semiBold,
                 ),
               ],
             ),
@@ -44,7 +44,7 @@ class _HomeFlatNextStop extends StatelessWidget {
               child: Text(
                 LocaleKeys.homeStopCount
                     .tr(namedArgs: {'current': '2', 'total': '5'}),
-                style: const TextStyle().setTertiaryColor.s12.bold,
+                style: const TextStyle().setTertiaryColor.s12.semiBold,
               ),
             ),
           ],
@@ -68,7 +68,7 @@ class _HomeFlatNextStop extends StatelessWidget {
               children: [
                 Text(
                   LocaleKeys.homeCustomerName.tr(),
-                  style: const TextStyle().setMainTextColor.s20.extraBold,
+                  style: const TextStyle().setMainTextColor.s20.bold,
                 ),
                 Container(
                   decoration: BoxDecoration(
@@ -82,7 +82,7 @@ class _HomeFlatNextStop extends StatelessWidget {
                   child: Text(
                     LocaleKeys.payCod.tr(),
                     style:
-                        const TextStyle().setColor(AppColors.postponedText).s12.bold,
+                        const TextStyle().setColor(AppColors.postponedText).s12.semiBold,
                   ),
                 ),
               ],
@@ -113,7 +113,7 @@ class _HomeFlatNextStop extends StatelessWidget {
                     children: [
                       Text(
                         LocaleKeys.homeViewOrder.tr(),
-                        style: const TextStyle().setWhite.s14.bold,
+                        style: const TextStyle().setWhite.s14.semiBold,
                       ),
                       8.szW,
                       IconWidget(
@@ -139,7 +139,7 @@ class _HomeFlatNextStop extends StatelessWidget {
           children: [
             Text(
               LocaleKeys.homeRemainingStops.tr(),
-              style: const TextStyle().setMainTextColor.s14.bold,
+              style: const TextStyle().setMainTextColor.s14.semiBold,
             ),
             Row(
               spacing: AppSize.sW4,
@@ -169,7 +169,7 @@ class _HomeFlatNextStop extends StatelessWidget {
           badgeColor: AppColors.textTertiary,
           badgeCircle: true,
           nameSize: FontSizeManager.s14,
-          nameWeight: FontWeightManager.bold,
+          nameWeight: FontWeightManager.semiBold,
           timeColor: AppColors.textPrimary,
           showDivider: true,
           verticalPadding: AppPadding.pH12,
@@ -184,7 +184,7 @@ class _HomeFlatNextStop extends StatelessWidget {
           badgeColor: AppColors.textTertiary,
           badgeCircle: true,
           nameSize: FontSizeManager.s14,
-          nameWeight: FontWeightManager.bold,
+          nameWeight: FontWeightManager.semiBold,
           timeColor: AppColors.textPrimary,
           showDivider: false,
           verticalPadding: AppPadding.pH12,

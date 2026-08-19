@@ -35,7 +35,7 @@ class _HomeOverviewCard extends StatelessWidget {
             children: [
               Text(
                 LocaleKeys.homeTodayOverview.tr(),
-                style: const TextStyle().setColor(AppColors.flatMuted).s14.bold,
+                style: const TextStyle().setColor(AppColors.flatMuted).s14.semiBold,
               ),
               IconWidget(
                 icon: AppAssets.svg.chevronLeft,
@@ -80,7 +80,7 @@ class _HomeOverviewCard extends StatelessWidget {
                     style: const TextStyle()
                         .setColor(AppColors.flatBlack)
                         .s20 // was s24 — big-font trim sweep
-                        .extraBold
+                        .bold
                         .tabular
                         .withHeight(1),
                     children: [
@@ -89,7 +89,7 @@ class _HomeOverviewCard extends StatelessWidget {
                         style: const TextStyle()
                             .setColor(AppColors.paymentSuffix)
                             .s14
-                            .bold,
+                            .semiBold,
                       ),
                     ],
                   ),
@@ -144,7 +144,7 @@ class _HomeOverviewCard extends StatelessWidget {
             style: const TextStyle()
                 .setColor(valueColor)
                 .s20
-                .extraBold
+                .bold
                 .tabular
                 .withHeight(1),
           ),

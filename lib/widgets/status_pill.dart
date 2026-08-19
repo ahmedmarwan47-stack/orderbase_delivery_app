@@ -50,7 +50,7 @@ class StatusPill extends StatelessWidget {
               curve: AppMotion.ease,
               builder: (context, color, child) => Text(
                 label,
-                style: const TextStyle().setColor(color ?? foreground).s12.bold,
+                style: const TextStyle().setColor(color ?? foreground).s12.semiBold,
               ),
             ),
           ),

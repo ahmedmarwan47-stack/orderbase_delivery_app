@@ -20,7 +20,7 @@ class _HomeStopProgress extends StatefulWidget {
 }
 
 class _HomeStopProgressState extends State<_HomeStopProgress>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _tipCtrl = AnimationController(
     vsync: this,
     duration: AppMotion.stamp,
@@ -28,6 +28,13 @@ class _HomeStopProgressState extends State<_HomeStopProgress>
   late final Animation<double> _tip = CurvedAnimation(
     parent: _tipCtrl,
     curve: AppMotion.ease,
+  );
+
+  /// Drives the looping highlight that sweeps from the first stop to the last
+  /// and back to the start — a soft "reading" pass along the whole route bar.
+  late final AnimationController _sweepCtrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1600),
   );
 
   /// One anchor link per segment so a tooltip can follow its own bar.
@@ -39,11 +46,31 @@ class _HomeStopProgressState extends State<_HomeStopProgress>
   LayerLink _link(int i) => _links.putIfAbsent(i, LayerLink.new);
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Loop the sweep, unless the user asked for reduced motion (then hold still).
+    if (AppMotion.reduced(context)) {
+      _sweepCtrl.stop();
+    } else if (!_sweepCtrl.isAnimating) {
+      _sweepCtrl.repeat();
+    }
+  }
+
+  /// Soft triangular highlight for segment [i] as the sweep head travels from
+  /// before the first segment to past the last one (a short gap at each end
+  /// gives the loop a natural reset beat). 0 = dark, 1 = fully lit.
+  double _sweepGlow(int i, int n) {
+    final head = _sweepCtrl.value * (n + 2) - 1; // -1 → n+1 across one cycle
+    return (1 - (head - i).abs()).clamp(0.0, 1.0);
+  }
+
+  @override
   void dispose() {
     _autoHide?.cancel();
     _entry?.remove();
     _entry = null;
     _tipCtrl.dispose();
+    _sweepCtrl.dispose();
     super.dispose();
   }
 
@@ -136,9 +163,32 @@ class _HomeStopProgressState extends State<_HomeStopProgress>
                       ),
                       duration: reduced ? Duration.zero : AppMotion.fill,
                       curve: AppMotion.ease,
-                      builder: (context, color, _) => _HomeProgressSeg(
-                        color ?? _segColor(s, widget.current),
-                      ),
+                      builder: (context, color, _) {
+                        final seg =
+                            _HomeProgressSeg(color ?? _segColor(s, widget.current));
+                        if (reduced) return seg;
+                        // A white sheen rides over the segment as the sweep head
+                        // passes, brightening each stop in turn from start to end.
+                        return AnimatedBuilder(
+                          animation: _sweepCtrl,
+                          builder: (context, _) => Stack(
+                            children: [
+                              seg,
+                              Positioned.fill(
+                                child: IgnorePointer(
+                                  child: Opacity(
+                                    opacity:
+                                        _sweepGlow(i, widget.stops.length) * 0.5,
+                                    child: const _HomeProgressSeg(
+                                      Color(0xFFFFFFFF),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -251,7 +301,7 @@ class _HomeProgressTip extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(title, style: const TextStyle().setWhite.s14.bold),
+                  Text(title, style: const TextStyle().setWhite.s14.semiBold),
                   4.szH,
                   Text(
                     orderNo,

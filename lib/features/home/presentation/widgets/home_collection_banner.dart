@@ -36,7 +36,7 @@ class _HomeCollectionBanner extends StatelessWidget {
                   text: '22,500',
                   style: const TextStyle()
                       .setColor(AppColors.cashBright)
-                      .extraBold
+                      .bold
                       .tabular
                       .withHeight(1)
                       .copyWith(fontSize: FontSizeManager.s24), // was s28
@@ -44,7 +44,7 @@ class _HomeCollectionBanner extends StatelessWidget {
                     TextSpan(
                       text: ' ${LocaleKeys.homeEgp.tr()}',
                       style:
-                          const TextStyle().setColor(AppColors.cashSuffixGreen).s16.bold,
+                          const TextStyle().setColor(AppColors.cashSuffixGreen).s16.semiBold,
                     ),
                   ],
                 ),

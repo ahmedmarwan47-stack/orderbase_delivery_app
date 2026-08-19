@@ -26,13 +26,13 @@ class _CustomerSection extends StatelessWidget {
                 8.szW,
                 Text(
                   LocaleKeys.orderDetailCustomer.tr(),
-                  style: const TextStyle().setMainTextColor.s14.bold,
+                  style: const TextStyle().setMainTextColor.s14.semiBold,
                 ),
               ],
             ),
             Text(
               name,
-              style: const TextStyle().setMainTextColor.s16.bold,
+              style: const TextStyle().setMainTextColor.s16.semiBold,
             ),
           ],
         ),

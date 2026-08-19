@@ -72,7 +72,7 @@ class _SheetScaffold extends StatelessWidget {
                 Flexible(
                   child: Text(
                     title!,
-                    style: const TextStyle().setMainTextColor.s18.extraBold,
+                    style: const TextStyle().setMainTextColor.s18.bold,
                   ),
                 ),
               ],
@@ -84,7 +84,7 @@ class _SheetScaffold extends StatelessWidget {
               alignment: AlignmentDirectional.centerStart,
               child: Text(
                 stepCaption!,
-                style: const TextStyle().setColor(AppColors.chipCountMuted).s12.bold,
+                style: const TextStyle().setColor(AppColors.chipCountMuted).s12.semiBold,
               ),
             ),
           ],
@@ -200,7 +200,7 @@ class _PrimaryButton extends StatelessWidget {
               child: Text(
                 label,
                 textAlign: TextAlign.center,
-                style: const TextStyle().setWhite.s14.bold,
+                style: const TextStyle().setWhite.s14.semiBold,
               ),
             ),
             if (trailingIcon != null) ...[
@@ -226,7 +226,6 @@ class _OutlineButton extends StatelessWidget {
     required this.onTap,
     this.leadingIcon,
     this.leadingIconColor,
-    this.height,
     this.labelColor,
     this.borderColor,
     this.borderWidth = 1,
@@ -236,7 +235,6 @@ class _OutlineButton extends StatelessWidget {
   final VoidCallback onTap;
   final String? leadingIcon;
   final Color? leadingIconColor;
-  final double? height;
   final Color? labelColor;
   final Color? borderColor;
   final double borderWidth;
@@ -247,7 +245,7 @@ class _OutlineButton extends StatelessWidget {
       button: true,
       label: label,
       child: Container(
-        height: height ?? AppSize.sH48,
+        height: AppSize.sH48,
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(AppCircular.r15),
@@ -276,7 +274,7 @@ class _OutlineButton extends StatelessWidget {
                 style: const TextStyle()
                     .setColor(labelColor ?? AppColors.textPrimary)
                     .s14
-                    .bold,
+                    .semiBold,
               ),
             ),
           ],
@@ -303,7 +301,7 @@ class _FieldLabel extends StatelessWidget {
       child: Text(
         text,
         style: strong
-            ? const TextStyle().setMainTextColor.s14.bold
+            ? const TextStyle().setMainTextColor.s14.semiBold
             : const TextStyle().setSecondaryColor.s12.semiBold,
       ),
     );
@@ -378,7 +376,7 @@ class _ReasonTag extends StatelessWidget {
         horizontal: AppPadding.pW8,
         vertical: AppPadding.pH4,
       ),
-      child: Text(label, style: const TextStyle().setColor(fg).s12.bold),
+      child: Text(label, style: const TextStyle().setColor(fg).s12.semiBold),
     );
   }
 }
@@ -524,7 +522,7 @@ class _OrderContextBackground extends StatelessWidget {
                       Text(
                         ctx.orderNum,
                         textDirection: TextDirection.ltr,
-                        style: const TextStyle().setMainTextColor.s16.extraBold,
+                        style: const TextStyle().setMainTextColor.s16.bold,
                       ),
                       4.szH,
                       Text(
@@ -569,7 +567,7 @@ class _StatusPill extends StatelessWidget {
         horizontal: AppPadding.pW8,
         vertical: AppPadding.pH4,
       ),
-      child: Text(label, style: const TextStyle().setColor(fg).s12.bold),
+      child: Text(label, style: const TextStyle().setColor(fg).s12.semiBold),
     );
   }
 }

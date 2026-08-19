@@ -25,7 +25,7 @@ class _HomeCompactHeader extends StatelessWidget {
               children: [
                 Text(
                   LocaleKeys.homeCourierName.tr(),
-                  style: const TextStyle().setMainTextColor.s14.bold,
+                  style: const TextStyle().setMainTextColor.s14.semiBold,
                 ),
                 Text(
                   LocaleKeys.homeMerchantName.tr(),

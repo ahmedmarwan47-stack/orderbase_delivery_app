@@ -1,8 +1,10 @@
 part of '../imports/orders_imports.dart';
 
-/// Header: title + subtitle + a search button, then the filter chips. The
-/// search button opens the shared Queue search experience (pushed over this
-/// screen) rather than an inline field.
+/// Header bar: title + subtitle + a search button — matching the unified
+/// [AppHeader] geometry (single row, 12/16 padding, 40pt tile). The filter
+/// chips live in the page body beneath the bar (see [_OrdersBody]). The search
+/// button opens the shared Queue search experience (pushed over this screen)
+/// rather than an inline field.
 class _OrdersHeader extends StatelessWidget {
   const _OrdersHeader({required this.vc});
   final OrdersViewController vc;
@@ -14,36 +16,29 @@ class _OrdersHeader extends StatelessWidget {
         color: AppColors.surface,
         border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    LocaleKeys.queueTitle.tr(),
-                    style: const TextStyle().setMainTextColor.s16.extraBold,
-                  ),
-                  4.szH,
-                  Text(
-                    LocaleKeys.ordersSubtitle.tr(),
-                    style: const TextStyle().setSecondaryColor.s14.regular,
-                  ),
-                ],
+              Text(
+                LocaleKeys.queueTitle.tr(),
+                style: const TextStyle().setMainTextColor.s16.bold,
               ),
-              _SearchButton(onTap: () => _openQueueSearch(context)),
+              4.szH,
+              Text(
+                LocaleKeys.ordersSubtitle.tr(),
+                style: const TextStyle().setSecondaryColor.s14.regular,
+              ),
             ],
           ),
-          12.szH,
-          _OrdersFilterChips(vc: vc),
+          _SearchButton(onTap: () => _openQueueSearch(context)),
         ],
       ).paddingOnlyDirectional(
         start: AppPadding.pW20,
         end: AppPadding.pW20,
-        top: AppPadding.pH8,
+        top: AppPadding.pH12,
         bottom: AppPadding.pH16,
       ),
     );
@@ -72,8 +67,8 @@ class _SearchButton extends StatelessWidget {
       button: true,
       label: LocaleKeys.a11ySearch.tr(),
       child: Container(
-        width: AppSize.sW44,
-        height: AppSize.sH44,
+        width: AppSize.sW40,
+        height: AppSize.sH40,
         decoration: BoxDecoration(
           color: AppColors.surfaceMuted,
           borderRadius: BorderRadius.circular(AppCircular.r12),

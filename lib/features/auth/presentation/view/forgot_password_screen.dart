@@ -32,7 +32,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           _AuthBackLink(onTap: () => Navigator.of(context).maybePop()),
           20.szH,
           Text(LocaleKeys.authForgotTitle.tr(),
-              style: const TextStyle().setMainTextColor.s20.extraBold),
+              style: const TextStyle().setMainTextColor.s20.bold),
           8.szH,
           Text(LocaleKeys.authForgotSubtitle.tr(),
               style: const TextStyle().setSecondaryColor.s14.regular.withHeight(1.5)),

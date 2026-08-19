@@ -44,7 +44,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           _AuthBackLink(onTap: () => Navigator.of(context).maybePop()),
           20.szH,
           Text(LocaleKeys.authChangeTitle.tr(),
-              style: const TextStyle().setMainTextColor.s20.extraBold),
+              style: const TextStyle().setMainTextColor.s20.bold),
           20.szH,
           _AuthProfileCard(
             initials: 'م ع',

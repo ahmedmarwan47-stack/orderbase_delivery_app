@@ -60,7 +60,7 @@ class _HomeRemainingStopRow extends StatelessWidget {
               style: const TextStyle()
                   .setColor(badgeColor)
                   .s14
-                  .bold
+                  .semiBold
                   .tabular,
             ),
           ),
@@ -91,7 +91,7 @@ class _HomeRemainingStopRow extends StatelessWidget {
           ),
           Text(
             time,
-            style: const TextStyle().setColor(timeColor).s14.bold.tabular,
+            style: const TextStyle().setColor(timeColor).s14.semiBold.tabular,
           ),
           IconWidget(
             icon: AppAssets.svg.chevronLeft,

@@ -71,7 +71,7 @@ class _StatusBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (leading != null) ...[leading, 8.szW],
-          Text(text, style: const TextStyle().setColor(fg).s12.bold),
+          Text(text, style: const TextStyle().setColor(fg).s12.semiBold),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
@@ -91,7 +91,7 @@ class _PayLabel extends StatelessWidget {
       style: const TextStyle()
           .setColor(prepaid ? AppColors.deliveredText : AppColors.postponedText)
           .s12
-          .bold,
+          .semiBold,
     );
   }
 }

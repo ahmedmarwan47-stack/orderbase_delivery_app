@@ -45,7 +45,7 @@ class _CashInHandCard extends StatelessWidget {
                           style: const TextStyle()
                               .setWhite
                               .s24 // was s28 — big-font trim sweep
-                              .extraBold
+                              .bold
                               .tabular,
                         ),
                         6.szW,
@@ -54,7 +54,7 @@ class _CashInHandCard extends StatelessWidget {
                           style: const TextStyle()
                               .setColor(AppColors.paymentSuffix)
                               .s16
-                              .bold,
+                              .semiBold,
                         ),
                       ],
                     ),
@@ -158,7 +158,7 @@ class _BreakdownCol extends StatelessWidget {
           style: const TextStyle()
               .setColor(valueColor ?? AppColors.surface)
               .s16
-              .extraBold
+              .bold
               .tabular,
         ),
       ],

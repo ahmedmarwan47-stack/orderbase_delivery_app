@@ -25,7 +25,6 @@ class _PickupCard extends StatelessWidget {
     final payLabel =
         order.cod ? LocaleKeys.payCod.tr() : LocaleKeys.pickupPayPaid.tr();
     final payFg = order.cod ? AppColors.postponedText : AppColors.deliveredText;
-    final payBg = order.cod ? AppColors.heroCodPillBg : AppColors.deliveredBg;
 
     return Container(
       decoration: BoxDecoration(
@@ -56,33 +55,59 @@ class _PickupCard extends StatelessWidget {
                       Text(
                         order.num,
                         textDirection: TextDirection.ltr,
-                        style: const TextStyle().setMainTextColor.s16.extraBold,
+                        style: const TextStyle().setMainTextColor.s14.semiBold,
                       ),
                       8.szW,
-                      Container(
-                        decoration: BoxDecoration(
-                          color: payBg,
-                          borderRadius: BorderRadius.circular(AppCircular.r7), // pay pill
-                        ),
-                        child: Text(
-                          payLabel,
-                          style: const TextStyle().setColor(payFg).s12.bold,
-                        ).paddingSymmetric(
-                          horizontal: AppPadding.pW8,
-                          vertical: AppPadding.pH4,
-                        ),
+                      // Badgeless payment label — matches the Queue card's
+                      // colour-only «الدفع عند الاستلام / مدفوع» (no pill).
+                      Text(
+                        payLabel,
+                        style: const TextStyle().setColor(payFg).s12.semiBold,
                       ),
                     ],
                   ),
                   4.szH,
                   Text(
                     order.name,
-                    style: const TextStyle().setColor(AppColors.textBody).s14.semiBold,
+                    style: const TextStyle().setColor(AppColors.textBody).s14.medium,
                   ),
+                  if (order.assignedTime.isNotEmpty) ...[
+                    4.szH,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconWidget(
+                          icon: AppAssets.svg.clock,
+                          color: AppColors.textSecondary,
+                          height: AppSize.sH14,
+                          width: AppSize.sW14,
+                        ),
+                        4.szW,
+                        Text(
+                          LocaleKeys.promisedAt
+                              .tr(namedArgs: {'time': order.assignedTime}),
+                          style: const TextStyle().setTertiaryColor.s12.regular,
+                        ),
+                      ],
+                    ),
+                  ],
                   4.szH,
-                  Text(
-                    order.meta,
-                    style: const TextStyle().setSecondaryColor.s12.regular,
+                  Row(
+                    children: [
+                      IconWidget(
+                        icon: AppAssets.svg.pin,
+                        color: AppColors.textTertiary,
+                        height: AppSize.sH14,
+                        width: AppSize.sW14,
+                      ),
+                      4.szW,
+                      Expanded(
+                        child: Text(
+                          order.meta,
+                          style: const TextStyle().setSecondaryColor.s12.regular,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

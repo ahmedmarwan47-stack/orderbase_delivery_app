@@ -361,7 +361,7 @@ class _SearchResultsCountBar extends StatelessWidget {
               'total': arabicDigits(total),
             },
           ),
-          style: const TextStyle().setSecondaryColor.s12.bold,
+          style: const TextStyle().setSecondaryColor.s12.semiBold,
         ),
         Text(
           LocaleKeys.searchSorted.tr(),
@@ -395,7 +395,7 @@ class _FilterResultsBar extends StatelessWidget {
               'label': vc.filterLabelKey(filter).tr(),
             },
           ),
-          style: const TextStyle().setSecondaryColor.s12.bold,
+          style: const TextStyle().setSecondaryColor.s12.semiBold,
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -412,7 +412,7 @@ class _FilterResultsBar extends StatelessWidget {
               style: const TextStyle()
                   .setColor(AppColors.dangerAccent)
                   .s12
-                  .bold,
+                  .semiBold,
             ),
           ],
         ).onClick(onTap: vc.clearFilter),
@@ -444,7 +444,7 @@ class _QueuePostponedEmpty extends StatelessWidget {
               Text(
                 LocaleKeys.postponedEmptyTitle.tr(),
                 textAlign: TextAlign.center,
-                style: const TextStyle().setMainTextColor.s20.extraBold,
+                style: const TextStyle().setMainTextColor.s20.bold,
               ),
               8.szH,
               Text(

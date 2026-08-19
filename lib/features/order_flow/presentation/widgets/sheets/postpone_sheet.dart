@@ -66,7 +66,7 @@ class _PostponeSheetState extends State<_PostponeSheet> {
           16.szH,
           Text(
             LocaleKeys.postponeDateLabel.tr(),
-            style: const TextStyle().setMainTextColor.s14.bold,
+            style: const TextStyle().setMainTextColor.s14.semiBold,
           ),
           8.szH,
           ValueListenableBuilder<DateTime>(
@@ -80,7 +80,7 @@ class _PostponeSheetState extends State<_PostponeSheet> {
           16.szH,
           Text(
             LocaleKeys.postponeTimeLabel.tr(),
-            style: const TextStyle().setMainTextColor.s14.bold,
+            style: const TextStyle().setMainTextColor.s14.semiBold,
           ),
           8.szH,
           ValueListenableBuilder<TimeOfDay>(
@@ -111,7 +111,7 @@ class _PostponeSheetState extends State<_PostponeSheet> {
                 8.szW,
                 Text(
                   LocaleKeys.postponeConfirm.tr(),
-                  style: const TextStyle().setWhite.s14.bold,
+                  style: const TextStyle().setWhite.s14.semiBold,
                 ),
               ],
             ),
@@ -145,8 +145,8 @@ class _PostponeSheetState extends State<_PostponeSheet> {
         child: Text(
           label,
           style: selected
-              ? const TextStyle().setColor(AppColors.brand).s14.bold
-              : const TextStyle().setMainTextColor.s14.bold,
+              ? const TextStyle().setColor(AppColors.brand).s14.semiBold
+              : const TextStyle().setMainTextColor.s14.semiBold,
         ),
       ).onClick(onTap: () => _controller.selectSlot(index)),
     );
@@ -174,7 +174,7 @@ class _PostponeSheetState extends State<_PostponeSheet> {
           8.szW,
           Text(
             value,
-            style: const TextStyle().setMainTextColor.s16.bold,
+            style: const TextStyle().setMainTextColor.s16.semiBold,
           ),
           const Spacer(),
           // Edit affordance: signals the field opens a native picker on tap.

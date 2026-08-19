@@ -49,7 +49,7 @@ class _AuthPrimaryButton extends StatelessWidget {
               ),
               8.szW,
             ],
-            Text(label, style: const TextStyle().setColor(fg).s14.bold),
+            Text(label, style: const TextStyle().setColor(fg).s14.semiBold),
           ],
         ),
       ).onClick(onTap: enabled ? onTap : null),
@@ -77,7 +77,7 @@ class _AuthOutlinedButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppCircular.r16),
           border: Border.all(color: AppColors.borderDefault),
         ),
-        child: Text(label, style: const TextStyle().setMainTextColor.s14.bold),
+        child: Text(label, style: const TextStyle().setMainTextColor.s14.semiBold),
       ).onClick(onTap: onTap),
     );
   }

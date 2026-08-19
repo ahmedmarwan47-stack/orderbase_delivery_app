@@ -232,6 +232,38 @@ final List<Order> sampleOrders = [
       ),
     ],
   ),
+  const Order(
+    num: '#89361',
+    name: 'خالد سمير',
+    addr: 'شارع ٩',
+    area: 'المعادي',
+    status: OrderStatus.failed,
+    reason: 'العميل رفض استلام الطلب',
+    items: [
+      FlowOrderItem(
+        name: 'دونات متنوع',
+        variant: 'علبة – 12 قطعة',
+        weight: '600 جم',
+        qty: 2,
+      ),
+    ],
+  ),
+  const Order(
+    num: '#89372',
+    name: 'منى سعيد',
+    addr: 'شارع الميرغني',
+    area: 'مصر الجديدة',
+    status: OrderStatus.failed,
+    reason: 'عدم تطابق المنتج',
+    items: [
+      FlowOrderItem(
+        name: 'تشيز كيك مانجو',
+        variant: 'وسط – 18 سم',
+        weight: '650 جم',
+        qty: 2,
+      ),
+    ],
+  ),
 ];
 
 /// Builds the rich per-order [FlowOrder] the order-flow screens expect straight

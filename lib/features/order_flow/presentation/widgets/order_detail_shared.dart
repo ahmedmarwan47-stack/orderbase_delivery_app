@@ -64,7 +64,7 @@ class _OutlineActionButton extends StatelessWidget {
             width: 19.w,
           ),
           8.szW,
-          Text(label, style: const TextStyle().setColor(fg).s14.bold),
+          Text(label, style: const TextStyle().setColor(fg).s14.semiBold),
         ],
       ),
     );

@@ -123,7 +123,7 @@ class _AddressCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(ctx.address, style: const TextStyle().setMainTextColor.s14.bold),
+          Text(ctx.address, style: const TextStyle().setMainTextColor.s14.semiBold),
           8.szH,
           Text(
             ctx.addressDetail,

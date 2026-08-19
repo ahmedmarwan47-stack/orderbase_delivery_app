@@ -38,7 +38,7 @@ class _DeliverBar extends StatelessWidget {
             8.szW,
             Text(
               LocaleKeys.orderDetailDeliver.tr(),
-              style: const TextStyle().setWhite.s14.bold,
+              style: const TextStyle().setWhite.s14.semiBold,
             ),
           ],
         ),

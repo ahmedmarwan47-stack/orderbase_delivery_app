@@ -95,7 +95,7 @@ class _AuthBackLink extends StatelessWidget {
           4.szW,
           Text(
             LocaleKeys.authBack.tr(),
-            style: const TextStyle().setSecondaryColor.s14.bold,
+            style: const TextStyle().setSecondaryColor.s14.semiBold,
           ),
         ],
       ).onClick(onTap: onTap),

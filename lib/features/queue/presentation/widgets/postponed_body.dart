@@ -197,7 +197,7 @@ class _PostponedHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(LocaleKeys.postponedTitle.tr(),
-                    style: const TextStyle().setMainTextColor.s16.extraBold),
+                    style: const TextStyle().setMainTextColor.s16.bold),
                 4.szH,
                 Text(
                   LocaleKeys.postponedSubtitle

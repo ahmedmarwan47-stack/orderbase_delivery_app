@@ -16,7 +16,7 @@ class _QueueBrowseHeader extends StatelessWidget {
           LocaleKeys.queueSubtitle.tr(
             namedArgs: {'count': arabicDigits(vc.active.length)},
           ),
-          style: const TextStyle().setMainTextColor.s14.extraBold,
+          style: const TextStyle().setMainTextColor.s14.bold,
         ).paddingOnlyDirectional(start: AppPadding.pW20, end: AppPadding.pW20),
         12.szH,
         // Chips run edge-to-edge (their own internal padding) so an off-screen

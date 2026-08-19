@@ -25,7 +25,7 @@ class _HomeFlatHeader extends StatelessWidget {
               children: [
                 Text(
                   LocaleKeys.homeCourierName.tr(),
-                  style: const TextStyle().setMainTextColor.s18.extraBold,
+                  style: const TextStyle().setMainTextColor.s18.bold,
                 ),
                 4.szH,
                 Row(

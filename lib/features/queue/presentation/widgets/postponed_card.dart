@@ -25,7 +25,7 @@ class _PostponedCard extends StatelessWidget {
                 children: [
                   Text(order.num,
                       textDirection: TextDirection.ltr,
-                      style: const TextStyle().setMainTextColor.s16.extraBold),
+                      style: const TextStyle().setMainTextColor.s16.bold),
                   8.szW,
                   _PayLabel(prepaid: order.prepaid),
                 ],
@@ -42,7 +42,7 @@ class _PostponedCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(order.name, style: const TextStyle().setMainTextColor.s18.bold),
+                    Text(order.name, style: const TextStyle().setMainTextColor.s18.semiBold),
                     4.szH,
                     Text(
                       LocaleKeys.addrArea
@@ -54,7 +54,7 @@ class _PostponedCard extends StatelessWidget {
                       Text(
                         LocaleKeys.collectEgp
                             .tr(namedArgs: {'amount': formatThousands(order.cod!)}),
-                        style: const TextStyle().setTertiaryColor.s12.bold.tabular,
+                        style: const TextStyle().setTertiaryColor.s12.semiBold.tabular,
                       ),
                     ],
                   ],
@@ -102,7 +102,7 @@ class _ReturnBadge extends StatelessWidget {
           ),
           4.szW,
           Text(LocaleKeys.returnsAt.tr(namedArgs: {'time': time}),
-              style: const TextStyle().setColor(AppColors.postponedText).s12.bold),
+              style: const TextStyle().setColor(AppColors.postponedText).s12.semiBold),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
@@ -125,7 +125,7 @@ class _ReasonBox extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(LocaleKeys.postponeReasonLabel.tr(),
-              style: const TextStyle().setTertiaryColor.s12.bold),
+              style: const TextStyle().setTertiaryColor.s12.semiBold),
           4.szH,
           Text(
             LocaleKeys.postponeReasonValue.tr(namedArgs: {
@@ -165,7 +165,7 @@ class _ReturnButton extends StatelessWidget {
           ),
           8.szW,
           Text(LocaleKeys.returnToQueue.tr(),
-              style: const TextStyle().setMainTextColor.s14.bold),
+              style: const TextStyle().setMainTextColor.s14.semiBold),
         ],
       ),
     ).onClick(onTap: onTap);

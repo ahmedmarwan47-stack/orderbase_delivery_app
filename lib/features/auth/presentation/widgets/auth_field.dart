@@ -88,8 +88,8 @@ class _AuthFieldState extends State<_AuthField> {
             Text(
               widget.label,
               style: widget.compact
-                  ? const TextStyle().setTertiaryColor.s12.bold
-                  : const TextStyle().setTertiaryColor.s14.bold,
+                  ? const TextStyle().setTertiaryColor.s12.semiBold
+                  : const TextStyle().setTertiaryColor.s14.semiBold,
             ),
             if (widget.labelTrailing != null) ...[
               const Spacer(),
@@ -221,7 +221,7 @@ class _AuthLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final base = const TextStyle().setColor(AppColors.dangerAccent).bold;
+    final base = const TextStyle().setColor(AppColors.dangerAccent).semiBold;
     return Text(
       label,
       style: compact ? base.s12 : base.s14,

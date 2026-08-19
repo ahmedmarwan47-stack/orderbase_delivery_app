@@ -36,7 +36,7 @@ class _AuthInfoCard extends StatelessWidget {
                     style: const TextStyle()
                         .setColor(AppColors.deliveredText)
                         .s14
-                        .bold),
+                        .semiBold),
                 4.szH,
                 Text(body,
                     style: const TextStyle()

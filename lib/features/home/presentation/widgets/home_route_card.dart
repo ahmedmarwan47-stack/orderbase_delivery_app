@@ -45,7 +45,7 @@ class _HomeRouteCard extends StatelessWidget {
                   ),
                   Text(
                     LocaleKeys.homeNextStop.tr(),
-                    style: const TextStyle().setMainTextColor.s14.bold,
+                    style: const TextStyle().setMainTextColor.s14.semiBold,
                   ),
                 ],
               ),
@@ -106,7 +106,7 @@ class _HomeRouteCard extends StatelessWidget {
                       children: [
                         Text(
                           LocaleKeys.homeCustomerName.tr(),
-                          style: const TextStyle().setMainTextColor.s14.bold,
+                          style: const TextStyle().setMainTextColor.s14.semiBold,
                         ),
                         Container(
                           decoration: BoxDecoration(
@@ -122,7 +122,7 @@ class _HomeRouteCard extends StatelessWidget {
                             style: const TextStyle()
                                 .setColor(AppColors.postponedText)
                                 .s12
-                                .bold,
+                                .semiBold,
                           ),
                         ),
                       ],
@@ -164,7 +164,7 @@ class _HomeRouteCard extends StatelessWidget {
                       children: [
                         Text(
                           LocaleKeys.homeViewOrder.tr(),
-                          style: const TextStyle().setWhite.s14.bold,
+                          style: const TextStyle().setWhite.s14.semiBold,
                         ),
                         8.szW,
                         IconWidget(
@@ -219,7 +219,7 @@ class _HomeRouteCard extends StatelessWidget {
               children: [
                 Text(
                   LocaleKeys.homeRemainingStops.tr(),
-                  style: const TextStyle().setTertiaryColor.s12.bold,
+                  style: const TextStyle().setTertiaryColor.s12.semiBold,
                 ),
                 Row(
                   spacing: AppSize.sW4,

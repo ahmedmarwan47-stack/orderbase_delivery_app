@@ -36,7 +36,7 @@ class _PickupConfirmBar extends StatelessWidget {
                 8.szW,
                 Text(
                   LocaleKeys.pickupConfirm.tr(namedArgs: {'count': '$count'}),
-                  style: const TextStyle().setWhite.s14.bold,
+                  style: const TextStyle().setWhite.s14.semiBold,
                 ),
               ],
             ),

@@ -32,7 +32,7 @@ class _QueueCard extends StatelessWidget {
                         Text(
                           order.num,
                           textDirection: TextDirection.ltr,
-                          style: const TextStyle().setMainTextColor.s14.extraBold,
+                          style: const TextStyle().setMainTextColor.s14.semiBold,
                         ),
                         8.szW,
                         if (isTransit)
@@ -42,7 +42,7 @@ class _QueueCard extends StatelessWidget {
                       ],
                     ),
                     4.szH,
-                    Text(order.name, style: const TextStyle().setMainTextColor.s16.bold),
+                    Text(order.name, style: const TextStyle().setMainTextColor.s14.medium),
                     if (isTransit && order.due != null) ...[
                       4.szH,
                       Row(
@@ -57,18 +57,33 @@ class _QueueCard extends StatelessWidget {
                           4.szW,
                           Text(
                             LocaleKeys.promisedAt.tr(namedArgs: {'time': order.due!}),
-                            style: const TextStyle().setTertiaryColor.s12.bold,
+                            style: const TextStyle().setTertiaryColor.s12.regular,
                           ),
                         ],
                       ),
                     ],
                     4.szH,
-                    Text(
-                      order.dist != null
-                          ? LocaleKeys.areaDistance
-                              .tr(namedArgs: {'area': order.area, 'dist': order.dist!})
-                          : order.area,
-                      style: const TextStyle().setHintColor.s14.regular,
+                    Row(
+                      children: [
+                        IconWidget(
+                          icon: AppAssets.svg.pin,
+                          color: AppColors.textTertiary,
+                          height: AppSize.sH14,
+                          width: AppSize.sW14,
+                        ),
+                        4.szW,
+                        Expanded(
+                          child: Text(
+                            order.dist != null
+                                ? LocaleKeys.areaDistance.tr(namedArgs: {
+                                    'area': order.area,
+                                    'dist': order.dist!,
+                                  })
+                                : order.area,
+                            style: const TextStyle().setHintColor.s12.regular,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -108,7 +123,7 @@ class _CodRow extends StatelessWidget {
               style: const TextStyle().setSecondaryColor.s12.regular),
           Text(
             LocaleKeys.amountEgp.tr(namedArgs: {'amount': formatThousands(amount)}),
-            style: const TextStyle().setMainTextColor.s14.extraBold.tabular,
+            style: const TextStyle().setMainTextColor.s14.semiBold.tabular,
           ),
         ],
       ).paddingOnly(top: AppPadding.pH12),
@@ -175,7 +190,7 @@ class _SearchResultCard extends StatelessWidget {
                     Text(
                       order.num,
                       textDirection: TextDirection.ltr,
-                      style: const TextStyle().setMainTextColor.s16.extraBold,
+                      style: const TextStyle().setMainTextColor.s16.bold,
                     ),
                     _StatusBadge(status: order.status, returns: order.returns),
                   ],
@@ -188,7 +203,7 @@ class _SearchResultCard extends StatelessWidget {
             ],
           ),
           8.szH,
-          Text(order.name, style: const TextStyle().setMainTextColor.s18.bold),
+          Text(order.name, style: const TextStyle().setMainTextColor.s18.semiBold),
           4.szH,
           _highlighted(
             LocaleKeys.addrArea.tr(namedArgs: {'addr': order.addr, 'area': order.area}),
@@ -246,7 +261,7 @@ class _MatchTag extends StatelessWidget {
         color: AppColors.surfaceMuted,
         borderRadius: BorderRadius.circular(AppCircular.r8),
       ),
-      child: Text(labelKey.tr(), style: const TextStyle().setSecondaryColor.s12.bold)
+      child: Text(labelKey.tr(), style: const TextStyle().setSecondaryColor.s12.semiBold)
           .paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
   }
@@ -278,7 +293,7 @@ class _PromisedCodRow extends StatelessWidget {
               8.szW,
               Text(
                 LocaleKeys.promisedAt.tr(namedArgs: {'time': order.due ?? ''}),
-                style: const TextStyle().setTertiaryColor.s12.bold,
+                style: const TextStyle().setTertiaryColor.s12.semiBold,
               ),
             ],
           ),
@@ -286,7 +301,7 @@ class _PromisedCodRow extends StatelessWidget {
             Text(
               LocaleKeys.collectEgp
                   .tr(namedArgs: {'amount': formatThousands(order.cod!)}),
-              style: const TextStyle().setColor(AppColors.failedText).s12.bold,
+              style: const TextStyle().setColor(AppColors.failedText).s12.semiBold,
             ),
         ],
       ).paddingOnly(top: AppPadding.pH12),

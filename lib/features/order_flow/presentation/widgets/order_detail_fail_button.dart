@@ -17,7 +17,7 @@ class _FailButton extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         LocaleKeys.orderDetailNotDelivered.tr(),
-        style: const TextStyle().setColor(AppColors.dangerAccent).s14.bold,
+        style: const TextStyle().setColor(AppColors.dangerAccent).s14.semiBold,
       ),
     ).onClick(onTap: onTap);
   }

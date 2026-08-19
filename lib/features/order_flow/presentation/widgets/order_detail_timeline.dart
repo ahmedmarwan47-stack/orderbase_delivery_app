@@ -15,7 +15,7 @@ class _Timeline extends StatelessWidget {
       children: [
         Text(
           LocaleKeys.orderDetailTimelineTitle.tr(),
-          style: const TextStyle().setTertiaryColor.s14.bold,
+          style: const TextStyle().setTertiaryColor.s14.semiBold,
         ).paddingOnly(bottom: AppPadding.pH12),
         IntrinsicHeight(
           child: Row(
@@ -96,7 +96,7 @@ class _TimelineText extends StatelessWidget {
       children: [
         Text(
           titleKey.tr(),
-          style: const TextStyle().setColor(titleColor).s14.bold.withHeight(20 / 14),
+          style: const TextStyle().setColor(titleColor).s14.semiBold.withHeight(20 / 14),
         ),
         Text(
           time,

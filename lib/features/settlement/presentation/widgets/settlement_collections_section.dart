@@ -17,7 +17,7 @@ class _CollectionsSection extends StatelessWidget {
           children: [
             Text(
               LocaleKeys.settlementCollectionsTitle.tr(),
-              style: const TextStyle().setMainTextColor.s16.bold,
+              style: const TextStyle().setMainTextColor.s16.semiBold,
             ),
             Text(
               LocaleKeys.settlementCollectionsHint.tr(),
@@ -74,7 +74,7 @@ class _CollectionRow extends StatelessWidget {
                   Text(
                     line.num,
                     textDirection: TextDirection.ltr,
-                    style: const TextStyle().setMainTextColor.s14.extraBold,
+                    style: const TextStyle().setMainTextColor.s14.bold,
                   ),
                   8.szW,
                   Flexible(
@@ -97,12 +97,12 @@ class _CollectionRow extends StatelessWidget {
                   formatThousands(line.paid),
                   textDirection: TextDirection.ltr,
                   style:
-                      const TextStyle().setMainTextColor.s16.extraBold.tabular,
+                      const TextStyle().setMainTextColor.s16.bold.tabular,
                 ),
                 4.szW,
                 Text(
                   LocaleKeys.settlementCurrency.tr(),
-                  style: const TextStyle().setSecondaryColor.s12.bold,
+                  style: const TextStyle().setSecondaryColor.s12.semiBold,
                 ),
               ],
             ),
@@ -153,7 +153,7 @@ class _WalletPill extends StatelessWidget {
           Text(
             LocaleKeys.settlementWalletChange
                 .tr(namedArgs: {'amount': formatThousands(amount)}),
-            style: const TextStyle().setColor(AppColors.postponedText).s12.bold,
+            style: const TextStyle().setColor(AppColors.postponedText).s12.semiBold,
           ),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),

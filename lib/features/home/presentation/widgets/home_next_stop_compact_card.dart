@@ -37,7 +37,7 @@ class _HomeNextStopCompactCard extends StatelessWidget {
                   ),
                   Text(
                     LocaleKeys.homeNextStop.tr(),
-                    style: const TextStyle().setMainTextColor.s14.bold,
+                    style: const TextStyle().setMainTextColor.s14.semiBold,
                   ),
                 ],
               ),
@@ -57,7 +57,7 @@ class _HomeNextStopCompactCard extends StatelessWidget {
                   children: [
                     Text(
                       LocaleKeys.homeCustomerName.tr(),
-                      style: const TextStyle().setMainTextColor.s16.bold,
+                      style: const TextStyle().setMainTextColor.s16.semiBold,
                     ),
                     4.szH,
                     Text(
@@ -89,7 +89,7 @@ class _HomeNextStopCompactCard extends StatelessWidget {
                       children: [
                         Text(
                           LocaleKeys.homeViewOrder.tr(),
-                          style: const TextStyle().setWhite.s14.bold,
+                          style: const TextStyle().setWhite.s14.semiBold,
                         ),
                         8.szW,
                         IconWidget(
@@ -132,7 +132,7 @@ class _HomeNextStopCompactCard extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: const TextStyle().setColor(AppColors.postponedText).s12.bold,
+          style: const TextStyle().setColor(AppColors.postponedText).s12.semiBold,
         ),
       );
 

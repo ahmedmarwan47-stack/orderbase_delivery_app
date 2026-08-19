@@ -141,13 +141,13 @@ class _SettlementHeader extends StatelessWidget {
                     if (showBack) ...[
                       Text(
                         LocaleKeys.settlementTitle.tr(),
-                        style: const TextStyle().setMainTextColor.s16.extraBold,
+                        style: const TextStyle().setMainTextColor.s16.bold,
                       ),
                       4.szH,
                     ],
                     Text(
                       LocaleKeys.settlementSubtitle.tr(),
-                      style: const TextStyle().setMainTextColor.s16.extraBold,
+                      style: const TextStyle().setMainTextColor.s16.bold,
                     ),
                   ],
                 ),
@@ -158,7 +158,7 @@ class _SettlementHeader extends StatelessWidget {
           ).paddingOnlyDirectional(
             start: AppPadding.pW20,
             end: AppPadding.pW20,
-            top: AppPadding.pH8,
+            top: AppPadding.pH12,
             bottom: AppPadding.pH16,
           ),
     );
@@ -178,7 +178,7 @@ class _NotSettledPill extends StatelessWidget {
       ),
       child: Text(
         LocaleKeys.settlementNotSettled.tr(),
-        style: const TextStyle().setColor(AppColors.postponedText).s12.bold,
+        style: const TextStyle().setColor(AppColors.postponedText).s12.semiBold,
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
   }

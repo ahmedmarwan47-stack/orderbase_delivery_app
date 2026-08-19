@@ -18,7 +18,7 @@ class _HomeTodayStats extends StatelessWidget {
       children: [
         Text(
           LocaleKeys.homeTodayOverview.tr(),
-          style: const TextStyle().setTertiaryColor.s14.bold,
+          style: const TextStyle().setTertiaryColor.s14.semiBold,
         ),
         12.szH,
         IntrinsicHeight(

@@ -250,7 +250,7 @@ class _ResultScreenState extends State<ResultScreen>
                         widget._title,
                         textAlign: TextAlign.center,
                         style:
-                            const TextStyle().setMainTextColor.s20.extraBold,
+                            const TextStyle().setMainTextColor.s20.bold,
                       ),
                     ),
                     8.szH,

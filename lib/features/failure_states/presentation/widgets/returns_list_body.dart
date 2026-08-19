@@ -1,40 +1,12 @@
 part of '../imports/failure_states_imports.dart';
 
-/// Body of the returns list (1g): header + filter chips, the dark "returns to
-/// branch" banner (the orders you actually returned via the failure flow), the
-/// order cards, and the bottom nav. All driven by [ShiftController].
-class _ReturnsListBody extends StatefulWidget {
+/// Body of the dedicated «مرتجعات للفرع» (returns to branch) page. A returns-
+/// focused screen — not the active queue: a prominent count of what's in the
+/// courier's custody, the list of returned orders, and the handover button.
+/// Confirming the handover (via a confirmation sheet) empties the custody and
+/// flips the whole page to its empty state. All driven by [ShiftController].
+class _ReturnsListBody extends StatelessWidget {
   const _ReturnsListBody();
-
-  @override
-  State<_ReturnsListBody> createState() => _ReturnsListBodyState();
-}
-
-class _ReturnsListBodyState extends State<_ReturnsListBody> {
-  final ScrollController _scroll = ScrollController();
-
-  // The header is transparent at the top and gains its surface background once
-  // the list scrolls beneath it (iOS large-title behaviour).
-  final ValueNotifier<bool> _scrolled = ValueNotifier(false);
-
-  @override
-  void initState() {
-    super.initState();
-    _scroll.addListener(_onScroll);
-  }
-
-  void _onScroll() {
-    final v = _scroll.offset > 2;
-    if (v != _scrolled.value) _scrolled.value = v;
-  }
-
-  @override
-  void dispose() {
-    _scroll.removeListener(_onScroll);
-    _scroll.dispose();
-    _scrolled.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,33 +14,19 @@ class _ReturnsListBodyState extends State<_ReturnsListBody> {
       animation: ShiftController.instance,
       builder: (_, _) {
         final shift = ShiftController.instance;
-        final returns = shift.returns;
-        final orders = shift.orders;
+        final returns = shift.pendingReturns;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ValueListenableBuilder<bool>(
-              valueListenable: _scrolled,
-              builder: (_, scrolled, _) =>
-                  _ReturnsHeader(count: orders.length, scrolled: scrolled),
-            ),
+            const _ReturnsPageHeader(),
             Expanded(
-              child: ListView.separated(
-                controller: _scroll,
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppPadding.pW20,
-                  vertical: AppPadding.pH16,
-                ),
-                itemCount: orders.length + (returns.isNotEmpty ? 1 : 0),
-                separatorBuilder: (_, _) => 12.szH,
-                itemBuilder: (_, i) {
-                  if (returns.isNotEmpty && i == 0) {
-                    return _ReturnsBanner(returns: returns);
-                  }
-                  final order = orders[i - (returns.isNotEmpty ? 1 : 0)];
-                  return _OrderMiniCard(order: order);
-                },
-              ),
+              child: returns.isEmpty
+                  ? const _ReturnsEmptyState()
+                  : _ReturnsContent(
+                      returns: returns,
+                      pieces: shift.returnPieces,
+                      branch: shift.returnsBranch,
+                    ),
             ),
           ],
         );
@@ -77,53 +35,30 @@ class _ReturnsListBodyState extends State<_ReturnsListBody> {
   }
 }
 
-class _ReturnsHeader extends StatelessWidget {
-  const _ReturnsHeader({required this.count, this.scrolled = false});
-  final int count;
-
-  /// True once the list has scrolled under the header — the header then fades
-  /// in its surface background + hairline (transparent while at the top).
-  final bool scrolled;
+/// White page header — back tile + title.
+class _ReturnsPageHeader extends StatelessWidget {
+  const _ReturnsPageHeader();
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOut,
-      decoration: BoxDecoration(
-        // Fade the SAME white in/out (transparent-white, never transparent-
-        // black) so the transition never flashes a dark tint.
-        color: AppColors.surface.withValues(alpha: scrolled ? 1 : 0),
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.borderHeader.withValues(alpha: scrolled ? 1 : 0),
-          ),
-        ),
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
       ),
       padding: EdgeInsets.only(
         left: AppPadding.pW20,
         right: AppPadding.pW20,
-        top: AppPadding.pH8,
+        top: AppPadding.pH12,
         bottom: AppPadding.pH16,
       ),
       child: Row(
         children: [
           const HeaderBackButton(),
           12.szW,
-          Text(LocaleKeys.failureOrders.tr(),
-              style: const TextStyle().setMainTextColor.s20.extraBold),
-          const Spacer(),
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceMuted,
-              borderRadius: BorderRadius.circular(AppCircular.r8),
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: AppPadding.pW12,
-              vertical: AppPadding.pH4,
-            ),
-            child: Text('$count',
-                style: const TextStyle().setSecondaryColor.s12.bold.tabular),
+          Text(
+            LocaleKeys.failureReturnsPageTitle.tr(),
+            style: const TextStyle().setMainTextColor.s16.bold,
           ),
         ],
       ),
@@ -131,63 +66,128 @@ class _ReturnsHeader extends StatelessWidget {
   }
 }
 
-/// The dark "returns to branch" summary — one row per returned order.
-class _ReturnsBanner extends StatelessWidget {
-  const _ReturnsBanner({required this.returns});
+/// Populated state: hero count → returned-order list → pinned handover button.
+class _ReturnsContent extends StatelessWidget {
+  const _ReturnsContent({
+    required this.returns,
+    required this.pieces,
+    required this.branch,
+  });
+
   final List<Order> returns;
+  final int pieces;
+  final String branch;
 
   @override
   Widget build(BuildContext context) {
-    final totalPieces = returns.fold(0, (sum, o) => sum + o.pieces);
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppPadding.pW20,
+              vertical: AppPadding.pH16,
+            ),
+            children: [
+              _ReturnsHero(count: returns.length, pieces: pieces, branch: branch),
+              20.szH,
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  LocaleKeys.failureReturnsListLabel.tr(),
+                  style: const TextStyle().setSecondaryColor.s12.semiBold,
+                ),
+              ),
+              12.szH,
+              for (var i = 0; i < returns.length; i++) ...[
+                if (i != 0) 12.szH,
+                _ReturnOrderCard(order: returns[i]),
+              ],
+            ],
+          ),
+        ),
+        _HandoverBar(count: returns.length, pieces: pieces, branch: branch),
+      ],
+    );
+  }
+}
+
+/// The prominent custody count — the "orders returned" number, front and centre.
+class _ReturnsHero extends StatelessWidget {
+  const _ReturnsHero({
+    required this.count,
+    required this.pieces,
+    required this.branch,
+  });
+
+  final int count;
+  final int pieces;
+  final String branch;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paymentCardBg,
-        borderRadius: BorderRadius.circular(AppCircular.r16),
+        borderRadius: BorderRadius.circular(AppCircular.r20),
       ),
-      padding: EdgeInsets.all(AppPadding.pH16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      padding: EdgeInsets.all(AppPadding.pH20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              IconWidget(
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  LocaleKeys.failureReturnsInCustody.tr(),
+                  style: const TextStyle().setWhite.s14.semiBold,
+                ),
+                12.szH,
+                Row(
+                  textBaseline: TextBaseline.alphabetic,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  children: [
+                    Text(
+                      arabicDigits(count),
+                      style: const TextStyle().setWhite.s36.bold.tabular,
+                    ),
+                    8.szW,
+                    Text(
+                      _ordersUnit(count),
+                      style: const TextStyle().setColor(AppColors.mutedOnDark).s16.semiBold,
+                    ),
+                  ],
+                ),
+                6.szH,
+                Text(
+                  '${_piecesLabel(pieces)} · '
+                  '${LocaleKeys.failureReturnsHandedTo.tr(namedArgs: {'branch': branch})}',
+                  style: const TextStyle()
+                      .setColor(AppColors.mutedOnDark)
+                      .s12
+                      .regular
+                      .withHeight(1.5),
+                ),
+              ],
+            ),
+          ),
+          12.szW,
+          Container(
+            width: AppSize.sW44,
+            height: AppSize.sH44,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(AppCircular.r12),
+            ),
+            child: Center(
+              child: IconWidget(
                 icon: FailureIcons.box,
-                color: AppColors.surface,
+                color: AppColors.textPrimary,
                 height: AppSize.sH20,
                 width: AppSize.sW20,
               ),
-              12.szW,
-              Expanded(
-                child: Text(LocaleKeys.failureReturnsToBranch.tr(),
-                    style: const TextStyle().setWhite.s14.bold),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(AppCircular.r8),
-                ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppPadding.pW8,
-                  vertical: AppPadding.pH4,
-                ),
-                child: Text('$totalPieces قطعة',
-                    style: const TextStyle().setMainTextColor.s12.bold),
-              ),
-            ],
-          ),
-          for (final o in returns) ...[
-            12.szH,
-            _ReturnItemRow(
-              orderNum: o.num,
-              reason: o.reason ?? LocaleKeys.failureReasonOther.tr(),
-              pieces: '${o.pieces} قطعة',
             ),
-          ],
-          12.szH,
-          _OutlineButton(
-            label: LocaleKeys.failureHandReturns.tr(),
-            height: AppSize.sH48,
-            onTap: () {},
           ),
         ],
       ),
@@ -195,89 +195,14 @@ class _ReturnsBanner extends StatelessWidget {
   }
 }
 
-class _ReturnItemRow extends StatelessWidget {
-  const _ReturnItemRow({
-    required this.orderNum,
-    required this.reason,
-    required this.pieces,
-  });
-  final String orderNum;
-  final String reason;
-  final String pieces;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.darkCardRowBg,
-        borderRadius: BorderRadius.circular(AppCircular.r12),
-      ),
-      padding: EdgeInsets.all(AppPadding.pH12),
-      child: Row(
-        children: [
-          Text(
-            orderNum,
-            textDirection: TextDirection.ltr,
-            style: const TextStyle().setWhite.s14.extraBold,
-          ),
-          12.szW,
-          Expanded(
-            child: Text(
-              reason,
-              style: const TextStyle().setColor(AppColors.mutedOnDark).s12.regular,
-            ),
-          ),
-          Text(pieces, style: const TextStyle().setWhite.s12.bold),
-        ],
-      ),
-    );
-  }
-}
-
-/// A compact order row on the returns screen — status tile + number + pill +
-/// customer/area, derived from the order's live status.
-class _OrderMiniCard extends StatelessWidget {
-  const _OrderMiniCard({required this.order});
+/// One returned order — status tile · number + «تعذّر التسليم» pill · reason ·
+/// pieces.
+class _ReturnOrderCard extends StatelessWidget {
+  const _ReturnOrderCard({required this.order});
   final Order order;
 
   @override
   Widget build(BuildContext context) {
-    final (String icon, Color tileBg, Color tileIcon, String pillLabel,
-            Color pillBg, Color pillFg) =
-        switch (order.status) {
-      OrderStatus.transit => (
-          FailureIcons.nav,
-          AppColors.transitPillBg,
-          AppColors.transitBg,
-          LocaleKeys.failureStatusInTransit.tr(),
-          AppColors.transitPillBg,
-          AppColors.transitBg,
-        ),
-      OrderStatus.postponed => (
-          FailureIcons.clock,
-          AppColors.heroCodPillBg,
-          AppColors.postponedText,
-          LocaleKeys.filterPostponed.tr(),
-          AppColors.heroCodPillBg,
-          AppColors.postponedText,
-        ),
-      OrderStatus.delivered => (
-          FailureIcons.wallet,
-          AppColors.deliveredBg,
-          AppColors.deliveredText,
-          LocaleKeys.failureStatusDelivered.tr(),
-          AppColors.deliveredBg,
-          AppColors.deliveredText,
-        ),
-      OrderStatus.failed => (
-          FailureIcons.box,
-          AppColors.failedBg,
-          AppColors.failedText,
-          LocaleKeys.failureStatusCouldNotDeliver.tr(),
-          AppColors.failedBg,
-          AppColors.failedText,
-        ),
-    };
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -291,13 +216,13 @@ class _OrderMiniCard extends StatelessWidget {
             width: AppSize.sW40,
             height: AppSize.sH40,
             decoration: BoxDecoration(
-              color: tileBg,
+              color: AppColors.failedBg,
               borderRadius: BorderRadius.circular(AppCircular.r12),
             ),
             child: Center(
               child: IconWidget(
-                icon: icon,
-                color: tileIcon,
+                icon: FailureIcons.box,
+                color: AppColors.failedText,
                 height: AppSize.sH20,
                 width: AppSize.sW20,
               ),
@@ -313,20 +238,130 @@ class _OrderMiniCard extends StatelessWidget {
                     Text(
                       order.num,
                       textDirection: TextDirection.ltr,
-                      style: const TextStyle().setMainTextColor.s16.extraBold,
+                      style: const TextStyle().setMainTextColor.s16.bold,
                     ),
                     8.szW,
-                    _StatusPill(label: pillLabel, bg: pillBg, fg: pillFg),
+                    _StatusPill(
+                      label: LocaleKeys.failureStatusCouldNotDeliver.tr(),
+                      bg: AppColors.failedBg,
+                      fg: AppColors.failedText,
+                    ),
                   ],
                 ),
                 4.szH,
-                Text('${order.name} · ${order.area}',
-                    style: const TextStyle().setSecondaryColor.s12.regular),
+                Text(
+                  order.reason ?? LocaleKeys.failureReasonOther.tr(),
+                  style: const TextStyle().setSecondaryColor.s12.regular,
+                ),
               ],
             ),
+          ),
+          8.szW,
+          Text(
+            _piecesLabel(order.pieces),
+            style: const TextStyle().setSecondaryColor.s12.semiBold,
           ),
         ],
       ),
     );
   }
+}
+
+/// The pinned bottom bar carrying the primary handover action.
+class _HandoverBar extends StatelessWidget {
+  const _HandoverBar({
+    required this.count,
+    required this.pieces,
+    required this.branch,
+  });
+
+  final int count;
+  final int pieces;
+  final String branch;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(top: BorderSide(color: AppColors.borderHeader)),
+      ),
+      padding: EdgeInsets.only(
+        left: AppPadding.pW20,
+        right: AppPadding.pW20,
+        top: AppPadding.pH12,
+        bottom: AppPadding.pH12 + MediaQuery.of(context).viewPadding.bottom,
+      ),
+      child: _PrimaryButton(
+        label: LocaleKeys.failureHandReturns.tr(),
+        leadingIcon: FailureIcons.box,
+        onTap: () => _showReturnsHandoverSheet(
+          context,
+          count: count,
+          pieces: pieces,
+          branch: branch,
+        ),
+      ),
+    );
+  }
+}
+
+/// The empty state shown once the returns are handed to the branch — the
+/// isolated Higgsfield handover illustration + a reassuring done message.
+class _ReturnsEmptyState extends StatelessWidget {
+  const _ReturnsEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppPadding.pW32,
+          vertical: AppPadding.pH24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              AppAssets.img.returnsHandover,
+              width: 240.w,
+              height: 240.h,
+              fit: BoxFit.contain,
+            ),
+            24.szH,
+            Text(
+              LocaleKeys.failureReturnsDoneTitle.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle().setMainTextColor.s20.bold,
+            ),
+            8.szH,
+            Text(
+              LocaleKeys.failureReturnsDoneBody.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle()
+                  .setSecondaryColor
+                  .s14
+                  .regular
+                  .withHeight(1.5),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── helpers ──────────────────────────────────────────────────────────────────
+
+/// «طلب» / «طلبات» — singular for one order, plural otherwise.
+String _ordersUnit(int count) => count == 1
+    ? LocaleKeys.failureOrdersUnitSingular.tr()
+    : LocaleKeys.failureOrdersUnitPlural.tr();
+
+/// «N قطعة» / «N قطع» with Eastern-Arabic digits.
+String _piecesLabel(int pieces) {
+  final unit = pieces == 1
+      ? LocaleKeys.failurePiecesUnitSingular.tr()
+      : LocaleKeys.failurePiecesUnitPlural.tr();
+  return '${arabicDigits(pieces)} $unit';
 }

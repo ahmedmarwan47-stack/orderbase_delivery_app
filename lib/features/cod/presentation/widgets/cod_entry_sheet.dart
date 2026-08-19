@@ -129,7 +129,7 @@ class _AmountField extends StatelessWidget {
     final amountStyle = const TextStyle()
         .setColor(amountColor)
         .s24 // was s28 — big-font trim sweep
-        .extraBold
+        .bold
         .withHeight(1)
         .tabular;
 
@@ -179,7 +179,7 @@ class _AmountField extends StatelessWidget {
                   style: const TextStyle()
                       .setColor(AppColors.chipCountMuted)
                       .s16
-                      .bold,
+                      .semiBold,
                 ),
               ],
             ),
@@ -232,7 +232,7 @@ class _ConfirmButton extends StatelessWidget {
               width: AppSize.sW20,
             ),
             8.szW,
-            Text(label, style: const TextStyle().setColor(fg).s14.bold),
+            Text(label, style: const TextStyle().setColor(fg).s14.semiBold),
           ],
         ),
       ).onClick(onTap: enabled ? onConfirm : null),

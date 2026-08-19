@@ -75,7 +75,7 @@ class _HomeStatStrip extends StatelessWidget {
           value,
           style: const TextStyle()
               .setColor(valueColor)
-              .extraBold
+              .bold
               .tabular
               .withHeight(0.95)
               .copyWith(fontSize: 28.sp), // was 40px — big-font trim sweep

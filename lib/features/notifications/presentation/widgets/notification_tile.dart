@@ -49,7 +49,7 @@ class _NotificationTile extends StatelessWidget {
                     Expanded(
                       child: Text(
                         n.title,
-                        style: const TextStyle().setMainTextColor.s14.bold,
+                        style: const TextStyle().setMainTextColor.s14.semiBold,
                       ),
                     ),
                     8.szW,

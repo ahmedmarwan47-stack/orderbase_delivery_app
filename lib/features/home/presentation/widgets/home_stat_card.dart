@@ -35,7 +35,7 @@ class _HomeStatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final valueStyle = const TextStyle()
         .setColor(valueColor)
-        .extraBold
+        .bold
         .tabular
         .withHeight(1)
         .copyWith(
@@ -85,7 +85,7 @@ class _HomeStatCard extends StatelessWidget {
                               dark ? AppColors.paymentSuffix : valueColor,
                             )
                             .s14
-                            .bold,
+                            .semiBold,
                       ),
                     ],
             ),

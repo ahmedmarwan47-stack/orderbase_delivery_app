@@ -44,7 +44,7 @@ class _CodeEntryScreenState extends State<CodeEntryScreen> {
           _AuthBackLink(onTap: () => Navigator.of(context).maybePop()),
           20.szH,
           Text(LocaleKeys.authCodeTitle.tr(),
-              style: const TextStyle().setMainTextColor.s20.extraBold),
+              style: const TextStyle().setMainTextColor.s20.bold),
           8.szH,
           Text(
             LocaleKeys.authCodeSubtitle.tr(namedArgs: {'phone': phone}),
@@ -103,7 +103,7 @@ class _AuthResendRow extends StatelessWidget {
         return Align(
           alignment: Alignment.center,
           child: Text(LocaleKeys.authResend.tr(),
-                  style: const TextStyle().setMainTextColor.s14.bold)
+                  style: const TextStyle().setMainTextColor.s14.semiBold)
               .onClick(onTap: vc.resend),
         );
       },

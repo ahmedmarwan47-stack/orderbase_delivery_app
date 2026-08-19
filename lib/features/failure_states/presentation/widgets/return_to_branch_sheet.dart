@@ -133,7 +133,7 @@ class _SummaryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var style = const TextStyle().setColor(valueColor ?? AppColors.textPrimary).s14;
-    style = emphasize ? style.extraBold : style.bold;
+    style = emphasize ? style.bold : style.semiBold;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

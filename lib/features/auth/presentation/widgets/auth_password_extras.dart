@@ -36,7 +36,7 @@ class _AuthStrengthMeter extends StatelessWidget {
         Text(
           LocaleKeys.authStrengthLabel
               .tr(namedArgs: {'level': strength.labelKey!.tr()}),
-          style: const TextStyle().setColor(AppColors.deliveredText).s12.bold,
+          style: const TextStyle().setColor(AppColors.deliveredText).s12.semiBold,
         ),
       ],
     );

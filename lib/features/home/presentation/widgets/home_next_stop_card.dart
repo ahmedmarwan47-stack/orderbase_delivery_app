@@ -59,7 +59,7 @@ class _HomeNextStopCard extends StatelessWidget {
                   8.szW,
                   Text(
                     LocaleKeys.homeNextStop.tr(),
-                    style: const TextStyle().setMainTextColor.s14.bold,
+                    style: const TextStyle().setMainTextColor.s14.semiBold,
                   ),
                 ],
               ),
@@ -120,7 +120,7 @@ class _HomeNextStopCard extends StatelessWidget {
               8.szH,
               Text(
                 order.name,
-                style: const TextStyle().setMainTextColor.s18.bold,
+                style: const TextStyle().setMainTextColor.s18.semiBold,
               ),
               8.szH,
               Row(
@@ -210,7 +210,7 @@ class _HomeNextStopCard extends StatelessWidget {
                       children: [
                         Text(
                           LocaleKeys.homeViewOrder.tr(),
-                          style: const TextStyle().setWhite.s14.bold,
+                          style: const TextStyle().setWhite.s14.semiBold,
                         ),
                         8.szW,
                         IconWidget(
@@ -277,7 +277,7 @@ class _PayPill extends StatelessWidget {
         style: const TextStyle()
             .setColor(isCod ? AppColors.postponedText : AppColors.deliveredText)
             .s12
-            .bold,
+            .semiBold,
       ).paddingSymmetric(horizontal: AppPadding.pW12, vertical: AppPadding.pH4),
     );
   }
@@ -339,7 +339,7 @@ class _HomeRouteCompleteCard extends StatelessWidget {
           Text(
             LocaleKeys.homeRouteCompleteTitle.tr(),
             textAlign: TextAlign.center,
-            style: const TextStyle().setMainTextColor.s18.extraBold,
+            style: const TextStyle().setMainTextColor.s18.bold,
           ),
           8.szH,
           Text(
@@ -360,7 +360,7 @@ class _HomeRouteCompleteCard extends StatelessWidget {
               },
             ),
             textAlign: TextAlign.center,
-            style: const TextStyle().setTertiaryColor.s12.bold,
+            style: const TextStyle().setTertiaryColor.s12.semiBold,
           ),
         ],
       ),

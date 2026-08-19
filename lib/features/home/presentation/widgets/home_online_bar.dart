@@ -36,7 +36,7 @@ class _HomeOnlineBar extends StatelessWidget {
               ),
               Text(
                 LocaleKeys.homeOnlineNow.tr(),
-                style: const TextStyle().setColor(AppColors.deliveredText).s14.bold,
+                style: const TextStyle().setColor(AppColors.deliveredText).s14.semiBold,
               ),
             ],
           ),

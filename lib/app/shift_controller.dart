@@ -18,8 +18,12 @@ class ShiftController extends ChangeNotifier {
   /// Seeded from the sample batch; mutated in place as stops are closed.
   List<Order> _orders = List<Order>.from(sampleOrders);
   bool _accepted = false;
+  bool _returnsHandedOver = false;
 
   List<Order> get orders => _orders;
+
+  /// The branch the returns are physically handed back to.
+  String get returnsBranch => 'Sale Sucre — مدينة نصر';
 
   /// True once the courier confirmed the branch pickup — until then the app
   /// opens on the "collect from branch" screen instead of Home.
@@ -71,6 +75,17 @@ class ShiftController extends ChangeNotifier {
   List<Order> get returns =>
       _orders.where((o) => o.status == OrderStatus.failed).toList();
 
+  /// Returns still in the courier's custody — the same [returns] until the
+  /// courier hands the batch to the branch, then empty (drives the returns
+  /// page's empty state).
+  List<Order> get pendingReturns => _returnsHandedOver ? const [] : returns;
+
+  /// Total pieces across the pending returns (sum of item quantities).
+  int get returnPieces => pendingReturns.fold(0, (sum, o) => sum + o.pieces);
+
+  /// True once the courier confirmed handing the returns to the branch.
+  bool get returnsHandedOver => _returnsHandedOver;
+
   Order? orderByNum(String number) {
     for (final o in _orders) {
       if (o.num == number) return o;
@@ -99,6 +114,14 @@ class ShiftController extends ChangeNotifier {
   void markPostponed(String number) =>
       _update(number, (o) => o.copyWith(status: OrderStatus.postponed));
 
+  /// Hand the whole returns batch to the branch — the returns leave the
+  /// courier's custody, so the returns page flips to its empty state.
+  void handOverReturns() {
+    if (_returnsHandedOver) return;
+    _returnsHandedOver = true;
+    notifyListeners();
+  }
+
   /// Return a postponed order to the active queue (status → transit).
   void returnToQueue(String number) =>
       _update(number, (o) => o.copyWith(status: OrderStatus.transit));
@@ -107,6 +130,7 @@ class ShiftController extends ChangeNotifier {
   void reset() {
     _orders = List<Order>.from(sampleOrders);
     _accepted = false;
+    _returnsHandedOver = false;
     notifyListeners();
   }
 

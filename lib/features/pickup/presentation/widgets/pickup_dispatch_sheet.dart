@@ -68,7 +68,7 @@ class _PickupDispatchSheet extends StatelessWidget {
                 8.szW,
                 Text(
                   LocaleKeys.pickupDispatchCarry.tr(),
-                  style: const TextStyle().setWhite.s14.bold,
+                  style: const TextStyle().setWhite.s14.semiBold,
                 ),
               ],
             ),
@@ -80,7 +80,7 @@ class _PickupDispatchSheet extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               LocaleKeys.pickupDispatchLater.tr(),
-              style: const TextStyle().setSecondaryColor.s14.bold,
+              style: const TextStyle().setSecondaryColor.s14.semiBold,
             ),
           ).onClick(onTap: () => Navigator.of(context).pop(false)),
         ],
@@ -121,7 +121,7 @@ class _DispatchOrderRow extends StatelessWidget {
               Text(
                 order.num,
                 textDirection: TextDirection.ltr,
-                style: const TextStyle().setMainTextColor.s14.extraBold,
+                style: const TextStyle().setMainTextColor.s14.bold,
               ),
               8.szW,
               Container(
@@ -135,7 +135,7 @@ class _DispatchOrderRow extends StatelessWidget {
                 ),
                 child: Text(
                   payLabel,
-                  style: const TextStyle().setColor(payFg).s12.bold,
+                  style: const TextStyle().setColor(payFg).s12.semiBold,
                 ),
               ),
             ],

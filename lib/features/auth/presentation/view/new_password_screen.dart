@@ -34,7 +34,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
             _AuthBackLink(onTap: () => Navigator.of(context).maybePop()),
             20.szH,
             Text(LocaleKeys.authNewTitle.tr(),
-                style: const TextStyle().setMainTextColor.s20.extraBold),
+                style: const TextStyle().setMainTextColor.s20.bold),
             8.szH,
             Text(LocaleKeys.authNewSubtitle.tr(),
                 style: const TextStyle().setSecondaryColor.s14.regular),

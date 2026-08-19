@@ -23,7 +23,7 @@ class _ItemsSection extends StatelessWidget {
             8.szW,
             Text(
               LocaleKeys.orderDetailItemsTitle.tr(),
-              style: const TextStyle().setMainTextColor.s14.bold,
+              style: const TextStyle().setMainTextColor.s14.semiBold,
             ),
           ],
         ).paddingOnly(bottom: AppPadding.pH8),
@@ -71,7 +71,7 @@ class _ItemRow extends StatelessWidget {
                 children: [
                   Text(
                     item.name,
-                    style: const TextStyle().setMainTextColor.s14.bold,
+                    style: const TextStyle().setMainTextColor.s14.semiBold,
                   ),
                   4.szH,
                   Text(
@@ -81,7 +81,7 @@ class _ItemRow extends StatelessWidget {
                   4.szH,
                   Text(
                     item.weight,
-                    style: const TextStyle().setTertiaryColor.s12.bold.tabular,
+                    style: const TextStyle().setTertiaryColor.s12.semiBold.tabular,
                   ),
                 ],
               ),
@@ -93,7 +93,7 @@ class _ItemRow extends StatelessWidget {
                 child: Text(
                   '×${item.qty}',
                   textDirection: TextDirection.ltr,
-                  style: const TextStyle().setMainTextColor.s16.extraBold.tabular,
+                  style: const TextStyle().setMainTextColor.s16.bold.tabular,
                 ),
               ),
             ),

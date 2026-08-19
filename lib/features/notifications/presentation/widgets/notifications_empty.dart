@@ -34,7 +34,7 @@ class _NotificationsEmpty extends StatelessWidget {
           Text(
             LocaleKeys.notifEmptyTitle.tr(),
             textAlign: TextAlign.center,
-            style: const TextStyle().setMainTextColor.s18.bold,
+            style: const TextStyle().setMainTextColor.s18.semiBold,
           ),
           8.szH,
           Text(
