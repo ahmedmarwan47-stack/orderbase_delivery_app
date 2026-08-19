@@ -129,13 +129,13 @@ class _TimelineRailState extends State<_TimelineRail>
           (_ctrl.value / 0.8).clamp(0.0, 1.0),
         );
         // Keep the two stops strictly inside (0,1) so adjacent stops never
-        // coincide at the ends. Brand fills from the bottom (past node) up.
+        // coincide at the ends. Brand fills from the top node downward.
         final f = fill.clamp(0.001, 0.999);
         return DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
               colors: const [
                 AppColors.brand,
                 AppColors.brand,
