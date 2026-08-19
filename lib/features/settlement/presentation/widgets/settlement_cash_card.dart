@@ -95,6 +95,9 @@ class _CashInHandCard extends StatelessWidget {
                   ),
                   16.szH,
                   Row(
+                    // Bottom-align so the values line up even when one label
+                    // («عدد الطلبات النقدية») wraps to two lines.
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Expanded(
                         child: _BreakdownCol(

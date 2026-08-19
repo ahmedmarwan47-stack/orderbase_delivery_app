@@ -392,7 +392,7 @@
   "settlement_cash_in_hand": "النقدية التي معك الآن",
   "settlement_breakdown_orders": "قيمة الطلبات",
   "settlement_breakdown_wallet": "فكة للمحفظة",
-  "settlement_breakdown_count": "طلبات نقدية",
+  "settlement_breakdown_count": "عدد الطلبات النقدية",
   "settlement_settled_title": "تمت التسوية",
   "settlement_settled_body": "استلم الكاشير {cash} جم وتم إغلاق {count} طلبات. رصيد التحصيل الآن صفر.",
   "settlement_summary_delivered": "النقدية المُسلّمة",
