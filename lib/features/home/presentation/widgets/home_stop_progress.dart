@@ -30,8 +30,8 @@ class _HomeStopProgressState extends State<_HomeStopProgress>
     curve: AppMotion.ease,
   );
 
-  /// Drives the looping highlight that sweeps from the first stop to the last
-  /// and back to the start — a soft "reading" pass along the whole route bar.
+  /// Drives the current stop's fill — the ink segment fills from empty to full
+  /// width, loops, and refills, so the stop the courier is on keeps "charging".
   late final AnimationController _sweepCtrl = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1600),
@@ -54,14 +54,6 @@ class _HomeStopProgressState extends State<_HomeStopProgress>
     } else if (!_sweepCtrl.isAnimating) {
       _sweepCtrl.repeat();
     }
-  }
-
-  /// Soft triangular highlight for segment [i] as the sweep head travels from
-  /// before the first segment to past the last one (a short gap at each end
-  /// gives the loop a natural reset beat). 0 = dark, 1 = fully lit.
-  double _sweepGlow(int i, int n) {
-    final head = _sweepCtrl.value * (n + 2) - 1; // -1 → n+1 across one cycle
-    return (1 - (head - i).abs()).clamp(0.0, 1.0);
   }
 
   @override
@@ -164,29 +156,37 @@ class _HomeStopProgressState extends State<_HomeStopProgress>
                       duration: reduced ? Duration.zero : AppMotion.fill,
                       curve: AppMotion.ease,
                       builder: (context, color, _) {
-                        final seg =
-                            _HomeProgressSeg(color ?? _segColor(s, widget.current));
-                        if (reduced) return seg;
-                        // A white sheen rides over the segment as the sweep head
-                        // passes, brightening each stop in turn from start to end.
+                        final base = _segColor(s, widget.current);
+                        // Only the current stop (the ink segment) animates: it
+                        // fills from zero to its full width, over and over. Every
+                        // other segment stays a static colour.
+                        final isCurrent = base == AppColors.inkFill;
+                        if (reduced || !isCurrent) {
+                          return _HomeProgressSeg(color ?? base);
+                        }
                         return AnimatedBuilder(
                           animation: _sweepCtrl,
-                          builder: (context, _) => Stack(
-                            children: [
-                              seg,
-                              Positioned.fill(
-                                child: IgnorePointer(
-                                  child: Opacity(
-                                    opacity:
-                                        _sweepGlow(i, widget.stops.length) * 0.5,
+                          builder: (context, _) {
+                            // Ease the fill in over the first 80% of the loop,
+                            // hold full briefly, then restart.
+                            final fill = Curves.easeInOut.transform(
+                              (_sweepCtrl.value / 0.8).clamp(0.0, 1.0),
+                            );
+                            return Stack(
+                              children: [
+                                const _HomeProgressSeg(AppColors.borderDefault),
+                                Align(
+                                  alignment: AlignmentDirectional.centerStart,
+                                  child: FractionallySizedBox(
+                                    widthFactor: fill,
                                     child: const _HomeProgressSeg(
-                                      Color(0xFFFFFFFF),
+                                      AppColors.inkFill,
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            );
+                          },
                         );
                       },
                     ),

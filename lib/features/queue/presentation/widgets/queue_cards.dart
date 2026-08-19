@@ -35,10 +35,10 @@ class _QueueCard extends StatelessWidget {
                           style: const TextStyle().setMainTextColor.s14.semiBold,
                         ),
                         8.szW,
-                        if (isTransit)
-                          _PayLabel(prepaid: order.prepaid)
-                        else
-                          _StatusBadge(status: order.status, returns: order.returns),
+                        // Payment type only — never a status pill. The delivery
+                        // status is already conveyed by the active filter and the
+                        // dimmed (completed) card, so the badge is dropped here.
+                        _PayLabel(prepaid: order.prepaid),
                       ],
                     ),
                     4.szH,
@@ -192,7 +192,9 @@ class _SearchResultCard extends StatelessWidget {
                       textDirection: TextDirection.ltr,
                       style: const TextStyle().setMainTextColor.s16.bold,
                     ),
-                    _StatusBadge(status: order.status, returns: order.returns),
+                    // Match the main queue card: payment type only, no status
+                    // pill — so no badge reappears when filtering/searching.
+                    _PayLabel(prepaid: order.prepaid),
                   ],
                 ),
               ),
