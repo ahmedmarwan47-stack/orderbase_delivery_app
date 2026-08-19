@@ -121,6 +121,7 @@ abstract final class AppCircular {
 /// Font sizes (`.sp`). The mockups use a 4-multiple scale plus 14/18.
 abstract final class FontSizeManager {
   // Floor is 14sp; 12sp only for dense meta/counts. Nothing smaller.
+  static double get s10 => 10.sp; // off the 4px scale — status-pill label only
   static double get s12 => 12.sp;
   static double get s14 => 14.sp;
   static double get s16 => 16.sp;

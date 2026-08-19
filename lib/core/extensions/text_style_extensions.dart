@@ -9,6 +9,7 @@ import '../../theme/colors.dart';
 /// inherited from the theme (Noto Kufi Arabic).
 extension TextStyleEx on TextStyle {
   // ── sizes ── (floor is 14px; 12px used occasionally for dense meta)
+  TextStyle get s10 => copyWith(fontSize: FontSizeManager.s10);
   TextStyle get s12 => copyWith(fontSize: FontSizeManager.s12);
   TextStyle get s14 => copyWith(fontSize: FontSizeManager.s14);
   TextStyle get s16 => copyWith(fontSize: FontSizeManager.s16);

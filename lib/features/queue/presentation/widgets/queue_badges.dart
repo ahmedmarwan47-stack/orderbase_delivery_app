@@ -62,12 +62,12 @@ class _StatusBadge extends StatelessWidget {
             IconWidget(
               icon: leading,
               color: fg,
-              height: AppSize.sH12,
-              width: AppSize.sW12,
+              height: AppSize.sH10,
+              width: AppSize.sW10,
             ),
             4.szW,
           ],
-          Text(text, style: const TextStyle().setColor(fg).s12.semiBold),
+          Text(text, style: const TextStyle().setColor(fg).s10.semiBold),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
