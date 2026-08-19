@@ -48,7 +48,10 @@ class _PickupDispatchSheet extends StatelessWidget {
             ),
           ),
           16.szH,
-          // Primary: go carry now → opens Pickup (the full carry flow).
+          // Informational only: this sheet just tells the courier a batch has
+          // been dispatched. Acknowledging closes it — the actual "carried from
+          // branch" confirmation lives on the Pickup («الاستلام») tab, so this is
+          // no longer one of the carry-confirmation steps.
           Container(
             height: AppSize.sH56,
             alignment: Alignment.center,
@@ -60,27 +63,17 @@ class _PickupDispatchSheet extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconWidget(
-                  icon: AppAssets.svg.bag,
+                  icon: AppAssets.svg.check,
                   color: AppColors.surface,
                   height: AppSize.sH18,
                   width: AppSize.sW18,
                 ),
                 8.szW,
                 Text(
-                  LocaleKeys.pickupDispatchCarry.tr(),
+                  LocaleKeys.pickupDispatchSeen.tr(),
                   style: const TextStyle().setWhite.s14.semiBold,
                 ),
               ],
-            ),
-          ).onClick(onTap: () => Navigator.of(context).pop(true)),
-          8.szH,
-          // Secondary: dismiss — nothing is forced, the batch stays waiting.
-          Container(
-            height: AppSize.sH52,
-            alignment: Alignment.center,
-            child: Text(
-              LocaleKeys.pickupDispatchLater.tr(),
-              style: const TextStyle().setSecondaryColor.s14.semiBold,
             ),
           ).onClick(onTap: () => Navigator.of(context).pop(false)),
         ],

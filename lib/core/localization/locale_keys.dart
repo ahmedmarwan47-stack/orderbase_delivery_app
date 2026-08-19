@@ -170,6 +170,7 @@ abstract final class LocaleKeys {
   static const String pickupDispatchBody = 'pickup_dispatch_body';
   static const String pickupDispatchCarry = 'pickup_dispatch_carry';
   static const String pickupDispatchLater = 'pickup_dispatch_later';
+  static const String pickupDispatchSeen = 'pickup_dispatch_seen';
 
   // ── order_flow ──
   static const String orderDetailBack = 'order_detail_back';
