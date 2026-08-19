@@ -35,7 +35,7 @@ class _Timeline extends StatelessWidget {
                   Expanded(
                     child: SizedBox(
                       width: 2.w, // 2px connector rule — off the 4px grid
-                      child: const ColoredBox(color: AppColors.borderDefault),
+                      child: const _TimelineRail(),
                     ).paddingSymmetric(vertical: AppPadding.pH2),
                   ),
                 ],
@@ -74,6 +74,79 @@ class _Timeline extends StatelessWidget {
       right: AppPadding.pW4,
       top: AppPadding.pH8,
       bottom: AppPadding.pH4,
+    );
+  }
+}
+
+/// The connector rail between the previous node and the current (red) one. A
+/// brand fill "charges" up the grey track toward the current node — the same
+/// zero-to-full progress fill the home hero uses — so the log reads as
+/// animating up to the current state. Static grey under Reduce Motion.
+class _TimelineRail extends StatefulWidget {
+  const _TimelineRail();
+
+  @override
+  State<_TimelineRail> createState() => _TimelineRailState();
+}
+
+class _TimelineRailState extends State<_TimelineRail>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1600),
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (AppMotion.reduced(context)) {
+      _ctrl.stop();
+    } else if (!_ctrl.isAnimating) {
+      _ctrl.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (AppMotion.reduced(context)) {
+      return const ColoredBox(color: AppColors.borderDefault);
+    }
+    // A DecoratedBox gradient (not a Stack/FractionallySizedBox) so the rail
+    // stays a leaf box with trivial intrinsics — safe inside the enclosing
+    // IntrinsicHeight, which a Stack here would break (zero-height collapse).
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, _) {
+        // Ease the fill in over the first 80% of the loop, hold full briefly,
+        // then restart — identical timing to the home progress segment.
+        final fill = Curves.easeInOut.transform(
+          (_ctrl.value / 0.8).clamp(0.0, 1.0),
+        );
+        // Keep the two stops strictly inside (0,1) so adjacent stops never
+        // coincide at the ends. Brand fills from the bottom (past node) up.
+        final f = fill.clamp(0.001, 0.999);
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: const [
+                AppColors.brand,
+                AppColors.brand,
+                AppColors.borderDefault,
+                AppColors.borderDefault,
+              ],
+              stops: [0.0, f, f, 1.0],
+            ),
+          ),
+        );
+      },
     );
   }
 }

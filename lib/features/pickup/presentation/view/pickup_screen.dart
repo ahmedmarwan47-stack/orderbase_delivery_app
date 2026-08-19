@@ -173,7 +173,12 @@ class _PickupEmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(AppAssets.img.pickupEmpty, width: 180.w, height: 180.w),
+          Image.asset(
+            AppAssets.img.pickupEmpty,
+            width: 220.w,
+            height: 220.w,
+            fit: BoxFit.contain,
+          ),
           8.szH,
           Text(
             LocaleKeys.pickupEmptyTitle.tr(),
