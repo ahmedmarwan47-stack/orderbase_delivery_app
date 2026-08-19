@@ -52,7 +52,7 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(AppCircular.r8),
+        borderRadius: BorderRadius.circular(100), // full pill (radii 4px-exempt)
         border: border != null ? Border.all(color: border) : null,
       ),
       child: Row(
@@ -62,8 +62,8 @@ class _StatusBadge extends StatelessWidget {
             IconWidget(
               icon: leading,
               color: fg,
-              height: AppSize.sH14,
-              width: AppSize.sW14,
+              height: AppSize.sH12,
+              width: AppSize.sW12,
             ),
             4.szW,
           ],
