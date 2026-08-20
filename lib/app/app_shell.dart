@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/live_activity/live_activity_bridge.dart';
 import '../core/utils/app_motion.dart';
 import '../core/widgets/app_assets.dart';
 import '../core/widgets/icon_widget.dart';
@@ -69,6 +70,9 @@ class _AppShellState extends State<AppShell>
   @override
   void initState() {
     super.initState();
+    // A tap on the Live Activity opens that order here (no-op on devices that
+    // never show one).
+    LiveActivityBridge.instance.onOpenOrder = _openOrderByNum;
     // Greet the courier with the dispatched batch once the shell is on screen —
     // informative, not a gate (see [_announceDispatch]).
     WidgetsBinding.instance.addPostFrameCallback((_) => _announceDispatch());
@@ -92,6 +96,7 @@ class _AppShellState extends State<AppShell>
 
   @override
   void dispose() {
+    LiveActivityBridge.instance.onOpenOrder = null;
     _tabFade.dispose();
     _ordersVc.dispose();
     super.dispose();

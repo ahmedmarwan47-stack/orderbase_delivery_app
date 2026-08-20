@@ -4,12 +4,16 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'app_module.dart';
+import 'core/live_activity/live_activity_bridge.dart';
 import 'theme/colors.dart';
 import 'theme/typography.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  // Mirrors the shift onto the iOS Dynamic Island / Lock Screen where the
+  // device supports it. A no-op everywhere else — see [LiveActivityService].
+  LiveActivityBridge.instance.attach();
   runApp(
     ModularApp(
       module: AppModule(),

@@ -12,5 +12,7 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    // Dynamic Island / Lock Screen Live Activity. No-op below iOS 16.1.
+    LiveActivityChannel.shared.register(with: engineBridge.pluginRegistry)
   }
 }

@@ -204,6 +204,52 @@ The real entry point — `main.dart` sets `home: const AppShell()`. It's an `Ind
   selected `NavTab`. `OrderDetailScreen` takes `onFinishToNext` / `onFinishToHome` / `onSelectTab`.
 - **Not yet in the shell:** Pickup and the standalone Result variants — reach them via DevGallery.
 
+## Live Activity / Dynamic Island (iOS, optional)
+
+The current stop mirrored onto the Dynamic Island and the Lock Screen — stop
+counter, customer, area, COD due, and a call button. **Not built, not wired, and
+not required**: the fleet carries a lot of older iPhones, so every entry point
+degrades to a silent no-op on Android, on the web build, on iOS < 16.1, and when
+the courier has Live Activities switched off in Settings.
+
+| Piece | Where |
+|---|---|
+| Channel wrapper + payload model | `lib/core/live_activity/live_activity_service.dart` |
+| Shift → island sync + deep links | `lib/core/live_activity/live_activity_bridge.dart` |
+| ActivityKit calls, dialer, URL relay | `ios/Runner/LiveActivityChannel.swift` |
+| Shared `ActivityAttributes` (BOTH targets) | `ios/Shared/DeliveryActivityAttributes.swift` |
+| The five SwiftUI presentations | `ios/LiveActivity/` |
+| **Xcode target setup (a human step)** | `ios/LiveActivity/SETUP.md` |
+
+**The widget-extension target does not exist in `Runner.xcodeproj` yet** — it can
+only be created through Xcode's GUI. Until someone follows `SETUP.md`, the Dart
+side runs, finds no native handler, swallows the `MissingPluginException` and the
+app behaves exactly as before. Nothing is broken in the meantime.
+
+Design source: the five presentations were mocked first (compact leading /
+trailing, minimal, expanded, lock screen) at Apple's real geometry — 232×37,
+37pt circle, 371×160 — before any Swift was written.
+
+Rules worth keeping:
+- **One activity per stop, not per shift.** iOS ends a Live Activity after ~8h and
+  a shift outlasts that. `LiveActivityBridge` starts one when a stop becomes
+  current and ends it when the stop closes.
+- **`DeliveryActivityAttributes.swift` must be in both targets.** ActivityKit
+  pairs an activity to its widget by that type; one-target membership is the
+  classic "starts but renders nothing" bug.
+- **Keep Runner's deployment target at 13.0** and link ActivityKit as *Optional*.
+  Raising it would drop the older iPhones this feature is explicitly optional for.
+- **Cash shows on the island, is masked on the Lock Screen** — the island only
+  appears on an unlocked phone in the courier's hand; the Lock Screen is readable
+  over their shoulder.
+- The payload is a flat map crossing a `MethodChannel`; `DeliveryActivityState.toMap()`
+  (Dart), `ContentState` (Swift) and `contentState(from:)` are three copies of one
+  contract. Change one, change all three.
+
+Not built yet: APNs `liveactivity` pushes (so the island goes stale once iOS
+suspends the app), a real countdown (`Order.due` is a formatted string, not a
+timestamp), an `arrived` trigger (no geofence), and any Android equivalent.
+
 ## DevGallery (`lib/dev/dev_gallery.dart`)
 
 Launcher listing every built screen, now reached from the **المزيد (More)** tab's "الشاشات (Dev)"
