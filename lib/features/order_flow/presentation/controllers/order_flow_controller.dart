@@ -81,13 +81,20 @@ class OrderFlowController {
       );
       return;
     }
+    // The island switches to its "collecting" face while the sheet is up; if
+    // the courier backs out it goes straight back to the en-route face.
+    await LiveActivityBridge.instance.setPhase(DeliveryPhase.collecting);
     final collected = await showCodCollectionSheet(
       context,
       due: due,
       orderNum: orderNum.replaceAll('#', '').trim(),
       customerName: customer,
     );
-    if (collected != null && context.mounted) {
+    if (collected == null) {
+      await LiveActivityBridge.instance.setPhase(DeliveryPhase.enRoute);
+      return;
+    }
+    if (context.mounted) {
       ShiftController.instance
           .markDelivered(orderNum, collected: collected.amount);
       final hasWalletChange = collected.walletChange > 0;

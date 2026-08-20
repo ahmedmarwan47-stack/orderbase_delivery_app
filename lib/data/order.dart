@@ -19,6 +19,7 @@ class Order {
     this.items = const [],
     this.note,
     this.collected,
+    this.phone,
   });
 
   final String num;
@@ -45,6 +46,10 @@ class Order {
   /// Cash actually collected on delivery (COD). Set when the order is marked
   /// delivered so the shift's "collected today" total is real.
   final int? collected;
+
+  /// The customer's phone, in dialable form. Powers the Order Detail call
+  /// button and the Live Activity's "اتصال بالعميل" — null simply hides both.
+  final String? phone;
 
   /// Number of pieces = the sum of item quantities. Reflected on the card meta
   /// ("<area> · N قطعة") and on the detail.
@@ -74,6 +79,7 @@ class Order {
       items: items,
       note: note,
       collected: collected ?? this.collected,
+      phone: phone,
     );
   }
 }
@@ -84,6 +90,7 @@ class Order {
 final List<Order> sampleOrders = [
   const Order(
     num: '#89289',
+    phone: '+201092890',
     name: 'محمد حمدي',
     addr: 'شارع بن عبدالعزيز',
     area: 'زهراء مدينة نصر',
@@ -110,6 +117,7 @@ final List<Order> sampleOrders = [
   ),
   const Order(
     num: '#89304',
+    phone: '+201093040',
     name: 'سارة علي',
     addr: 'شارع ١٠',
     area: 'زهراء مدينة نصر',
@@ -128,6 +136,7 @@ final List<Order> sampleOrders = [
   ),
   const Order(
     num: '#89322',
+    phone: '+201093220',
     name: 'نور عادل',
     addr: 'شارع ٢٦',
     area: 'زهراء مدينة نصر',
@@ -143,6 +152,7 @@ final List<Order> sampleOrders = [
   ),
   const Order(
     num: '#89293',
+    phone: '+201092930',
     name: 'يوسف كمال',
     addr: 'شارع النصر',
     area: 'مصر الجديدة',
@@ -161,6 +171,7 @@ final List<Order> sampleOrders = [
   ),
   const Order(
     num: '#89298',
+    phone: '+201092980',
     name: 'هناء مصطفى',
     addr: 'شارع التسعين',
     area: 'المعادي',
@@ -183,6 +194,7 @@ final List<Order> sampleOrders = [
   ),
   const Order(
     num: '#89311',
+    phone: '+201093110',
     name: 'عمر شريف',
     addr: 'شارع ٩',
     area: 'المقطم',
@@ -202,6 +214,7 @@ final List<Order> sampleOrders = [
   ),
   const Order(
     num: '#89340',
+    phone: '+201093400',
     name: 'كريم عادل',
     addr: 'شارع الثورة',
     area: 'مدينة نصر',
@@ -219,6 +232,7 @@ final List<Order> sampleOrders = [
   ),
   const Order(
     num: '#89355',
+    phone: '+201093550',
     name: 'ليلى فتحي',
     addr: 'شارع الحرية',
     area: 'مدينة نصر',
@@ -234,6 +248,7 @@ final List<Order> sampleOrders = [
   ),
   const Order(
     num: '#89361',
+    phone: '+201093610',
     name: 'خالد سمير',
     addr: 'شارع ٩',
     area: 'المعادي',
@@ -250,6 +265,7 @@ final List<Order> sampleOrders = [
   ),
   const Order(
     num: '#89372',
+    phone: '+201093720',
     name: 'منى سعيد',
     addr: 'شارع الميرغني',
     area: 'مصر الجديدة',
