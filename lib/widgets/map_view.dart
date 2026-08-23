@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../config/res/config_imports.dart';
+import '../core/live_activity/external_links.dart';
 import '../theme/shadows.dart';
 
 /// Interactive map with a centered red pin. Used both as the short strip inside
@@ -21,6 +23,8 @@ class MapView extends StatefulWidget {
     this.pinIconSize = 19,
     this.pinVerticalAlignment = 0,
     this.center,
+    this.destinationLabel,
+    this.showOpenInMaps = true,
   });
 
   final double height;
@@ -38,6 +42,14 @@ class MapView extends StatefulWidget {
 
   /// Map focus point. Defaults to central Cairo.
   final LatLng? center;
+
+  /// Place name handed to Google Maps, so the courier lands on the destination
+  /// by name rather than a bare coordinate. Falls back to lat/lng when absent.
+  final String? destinationLabel;
+
+  /// Shows the "open in Google Maps" badge. The map itself is a preview — real
+  /// turn-by-turn belongs to a maps app, and the badge is what says so.
+  final bool showOpenInMaps;
 
   static const LatLng _defaultCenter = LatLng(30.0444, 31.2357);
 
@@ -159,7 +171,67 @@ class _MapViewState extends State<MapView>
               ],
             ),
           ),
+          if (widget.showOpenInMaps)
+            Positioned(
+              bottom: AppPadding.pH8,
+              left: AppPadding.pW8,
+              child: _OpenInMapsBadge(
+                focus: focus,
+                label: widget.destinationLabel,
+              ),
+            ),
         ],
+      ),
+    );
+  }
+}
+
+/// The small "open in Google Maps" chip that sits on the map.
+///
+/// Deliberately quiet and corner-anchored: the map is a preview of where the
+/// order is, and this is the hand-off to an app that can actually navigate.
+class _OpenInMapsBadge extends StatelessWidget {
+  const _OpenInMapsBadge({required this.focus, this.label});
+
+  final LatLng focus;
+  final String? label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(AppCircular.r8),
+      elevation: 0,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppCircular.r8),
+        onTap: () => ExternalLinks.openInGoogleMaps(
+          lat: focus.latitude,
+          lng: focus.longitude,
+          label: label,
+        ),
+        child: Padding(
+          padding: EdgeInsetsDirectional.symmetric(
+            horizontal: AppPadding.pW8,
+            vertical: AppPadding.pH4,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // The real Google Maps mark, drawn as-is: it is a multi-colour
+              // brand logo, so it deliberately bypasses IconWidget, which
+              // recolours the app's monochrome icon set through a srcIn filter.
+              SvgPicture.asset(
+                'assets/brand/google_maps.svg',
+                height: AppSize.sH16,
+              ),
+              4.szW,
+              Text(
+                LocaleKeys.mapOpenInGoogle.tr(),
+                style: const TextStyle().setMainTextColor.s12.semiBold,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

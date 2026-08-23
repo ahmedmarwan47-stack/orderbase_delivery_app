@@ -20,7 +20,30 @@ class ShiftController extends ChangeNotifier {
   bool _accepted = false;
   bool _returnsHandedOver = false;
 
+  /// Batches dispatched to this courier but not yet carried out of the branch,
+  /// oldest first. A day holds several — a new one often lands while the
+  /// previous is still being delivered — and each keeps its identity so the
+  /// Pickup tab can present them as the separate batches they are.
+  final List<OrderBatch> _pendingBatches = <OrderBatch>[];
+
+  /// Sequence behind the generated batch ids.
+  int _batchSeq = 1;
+
+  /// A batch that has arrived but whose announcement sheet has not been shown
+  /// yet. Read once via [takeAnnouncement] so it cannot announce twice.
+  List<Order>? _announcement;
+
   List<Order> get orders => _orders;
+
+  /// Batches waiting at the branch. The Pickup tab renders one group per entry;
+  /// carrying one merges its orders into the route and grows [totalStops].
+  List<OrderBatch> get pendingBatches => List.unmodifiable(_pendingBatches);
+
+  bool get hasPendingPickup => _pendingBatches.isNotEmpty;
+
+  /// Every order waiting at the branch, flattened across batches.
+  List<Order> get pendingPickup =>
+      [for (final b in _pendingBatches) ...b.orders];
 
   /// The branch the returns are physically handed back to.
   String get returnsBranch => 'Sale Sucre — مدينة نصر';
@@ -29,9 +52,35 @@ class ShiftController extends ChangeNotifier {
   /// opens on the "collect from branch" screen instead of Home.
   bool get accepted => _accepted;
 
-  // ── route (the batch being delivered — postponed orders leave the route) ──
-  List<Order> get routeStops =>
-      _orders.where((o) => o.status != OrderStatus.postponed).toList();
+  /// Order numbers belonging to the batches the courier is actually carrying.
+  /// Grows as further batches are carried, so the route is always "what is in
+  /// the bag", never the whole day's history.
+  final Set<String> _carried = <String>{};
+
+  /// Record a batch as being in hand. Union, not replace: carrying a second
+  /// batch adds to the route rather than starting a new one.
+  void _markCarried(Iterable<Order> batch) =>
+      _carried.addAll(batch.map((o) => o.num));
+
+  // ── route (the batches being delivered — postponed orders leave the route) ──
+  //
+  // Scoped to what has actually been carried, so the counters are driven by the
+  // real batch instead of a fixed day: carry four orders and the hero reads
+  // "الطلب ١ من ٤", and it climbs as each one closes. Before anything is
+  // carried there is no batch to scope to, so this falls back to the full set.
+  List<Order> get routeStops {
+    if (_carried.isEmpty) {
+      // Nothing carried yet: the batch about to be collected is what the hero
+      // should describe, so scope to what is still to deliver rather than the
+      // whole day. Otherwise the courier lands on Home reading a count that
+      // includes orders they closed hours ago.
+      return _orders.where((o) => o.status == OrderStatus.transit).toList();
+    }
+    return _orders
+        .where((o) => _carried.contains(o.num))
+        .where((o) => o.status != OrderStatus.postponed)
+        .toList();
+  }
 
   /// Stops already closed today (delivered or failed).
   int get closedStops =>
@@ -94,8 +143,54 @@ class ShiftController extends ChangeNotifier {
   }
 
   // ── mutations ──
+  /// Dispatch a new batch to the courier mid-day. The orders wait at the branch
+  /// until [carryPendingBatch] moves them onto the route; the batch is also
+  /// parked in [_announcement] so the shell can surface the dispatch sheet.
+  void assignBatch(List<Order> batch) {
+    if (batch.isEmpty) return;
+    _batchSeq += 1;
+    _pendingBatches.add(
+      OrderBatch(id: 'batch-$_batchSeq', orders: List<Order>.unmodifiable(batch)),
+    );
+    _announcement = List<Order>.unmodifiable(batch);
+    notifyListeners();
+  }
+
+  /// Returns a newly-arrived batch exactly once, so a rebuild cannot re-announce
+  /// a batch the courier has already been told about.
+  List<Order>? takeAnnouncement() {
+    final batch = _announcement;
+    _announcement = null;
+    return batch;
+  }
+
   void acceptBatch() {
     if (_accepted) return;
+    _accepted = true;
+    // The day's first batch is whatever is still to deliver at this point.
+    _markCarried(_orders.where((o) => o.status == OrderStatus.transit));
+    notifyListeners();
+  }
+
+  /// Carry one batch onto the active route. Totals grow, so "الطلب ٥ من ٨"
+  /// becomes "الطلب ٥ من ١١" the moment this lands.
+  void carryBatch(String id) {
+    final i = _pendingBatches.indexWhere((b) => b.id == id);
+    if (i < 0) return;
+    final batch = _pendingBatches.removeAt(i);
+    _orders = [..._orders, ...batch.orders];
+    _markCarried(batch.orders);
+    _accepted = true;
+    notifyListeners();
+  }
+
+  /// Carry everything waiting at the branch in one action.
+  void carryPendingBatch() {
+    if (_pendingBatches.isEmpty) return;
+    final incoming = pendingPickup;
+    _orders = [..._orders, ...incoming];
+    _markCarried(incoming);
+    _pendingBatches.clear();
     _accepted = true;
     notifyListeners();
   }
@@ -129,6 +224,10 @@ class ShiftController extends ChangeNotifier {
   /// Reset the shift (used on logout) — re-seed the batch, un-accept it.
   void reset() {
     _orders = List<Order>.from(sampleOrders);
+    _pendingBatches.clear();
+    _carried.clear();
+    _batchSeq = 1;
+    _announcement = null;
     _accepted = false;
     _returnsHandedOver = false;
     notifyListeners();

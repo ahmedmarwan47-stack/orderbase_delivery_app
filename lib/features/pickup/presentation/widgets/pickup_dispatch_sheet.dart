@@ -38,7 +38,7 @@ class _PickupDispatchSheet extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: AppSize.sH8,
-            children: [for (final o in orders) _DispatchOrderRow(order: o)],
+            children: [for (final o in orders) _PickupOrderRow(order: o)],
           ),
           16.szH,
           Text(
@@ -84,64 +84,3 @@ class _PickupDispatchSheet extends StatelessWidget {
 
 /// A single waiting order in miniature: order number + pay pill on top, customer
 /// name · area beneath — the pickup card stripped to a slim, thumbnail-less row.
-class _DispatchOrderRow extends StatelessWidget {
-  const _DispatchOrderRow({required this.order});
-  final FlowOrder order;
-
-  @override
-  Widget build(BuildContext context) {
-    final payLabel = order.cod
-        ? LocaleKeys.payCod.tr()
-        : LocaleKeys.pickupPayPaid.tr();
-    final payFg = order.cod ? AppColors.postponedText : AppColors.deliveredText;
-    final payBg = order.cod ? AppColors.heroCodPillBg : AppColors.deliveredBg;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceMuted,
-        borderRadius: BorderRadius.circular(AppCircular.r12),
-      ),
-      padding: EdgeInsetsDirectional.symmetric(
-        horizontal: AppPadding.pW12,
-        vertical: AppPadding.pH8,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              Text(
-                order.num,
-                textDirection: TextDirection.ltr,
-                style: const TextStyle().setMainTextColor.s14.bold,
-              ),
-              8.szW,
-              Container(
-                decoration: BoxDecoration(
-                  color: payBg,
-                  borderRadius: BorderRadius.circular(AppCircular.r7),
-                ),
-                padding: EdgeInsetsDirectional.symmetric(
-                  horizontal: AppPadding.pW8,
-                  vertical: AppPadding.pH4,
-                ),
-                child: Text(
-                  payLabel,
-                  style: const TextStyle().setColor(payFg).s12.semiBold,
-                ),
-              ),
-            ],
-          ),
-          4.szH,
-          Text(
-            '${order.name} · ${order.meta}',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle().setSecondaryColor.s12.regular,
-          ),
-        ],
-      ),
-    );
-  }
-}

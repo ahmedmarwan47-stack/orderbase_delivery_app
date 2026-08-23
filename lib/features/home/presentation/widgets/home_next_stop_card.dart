@@ -99,7 +99,11 @@ class _HomeNextStopCard extends StatelessWidget {
           // and a tap explains the colour in a small tooltip. See the widget.
           _HomeStopProgress(stops: orderedStops, current: order),
           // ── map strip ──
-          MapView(height: AppSize.sH120, showHairlines: true),
+          MapView(
+            height: AppSize.sH120,
+            showHairlines: true,
+            destinationLabel: order.fullAddress,
+          ),
           // ── order info ──
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +118,22 @@ class _HomeNextStopCard extends StatelessWidget {
                     style:
                         const TextStyle().setMainTextColor.s16.semiBold.tabular,
                   ),
-                  _PayPill(isCod: isCod),
+                  // The pill carries a cash figure now, so it can no longer
+                  // be assumed to fit: let it take the room that is left and
+                  // scale down rather than overflow on a long amount.
+                  Flexible(
+                    child: Align(
+                      alignment: AlignmentDirectional.centerEnd,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: AlignmentDirectional.centerEnd,
+                        child: _PayPill(
+                          isCod: isCod,
+                          amount: isCod ? order.cod : null,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               8.szH,
@@ -261,24 +280,39 @@ class _HomeNextStopCard extends StatelessWidget {
 }
 
 /// The COD / prepaid pill in the hero header.
+///
+/// On a cash order the pill carries the figure the courier has to collect —
+/// knowing there IS cash due is not much use without knowing how much, and the
+/// hero is the one place they look before setting off.
 class _PayPill extends StatelessWidget {
-  const _PayPill({required this.isCod});
+  const _PayPill({required this.isCod, this.amount});
   final bool isCod;
+
+  /// Cash due in EGP. Null on a prepaid order, where there is nothing to show.
+  final int? amount;
 
   @override
   Widget build(BuildContext context) {
+    // The figure IS the state: a cash amount can only mean cash on delivery, so
+    // spelling that out beside it is noise. Prepaid has no figure, so there the
+    // label is the whole message.
+    final text = amount != null
+        ? LocaleKeys.amountEgp.tr(
+            namedArgs: {'amount': formatThousands(amount!)},
+          )
+        : (isCod ? LocaleKeys.payCod : LocaleKeys.payPrepaid).tr();
     return Container(
       decoration: BoxDecoration(
         color: isCod ? AppColors.heroCodPillBg : AppColors.deliveredBg,
         borderRadius: BorderRadius.circular(AppCircular.r8),
       ),
       child: Text(
-        (isCod ? LocaleKeys.payCod : LocaleKeys.payPrepaid).tr(),
+        text,
         style: const TextStyle()
             .setColor(isCod ? AppColors.postponedText : AppColors.deliveredText)
             .s12
             .semiBold,
-      ).paddingSymmetric(horizontal: AppPadding.pW12, vertical: AppPadding.pH4),
+      ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
   }
 }

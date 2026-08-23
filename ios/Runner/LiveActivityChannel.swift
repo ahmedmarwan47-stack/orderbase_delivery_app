@@ -71,6 +71,18 @@ final class LiveActivityChannel: NSObject {
             pendingLink = nil
             result(link)
 
+        case "openUrl":
+            guard let args = call.arguments as? [String: Any],
+                  let raw = args["url"] as? String,
+                  let url = URL(string: raw) else {
+                result(FlutterError(code: "bad_args", message: "openUrl needs a url", details: nil))
+                return
+            }
+            DispatchQueue.main.async {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+            result(nil)
+
         case "dial":
             guard let args = call.arguments as? [String: Any],
                   let phone = args["phone"] as? String else {

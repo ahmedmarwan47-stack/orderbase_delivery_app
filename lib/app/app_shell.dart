@@ -61,6 +61,7 @@ class _AppShellState extends State<AppShell>
   /// The Orders tab IS the "today's orders" queue (search + 5 filters +
   /// postponed). The shell owns its controller so a Home KPI tap can preselect
   /// a filter and switch tabs; card taps open the flow *through* the shell.
+
   late final QueueViewController _ordersVc = QueueViewController(
     onSelectTab: _select,
     onOpenOrder: _openOrder,
@@ -77,6 +78,8 @@ class _AppShellState extends State<AppShell>
     // informative, not a gate (see [_announceDispatch]).
     WidgetsBinding.instance.addPostFrameCallback((_) => _announceDispatch());
   }
+
+
 
   /// If a branch batch is waiting and hasn't been carried yet, pop the
   /// dismissible "new batch at the branch" sheet. Choosing "carry from branch"
@@ -199,9 +202,12 @@ class _AppShellState extends State<AppShell>
               onOpenNotifications: _openNotifications,
               onOpenSearch: _openOrdersSearch,
               onConfirm: () {
-                // Carrying from the Pickup tab records the batch as collected
-                // (flips Pickup to its empty state) and returns to Home.
-                ShiftController.instance.acceptBatch();
+                // Carrying from the Pickup tab collects everything waiting at
+                // the branch: the day's first batch, plus any dispatched since.
+                // Later batches join the route, so the totals grow.
+                final shift = ShiftController.instance;
+                shift.acceptBatch();
+                shift.carryPendingBatch();
                 _select(NavTab.home);
               },
             ),

@@ -52,7 +52,7 @@ abstract final class AppColors {
   static const failedBg = Color(0xFFFDECEC);
   static const failedBorder = Color(0xFFF0C4C3);
   static const failedText = Color(0xFFB8120F);
-  static const stopCountText = Color(0xFFB0201E); // "المحطة 2 من 5" pill text
+  static const stopCountText = Color(0xFFB0201E); // "الطلب 2 من 5" pill text
 
   // Status: postponed (amber)
   static const postponedBg = Color(0xFFFEF6E4); // pill background
@@ -137,7 +137,7 @@ abstract final class AppColors {
   static const flatMuted = Color(0xFF85847F); // Flat (2a) muted labels / meta
   static const flatBadgeBg = Color(0xFFEDECE8); // Flat (2a) numbered stop badge
   static const flatDivider = Color(0xFFE8E7E3); // Flat (2a) hairline dividers / circle button border
-  static const flatBlack = Color(0xFF000000); // Flat (2a) pure-black primary button + banner text
+  static const flatBlack = Color(0xFF000000); // Flat (2a) primary button + banner text; batch cash total
   static const flatBannerBg = Color(0xFF898989); // Flat (2a) grey "today's overview" banner
   static const flatMutedDot = Color(0xFFC6C5C0); // Flat (2a) chevron + meta separator dot
   static const darkTileLabel = Color(0xFFCCCCD0); // Compact (1c) muted label on the dark collection tile

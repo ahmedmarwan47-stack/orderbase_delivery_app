@@ -84,6 +84,7 @@ class OrderFlowController {
     // The island switches to its "collecting" face while the sheet is up; if
     // the courier backs out it goes straight back to the en-route face.
     await LiveActivityBridge.instance.setPhase(DeliveryPhase.collecting);
+    if (!context.mounted) return;
     final collected = await showCodCollectionSheet(
       context,
       due: due,

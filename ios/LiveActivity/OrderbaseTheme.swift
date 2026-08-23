@@ -56,7 +56,7 @@ enum OB {
     }
 
     static func stopLabel(_ current: Int, _ total: Int) -> String {
-        "المحطة \(current) من \(total)"
+        "الطلب \(current) من \(total)"
     }
 
     static func stopCounter(_ current: Int, _ total: Int) -> String {

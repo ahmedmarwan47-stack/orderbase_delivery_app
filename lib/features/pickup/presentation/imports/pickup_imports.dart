@@ -8,7 +8,6 @@ import '../../../../app/shift_controller.dart';
 import '../../../../config/res/config_imports.dart';
 import '../../../../data/flow_order.dart';
 import '../../../../data/order.dart';
-import '../../../../theme/shadows.dart';
 import '../../../../widgets/app_header.dart';
 import '../../../../widgets/app_sheet.dart';
 import '../../../../widgets/bottom_nav.dart';
@@ -20,6 +19,7 @@ part '../view/pickup_screen.dart';
 
 // Widgets (private to the feature)
 part '../widgets/pickup_header.dart';
-part '../widgets/pickup_card.dart';
 part '../widgets/pickup_confirm_bar.dart';
+part '../widgets/pickup_batch_section.dart';
+part '../widgets/pickup_order_row.dart';
 part '../widgets/pickup_dispatch_sheet.dart';

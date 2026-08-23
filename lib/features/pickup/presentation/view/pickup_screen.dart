@@ -24,16 +24,6 @@ class PickupScreen extends StatefulWidget {
   final VoidCallback? onOpenNotifications;
   final VoidCallback? onOpenSearch;
 
-  /// Total time the entrance stagger is allowed to span across the whole batch.
-  static const Duration _totalStagger = Duration(milliseconds: 300);
-
-  /// Per-card lead-in: evenly spread across [_totalStagger] regardless of how
-  /// many cards there are, so a long list never crawls in.
-  static Duration _staggerDelay(int index, int count) {
-    if (count <= 1) return Duration.zero;
-    final step = _totalStagger.inMilliseconds / (count - 1);
-    return Duration(milliseconds: (step * index).round());
-  }
 
   @override
   State<PickupScreen> createState() => _PickupScreenState();
@@ -80,17 +70,24 @@ class _PickupScreenState extends State<PickupScreen> {
   @override
   Widget build(BuildContext context) {
     final onSelectTab = widget.onSelectTab;
-    // The batch waiting at the branch = the shift's in-transit orders (the ones
-    // still to deliver), so pickup shows the same orders as the rest of the app.
-    final orders =
-        ShiftController.instance.orders
-            .where((o) => o.status == OrderStatus.transit)
-            .map(orderToFlow)
-            .toList()
-          ..sort((a, b) => a.num.compareTo(b.num));
-    // Once the batch has been carried (accepted) there is nothing left at the
-    // branch — the page becomes an empty state instead of the list + CTA.
-    final carried = ShiftController.instance.accepted || orders.isEmpty;
+    final shift = ShiftController.instance;
+    // This tab is a view of BATCHES, not a flat order list: a courier can have
+    // several waiting at the branch at once. Before the first is carried, the
+    // day's own in-transit orders are that first batch, so it renders in the
+    // same shape as every batch dispatched later.
+    final batches = <OrderBatch>[
+      if (!shift.accepted)
+        OrderBatch(
+          id: 'batch-1',
+          orders: shift.orders
+              .where((o) => o.status == OrderStatus.transit)
+              .toList(),
+        ),
+      ...shift.pendingBatches,
+    ]..removeWhere((b) => b.orders.isEmpty);
+    final totalOrders = batches.fold<int>(0, (sum, b) => sum + b.count);
+    // Nothing left at the branch — the page becomes an empty state.
+    final carried = batches.isEmpty;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -111,7 +108,7 @@ class _PickupScreenState extends State<PickupScreen> {
                 ValueListenableBuilder<bool>(
                   valueListenable: _scrolled,
                   builder: (_, scrolled, _) => _PickupHeader(
-                    count: carried ? 0 : orders.length,
+                    count: totalOrders,
                     showBack: true,
                     scrolled: scrolled,
                   ),
@@ -129,25 +126,21 @@ class _PickupScreenState extends State<PickupScreen> {
                       bottom: AppPadding.pH20,
                     ),
                     // +1 leading item = the "ready for pickup" banner, on top of
-                    // the orders (moved out of the header) so it scrolls away.
-                    itemCount: orders.length + 1,
-                    separatorBuilder: (_, _) => 12.szH,
+                    // the batches (moved out of the header) so it scrolls away.
+                    itemCount: batches.length + 1,
+                    separatorBuilder: (_, _) => 16.szH,
                     itemBuilder: (_, i) {
-                      if (i == 0) return _PickupBanner(count: orders.length);
-                      final order = orders[i - 1];
-                      return _PickupCard(
-                        order: order,
-                        entranceDelay: PickupScreen._staggerDelay(
-                          i - 1,
-                          orders.length,
-                        ),
+                      if (i == 0) return _PickupBanner(count: totalOrders);
+                      return _PickupBatchSection(
+                        batch: batches[i - 1],
+                        index: i,
                       );
                     },
                   ),
                 ),
                 _PickupConfirmBar(
-                  count: orders.length,
-                  onConfirm: () => _carry(orders.length),
+                  count: totalOrders,
+                  onConfirm: () => _carry(totalOrders),
                 ),
               ],
               if (onSelectTab != null)

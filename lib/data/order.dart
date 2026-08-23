@@ -87,6 +87,64 @@ class Order {
 /// Sample data mirroring the mockup's own `state.orders`. Names are Arabic (the
 /// app is Arabic-first) and every order carries its items + note so a tapped
 /// card and its detail agree.
+/// One dispatch of orders from the branch. A courier's day is a sequence of
+/// these, not a single hand-off: a batch can land while an earlier one is still
+/// being delivered, so each keeps its own identity through the Pickup tab.
+class OrderBatch {
+  const OrderBatch({required this.id, required this.orders});
+
+  /// Stable identity — used to carry one batch without touching the others.
+  final String id;
+  final List<Order> orders;
+
+  int get count => orders.length;
+
+  /// Total cash due across the batch, so the courier can size up what they are
+  /// about to carry before accepting it.
+  int get codTotal =>
+      orders.fold(0, (sum, o) => sum + (o.prepaid ? 0 : (o.cod ?? 0)));
+}
+
+/// The second branch batch — dispatched to the courier *while the first one is
+/// still being delivered*, which is the normal case in the field: a courier can
+/// hold several batches in one day. Announced by the dispatch sheet and waits in
+/// [ShiftController.pendingPickup] until it is carried from the branch.
+final List<Order> sampleBatchTwo = [
+  const Order(
+    num: '#89412',
+    phone: '+201115540',
+    name: 'سلمى فؤاد',
+    addr: 'شارع مصدق',
+    area: 'الدقي',
+    status: OrderStatus.transit,
+    due: '٥:٢٠ م',
+    cod: 640,
+    dist: '6.8 كم',
+  ),
+  const Order(
+    num: '#89417',
+    phone: '+201227781',
+    name: 'طارق الشناوي',
+    addr: 'شارع التسعين الشمالي',
+    area: 'التجمع الخامس',
+    status: OrderStatus.transit,
+    due: '٥:٥٠ م',
+    prepaid: true,
+    dist: '11.3 كم',
+  ),
+  const Order(
+    num: '#89423',
+    phone: '+201004432',
+    name: 'دينا سمير',
+    addr: 'شارع جسر السويس',
+    area: 'مصر الجديدة',
+    status: OrderStatus.transit,
+    due: '٦:١٥ م',
+    cod: 980,
+    dist: '8.1 كم',
+  ),
+];
+
 final List<Order> sampleOrders = [
   const Order(
     num: '#89289',

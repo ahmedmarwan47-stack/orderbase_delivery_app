@@ -45,7 +45,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final items = sampleNotifications();
+    final items = NotificationsStore.instance.items;
     final unread = items.where((n) => n.unread).length;
     return Directionality(
       textDirection: TextDirection.rtl,

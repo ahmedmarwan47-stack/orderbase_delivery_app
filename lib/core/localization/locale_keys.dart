@@ -26,6 +26,8 @@ abstract final class LocaleKeys {
   static const String notifHoursAgo = 'notif_hours_ago';
   static const String notifTitleAssigned = 'notif_title_assigned';
   static const String notifBodyAssigned = 'notif_body_assigned';
+  static const String notifTitleBatch = 'notif_title_batch';
+  static const String notifBodyBatch = 'notif_body_batch';
   static const String notifTitleCancelled = 'notif_title_cancelled';
   static const String notifBodyCancelled = 'notif_body_cancelled';
   static const String notifTitleNote = 'notif_title_note';
@@ -165,6 +167,9 @@ abstract final class LocaleKeys {
   static const String pickupEmptyTitle = 'pickup_empty_title';
   static const String pickupEmptyDesc = 'pickup_empty_desc';
   // Dispatch announcement sheet (shown once on app open — dismissible).
+  static const String mapOpenInGoogle = 'map_open_in_google';
+  static const String pickupBatchLabel = 'pickup_batch_label';
+  static const String pickupBatchMeta = 'pickup_batch_meta';
   static const String pickupDispatchTitle = 'pickup_dispatch_title';
   static const String pickupDispatchBanner = 'pickup_dispatch_banner';
   static const String pickupDispatchBody = 'pickup_dispatch_body';

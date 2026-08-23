@@ -3,11 +3,12 @@ part of '../imports/notifications_imports.dart';
 /// The kind of a courier notification — drives the tinted icon tile, matching
 /// the status palette used across the app (transit blue / failed red /
 /// postponed amber / delivered green).
-enum NotifKind { assigned, cancelled, note, wallet }
+enum NotifKind { assigned, batch, cancelled, note, wallet }
 
 extension NotifKindX on NotifKind {
   String get icon => switch (this) {
         NotifKind.assigned => AppAssets.svg.box,
+        NotifKind.batch => AppAssets.svg.box,
         NotifKind.cancelled => AppAssets.svg.x,
         NotifKind.note => AppAssets.svg.note,
         NotifKind.wallet => AppAssets.svg.wallet,
@@ -15,6 +16,7 @@ extension NotifKindX on NotifKind {
 
   Color get tileBg => switch (this) {
         NotifKind.assigned => AppColors.transitPillBg,
+        NotifKind.batch => AppColors.transitPillBg,
         NotifKind.cancelled => AppColors.failedBg,
         NotifKind.note => AppColors.heroCodPillBg,
         NotifKind.wallet => AppColors.deliveredBg,
@@ -22,6 +24,7 @@ extension NotifKindX on NotifKind {
 
   Color get iconColor => switch (this) {
         NotifKind.assigned => AppColors.transitBg,
+        NotifKind.batch => AppColors.transitBg,
         NotifKind.cancelled => AppColors.failedText,
         NotifKind.note => AppColors.postponedText,
         NotifKind.wallet => AppColors.deliveredText,
@@ -57,6 +60,17 @@ class AppNotification {
 List<AppNotification> sampleNotifications() {
   const branch = 'مدينة نصر';
   return [
+    // Newest first: the batch that started this shift.
+    AppNotification(
+      kind: NotifKind.batch,
+      orderNum: '89289',
+      title: LocaleKeys.notifTitleBatch.tr(namedArgs: {'count': '4'}),
+      body: LocaleKeys.notifBodyBatch.tr(
+        namedArgs: {'branch': branch, 'cash': '2,290'},
+      ),
+      time: LocaleKeys.notifMinutesAgo.tr(namedArgs: {'n': '٥'}),
+      unread: true,
+    ),
     AppNotification(
       kind: NotifKind.assigned,
       orderNum: '89340',
@@ -117,4 +131,47 @@ List<AppNotification> sampleNotifications() {
       time: LocaleKeys.notifHoursAgo.tr(namedArgs: {'n': '٤'}),
     ),
   ];
+}
+
+/// The live notification feed.
+///
+/// Seeded from [sampleNotifications] and appended to as the shift runs, so an
+/// event the courier was told about in a sheet — a batch landing, say — is
+/// still there in the list afterwards instead of vanishing with the sheet.
+class NotificationsStore extends ChangeNotifier {
+  NotificationsStore._();
+  static final NotificationsStore instance = NotificationsStore._();
+
+  List<AppNotification>? _items;
+
+  /// Seeded lazily: the sample feed resolves [LocaleKeys], which needs
+  /// easy_localization to be initialised first.
+  List<AppNotification> get items => _items ??= sampleNotifications();
+
+  /// File a notification at the top of the feed, newest first.
+  void add(AppNotification n) {
+    _items = [n, ...items];
+    notifyListeners();
+  }
+
+  /// Announce a freshly dispatched batch.
+  void addBatchAssigned(OrderBatch batch, {required String branch}) {
+    add(
+      AppNotification(
+        kind: NotifKind.batch,
+        orderNum: batch.orders.first.num.replaceAll('#', '').trim(),
+        title: LocaleKeys.notifTitleBatch.tr(
+          namedArgs: {'count': '${batch.count}'},
+        ),
+        body: LocaleKeys.notifBodyBatch.tr(
+          namedArgs: {
+            'branch': branch,
+            'cash': formatThousands(batch.codTotal),
+          },
+        ),
+        time: LocaleKeys.notifMinutesAgo.tr(namedArgs: {'n': '١'}),
+        unread: true,
+      ),
+    );
+  }
 }

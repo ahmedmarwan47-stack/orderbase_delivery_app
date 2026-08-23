@@ -171,8 +171,15 @@ simulator) is the only one shown — the app no longer draws its own `9:41` row.
   `HomeIndicator`.
 - `HomeIndicator` — the home-indicator pill on a white strip (used directly by screens with no tab
   bar, e.g. Pickup).
-- `MapView` — the static decorative map + red pin (Home strip and Order-detail map both use it;
-  the map is a placeholder SVG — swap for a real map later).
+- `MapView` — real `FlutterMap` + OSM raster tiles + red pin (Home strip and Order-detail map both
+  use it; pure Dart, no native plugin, so the iOS build stays CocoaPods-free). Carries the
+  **open-in-Google-Maps badge**: pass `destinationLabel` so Maps opens on the address rather than a
+  bare coordinate. The badge draws `assets/brand/google_maps.svg` through `SvgPicture` directly —
+  it is a multi-colour brand mark, so it must NOT go through `IconWidget`, which recolours the
+  monochrome icon set via a `srcIn` filter.
+- Opening a URL goes through `ExternalLinks` (`lib/core/live_activity/external_links.dart`), which
+  rides the Live Activity method channel's `openUrl` rather than adding `url_launcher` — that
+  plugin would put native code back into the iOS build.
 - `StatusPill` — small status pill (background/foreground/border/icon).
 
 ## Icons (`lib/icons/app_icon.dart`)
@@ -197,6 +204,8 @@ The real entry point — `main.dart` sets `home: const AppShell()`. It's an `Ind
 `BottomNav` tab host:
 - **Home** and **الطلبات (Orders)** are real screens. **الاشعارات / المزيد** are `_PlaceholderTab`
   ("قريبًا") until those screens are built.
+- The pickup tab is labelled **الدفعات** (`nav_pickup`), not "الاستلام": a tab bar names sections,
+  not actions, and the tab now lists the batches waiting at the branch.
 - Tapping **عرض الطلب** (Home hero) or an **order card** (Orders) pushes the order-detail flow
   *over* the shell. The Result screen's buttons pop the whole flow back via
   `popUntil((r) => r.isFirst)`; "العودة للرئيسية" also switches to the Home tab.
@@ -221,10 +230,18 @@ the courier has Live Activities switched off in Settings.
 | The five SwiftUI presentations | `ios/LiveActivity/` |
 | **Xcode target setup (a human step)** | `ios/LiveActivity/SETUP.md` |
 
-**The widget-extension target does not exist in `Runner.xcodeproj` yet** — it can
-only be created through Xcode's GUI. Until someone follows `SETUP.md`, the Dart
-side runs, finds no native handler, swallows the `MissingPluginException` and the
-app behaves exactly as before. Nothing is broken in the meantime.
+**The `OrderbaseLiveActivity` widget-extension target now exists** — it was
+authored directly in `project.pbxproj` (native target + Debug/Release/Profile
+configs + an *Embed App Extensions* phase on Runner + a target dependency), so
+`SETUP.md` steps 1–5 are **already done** and no Xcode GUI pass is needed. The
+four Noto Kufi faces are bundled into the extension, and ActivityKit is
+weak-linked on Runner so it keeps launching below iOS 16.1.
+
+Both presentations are height-budgeted: the expanded island and the Lock Screen
+card each get ~160pt and iOS **silently clips** anything taller (the expanded
+card loses its call button; the Lock Screen card loses its whole header row).
+Keep the type/gaps/control heights in `DeliveryLiveActivity.swift` as they are
+unless you re-measure.
 
 Design source: the five presentations were mocked first (compact leading /
 trailing, minimal, expanded, lock screen) at Apple's real geometry — 232×37,
@@ -249,6 +266,36 @@ Rules worth keeping:
 Not built yet: APNs `liveactivity` pushes (so the island goes stale once iOS
 suspends the app), a real countdown (`Order.due` is a formatted string, not a
 timestamp), an `arrived` trigger (no geofence), and any Android equivalent.
+
+## Batches (`OrderBatch` + `ShiftController`)
+
+A courier's day is a **sequence of batches**, not one hand-off: another batch can
+be dispatched while the previous one is still being delivered.
+
+- `OrderBatch` (`lib/data/order.dart`) — `id` + `orders`, with `count`/`codTotal`.
+- `ShiftController` — `assignBatch()` files a new batch into `pendingBatches` and
+  parks it in `_announcement`; `takeAnnouncement()` hands it over exactly once
+  (so a rebuild cannot re-announce); `carryBatch(id)` / `carryPendingBatch()`
+  move batches onto the route and record them in `_carried`.
+- **`routeStops` is scoped to `_carried`**, which is what makes the Home hero
+  read "الطلب ١ من ٤" — the batch in hand — instead of a fixed day count. Before
+  anything is carried it falls back to the still-to-deliver orders, so the hero
+  never counts orders closed hours ago.
+- The **الدفعات** tab (`features/pickup/`) renders one `_PickupBatchSection` per
+  batch, each a header plus `_PickupOrderRow` compact rows — the same row the
+  dispatch sheet uses, so a batch looks the same wherever it appears.
+- A batch pill shows the **cash figure alone** on a COD order: the amount already
+  implies cash on delivery, so the "الدفع عند الاستلام" label beside it was noise.
+
+> **Only one batch ships today.** `sampleBatchTwo`, `assignBatch`,
+> `takeAnnouncement`, `carryBatch` and `NotificationsStore.addBatchAssigned` are
+> deliberately unreferenced — they are the one-line re-enable for a second batch
+> arriving mid-route (previously on a 30s timer in `AppShell`). Don't delete them
+> as dead code.
+
+**Copy rule:** an order is never a "stop" or a "destination". It is **الطلب ٥ من ٨**
+(`home_stop_count`) / **الطلب التالي** (`home_next_stop`), in `ar.json`, `en.json`
+*and* `OrderbaseTheme.stopLabel` on the Swift side.
 
 ## DevGallery (`lib/dev/dev_gallery.dart`)
 
