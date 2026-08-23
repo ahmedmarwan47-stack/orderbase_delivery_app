@@ -29,6 +29,13 @@ enum OB {
     static let subtle = Color(red: 0.945, green: 0.941, blue: 0.929)
     /// #E6E5E2 — AppColors.borderDefault
     static let hairline = Color(red: 0.902, green: 0.898, blue: 0.886)
+    /// #BDBAB4 — the unfilled half of the progress track. Deliberately darker
+    /// than `hairline`: a hairline on `paper` is ~1.1:1, which disappears
+    /// outright once the Lock Screen dims the card.
+    static let track = Color(red: 0.741, green: 0.729, blue: 0.706)
+    /// #EAE8E4 — fill behind the cash row, a step darker than `subtle` so the
+    /// row reads as a contained block rather than a flat band.
+    static let rowFill = Color(red: 0.918, green: 0.910, blue: 0.894)
 
     // MARK: - Type
 

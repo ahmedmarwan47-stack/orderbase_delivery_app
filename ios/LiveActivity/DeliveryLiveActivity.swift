@@ -204,7 +204,7 @@ private struct LockScreenCard: View {
             ProgressSegments(done: max(state.stopNumber - 1, 0), total: state.totalStops)
             cashRow
         }
-        .padding(12)
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -245,7 +245,7 @@ private struct LockScreenCard: View {
                 .lineLimit(1)
             Text(state.subtitle)
                 .font(OB.font(14))
-                .foregroundColor(OB.warmMuted)
+                .foregroundColor(OB.secondary)
                 .lineLimit(1)
         }
     }
@@ -254,10 +254,10 @@ private struct LockScreenCard: View {
         HStack(spacing: 8) {
             Image(systemName: state.prepaid ? "checkmark.seal" : "banknote")
                 .font(.system(size: 14))
-                .foregroundColor(OB.warmMuted)
+                .foregroundColor(OB.secondary)
             Text(state.prepaid ? "مدفوع مقدمًا" : "تحصيل نقدي")
                 .font(OB.font(12, OB.semibold))
-                .foregroundColor(OB.warmMuted)
+                .foregroundColor(OB.secondary)
 
             Spacer(minLength: 8)
 
@@ -268,14 +268,14 @@ private struct LockScreenCard: View {
                         .foregroundColor(OB.ink)
                     Image(systemName: "lock.fill")
                         .font(.system(size: 12))
-                        .foregroundColor(OB.warmMuted)
+                        .foregroundColor(OB.secondary)
                 }
             }
         }
         .padding(.horizontal, 12)
-        .frame(height: 36)
+        .frame(height: 32)
         .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous).fill(OB.subtle)
+            RoundedRectangle(cornerRadius: 12, style: .continuous).fill(OB.rowFill)
         )
     }
 }
@@ -292,7 +292,7 @@ private struct ProgressSegments: View {
         HStack(spacing: 4) {
             ForEach(0..<capped, id: \.self) { index in
                 Capsule()
-                    .fill(index < done ? OB.green : OB.hairline)
+                    .fill(index < done ? OB.green : OB.track)
                     .frame(height: 4)
             }
         }
