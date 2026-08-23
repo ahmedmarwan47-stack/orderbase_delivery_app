@@ -148,30 +148,37 @@ private struct ExpandedBottom: View {
     let state: State
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        // The expanded island caps out at ~160pt tall, and the leading/trailing
+        // row eats the top of that. Every size below is chosen so the whole
+        // stack — name, address and the call button — fits inside what is
+        // left; raising any of them clips the button off the bottom edge.
+        VStack(alignment: .leading, spacing: 8) {
             VStack(alignment: .leading, spacing: 0) {
                 Text(state.customer)
-                    .font(OB.font(20, OB.bold))
+                    .font(OB.font(18, OB.bold))
                     .foregroundColor(.white)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                 Text(state.subtitle)
-                    .font(OB.font(14))
+                    .font(OB.font(12))
                     .foregroundColor(OB.muted)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
 
             if let url = state.callURL {
                 Link(destination: url) {
                     HStack(spacing: 8) {
                         Image(systemName: "phone.fill")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.system(size: 14, weight: .semibold))
                         Text("اتصال بالعميل")
-                            .font(OB.font(14, OB.bold))
+                            .font(OB.font(12, OB.bold))
                     }
                     .foregroundColor(OB.ink)
-                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .frame(maxWidth: .infinity, minHeight: 36)
                     .background(Capsule().fill(Color.white))
                 }
+                .fixedSize(horizontal: false, vertical: true)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -188,13 +195,16 @@ private struct LockScreenCard: View {
     let state: State
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        // A Lock Screen activity gets ~160pt of height and iOS clips the TOP
+        // when the content is taller, silently eating the header row. Every
+        // gap and inset below is sized to keep the whole card inside that.
+        VStack(alignment: .leading, spacing: 8) {
             header
             identity
             ProgressSegments(done: max(state.stopNumber - 1, 0), total: state.totalStops)
             cashRow
         }
-        .padding(16)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -202,7 +212,7 @@ private struct LockScreenCard: View {
         HStack(spacing: 8) {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(OB.brand)
-                .frame(width: 24, height: 24)
+                .frame(width: 20, height: 20)
                 .overlay(
                     Image(systemName: "bicycle")
                         .font(.system(size: 12, weight: .semibold))
@@ -263,7 +273,7 @@ private struct LockScreenCard: View {
             }
         }
         .padding(.horizontal, 12)
-        .frame(height: 44)
+        .frame(height: 36)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous).fill(OB.subtle)
         )
