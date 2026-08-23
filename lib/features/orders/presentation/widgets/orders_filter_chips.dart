@@ -11,7 +11,7 @@ class _OrdersFilterChips extends StatelessWidget {
     return ValueListenableBuilder<OrdersFilter>(
       valueListenable: vc.filter,
       builder: (_, selected, _) => Row(
-        spacing: AppSize.sW8,
+        spacing: AppSize.sW4,
         children: [
           for (final f in OrdersFilter.values)
             _OrdersFilterChip(

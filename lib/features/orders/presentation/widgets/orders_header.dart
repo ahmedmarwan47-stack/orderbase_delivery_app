@@ -24,12 +24,12 @@ class _OrdersHeader extends StatelessWidget {
             children: [
               Text(
                 LocaleKeys.queueTitle.tr(),
-                style: const TextStyle().setMainTextColor.s16.bold,
+                style: const TextStyle().setMainTextColor.s14.semiBold,
               ),
               4.szH,
               Text(
                 LocaleKeys.ordersSubtitle.tr(),
-                style: const TextStyle().setSecondaryColor.s14.regular,
+                style: const TextStyle().setSecondaryColor.s12.medium,
               ),
             ],
           ),

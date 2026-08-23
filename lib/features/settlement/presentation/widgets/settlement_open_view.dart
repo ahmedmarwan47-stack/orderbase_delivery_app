@@ -141,13 +141,13 @@ class _SettlementHeader extends StatelessWidget {
                     if (showBack) ...[
                       Text(
                         LocaleKeys.settlementTitle.tr(),
-                        style: const TextStyle().setMainTextColor.s16.bold,
+                        style: const TextStyle().setSecondaryColor.s12.medium,
                       ),
                       4.szH,
                     ],
                     Text(
                       LocaleKeys.settlementSubtitle.tr(),
-                      style: const TextStyle().setMainTextColor.s16.bold,
+                      style: const TextStyle().setMainTextColor.s14.semiBold,
                     ),
                   ],
                 ),

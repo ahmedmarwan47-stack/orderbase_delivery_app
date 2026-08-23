@@ -58,7 +58,7 @@ class _ReturnsPageHeader extends StatelessWidget {
           12.szW,
           Text(
             LocaleKeys.failureReturnsPageTitle.tr(),
-            style: const TextStyle().setMainTextColor.s16.bold,
+            style: const TextStyle().setMainTextColor.s14.semiBold,
           ),
         ],
       ),
