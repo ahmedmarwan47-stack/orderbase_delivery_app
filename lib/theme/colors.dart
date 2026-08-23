@@ -43,6 +43,11 @@ abstract final class AppColors {
   // Brighter than deliveredText (#15803D); kept distinct on purpose.
   static const greenAccent = Color(0xFF16A34A);
 
+  // WhatsApp contact action — WhatsApp's own darker brand green. Deliberately
+  // deeper/tealer than greenAccent + deliveredText (#15803D) so the contact
+  // button never reads as the "delivered" status hue.
+  static const whatsappGreen = Color(0xFF128C7E);
+
   // Status: failed
   static const failedBg = Color(0xFFFDECEC);
   static const failedBorder = Color(0xFFF0C4C3);

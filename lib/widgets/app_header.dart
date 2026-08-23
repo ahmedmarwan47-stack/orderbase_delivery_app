@@ -64,8 +64,8 @@ class AppHeader extends StatelessWidget {
                               ),
                               style: const TextStyle()
                                   .setMainTextColor
-                                  .s16
-                                  .bold,
+                                  .s14
+                                  .semiBold,
                             ),
                             4.szH,
                             Text(
@@ -76,8 +76,8 @@ class AppHeader extends StatelessWidget {
                               ),
                               style: const TextStyle()
                                   .setSecondaryColor
-                                  .s14
-                                  .regular,
+                                  .s12
+                                  .medium,
                             ),
                           ],
                         ),

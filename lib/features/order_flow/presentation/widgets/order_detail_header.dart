@@ -69,9 +69,9 @@ class _OrderDetailHeader extends StatelessWidget {
                       textDirection: TextDirection.ltr,
                       style: const TextStyle()
                           .setMainTextColor
-                          .s16
-                          .bold
-                          .withHeight(20 / 16)
+                          .s14
+                          .semiBold
+                          .withHeight(20 / 14)
                           .tabular,
                     ),
                   ],
@@ -86,7 +86,7 @@ class _OrderDetailHeader extends StatelessWidget {
                     style: const TextStyle()
                         .setColor(AppColors.failedText)
                         .s12
-                        .semiBold,
+                        .medium,
                   ),
                 ],
               ],

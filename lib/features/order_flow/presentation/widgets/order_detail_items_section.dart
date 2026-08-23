@@ -34,7 +34,7 @@ class _ItemsSection extends StatelessWidget {
   }
 }
 
-/// A single order line — merchant thumb, name/variant/weight, and quantity.
+/// A single order line — merchant thumb, name/variant, and quantity.
 class _ItemRow extends StatelessWidget {
   const _ItemRow({required this.item, required this.withDivider});
   final FlowOrderItem item;
@@ -77,11 +77,6 @@ class _ItemRow extends StatelessWidget {
                   Text(
                     item.variant,
                     style: const TextStyle().setSecondaryColor.s12.regular,
-                  ),
-                  4.szH,
-                  Text(
-                    item.weight,
-                    style: const TextStyle().setTertiaryColor.s12.semiBold.tabular,
                   ),
                 ],
               ),

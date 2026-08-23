@@ -43,10 +43,10 @@ class _CustomerSection extends StatelessWidget {
               child: _OutlineActionButton(
                 icon: AppAssets.svg.phone,
                 label: LocaleKeys.orderDetailCall.tr(),
-                // Neutral — off the status hues so call/whatsapp never read as
-                // the failed-red / delivered-green states.
-                fg: AppColors.textPrimary,
-                border: AppColors.borderDefault,
+                // Call = blue, WhatsApp = green — a contact accent per channel,
+                // distinct from the failed-red / delivered-green status hues.
+                fg: AppColors.transitBg,
+                border: AppColors.transitBg,
                 background: AppColors.surface,
               ).onClick(onTap: AppHaptics.tap),
             ),
@@ -55,8 +55,8 @@ class _CustomerSection extends StatelessWidget {
               child: _OutlineActionButton(
                 icon: AppAssets.svg.chat,
                 label: LocaleKeys.orderDetailWhatsapp.tr(),
-                fg: AppColors.textPrimary,
-                border: AppColors.borderDefault,
+                fg: AppColors.whatsappGreen,
+                border: AppColors.whatsappGreen,
                 background: AppColors.surface,
               ).onClick(onTap: AppHaptics.tap),
             ),

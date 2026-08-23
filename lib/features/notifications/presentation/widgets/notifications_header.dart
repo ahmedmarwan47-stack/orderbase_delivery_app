@@ -31,7 +31,7 @@ class _NotificationsHeader extends StatelessWidget {
           12.szW,
           Text(
             LocaleKeys.navNotifications.tr(),
-            style: const TextStyle().setMainTextColor.s16.bold,
+            style: const TextStyle().setMainTextColor.s14.semiBold,
           ),
           const Spacer(),
           if (unread > 0)

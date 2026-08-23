@@ -17,7 +17,7 @@ class _QueueFilterChips extends StatelessWidget {
           end: AppPadding.pW20,
         ),
         child: Row(
-          spacing: AppSize.sW8,
+          spacing: AppSize.sW4,
           children: [
             _FilterChip(
               labelKey: LocaleKeys.filterAll,
