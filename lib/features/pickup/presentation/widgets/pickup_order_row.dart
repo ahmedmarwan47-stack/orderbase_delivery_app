@@ -36,10 +36,11 @@ class _PickupOrderRow extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
         border: last
+            // borderDefault, not the near-invisible itemDivider: this rule has
+            // to read on the warm page background, not on white.
             ? null
-            : const Border(bottom: BorderSide(color: AppColors.itemDivider)),
+            : const Border(bottom: BorderSide(color: AppColors.borderDefault)),
       ),
       padding: EdgeInsetsDirectional.only(
         // Indented past the batch header's label, so the rows read as its

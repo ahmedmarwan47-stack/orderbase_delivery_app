@@ -226,34 +226,31 @@ class _AnimatedQueueListState extends State<_AnimatedQueueList> {
   @override
   Widget build(BuildContext context) {
     final duration = widget.reduced ? Duration.zero : AppMotion.fill;
-    return ColoredBox(
-      color: AppColors.surface,
-      child: RefreshIndicator(
-        onRefresh: _refresh,
-        color: AppColors.brand,
-        backgroundColor: AppColors.surface,
-        child: ListView(
-          // Drives the scroll-reactive browse header (offset > 2 ⇒ header fades
-          // in its surface + hairline). Only this browse list attaches it.
-          controller: widget.vc.scrollController,
-          // Always scrollable so the pull works even with a short list.
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: widget.padding,
-          children: [
-            for (final (i, row) in _rows.indexed)
-              _CollapsibleRow(
-                key: ValueKey(row.order.num),
-                removing: row.removing,
-                duration: duration,
-                onRemoved: () => _prune(row.order.num),
-                child: _QueueCard(
-                  order: row.order,
-                  last: i == _rows.length - 1,
-                  onTap: () => widget.vc.openOrder(context, row.order),
-                ),
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      color: AppColors.brand,
+      backgroundColor: AppColors.surface,
+      child: ListView(
+        // Drives the scroll-reactive browse header (offset > 2 ⇒ header fades
+        // in its surface + hairline). Only this browse list attaches it.
+        controller: widget.vc.scrollController,
+        // Always scrollable so the pull works even with a short list.
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: widget.padding,
+        children: [
+          for (final (i, row) in _rows.indexed)
+            _CollapsibleRow(
+              key: ValueKey(row.order.num),
+              removing: row.removing,
+              duration: duration,
+              onRemoved: () => _prune(row.order.num),
+              child: _QueueCard(
+                order: row.order,
+                last: i == _rows.length - 1,
+                onTap: () => widget.vc.openOrder(context, row.order),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
@@ -321,18 +318,15 @@ class _QueueSearchResults extends StatelessWidget {
               total: vc.orders.length,
             ).paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH12),
             Expanded(
-              child: ColoredBox(
-                color: AppColors.surface,
-                child: ListView.builder(
-                  padding: EdgeInsetsDirectional.only(bottom: AppPadding.pH20),
-                  itemCount: matches.length,
-                  itemBuilder: (context, i) => _SearchResultCard(
-                    order: matches[i],
-                    query: query,
-                    reasonKey: vc.matchKey(matches[i]),
-                    last: i == matches.length - 1,
-                    onTap: () => vc.openOrder(context, matches[i]),
-                  ),
+              child: ListView.builder(
+                padding: EdgeInsetsDirectional.only(bottom: AppPadding.pH20),
+                itemCount: matches.length,
+                itemBuilder: (context, i) => _SearchResultCard(
+                  order: matches[i],
+                  query: query,
+                  reasonKey: vc.matchKey(matches[i]),
+                  last: i == matches.length - 1,
+                  onTap: () => vc.openOrder(context, matches[i]),
                 ),
               ),
             ),

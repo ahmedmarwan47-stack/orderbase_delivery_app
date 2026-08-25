@@ -132,37 +132,34 @@ class _AnimatedPostponedListState extends State<_AnimatedPostponedList> {
   @override
   Widget build(BuildContext context) {
     final duration = widget.reduced ? Duration.zero : AppMotion.fill;
-    // Same flat-list treatment as the main queue: rows edge to edge on one
-    // surface, hairlines instead of card outlines. The advisory banner keeps
-    // its own shape — it is a note, not an order.
-    return ColoredBox(
-      color: AppColors.surface,
-      child: ListView(
-        controller: widget.scrollController,
-        padding: EdgeInsetsDirectional.only(bottom: AppPadding.pH20),
-        children: [
-          const _PostponedInfoBanner().paddingSymmetric(
-            horizontal: AppPadding.pW20,
-            vertical: AppPadding.pH16,
-          ),
-          for (final (i, row) in _rows.indexed)
-            _CollapsibleRow(
-              key: ValueKey(row.order.num),
-              removing: row.removing,
-              duration: duration,
-              onRemoved: () => _prune(row.order.num),
-              // A row that's collapsing away shouldn't take another tap.
-              child: IgnorePointer(
-                ignoring: row.removing,
-                child: _PostponedCard(
-                  order: row.order,
-                  last: i == _rows.length - 1,
-                  onReturn: () => widget.onReturn(row.order),
-                ),
+    // Same flat-list treatment as the main queue: rows edge to edge on the page,
+    // hairlines instead of card outlines. The advisory banner keeps its own
+    // shape — it is a note, not an order.
+    return ListView(
+      controller: widget.scrollController,
+      padding: EdgeInsetsDirectional.only(bottom: AppPadding.pH20),
+      children: [
+        const _PostponedInfoBanner().paddingSymmetric(
+          horizontal: AppPadding.pW20,
+          vertical: AppPadding.pH16,
+        ),
+        for (final (i, row) in _rows.indexed)
+          _CollapsibleRow(
+            key: ValueKey(row.order.num),
+            removing: row.removing,
+            duration: duration,
+            onRemoved: () => _prune(row.order.num),
+            // A row that's collapsing away shouldn't take another tap.
+            child: IgnorePointer(
+              ignoring: row.removing,
+              child: _PostponedCard(
+                order: row.order,
+                last: i == _rows.length - 1,
+                onReturn: () => widget.onReturn(row.order),
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }

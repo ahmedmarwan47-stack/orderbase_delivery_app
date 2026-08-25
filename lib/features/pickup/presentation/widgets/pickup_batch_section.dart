@@ -10,9 +10,9 @@ part of '../imports/pickup_imports.dart';
 /// and the one they are working through: the header alone (count + cash) is
 /// enough to keep it accounted for.
 ///
-/// The section is drawn as list structure, not as a card — no outline, no
-/// rounded box around a box. A hairline closes each row, and a heavier one
-/// closes the section.
+/// The section is drawn as list structure, not as a card — no outline, no fill,
+/// no rounded box around a box. It sits straight on the page and a hairline is
+/// all that closes each row and each section.
 class _PickupBatchSection extends StatefulWidget {
   const _PickupBatchSection({
     required this.batch,
@@ -52,7 +52,6 @@ class _PickupBatchSectionState extends State<_PickupBatchSection> {
     final reduced = AppMotion.reduced(context);
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.surface,
         border: widget.last
             ? null
             : const Border(bottom: BorderSide(color: AppColors.borderDefault)),

@@ -5,9 +5,10 @@ part of '../imports/queue_imports.dart';
 /// The tab used to be a stack of rounded white cards floating on the page: a
 /// box inside a box, with the screen's padding wrapped around each card's own
 /// padding. A queue is a list, so it is drawn as one — rows run edge to edge
-/// on a single surface and a hairline is all that separates them. That buys
-/// back ~40px of width per row and lets the eye run straight down the column
-/// instead of stepping over eight card outlines.
+/// straight on the page and a hairline is all that separates them. No fill of
+/// their own either: a white sheet under the rows was the card outline back
+/// again, one size larger. That buys back ~40px of width per row and lets the
+/// eye run straight down the column instead of stepping over eight outlines.
 class _ListRow extends StatelessWidget {
   const _ListRow({required this.child, required this.last, this.onTap});
 

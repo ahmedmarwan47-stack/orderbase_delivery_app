@@ -351,11 +351,15 @@ timestamp), an `arrived` trigger (no geofence), and any Android equivalent.
 
 ## Lists are flat (Orders + Batches)
 
-Neither tab uses cards any more. Rows run edge to edge on a single `AppColors.surface` sheet,
-separated by a `borderHeader` hairline (`_ListRow` in `queue_cards.dart`), and the row owns its 20px
-side padding so there is no screen-padding-around-card-padding nesting. The last row in a list drops
-its hairline (`last: true`). The same treatment covers the browse list, search results, the postponed
-list, and the batch sections.
+Neither tab uses cards any more. Rows run edge to edge **straight on the page background** — no fill
+of their own and no white sheet under them, since a sheet is just the card outline back again one
+size larger. A `borderDefault` hairline is all that separates them (`_ListRow` in `queue_cards.dart`),
+and the row owns its 20px side padding so there is no screen-padding-around-card-padding nesting. The
+last row in a list drops its hairline (`last: true`). The same treatment covers the browse list,
+search results, the postponed list, and the batch sections.
+
+> Use `borderDefault` (#E6E5E2) for these rules, **not** `borderHeader` / `itemDivider` — those were
+> picked to sit on white and all but vanish against the warm `background` (#F6F5F3).
 
 **COD shows as the figure alone.** «الدفع عند الاستلام» plus a separate "cash to collect" row said
 the same thing twice — an amount can only mean cash on delivery. The queue row, the hero pill and the

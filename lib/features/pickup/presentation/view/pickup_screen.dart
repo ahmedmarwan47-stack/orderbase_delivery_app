@@ -116,27 +116,25 @@ class _PickupScreenState extends State<PickupScreen> {
                 const Expanded(child: _PickupEmptyState())
               else ...[
                 Expanded(
-                  // One surface, edge-to-edge sections — the batches are list
-                  // structure now, not cards floating on paper.
-                  child: ColoredBox(
-                    color: AppColors.surface,
-                    child: ListView.builder(
-                      controller: _scroll,
-                      padding: EdgeInsetsDirectional.only(
-                        bottom: AppPadding.pH20,
-                      ),
-                      // Straight into the batches. The old "N orders ready for
-                      // pickup" banner said what the batch headers and the
-                      // confirm bar below already say, twice over.
-                      itemCount: batches.length,
-                      itemBuilder: (_, i) => _PickupBatchSection(
-                        batch: batches[i],
-                        index: i + 1,
-                        // The batch in front of the courier is open; the ones
-                        // queued behind it stay folded until wanted.
-                        initiallyExpanded: i == 0,
-                        last: i == batches.length - 1,
-                      ),
+                  // Edge-to-edge sections straight on the page — the batches
+                  // are list structure now, not cards floating on paper, and
+                  // not a white sheet standing in for one either.
+                  child: ListView.builder(
+                    controller: _scroll,
+                    padding: EdgeInsetsDirectional.only(
+                      bottom: AppPadding.pH20,
+                    ),
+                    // Straight into the batches. The old "N orders ready for
+                    // pickup" banner said what the batch headers and the
+                    // confirm bar below already say, twice over.
+                    itemCount: batches.length,
+                    itemBuilder: (_, i) => _PickupBatchSection(
+                      batch: batches[i],
+                      index: i + 1,
+                      // The batch in front of the courier is open; the ones
+                      // queued behind it stay folded until wanted.
+                      initiallyExpanded: i == 0,
+                      last: i == batches.length - 1,
                     ),
                   ),
                 ),
