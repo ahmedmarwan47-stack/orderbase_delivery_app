@@ -205,9 +205,11 @@ color filter (matching the mockups' `stroke: currentColor`).
 **Source of truth: the courier-app Figma library**, not the mockups' inline `<symbol>` defs —
 `https://www.figma.com/design/HOcEPWJfofqhzF9DlMYtUV/claude-test---delivery-app?node-id=6-682`
 (the "Icons" canvas, Huge Icon Set v2.0). Every glyph in `assets/icons/` was re-exported from it so
-the whole app draws one family. **Exceptions:** `chevron_left` / `chevron_right` (the library has no
-bare chevron — only arrows with shafts, which read wrong at 18px) and `status_bar.svg` (mock artwork,
-unused). Those two chevrons are still the mockups'.
+the whole app draws one family. The only file left out is `status_bar.svg` (mock artwork, unused).
+
+> The bare chevrons are `arrow-left-01-round` / `arrow-right-01-round` in the **ARROWS (ROUND)**
+> frame (`6:71855`). Don't be fooled by `arrow-left-02`…`-05`, which are arrows *with shafts* and
+> read wrong at 18px — only the `-01` pair is a plain chevron.
 
 ### Pulling a glyph out of Figma
 
