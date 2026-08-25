@@ -43,6 +43,11 @@ class _AppSvgs {
   String get eye => _icon('eye');
   String get eyeOff => _icon('eye_off');
 
+  // Place glyphs — the two ends of the Home hero's current leg. The branch is
+  // `store`; these two say what kind of address the courier is heading to.
+  String get building => _icon('building');
+  String get villa => _icon('villa');
+
   // Failure States glyphs (from Failure States.dc.html) — the failure flow.
   String get tick => _icon('tick'); // i-tick (bare check, radio/checkbox)
   String get alert => _icon('alert'); // i-alert (!-in-circle)
@@ -50,10 +55,13 @@ class _AppSvgs {
   String get wa => _icon('wa'); // i-wa (whatsapp)
 
   // Filled (solid) variants — used only for the bottom-nav ACTIVE tab.
+  String get storeFilled => _icon('store_filled');
+  String get walletFilled => _icon('wallet_filled');
   String get homeFilled => _icon('home_filled');
   String get ordersFilled => _icon('orders_filled');
   String get bellFilled => _icon('bell_filled');
   String get moreFilled => _icon('more_filled');
+  String get userFilled => _icon('user_filled');
 }
 
 class _AppImages {
