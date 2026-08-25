@@ -1,1 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16"/><path d="M9.6 6.1A9.4 9.4 0 0 1 12 5.8c6 0 9.5 6.2 9.5 6.2a17 17 0 0 1-2.8 3.5"/><path d="M6.4 8A17 17 0 0 0 2.5 12s3.5 6.2 9.5 6.2a9.6 9.6 0 0 0 3.2-.5"/><path d="M10 10a3 3 0 0 0 4 4"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<g transform="translate(1.2491,7.2486)">
+<g>
+<path d="M20.7501 0.75008C20.7501 0.75008 16.7501 6.75008 10.7501 6.75008C4.75008 6.75008 0.75008 0.75008 0.75008 0.75008" stroke="#000000" stroke-width="1.5" stroke-linecap="round"/>
+<path d="M13.7501 6.25008L15.2501 8.75008" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18.7501 3.75008L20.7501 5.75008" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M0.75008 5.75008L2.75008 3.75008" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M7.75008 6.25008L6.25008 8.75008" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</svg>
