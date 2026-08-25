@@ -2,34 +2,25 @@ import 'package:flutter/material.dart';
 
 import '../core/live_activity/live_activity_bridge.dart';
 import '../core/utils/app_motion.dart';
-import '../core/widgets/app_assets.dart';
-import '../core/widgets/icon_widget.dart';
 import '../data/flow_order.dart';
 import '../data/order.dart';
-import '../dev/dev_gallery.dart';
 import 'shift_controller.dart';
-import '../features/auth/presentation/imports/auth_imports.dart';
-import '../features/failure_states/presentation/imports/failure_states_imports.dart';
 import '../features/home/presentation/imports/home_imports.dart';
 import '../features/notifications/presentation/imports/notifications_imports.dart';
 import '../features/order_flow/presentation/imports/order_flow_imports.dart';
 import '../features/pickup/presentation/imports/pickup_imports.dart';
+import '../features/profile/presentation/imports/profile_imports.dart';
 import '../features/queue/presentation/imports/queue_imports.dart';
 import '../features/settlement/presentation/imports/settlement_imports.dart';
-import '../theme/colors.dart';
-import '../theme/spacing.dart';
-import '../theme/typography.dart';
-import '../widgets/app_header.dart';
 import '../widgets/bottom_nav.dart';
 
 /// The signed-in app: a tabbed shell hosting the built screens and wiring the
 /// Order Flow end-to-end. Shown by [AuthGate] (the real `/` entry point) once
 /// the courier is logged in.
 ///
-/// Tabs map to [NavTab]: **Home** and **Orders** are real screens; the
-/// **notifications** / **more** tabs are placeholders until those screens are
-/// built (the *more* tab keeps the DevGallery reachable for testing screens
-/// that aren't in the nav yet, e.g. Pickup and the standalone Result variants).
+/// Tabs map to [NavTab]: home · orders · batches · settlement · account. The
+/// last one is the courier's own profile (it keeps the DevGallery reachable for
+/// screens that aren't in the nav yet, e.g. the standalone Result variants).
 ///
 /// The order-detail flow (detail → handoff/fail/postpone sheets → result) is
 /// pushed *over* the shell. The result screen's buttons pop the whole flow
@@ -78,8 +69,6 @@ class _AppShellState extends State<AppShell>
     // informative, not a gate (see [_announceDispatch]).
     WidgetsBinding.instance.addPostFrameCallback((_) => _announceDispatch());
   }
-
-
 
   /// If a branch batch is waiting and hasn't been carried yet, pop the
   /// dismissible "new batch at the branch" sheet. Choosing "carry from branch"
@@ -150,10 +139,29 @@ class _AppShellState extends State<AppShell>
     );
   }
 
-  /// Home hero "عرض الطلب" — open the current next-stop order.
+  /// A tap on the Home hero card — open the current next-stop order.
   void _openNextStop() {
     final o = ShiftController.instance.nextStop;
     if (o != null) _openOrder(orderToFlow(o));
+  }
+
+  /// The Home hero's black button — hand the current order over without going
+  /// through the detail screen first. It runs the *same* flow the detail's
+  /// sticky bar runs (handoff sheet → COD collection → result), because there
+  /// is only one way to close an order in this app.
+  Future<void> _deliverNextStop() async {
+    final o = ShiftController.instance.nextStop;
+    if (o == null) return;
+    void popToShell() => Navigator.of(context).popUntil((r) => r.isFirst);
+    await OrderFlowController(
+      orderNum: o.num,
+      customer: o.name,
+      onFinishToNext: popToShell,
+      onFinishToHome: () {
+        popToShell();
+        _select(NavTab.home);
+      },
+    ).deliver(context, cod: o.cod != null && !o.prepaid, due: o.cod ?? 0);
   }
 
   /// A notification tap — open the order it refers to (resolved against the
@@ -191,6 +199,7 @@ class _AppShellState extends State<AppShell>
             HomeScreen(
               onSelectTab: _select,
               onOpenOrder: _openNextStop,
+              onDeliverOrder: _deliverNextStop,
               onOpenOrdersFilter: _openOrdersFilter,
               onOpenSettlement: _openSettlement,
               onOpenNotifications: _openNotifications,
@@ -216,165 +225,12 @@ class _AppShellState extends State<AppShell>
               onOpenNotifications: _openNotifications,
               onOpenSearch: _openOrdersSearch,
             ),
-            _MoreTab(
+            ProfileScreen(
               onSelectTab: _select,
               onOpenNotifications: _openNotifications,
               onOpenSearch: _openOrdersSearch,
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// The **More** tab — a real menu linking the built-but-not-tabbed screens
-/// (settlement, returns, pickup, account) plus the DevGallery, so everything is
-/// reachable from the running app rather than only through dev tooling.
-class _MoreTab extends StatelessWidget {
-  const _MoreTab({
-    required this.onSelectTab,
-    this.onOpenNotifications,
-    this.onOpenSearch,
-  });
-
-  final ValueChanged<NavTab> onSelectTab;
-  final VoidCallback? onOpenNotifications;
-  final VoidCallback? onOpenSearch;
-
-  void _push(BuildContext context, Widget screen) =>
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
-
-  @override
-  Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              AppHeader(
-                onSearch: onOpenSearch,
-                onOpenNotifications: onOpenNotifications,
-              ),
-              // "المزيد" title moved into the body beneath the unified header.
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.s20,
-                  AppSpacing.s16,
-                  AppSpacing.s20,
-                  AppSpacing.s12,
-                ),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    'المزيد',
-                    style: AppTypography.size16.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.s20,
-                  ),
-                  children: [
-                    _MoreRow(
-                      icon: AppAssets.svg.box,
-                      label: 'مرتجعات للفرع',
-                      onTap: () => _push(context, const ReturnsListScreen()),
-                    ),
-                    _MoreRow(
-                      icon: AppAssets.svg.user,
-                      label: 'الحساب وكلمة المرور',
-                      onTap: () => _push(context, const ChangePasswordScreen()),
-                    ),
-                    _MoreRow(
-                      icon: AppAssets.svg.more,
-                      label: 'كل الشاشات (Dev)',
-                      onTap: () => _push(context, const DevGallery()),
-                    ),
-                  ],
-                ),
-              ),
-              BottomNav(
-                active: NavTab.more,
-                notificationsBadge: true,
-                onTap: onSelectTab,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MoreRow extends StatelessWidget {
-  const _MoreRow({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final String icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.s12),
-      child: Material(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.s16),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceMuted,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: IconWidget(
-                      icon: icon,
-                      color: AppColors.textPrimary,
-                      height: 20,
-                      width: 20,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.s12),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: AppTypography.size16.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-                IconWidget(
-                  icon: AppAssets.svg.chevronLeft,
-                  color: AppColors.textSecondary,
-                  height: 18,
-                  width: 18,
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );

@@ -26,6 +26,7 @@ part '../view/home_flat_screen.dart';
 part '../widgets/home_square_icon_button.dart';
 part '../widgets/home_next_stop_card.dart';
 part '../widgets/home_progress_seg.dart';
+part '../widgets/home_route_leg.dart';
 part '../widgets/home_stop_progress.dart';
 part '../widgets/home_today_stats.dart';
 part '../widgets/home_stat_card.dart';

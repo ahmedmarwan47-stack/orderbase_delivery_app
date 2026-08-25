@@ -104,10 +104,10 @@ class _QueueBrowseList extends StatelessWidget {
                         orders: items,
                         vc: vc,
                         reduced: reduced,
+                        // Rows carry their own 20px side padding now, so the
+                        // list itself is edge to edge — no page padding around
+                        // a card padding around the content.
                         padding: EdgeInsetsDirectional.only(
-                          start: AppPadding.pW20,
-                          end: AppPadding.pW20,
-                          top: showBar ? 0 : AppPadding.pH8,
                           bottom: AppPadding.pH20,
                         ),
                       ),
@@ -226,33 +226,34 @@ class _AnimatedQueueListState extends State<_AnimatedQueueList> {
   @override
   Widget build(BuildContext context) {
     final duration = widget.reduced ? Duration.zero : AppMotion.fill;
-    return RefreshIndicator(
-      onRefresh: _refresh,
-      color: AppColors.brand,
-      backgroundColor: AppColors.surface,
-      child: ListView(
-        // Drives the scroll-reactive browse header (offset > 2 ⇒ header fades
-        // in its surface + hairline). Only this browse list attaches it.
-        controller: widget.vc.scrollController,
-        // Always scrollable so the pull works even with a short list.
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: widget.padding,
-        children: [
-          for (final row in _rows)
-            _CollapsibleRow(
-              key: ValueKey(row.order.num),
-              removing: row.removing,
-              duration: duration,
-              onRemoved: () => _prune(row.order.num),
-              child: Padding(
-                padding: EdgeInsetsDirectional.only(bottom: AppPadding.pH12),
+    return ColoredBox(
+      color: AppColors.surface,
+      child: RefreshIndicator(
+        onRefresh: _refresh,
+        color: AppColors.brand,
+        backgroundColor: AppColors.surface,
+        child: ListView(
+          // Drives the scroll-reactive browse header (offset > 2 ⇒ header fades
+          // in its surface + hairline). Only this browse list attaches it.
+          controller: widget.vc.scrollController,
+          // Always scrollable so the pull works even with a short list.
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: widget.padding,
+          children: [
+            for (final (i, row) in _rows.indexed)
+              _CollapsibleRow(
+                key: ValueKey(row.order.num),
+                removing: row.removing,
+                duration: duration,
+                onRemoved: () => _prune(row.order.num),
                 child: _QueueCard(
                   order: row.order,
+                  last: i == _rows.length - 1,
                   onTap: () => widget.vc.openOrder(context, row.order),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -320,19 +321,18 @@ class _QueueSearchResults extends StatelessWidget {
               total: vc.orders.length,
             ).paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH12),
             Expanded(
-              child: ListView.separated(
-                padding: EdgeInsetsDirectional.only(
-                  start: AppPadding.pW20,
-                  end: AppPadding.pW20,
-                  bottom: AppPadding.pH20,
-                ),
-                itemCount: matches.length,
-                separatorBuilder: (_, _) => 12.szH,
-                itemBuilder: (context, i) => _SearchResultCard(
-                  order: matches[i],
-                  query: query,
-                  reasonKey: vc.matchKey(matches[i]),
-                  onTap: () => vc.openOrder(context, matches[i]),
+              child: ColoredBox(
+                color: AppColors.surface,
+                child: ListView.builder(
+                  padding: EdgeInsetsDirectional.only(bottom: AppPadding.pH20),
+                  itemCount: matches.length,
+                  itemBuilder: (context, i) => _SearchResultCard(
+                    order: matches[i],
+                    query: query,
+                    reasonKey: vc.matchKey(matches[i]),
+                    last: i == matches.length - 1,
+                    onTap: () => vc.openOrder(context, matches[i]),
+                  ),
                 ),
               ),
             ),

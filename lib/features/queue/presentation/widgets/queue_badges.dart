@@ -13,32 +13,33 @@ class _StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (status) {
       OrderStatus.transit => _pill(
-          bg: AppColors.transitBg,
-          fg: AppColors.transitText,
-          text: LocaleKeys.statusTransit.tr(),
-        ),
+        bg: AppColors.transitBg,
+        fg: AppColors.transitText,
+        text: LocaleKeys.statusTransit.tr(),
+      ),
       OrderStatus.postponed => _pill(
-          bg: AppColors.postponedBg,
-          fg: AppColors.postponedText,
-          border: AppColors.postponedBorder,
-          leading: AppAssets.svg.clock,
-          text: LocaleKeys.statusPostponedReturns
-              .tr(namedArgs: {'time': returns ?? ''}),
+        bg: AppColors.postponedBg,
+        fg: AppColors.postponedText,
+        border: AppColors.postponedBorder,
+        leading: AppAssets.svg.clock,
+        text: LocaleKeys.statusPostponedReturns.tr(
+          namedArgs: {'time': returns ?? ''},
         ),
+      ),
       OrderStatus.delivered => _pill(
-          bg: AppColors.deliveredBg,
-          fg: AppColors.deliveredText,
-          border: AppColors.deliveredBorder,
-          leading: AppAssets.svg.check,
-          text: LocaleKeys.statusDelivered.tr(),
-        ),
+        bg: AppColors.deliveredBg,
+        fg: AppColors.deliveredText,
+        border: AppColors.deliveredBorder,
+        leading: AppAssets.svg.check,
+        text: LocaleKeys.statusDelivered.tr(),
+      ),
       OrderStatus.failed => _pill(
-          bg: AppColors.failedBg,
-          fg: AppColors.failedText,
-          border: AppColors.failedBorder,
-          leading: AppAssets.svg.fail,
-          text: LocaleKeys.statusFailed.tr(),
-        ),
+        bg: AppColors.failedBg,
+        fg: AppColors.failedText,
+        border: AppColors.failedBorder,
+        leading: AppAssets.svg.fail,
+        text: LocaleKeys.statusFailed.tr(),
+      ),
     };
   }
 
@@ -52,7 +53,9 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(100), // full pill (radii 4px-exempt)
+        borderRadius: BorderRadius.circular(
+          100,
+        ), // full pill (radii 4px-exempt)
         border: border != null ? Border.all(color: border) : null,
       ),
       child: Row(
@@ -77,17 +80,29 @@ class _StatusBadge extends StatelessWidget {
 /// Pay label — COD (amber, the COD semaphore) vs prepaid (green). Amber keeps
 /// red reserved as a locator (The One Red Rule) and matches the home hero pill.
 class _PayLabel extends StatelessWidget {
-  const _PayLabel({required this.prepaid});
+  const _PayLabel({required this.prepaid, this.amount});
   final bool prepaid;
+
+  /// Cash due, on a COD order. The figure IS the payment type — an amount can
+  /// only mean cash on delivery — so it replaces the «الدفع عند الاستلام»
+  /// label rather than sitting under it in a row of its own. Same rule the
+  /// hero pill and the batch rows follow.
+  final int? amount;
 
   @override
   Widget build(BuildContext context) {
+    final showAmount = !prepaid && amount != null;
     return Text(
-      (prepaid ? LocaleKeys.payPrepaid : LocaleKeys.payCod).tr(),
+      showAmount
+          ? LocaleKeys.amountEgp.tr(
+              namedArgs: {'amount': formatThousands(amount!)},
+            )
+          : (prepaid ? LocaleKeys.payPrepaid : LocaleKeys.payCod).tr(),
       style: const TextStyle()
           .setColor(prepaid ? AppColors.deliveredText : AppColors.postponedText)
           .s12
-          .semiBold,
+          .semiBold
+          .tabular,
     );
   }
 }

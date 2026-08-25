@@ -37,8 +37,11 @@ class _PickupDispatchSheet extends StatelessWidget {
           // The waiting orders as compact rows — the pickup list in miniature.
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: AppSize.sH8,
-            children: [for (final o in orders) _PickupOrderRow(order: o)],
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final o in orders)
+                _PickupOrderRow(order: o, last: o == orders.last, inset: false),
+            ],
           ),
           16.szH,
           Text(

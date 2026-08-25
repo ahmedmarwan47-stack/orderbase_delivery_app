@@ -124,42 +124,45 @@ class _AnimatedPostponedListState extends State<_AnimatedPostponedList> {
 
   void _prune(String orderNum) {
     if (!mounted) return;
-    setState(() =>
-        _rows.removeWhere((r) => r.removing && r.order.num == orderNum));
+    setState(
+      () => _rows.removeWhere((r) => r.removing && r.order.num == orderNum),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final duration = widget.reduced ? Duration.zero : AppMotion.fill;
-    return ListView(
-      controller: widget.scrollController,
-      padding: EdgeInsetsDirectional.only(
-        start: AppPadding.pW20,
-        end: AppPadding.pW20,
-        top: AppPadding.pH16,
-        bottom: AppPadding.pH20,
-      ),
-      children: [
-        const _PostponedInfoBanner(),
-        for (final row in _rows)
-          _CollapsibleRow(
-            key: ValueKey(row.order.num),
-            removing: row.removing,
-            duration: duration,
-            onRemoved: () => _prune(row.order.num),
-            child: Padding(
-              padding: EdgeInsetsDirectional.only(top: AppPadding.pH12),
+    // Same flat-list treatment as the main queue: rows edge to edge on one
+    // surface, hairlines instead of card outlines. The advisory banner keeps
+    // its own shape — it is a note, not an order.
+    return ColoredBox(
+      color: AppColors.surface,
+      child: ListView(
+        controller: widget.scrollController,
+        padding: EdgeInsetsDirectional.only(bottom: AppPadding.pH20),
+        children: [
+          const _PostponedInfoBanner().paddingSymmetric(
+            horizontal: AppPadding.pW20,
+            vertical: AppPadding.pH16,
+          ),
+          for (final (i, row) in _rows.indexed)
+            _CollapsibleRow(
+              key: ValueKey(row.order.num),
+              removing: row.removing,
+              duration: duration,
+              onRemoved: () => _prune(row.order.num),
               // A row that's collapsing away shouldn't take another tap.
               child: IgnorePointer(
                 ignoring: row.removing,
                 child: _PostponedCard(
                   order: row.order,
+                  last: i == _rows.length - 1,
                   onReturn: () => widget.onReturn(row.order),
                 ),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -186,34 +189,38 @@ class _PostponedHeader extends StatelessWidget {
           ),
         ),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const HeaderBackButton(),
-          12.szW,
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(LocaleKeys.postponedTitle.tr(),
-                    style: const TextStyle().setMainTextColor.s14.semiBold),
-                4.szH,
-                Text(
-                  LocaleKeys.postponedSubtitle
-                      .tr(namedArgs: {'count': arabicDigits(count)}),
-                  style: const TextStyle().setSecondaryColor.s12.medium,
+      child:
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const HeaderBackButton(),
+              12.szW,
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      LocaleKeys.postponedTitle.tr(),
+                      style: const TextStyle().setMainTextColor.s14.semiBold,
+                    ),
+                    4.szH,
+                    Text(
+                      LocaleKeys.postponedSubtitle.tr(
+                        namedArgs: {'count': arabicDigits(count)},
+                      ),
+                      style: const TextStyle().setSecondaryColor.s12.medium,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
+          ).paddingOnlyDirectional(
+            start: AppPadding.pW20,
+            end: AppPadding.pW20,
+            top: AppPadding.pH8,
+            bottom: AppPadding.pH16,
           ),
-        ],
-      ).paddingOnlyDirectional(
-        start: AppPadding.pW20,
-        end: AppPadding.pW20,
-        top: AppPadding.pH8,
-        bottom: AppPadding.pH16,
-      ),
     );
   }
 }

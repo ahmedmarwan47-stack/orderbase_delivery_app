@@ -2,6 +2,12 @@ import 'flow_order.dart';
 
 enum OrderStatus { transit, delivered, postponed, failed }
 
+/// What the courier is standing in front of at each end of a route leg — the
+/// branch they set out from, or the kind of address they are heading to. Drives
+/// the Home hero's «from → to» leg, which reads branch → building on the first
+/// order of a batch and building → villa on every one after it.
+enum PlaceKind { branch, building, villa }
+
 class Order {
   const Order({
     required this.num,
@@ -20,6 +26,7 @@ class Order {
     this.note,
     this.collected,
     this.phone,
+    this.place = PlaceKind.building,
   });
 
   final String num;
@@ -47,6 +54,12 @@ class Order {
   /// delivered so the shift's "collected today" total is real.
   final int? collected;
 
+  /// The kind of address this order is delivered to. Apartment blocks are the
+  /// common case, so [PlaceKind.building] is the default; a standalone house
+  /// gets [PlaceKind.villa]. Never [PlaceKind.branch] — that end of the leg is
+  /// the branch itself, not an order.
+  final PlaceKind place;
+
   /// The customer's phone, in dialable form. Powers the Order Detail call
   /// button and the Live Activity's "اتصال بالعميل" — null simply hides both.
   final String? phone;
@@ -58,11 +71,7 @@ class Order {
   /// Full delivery address ("street - area") for the hero + detail.
   String get fullAddress => '$addr - $area';
 
-  Order copyWith({
-    OrderStatus? status,
-    String? reason,
-    int? collected,
-  }) {
+  Order copyWith({OrderStatus? status, String? reason, int? collected}) {
     return Order(
       num: num,
       name: name,
@@ -80,6 +89,7 @@ class Order {
       note: note,
       collected: collected ?? this.collected,
       phone: phone,
+      place: place,
     );
   }
 }
@@ -128,6 +138,7 @@ final List<Order> sampleBatchTwo = [
     addr: 'شارع التسعين الشمالي',
     area: 'التجمع الخامس',
     status: OrderStatus.transit,
+    place: PlaceKind.villa,
     due: '٥:٥٠ م',
     prepaid: true,
     dist: '11.3 كم',
@@ -215,6 +226,7 @@ final List<Order> sampleOrders = [
     addr: 'شارع النصر',
     area: 'مصر الجديدة',
     status: OrderStatus.transit,
+    place: PlaceKind.villa,
     due: '٣:١٥ م',
     prepaid: true,
     dist: '6.8 كم',
@@ -225,7 +237,8 @@ final List<Order> sampleOrders = [
         weight: '900 جم',
       ),
     ],
-    note: 'الرجاء الاتصال قبل الوصول بـ 10 دقائق. البواب يستلم الطلب لو العميل غير موجود.',
+    note:
+        'الرجاء الاتصال قبل الوصول بـ 10 دقائق. البواب يستلم الطلب لو العميل غير موجود.',
   ),
   const Order(
     num: '#89298',
@@ -277,6 +290,7 @@ final List<Order> sampleOrders = [
     addr: 'شارع الثورة',
     area: 'مدينة نصر',
     status: OrderStatus.transit,
+    place: PlaceKind.villa,
     due: '٤:٠٠ م',
     cod: 450,
     dist: '7.3 كم',

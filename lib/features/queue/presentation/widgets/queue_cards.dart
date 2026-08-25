@@ -1,21 +1,59 @@
 part of '../imports/queue_imports.dart';
 
-/// Queue card (1b) — merchant thumb, number, pay/status, name, promised time,
+/// The flat row every Orders-tab list is built from.
+///
+/// The tab used to be a stack of rounded white cards floating on the page: a
+/// box inside a box, with the screen's padding wrapped around each card's own
+/// padding. A queue is a list, so it is drawn as one — rows run edge to edge
+/// on a single surface and a hairline is all that separates them. That buys
+/// back ~40px of width per row and lets the eye run straight down the column
+/// instead of stepping over eight card outlines.
+class _ListRow extends StatelessWidget {
+  const _ListRow({required this.child, required this.last, this.onTap});
+
+  final Widget child;
+
+  /// Last row in its list — no trailing hairline, so the list ends cleanly.
+  final bool last;
+
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final row = DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: last
+            ? null
+            : const Border(bottom: BorderSide(color: AppColors.borderHeader)),
+      ),
+      child: child.paddingSymmetric(
+        horizontal: AppPadding.pW20,
+        vertical: AppPadding.pH16,
+      ),
+    );
+    return onTap == null ? row : row.onClick(onTap: onTap);
+  }
+}
+
+/// Queue row (1b) — merchant thumb, number, pay/status, name, promised time,
 /// area·distance, and a COD row when cash is due.
 class _QueueCard extends StatelessWidget {
-  const _QueueCard({required this.order, required this.onTap});
+  const _QueueCard({
+    required this.order,
+    required this.onTap,
+    this.last = false,
+  });
   final Order order;
   final VoidCallback onTap;
+  final bool last;
 
   @override
   Widget build(BuildContext context) {
     final isTransit = order.status == OrderStatus.transit;
-    final Widget card = Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppCircular.r16),
-        border: Border.all(color: AppColors.borderCard),
-      ),
+    final Widget card = _ListRow(
+      last: last,
+      onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -32,7 +70,8 @@ class _QueueCard extends StatelessWidget {
                         Text(
                           order.num,
                           textDirection: TextDirection.ltr,
-                          style: const TextStyle().setMainTextColor.s14.semiBold,
+                          style:
+                              const TextStyle().setMainTextColor.s14.semiBold,
                         ),
                         8.szW,
                         // Payment type while the order is still out for delivery;
@@ -40,7 +79,7 @@ class _QueueCard extends StatelessWidget {
                         // success, failed = could-not-deliver) so a dimmed card
                         // explains *why* it's dimmed.
                         if (isTransit)
-                          _PayLabel(prepaid: order.prepaid)
+                          _PayLabel(prepaid: order.prepaid, amount: order.cod)
                         else
                           _StatusBadge(
                             status: order.status,
@@ -49,7 +88,10 @@ class _QueueCard extends StatelessWidget {
                       ],
                     ),
                     4.szH,
-                    Text(order.name, style: const TextStyle().setMainTextColor.s14.medium),
+                    Text(
+                      order.name,
+                      style: const TextStyle().setMainTextColor.s14.medium,
+                    ),
                     if (isTransit && order.due != null) ...[
                       4.szH,
                       Row(
@@ -63,8 +105,11 @@ class _QueueCard extends StatelessWidget {
                           ),
                           4.szW,
                           Text(
-                            LocaleKeys.promisedAt.tr(namedArgs: {'time': order.due!}),
-                            style: const TextStyle().setTertiaryColor.s12.regular,
+                            LocaleKeys.promisedAt.tr(
+                              namedArgs: {'time': order.due!},
+                            ),
+                            style:
+                                const TextStyle().setTertiaryColor.s12.regular,
                           ),
                         ],
                       ),
@@ -82,10 +127,12 @@ class _QueueCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             order.dist != null
-                                ? LocaleKeys.areaDistance.tr(namedArgs: {
-                                    'area': order.area,
-                                    'dist': order.dist!,
-                                  })
+                                ? LocaleKeys.areaDistance.tr(
+                                    namedArgs: {
+                                      'area': order.area,
+                                      'dist': order.dist!,
+                                    },
+                                  )
                                 : order.area,
                             style: const TextStyle().setHintColor.s12.regular,
                           ),
@@ -97,44 +144,12 @@ class _QueueCard extends StatelessWidget {
               ),
             ],
           ),
-          // Cash-to-collect only matters while the order is still out for
-          // delivery; once handed off it's already collected, so drop the row.
-          if (order.cod != null && isTransit) ...[
-            12.szH,
-            _CodRow(amount: order.cod!),
-          ],
         ],
-      ).paddingAll(AppPadding.pH16),
-    ).onClick(onTap: onTap);
+      ),
+    );
     // Completed (handed off / closed) orders are de-emphasised — just the status
     // check badge, dimmed a little.
     return isTransit ? card : Opacity(opacity: 0.6, child: card);
-  }
-}
-
-/// The "cash to collect" divider row.
-class _CodRow extends StatelessWidget {
-  const _CodRow({required this.amount});
-  final int amount;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: AppColors.itemDivider)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(LocaleKeys.codRequired.tr(),
-              style: const TextStyle().setSecondaryColor.s12.regular),
-          Text(
-            LocaleKeys.amountEgp.tr(namedArgs: {'amount': formatThousands(amount)}),
-            style: const TextStyle().setMainTextColor.s14.semiBold.tabular,
-          ),
-        ],
-      ).paddingOnly(top: AppPadding.pH12),
-    );
   }
 }
 
@@ -167,21 +182,20 @@ class _SearchResultCard extends StatelessWidget {
     required this.query,
     required this.reasonKey,
     required this.onTap,
+    this.last = false,
   });
   final Order order;
   final String query;
   final String? reasonKey;
   final VoidCallback onTap;
+  final bool last;
 
   @override
   Widget build(BuildContext context) {
     final isTransit = order.status == OrderStatus.transit;
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppCircular.r16),
-        border: Border.all(color: AppColors.borderCard),
-      ),
+    return _ListRow(
+      last: last,
+      onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -212,10 +226,15 @@ class _SearchResultCard extends StatelessWidget {
             ],
           ),
           8.szH,
-          Text(order.name, style: const TextStyle().setMainTextColor.s18.semiBold),
+          Text(
+            order.name,
+            style: const TextStyle().setMainTextColor.s18.semiBold,
+          ),
           4.szH,
           _highlighted(
-            LocaleKeys.addrArea.tr(namedArgs: {'addr': order.addr, 'area': order.area}),
+            LocaleKeys.addrArea.tr(
+              namedArgs: {'addr': order.addr, 'area': order.area},
+            ),
             query,
             const TextStyle().setHintColor.s14.regular.withHeight(1.5),
           ),
@@ -226,12 +245,16 @@ class _SearchResultCard extends StatelessWidget {
             8.szH,
             Text(
               LocaleKeys.outsideActive.tr(),
-              style: const TextStyle().setColor(AppColors.postponedText).s12.regular.withHeight(1.5),
+              style: const TextStyle()
+                  .setColor(AppColors.postponedText)
+                  .s12
+                  .regular
+                  .withHeight(1.5),
             ),
           ],
         ],
-      ).paddingAll(AppPadding.pH16),
-    ).onClick(onTap: onTap);
+      ),
+    );
   }
 
   Widget _highlighted(String text, String query, TextStyle base) {
@@ -247,11 +270,15 @@ class _SearchResultCard extends StatelessWidget {
         break;
       }
       if (idx > i) spans.add(TextSpan(text: text.substring(i, idx)));
-      spans.add(TextSpan(
-        text: text.substring(idx, idx + q.length),
-        style: base.copyWith(
-            backgroundColor: AppColors.markBg, color: AppColors.markText),
-      ));
+      spans.add(
+        TextSpan(
+          text: text.substring(idx, idx + q.length),
+          style: base.copyWith(
+            backgroundColor: AppColors.markBg,
+            color: AppColors.markText,
+          ),
+        ),
+      );
       i = idx + q.length;
     }
     return Text.rich(TextSpan(style: base, children: spans));
@@ -270,8 +297,10 @@ class _MatchTag extends StatelessWidget {
         color: AppColors.surfaceMuted,
         borderRadius: BorderRadius.circular(AppCircular.r8),
       ),
-      child: Text(labelKey.tr(), style: const TextStyle().setSecondaryColor.s12.semiBold)
-          .paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
+      child: Text(
+        labelKey.tr(),
+        style: const TextStyle().setSecondaryColor.s12.semiBold,
+      ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
   }
 }
@@ -308,9 +337,13 @@ class _PromisedCodRow extends StatelessWidget {
           ),
           if (order.cod != null)
             Text(
-              LocaleKeys.collectEgp
-                  .tr(namedArgs: {'amount': formatThousands(order.cod!)}),
-              style: const TextStyle().setColor(AppColors.failedText).s12.semiBold,
+              LocaleKeys.collectEgp.tr(
+                namedArgs: {'amount': formatThousands(order.cod!)},
+              ),
+              style: const TextStyle()
+                  .setColor(AppColors.failedText)
+                  .s12
+                  .semiBold,
             ),
         ],
       ).paddingOnly(top: AppPadding.pH12),

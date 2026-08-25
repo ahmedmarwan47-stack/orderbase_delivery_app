@@ -4,7 +4,7 @@ import '../app/shift_controller.dart';
 import '../config/res/config_imports.dart';
 import 'home_indicator.dart';
 
-enum NavTab { home, orders, pickup, settlement, more }
+enum NavTab { home, orders, pickup, settlement, profile }
 
 /// Shared bottom tab bar used across screens. The active tab renders in the
 /// brand-red accent; the rest are muted. The notifications tab can show a red
@@ -41,21 +41,41 @@ class BottomNav extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _item(NavTab.home, AppAssets.svg.home, LocaleKeys.navHome.tr(),
-                    activeIcon: AppAssets.svg.homeFilled),
-                _item(NavTab.orders, AppAssets.svg.orders,
-                    LocaleKeys.navOrders.tr(),
-                    activeIcon: AppAssets.svg.ordersFilled),
-                _item(NavTab.pickup, AppAssets.svg.store,
-                    LocaleKeys.navPickup.tr(),
-                    // Red dot only while there's still a batch to carry from the
-                    // branch (cleared once picked up / accepted).
-                    badge: !ShiftController.instance.accepted &&
-                        ShiftController.instance.inProgress > 0),
-                _item(NavTab.settlement, AppAssets.svg.wallet,
-                    LocaleKeys.navSettlement.tr()),
-                _item(NavTab.more, AppAssets.svg.more, LocaleKeys.navMore.tr(),
-                    activeIcon: AppAssets.svg.moreFilled),
+                _item(
+                  NavTab.home,
+                  AppAssets.svg.home,
+                  LocaleKeys.navHome.tr(),
+                  activeIcon: AppAssets.svg.homeFilled,
+                ),
+                _item(
+                  NavTab.orders,
+                  AppAssets.svg.orders,
+                  LocaleKeys.navOrders.tr(),
+                  activeIcon: AppAssets.svg.ordersFilled,
+                ),
+                _item(
+                  NavTab.pickup,
+                  AppAssets.svg.store,
+                  LocaleKeys.navPickup.tr(),
+                  activeIcon: AppAssets.svg.storeFilled,
+                  // Red dot only while there's still a batch to carry from the
+                  // branch (cleared once picked up / accepted).
+                  badge:
+                      !ShiftController.instance.accepted &&
+                      ShiftController.instance.inProgress > 0,
+                ),
+                _item(
+                  NavTab.settlement,
+                  AppAssets.svg.wallet,
+                  LocaleKeys.navSettlement.tr(),
+                  activeIcon: AppAssets.svg.walletFilled,
+                ),
+                _item(
+                  NavTab.profile,
+                  AppAssets.svg.user,
+                  LocaleKeys.navProfile.tr(),
+                  activeIcon: AppAssets.svg.userFilled,
+                ),
               ],
             ),
           ),
@@ -65,8 +85,13 @@ class BottomNav extends StatelessWidget {
     );
   }
 
-  Widget _item(NavTab tab, String icon, String label,
-      {String? activeIcon, bool badge = false}) {
+  Widget _item(
+    NavTab tab,
+    String icon,
+    String label, {
+    String? activeIcon,
+    bool badge = false,
+  }) {
     final isActive = tab == active;
     final color = isActive ? AppColors.dangerAccent : AppColors.textSecondary;
     // Active tab renders the filled (solid) glyph; inactive keeps the stroke
@@ -81,8 +106,14 @@ class BottomNav extends StatelessWidget {
     );
   }
 
-  Widget _itemBody(NavTab tab, String icon, String label, Color color,
-      bool isActive, bool badge) {
+  Widget _itemBody(
+    NavTab tab,
+    String icon,
+    String label,
+    Color color,
+    bool isActive,
+    bool badge,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -114,11 +145,12 @@ class BottomNav extends StatelessWidget {
         4.szH,
         Text(
           label,
-          style: (isActive
-                  ? const TextStyle().semiBold
-                  : const TextStyle().regular)
-              .s12
-              .setColor(color),
+          style:
+              (isActive
+                      ? const TextStyle().semiBold
+                      : const TextStyle().regular)
+                  .s12
+                  .setColor(color),
         ),
       ],
     ).onClick(onTap: onTap == null ? null : () => onTap!(tab));

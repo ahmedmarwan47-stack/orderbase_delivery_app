@@ -4,9 +4,23 @@ part of '../imports/pickup_imports.dart';
 ///
 /// Shared deliberately — the dispatch sheet and the Pickup tab are both
 /// "here is a batch waiting at the branch", so they show a batch the same way.
+/// Flat, like every other list in the app: a hairline between rows instead of a
+/// filled tile per order.
 class _PickupOrderRow extends StatelessWidget {
-  const _PickupOrderRow({required this.order});
+  const _PickupOrderRow({
+    required this.order,
+    this.last = false,
+    this.inset = true,
+  });
   final FlowOrder order;
+
+  /// Last row of its batch — drops the trailing hairline.
+  final bool last;
+
+  /// Applies the row's own side padding, indented under the batch header. The
+  /// dispatch sheet turns it off — [SheetShell] already pads its body, and a
+  /// second inset there would be the nested padding this list just shed.
+  final bool inset;
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +36,18 @@ class _PickupOrderRow extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceMuted,
-        borderRadius: BorderRadius.circular(AppCircular.r12),
+        color: AppColors.surface,
+        border: last
+            ? null
+            : const Border(bottom: BorderSide(color: AppColors.itemDivider)),
       ),
-      padding: EdgeInsetsDirectional.symmetric(
-        horizontal: AppPadding.pW12,
-        vertical: AppPadding.pH8,
+      padding: EdgeInsetsDirectional.only(
+        // Indented past the batch header's label, so the rows read as its
+        // children rather than as siblings of it.
+        start: inset ? AppPadding.pW32 : 0,
+        end: inset ? AppPadding.pW20 : 0,
+        top: AppPadding.pH12,
+        bottom: AppPadding.pH12,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

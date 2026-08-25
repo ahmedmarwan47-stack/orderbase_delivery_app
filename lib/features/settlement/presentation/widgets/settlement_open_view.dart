@@ -84,6 +84,10 @@ class _SettlementOpenViewState extends State<_SettlementOpenView> {
                     _CashInHandCard(vc: widget.vc),
                     20.szH,
                     _CollectionsSection(data: widget.vc.data),
+                    // The parcels that are also going back to the branch —
+                    // settling is one act, cash and returns together.
+                    20.szH,
+                    const _ReturnsSection(),
                     16.szH,
                     const _LockedNote(),
                   ],

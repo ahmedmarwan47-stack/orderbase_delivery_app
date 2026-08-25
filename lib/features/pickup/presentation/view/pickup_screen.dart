@@ -24,7 +24,6 @@ class PickupScreen extends StatefulWidget {
   final VoidCallback? onOpenNotifications;
   final VoidCallback? onOpenSearch;
 
-
   @override
   State<PickupScreen> createState() => _PickupScreenState();
 }
@@ -117,25 +116,28 @@ class _PickupScreenState extends State<PickupScreen> {
                 const Expanded(child: _PickupEmptyState())
               else ...[
                 Expanded(
-                  child: ListView.separated(
-                    controller: _scroll,
-                    padding: EdgeInsetsDirectional.only(
-                      start: AppPadding.pW20,
-                      end: AppPadding.pW20,
-                      top: AppPadding.pH16,
-                      bottom: AppPadding.pH20,
+                  // One surface, edge-to-edge sections — the batches are list
+                  // structure now, not cards floating on paper.
+                  child: ColoredBox(
+                    color: AppColors.surface,
+                    child: ListView.builder(
+                      controller: _scroll,
+                      padding: EdgeInsetsDirectional.only(
+                        bottom: AppPadding.pH20,
+                      ),
+                      // Straight into the batches. The old "N orders ready for
+                      // pickup" banner said what the batch headers and the
+                      // confirm bar below already say, twice over.
+                      itemCount: batches.length,
+                      itemBuilder: (_, i) => _PickupBatchSection(
+                        batch: batches[i],
+                        index: i + 1,
+                        // The batch in front of the courier is open; the ones
+                        // queued behind it stay folded until wanted.
+                        initiallyExpanded: i == 0,
+                        last: i == batches.length - 1,
+                      ),
                     ),
-                    // +1 leading item = the "ready for pickup" banner, on top of
-                    // the batches (moved out of the header) so it scrolls away.
-                    itemCount: batches.length + 1,
-                    separatorBuilder: (_, _) => 16.szH,
-                    itemBuilder: (_, i) {
-                      if (i == 0) return _PickupBanner(count: totalOrders);
-                      return _PickupBatchSection(
-                        batch: batches[i - 1],
-                        index: i,
-                      );
-                    },
                   ),
                 ),
                 _PickupConfirmBar(

@@ -8,6 +8,7 @@ class HomeScreen extends StatefulWidget {
     super.key,
     this.onSelectTab,
     this.onOpenOrder,
+    this.onDeliverOrder,
     this.onOpenOrdersFilter,
     this.onOpenSettlement,
     this.onOpenNotifications,
@@ -23,8 +24,13 @@ class HomeScreen extends StatefulWidget {
   /// Opens search (the header search icon) — routed to the Orders tab.
   final VoidCallback? onOpenSearch;
 
-  /// Opens the current next-stop order's detail ("عرض الطلب" on the hero).
+  /// Opens the current next-stop order's detail — the hero card taps through
+  /// to it.
   final VoidCallback? onOpenOrder;
+
+  /// Hands the current order over ("تم تسليم الطلب للعميل" — the hero's black
+  /// button): handoff sheet → COD collection when there is cash → result.
+  final VoidCallback? onDeliverOrder;
 
   /// A KPI tile that maps to a slice of the Orders/Queue tab (in-progress /
   /// delivered / failed) — switches to that tab with the filter preselected.
@@ -60,7 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            _HomeNextStopCard(onViewOrder: widget.onOpenOrder),
+                            _HomeNextStopCard(
+                              onViewOrder: widget.onOpenOrder,
+                              onDeliver: widget.onDeliverOrder,
+                            ),
                             20.szH,
                             _HomeTodayStats(
                               onOpenOrdersFilter: widget.onOpenOrdersFilter,

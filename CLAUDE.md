@@ -54,8 +54,9 @@ and/or `DevGallery`:
 | Queue States (1a–1e) — the pilot | `features/queue/` | `Queue States.dc.html` |
 | COD 2a (keypad entry → wallet confirm) | `features/cod/` | `COD Collection.dc.html` |
 | Failure States (1a–1g) — the app's fail flow | `features/failure_states/` | `Failure States.dc.html` |
-| Settlement (open + settled) | `features/settlement/` | `Settlement.dc.html` |
+| Settlement (open + settled, **and the returns**) | `features/settlement/` | `Settlement.dc.html` |
 | Auth (6 states, gates entry) | `features/auth/` | `Auth.dc.html` |
+| Account / profile (the 5th tab) | `features/profile/` | not a mockup — replaced the old «المزيد» menu |
 
 Shared widgets (`lib/widgets/bottom_nav`, `home_indicator`, `map_view`, `status_pill`, `app_sheet`)
 were also converted in place (same public APIs, Flutter_Base internals).
@@ -163,6 +164,16 @@ simulator) is the only one shown — the app no longer draws its own `9:41` row.
 - `typography.dart` (`AppTypography`) — Noto Kufi Arabic size scale. Note: most screens set
   `fontWeight` at the call site because the same size appears at different weights.
 
+## Returns live on the settlement page
+
+Settling is one act: at the end of a shift the courier hands the branch back both the cash they
+collected **and** the orders they could not deliver. `_ReturnsSection`
+(`features/settlement/`) lists the pending returns under the collections and raises the same
+confirmation sheet the standalone returns page raises — `showReturnsHandoverSheet`, the public
+wrapper over failure_states' private one, so the two entry points cannot drift. The dedicated
+`ReturnsListScreen` (`/returns`, DevGallery) still exists for anyone who wants only that half; it is
+no longer linked from the tab bar.
+
 ## Shared widgets (`lib/widgets/`) — reuse across screens
 
 - `StatusBar` — mock `9:41` + signal/wifi/battery glyph (LTR). **No longer used** — the OS status
@@ -172,7 +183,10 @@ simulator) is the only one shown — the app no longer draws its own `9:41` row.
 - `HomeIndicator` — the home-indicator pill on a white strip (used directly by screens with no tab
   bar, e.g. Pickup).
 - `MapView` — real `FlutterMap` + OSM raster tiles + red pin (Home strip and Order-detail map both
-  use it; pure Dart, no native plugin, so the iOS build stays CocoaPods-free). Carries the
+  use it; pure Dart, no native plugin, so the iOS build stays CocoaPods-free). **A still preview by
+  default** (`interactive: false`): it never pans or zooms, and the map layer is wrapped in an
+  `IgnorePointer` so it can't fight the surrounding scroll or swallow the Home hero's tap. Navigation
+  is the Google-Maps badge's job, and that badge stays live either way. Carries the
   **open-in-Google-Maps badge**: pass `destinationLabel` so Maps opens on the address rather than a
   bare coordinate. The badge draws `assets/brand/google_maps.svg` through `SvgPicture` directly —
   it is a multi-colour brand mark, so it must NOT go through `IconWidget`, which recolours the
@@ -182,14 +196,55 @@ simulator) is the only one shown — the app no longer draws its own `9:41` row.
   plugin would put native code back into the iOS build.
 - `StatusPill` — small status pill (background/foreground/border/icon).
 
-## Icons (`lib/icons/app_icon.dart`)
+## Icons (`assets/icons/` + `AppIcon` / `IconWidget`)
 
-`AppIcon(AppIconName.x, color:, size:)` renders `assets/icons/<name>.svg`. The SVGs are
-stroke-only artwork recolored at render time via a `srcIn` color filter (matching the mockups'
-`stroke: currentColor`). To add an icon: copy the `<symbol id="i-...">` path out of the mockup's
-inline `<svg>` defs into a new `assets/icons/<name>.svg` (stroke `#000000`, `fill="none"`), then
-add an enum entry (map the asset name in the `assetName` switch if it differs, e.g. `i-cr` →
-`chevron_right`).
+`AppIcon(AppIconName.x, color:, size:)` / `IconWidget(icon: AppAssets.svg.x, color:)` render
+`assets/icons/<name>.svg`. The SVGs are stroke-only artwork recolored at render time via a `srcIn`
+color filter (matching the mockups' `stroke: currentColor`).
+
+**Source of truth: the courier-app Figma library**, not the mockups' inline `<symbol>` defs —
+`https://www.figma.com/design/HOcEPWJfofqhzF9DlMYtUV/claude-test---delivery-app?node-id=6-682`
+(the "Icons" canvas, Huge Icon Set v2.0). Every glyph in `assets/icons/` was re-exported from it so
+the whole app draws one family. **Exceptions:** `chevron_left` / `chevron_right` (the library has no
+bare chevron — only arrows with shafts, which read wrong at 18px) and `status_bar.svg` (mock artwork,
+unused). Those two chevrons are still the mockups'.
+
+### Pulling a glyph out of Figma
+
+1. The Figma **desktop app must have that file as the active tab** — the MCP reads the open document,
+   so a different file open means `get_metadata` 404s on the node id.
+2. `mcp__figma-desktop__get_metadata` on `6:682` dumps the whole canvas (~1.3 MB; it lands in a
+   tool-results file — query it with python, don't read it). Symbol names map to Hugeicons names
+   (`store-01`, `building-06`, `tick-02`…).
+3. **Each glyph exists twice: the stroke version is the duplicate with the LARGER node id**, the solid
+   version the smaller. That is the only reliable way to tell them apart from the dump.
+4. `get_design_context` on the node returns a localhost asset URL plus the Tailwind insets that place
+   the vector inside its 24×24 frame. `curl` the URL, then replay those insets — the helper that does
+   it is checked into the scratchpad recipe below.
+
+### The export maths (why a raw Figma SVG can't be dropped in as-is)
+
+The exported `<svg>` is sized to the glyph's *content box*, not 24×24, and the insets place it:
+
+```
+content: x0 = left%·24, y0 = top%·24, w = 24·(1−left%−right%), h = 24·(1−top%−bottom%)
+img:     x = x0 + imgLeft%·w, y = y0 + imgTop%·h        (img insets are negative)
+wrap:    <g transform="translate(x,y)"> …paths… </g>    inside a 24×24 viewBox
+```
+
+Two more traps:
+- A `-rotate-180 -scale-x-100` wrapper on the node nets out to a **vertical flip** (`package`, `villa`,
+  `building`, `whatsapp`); a lone `-scale-x-100` is a **horizontal flip** (`search`). Miss it and the
+  glyph is upside down.
+- **Solid glyphs are filled outlines whose paths carry no `fill`**, so the root `<svg>` must supply
+  `fill="#000000"`; stroke glyphs need `fill="none"` or they blob into a silhouette.
+
+Recolouring happens at render time either way, so the committed colour is only a placeholder.
+
+### Filled variants
+
+`*_filled.svg` exists for the five bottom-nav tabs (`home`, `orders`, `store`, `wallet`, `user`) and is
+used **only** for the active tab.
 
 ## Data (`lib/data/`)
 
@@ -202,12 +257,15 @@ Sample data mirrors each mockup's `state`, kept identical so screens are compara
 
 The real entry point — `main.dart` sets `home: const AppShell()`. It's an `IndexedStack` +
 `BottomNav` tab host:
-- **Home** and **الطلبات (Orders)** are real screens. **الاشعارات / المزيد** are `_PlaceholderTab`
-  ("قريبًا") until those screens are built.
+- Five tabs: **الرئيسية · الطلبات · الدفعات · التسوية · الحساب**. The last one is the courier's own
+  profile (`features/profile/`) — name, avatar, «الحساب وكلمة المرور» → the existing
+  `ChangePasswordScreen`, the DevGallery, and sign-out. It replaced the old «المزيد» link menu:
+  a tab bar names a section, and the section is the person.
 - The pickup tab is labelled **الدفعات** (`nav_pickup`), not "الاستلام": a tab bar names sections,
   not actions, and the tab now lists the batches waiting at the branch.
-- Tapping **عرض الطلب** (Home hero) or an **order card** (Orders) pushes the order-detail flow
-  *over* the shell. The Result screen's buttons pop the whole flow back via
+- **The Home hero card itself opens the order** (tap anywhere on it); its black button is the
+  *action* — «تم تسليم الطلب» runs the same handoff → COD → result flow the detail's sticky bar runs
+  (`_deliverNextStop`). An **order row** (Orders) pushes the order-detail flow *over* the shell. The Result screen's buttons pop the whole flow back via
   `popUntil((r) => r.isFirst)`; "العودة للرئيسية" also switches to the Home tab.
 - Screens forward `BottomNav.onTap` up through an `onSelectTab` callback; the shell owns the
   selected `NavTab`. `OrderDetailScreen` takes `onFinishToNext` / `onFinishToHome` / `onSelectTab`.
@@ -267,6 +325,40 @@ Not built yet: APNs `liveactivity` pushes (so the island goes stale once iOS
 suspends the app), a real countdown (`Order.due` is a formatted string, not a
 timestamp), an `arrived` trigger (no geofence), and any Android equivalent.
 
+## Home hero — the next-order card (`_HomeNextStopCard`)
+
+- **One leg, not one segment per order.** `_HomeRouteLeg` draws where the courier is coming *from*,
+  where they are going, and roughly how long: `[origin] ——— [destination] · ١١ دقيقة`. Origin is the
+  branch on the first order of a batch and the door they just closed after that
+  (`ShiftController.legOrigin`); destination is the customer's own `Order.place`
+  (`PlaceKind.building` / `.villa`), so the two ends genuinely differ leg to leg.
+- The old per-order segment bar is **hidden, not deleted** — `kShowStopSegments = false` in
+  `home_next_stop_card.dart`. `_HomeStopProgress` (with its per-segment tooltip) is intact; flip the
+  flag to bring it back.
+- The ETA is derived from `Order.dist` at ~22 km/h (`_legEtaMinutes`). There is no routing service
+  and `Order.due` is a formatted string, not a timestamp — so it is an honest estimate, not a
+  countdown. Replace it the moment the backend can give a real one.
+- **The card is the link; the button is the action.** Tapping anywhere on the card opens the order
+  detail (`onViewOrder`); the black button is «تم تسليم الطلب» (`onDeliver`) and runs the *same*
+  handoff → COD → result flow the detail's sticky bar runs. Keep the hero label short — the button
+  shares its row with the call/chat tiles and a longer string truncates.
+- The header line reads «الدفعة ١ · الطلب ١ من ٤» as plain text, not two pills: two short facts did
+  not warrant two filled chips.
+- The address row and the promised-time/distance row are deliberately one type class (16px glyph,
+  14/regular) — both answer "where and when".
+
+## Lists are flat (Orders + Batches)
+
+Neither tab uses cards any more. Rows run edge to edge on a single `AppColors.surface` sheet,
+separated by a `borderHeader` hairline (`_ListRow` in `queue_cards.dart`), and the row owns its 20px
+side padding so there is no screen-padding-around-card-padding nesting. The last row in a list drops
+its hairline (`last: true`). The same treatment covers the browse list, search results, the postponed
+list, and the batch sections.
+
+**COD shows as the figure alone.** «الدفع عند الاستلام» plus a separate "cash to collect" row said
+the same thing twice — an amount can only mean cash on delivery. The queue row, the hero pill and the
+batch rows all follow this; prepaid keeps its «مدفوع مقدمًا» label, since it has no figure.
+
 ## Batches (`OrderBatch` + `ShiftController`)
 
 A courier's day is a **sequence of batches**, not one hand-off: another batch can
@@ -282,8 +374,11 @@ be dispatched while the previous one is still being delivered.
   anything is carried it falls back to the still-to-deliver orders, so the hero
   never counts orders closed hours ago.
 - The **الدفعات** tab (`features/pickup/`) renders one `_PickupBatchSection` per
-  batch, each a header plus `_PickupOrderRow` compact rows — the same row the
-  dispatch sheet uses, so a batch looks the same wherever it appears.
+  batch, each a **collapsible** header (label · count · cash · chevron) over
+  `_PickupOrderRow` rows — the same row the dispatch sheet uses, so a batch looks
+  the same wherever it appears. The first batch opens; later ones stay folded
+  until wanted. `_PickupOrderRow(inset: false)` drops the row's own side padding
+  for the dispatch sheet, whose `SheetShell` already pads its body.
 - A batch pill shows the **cash figure alone** on a COD order: the amount already
   implies cash on delivery, so the "الدفع عند الاستلام" label beside it was noise.
 
@@ -299,8 +394,8 @@ be dispatched while the previous one is still being delivered.
 
 ## DevGallery (`lib/dev/dev_gallery.dart`)
 
-Launcher listing every built screen, now reached from the **المزيد (More)** tab's "الشاشات (Dev)"
-button (no longer the app's `home`). Still the place to preview screens not yet wired into the
+Launcher listing every built screen, now reached from the **الحساب (Account)** tab's
+"كل الشاشات (Dev)" row (no longer the app's `home`). Still the place to preview screens not yet wired into the
 shell. **Add a gallery entry for each new screen.**
 
 ---

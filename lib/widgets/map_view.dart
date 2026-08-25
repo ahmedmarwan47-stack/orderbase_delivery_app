@@ -11,8 +11,15 @@ import '../theme/shadows.dart';
 /// the Home hero card and as the taller rounded map in the order detail.
 ///
 /// Renders a real [FlutterMap] with OpenStreetMap raster tiles (pure-Dart, no
-/// native plugin — keeps the iOS build CocoaPods-free). Rotation is disabled and
-/// the pin sits at the map centre.
+/// native plugin — keeps the iOS build CocoaPods-free). The pin sits at the map
+/// centre.
+///
+/// The map is a **still preview** by default ([interactive] off): it holds its
+/// frame on the order's address instead of panning under the courier's thumb.
+/// That matters twice over — a map that drags inside a scrolling card fights
+/// the scroll, and it would swallow the taps of the cards these strips sit in.
+/// Real navigation is the open-in-Google-Maps badge's job, and that badge stays
+/// live either way.
 class MapView extends StatefulWidget {
   const MapView({
     super.key,
@@ -25,6 +32,7 @@ class MapView extends StatefulWidget {
     this.center,
     this.destinationLabel,
     this.showOpenInMaps = true,
+    this.interactive = false,
   });
 
   final double height;
@@ -47,6 +55,10 @@ class MapView extends StatefulWidget {
   /// by name rather than a bare coordinate. Falls back to lat/lng when absent.
   final String? destinationLabel;
 
+  /// Lets the courier pan/zoom the map itself. Off everywhere in the app —
+  /// see the class doc.
+  final bool interactive;
+
   /// Shows the "open in Google Maps" badge. The map itself is a preview — real
   /// turn-by-turn belongs to a maps app, and the badge is what says so.
   final bool showOpenInMaps;
@@ -57,8 +69,7 @@ class MapView extends StatefulWidget {
   State<MapView> createState() => _MapViewState();
 }
 
-class _MapViewState extends State<MapView>
-    with SingleTickerProviderStateMixin {
+class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
   // A slow, continuous breath so the pin reads as a live GPS fix.
   late final AnimationController _pulse = AnimationController(
     vsync: this,
@@ -101,8 +112,10 @@ class _MapViewState extends State<MapView>
       options: MapOptions(
         initialCenter: focus,
         initialZoom: 15,
-        interactionOptions: const InteractionOptions(
-          flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+        interactionOptions: InteractionOptions(
+          flags: widget.interactive
+              ? InteractiveFlag.all & ~InteractiveFlag.rotate
+              : InteractiveFlag.none,
         ),
       ),
       children: [
@@ -119,8 +132,15 @@ class _MapViewState extends State<MapView>
     );
 
     if (borderRadius > 0) {
-      map = ClipRRect(borderRadius: BorderRadius.circular(borderRadius), child: map);
+      map = ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: map,
+      );
     }
+
+    // A still map is decoration, so it must not eat the gestures of whatever it
+    // is embedded in — the Home hero is tappable through this strip.
+    if (!widget.interactive) map = IgnorePointer(child: map);
 
     final Widget pin = Container(
       width: pinDiameter,

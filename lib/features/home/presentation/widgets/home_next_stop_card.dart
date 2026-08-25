@@ -1,13 +1,27 @@
 part of '../imports/home_imports.dart';
 
-/// The next-stop hero card — progress, a map strip, the *current* order's
-/// details, and the primary "view order" + call/chat actions. Everything is
-/// driven by [ShiftController.nextStop]; when the route is finished it collapses
-/// to a "route complete" state.
-class _HomeNextStopCard extends StatelessWidget {
-  const _HomeNextStopCard({this.onViewOrder});
+/// Shows the old one-segment-per-order progress bar instead of the single
+/// origin → destination leg. **Off**: the segment bar was replaced, not
+/// deleted — [_HomeStopProgress] and its per-segment tooltip are kept intact
+/// so flipping this back to `true` restores them exactly as they were.
+const bool kShowStopSegments = false;
 
+/// The next-stop hero card — the current leg, a map strip, the *current*
+/// order's details, and the primary "handed over" + call/chat actions.
+/// Everything is driven by [ShiftController.nextStop]; when the route is
+/// finished it collapses to a "route complete" state.
+///
+/// The card **is** the link to the order: tapping anywhere on it opens the
+/// order detail, which frees the black button to carry the one action the
+/// courier actually takes at the door — handing the order over.
+class _HomeNextStopCard extends StatelessWidget {
+  const _HomeNextStopCard({this.onViewOrder, this.onDeliver});
+
+  /// Opens the current order's detail — the whole card taps through to it.
   final VoidCallback? onViewOrder;
+
+  /// Marks the order handed over (handoff sheet → COD collection → result).
+  final VoidCallback? onDeliver;
 
   @override
   Widget build(BuildContext context) {
@@ -63,41 +77,42 @@ class _HomeNextStopCard extends StatelessWidget {
                   ),
                 ],
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.failedBg,
-                  borderRadius: BorderRadius.circular(AppCircular.r20),
+              // Which batch this order came in, and where in it the courier
+              // is. Two pills for two short facts was more chrome than
+              // content — as one quiet line they take a third of the room and
+              // still read at a glance.
+              Flexible(
+                child: Text(
+                  '${LocaleKeys.homeBatchLabel.tr(namedArgs: {'n': arabicDigits(shift.currentBatchNumber)})}'
+                  ' · '
+                  '${LocaleKeys.homeStopCount.tr(namedArgs: {'current': arabicDigits(shift.currentStopNumber), 'total': arabicDigits(shift.totalStops)})}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: const TextStyle().setSecondaryColor.s12.semiBold,
                 ),
-                child:
-                    Text(
-                      LocaleKeys.homeStopCount.tr(
-                        namedArgs: {
-                          'current': '${shift.currentStopNumber}',
-                          'total': '${shift.totalStops}',
-                        },
-                      ),
-                      style: const TextStyle()
-                          .setColor(AppColors.stopCountText)
-                          .s12
-                          .semiBold,
-                    ).paddingSymmetric(
-                      horizontal: AppPadding.pW12,
-                      vertical: AppPadding.pH4,
-                    ),
               ),
             ],
           ).paddingOnly(
             left: AppPadding.pW20,
             top: AppPadding.pH16,
             right: AppPadding.pW20,
-            // 8px less than before — [_HomeStopProgress] pads its tap target by
-            // 8px on top, so the bar keeps its original 12px gap from the header.
+            // 8px less than before — the leg below pads itself by 8px on top,
+            // so the bar keeps its original 12px gap from the header.
             bottom: AppPadding.pH4,
           ),
-          // ── progress segments (one per route stop) ──
-          // Each segment fades its colour when a stop closes (grey → green/red),
-          // and a tap explains the colour in a small tooltip. See the widget.
-          _HomeStopProgress(stops: orderedStops, current: order),
+          // ── the current leg: where from → where to, and how long ──
+          // One bar, not one-per-order: the courier runs a single leg at a
+          // time. The old per-stop segment bar is kept behind
+          // [kShowStopSegments] in case it is wanted back.
+          if (kShowStopSegments)
+            _HomeStopProgress(stops: orderedStops, current: order)
+          else
+            _HomeRouteLeg(
+              origin: shift.legOrigin,
+              destination: order.place,
+              etaMinutes: _legEtaMinutes(order),
+            ),
           // ── map strip ──
           MapView(
             height: AppSize.sH120,
@@ -166,18 +181,21 @@ class _HomeNextStopCard extends StatelessWidget {
                 Row(
                   children: [
                     if (order.due != null) ...[
+                      // Matched to the address row above — same 16px glyph,
+                      // same 14/regular type. Address and promised time are one
+                      // class of fact ("where and when"), so they read as one.
                       IconWidget(
                         icon: AppAssets.svg.clock,
                         color: AppColors.textTertiary,
-                        height: 15.h, // mockup glyph 15px (off the 4px grid)
-                        width: 15.w,
+                        height: AppSize.sH16,
+                        width: AppSize.sW16,
                       ),
-                      4.szW,
+                      8.szW,
                       Text(
                         LocaleKeys.promisedAt.tr(
                           namedArgs: {'time': order.due!},
                         ),
-                        style: const TextStyle().setTertiaryColor.s12.regular,
+                        style: const TextStyle().setTertiaryColor.s14.regular,
                       ),
                     ],
                     if (order.due != null && order.dist != null) ...[
@@ -197,7 +215,7 @@ class _HomeNextStopCard extends StatelessWidget {
                         order.dist!,
                         style: const TextStyle()
                             .setTertiaryColor
-                            .s12
+                            .s14
                             .regular
                             .tabular,
                       ),
@@ -227,21 +245,28 @@ class _HomeNextStopCard extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          LocaleKeys.homeViewOrder.tr(),
-                          style: const TextStyle().setWhite.s14.semiBold,
-                        ),
-                        8.szW,
                         IconWidget(
-                          icon: AppAssets.svg.chevronLeft,
+                          icon: AppAssets.svg.check,
                           color: AppColors.surface,
                           height: AppSize.sH18,
                           width: AppSize.sW18,
                         ),
+                        8.szW,
+                        // The hero's one action is the one taken at the door.
+                        // Opening the order is the card's own tap, so the
+                        // button no longer has to spend itself on navigation.
+                        Flexible(
+                          child: Text(
+                            LocaleKeys.homeDeliver.tr(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle().setWhite.s14.semiBold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                ).onClick(onTap: onViewOrder),
+                ).onClick(onTap: onDeliver),
               ),
               12.szW,
               // Neutral tiles (ink glyph, white fill, hairline) matching the
@@ -275,7 +300,10 @@ class _HomeNextStopCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+      // The whole card opens the order. Everything inside that handles its own
+      // tap — the deliver button, call/chat, the open-in-Maps badge — still
+      // wins the gesture arena, so only the "dead" areas fall through here.
+    ).onClick(onTap: onViewOrder);
   }
 }
 
