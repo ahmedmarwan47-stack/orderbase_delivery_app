@@ -145,7 +145,9 @@ class _PostponeSheetState extends State<_PostponeSheet> {
         child: Text(
           label,
           style: selected
-              ? const TextStyle().setColor(AppColors.brand).s14.semiBold
+              // The brand red is a mark, not a text colour — dangerAccent is
+              // its readable twin. The chip keeps the brand border either way.
+              ? const TextStyle().setColor(AppColors.dangerAccent).s14.semiBold
               : const TextStyle().setMainTextColor.s14.semiBold,
         ),
       ).onClick(onTap: () => _controller.selectSlot(index)),

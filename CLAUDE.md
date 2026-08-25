@@ -153,6 +153,26 @@ simulator) is the only one shown — the app no longer draws its own `9:41` row.
 
 ---
 
+## Contrast
+
+Every colour pairing the app actually renders was measured against WCAG AA (4.5:1 for text below
+18.66px bold / 24px, 3:1 for icons, borders and other non-text marks). Rules that came out of it:
+
+- **`brand` is a mark, not a text colour.** #E72B29 is 4.40:1 on white — fine for the logo, icons and
+  borders, short of AA for anything meant to be *read*. `dangerAccent` (#C81E1C, 5.74:1) is its
+  readable twin; use that when a red carries words.
+- **`greenAccent` (3.30:1) is likewise icon-only.** For green text use `deliveredText` (5.02:1).
+- Text that sits on the warm `background` has less room than on white — `textMuted` is 4.61:1 there
+  versus 5.02:1 on white. Anything below `textSecondary` in weight needs checking against
+  **`background`**, not `surface`, now that the lists are on the page.
+- On the slate money card (`paymentCardBg`) the label token is `paymentLabel`; `mutedOnDark` is tuned
+  for the near-black cards (`inkFill` / `darkCardRowBg`) and only reaches 3.04:1 on slate.
+
+Known and deliberately left: the **Home 1b/1c/2a explorations** (DevGallery only, not the shipped
+Home) keep their mockup hexes — `flatMuted` 3.75:1, white on `flatBannerBg` 3.50:1, the
+`flatMutedDot` separator 1.73:1. They are design references, and matching the mockup matters more
+there than shipping-grade contrast. Fix them if any of those directions is ever adopted.
+
 ## Theme tokens (`lib/theme/`) — always reuse, never inline
 
 - `colors.dart` (`AppColors`) — every hex from the mockups, grouped by role, with comments on where

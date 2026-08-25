@@ -23,10 +23,11 @@ class _ListRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final row = DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.surface,
         border: last
             ? null
-            : const Border(bottom: BorderSide(color: AppColors.borderHeader)),
+            // borderDefault, a shade darker than the header hairline: this rule
+            // has to read on the warm page background, not on white.
+            : const Border(bottom: BorderSide(color: AppColors.borderDefault)),
       ),
       child: child.paddingSymmetric(
         horizontal: AppPadding.pW20,

@@ -24,10 +24,13 @@ abstract final class AppColors {
   static const textPrimary = Color(0xFF1A1919);
   static const textSecondary = Color(0xFF6B6B73);
   static const textTertiary = Color(0xFF52525B);
-  static const textMuted = Color(0xFF7E6E65); // address lines, hints — AA on white (4.88:1)
+  static const textMuted = Color(0xFF7C6C63); // address lines, hints — AA on white (5.03:1)
+  // and on the warm page background (4.53:1), which is where the flat lists put it.
   static const textBody = Color(0xFF3F3F46); // long-form address / body copy
 
-  // Brand
+  // Brand — the Orderbase red. 4.40:1 on white, so it clears the 3:1 bar for
+  // icons, borders and other non-text marks but NOT the 4.5:1 one for body
+  // text. Use [dangerAccent] (5.74:1) when a red has to be *read*.
   static const brand = Color(0xFFE72B29);
 
   // Status: in transit
@@ -46,7 +49,7 @@ abstract final class AppColors {
   // WhatsApp contact action — WhatsApp's own darker brand green. Deliberately
   // deeper/tealer than greenAccent + deliveredText (#15803D) so the contact
   // button never reads as the "delivered" status hue.
-  static const whatsappGreen = Color(0xFF128C7E);
+  static const whatsappGreen = Color(0xFF107E72);
 
   // Status: failed
   static const failedBg = Color(0xFFFDECEC);
@@ -80,8 +83,10 @@ abstract final class AppColors {
   // tooltip's order-number line over the ink bubble).
   static const onInkMuted = Color(0xB3FFFFFF);
 
-  // Muted count text inside an unselected filter chip
-  static const chipCountMuted = Color(0xFF9A9994);
+  // Muted count text inside an unselected filter chip. Darkened from the
+  // mockup's #9A9994, which sat at 2.6:1 — unreadable by the standard, and it
+  // carries real content (result counts, field hints).
+  static const chipCountMuted = Color(0xFF706F6A);
 
   // Destructive accent (clear filter, active nav icon)
   static const dangerAccent = Color(0xFFC81E1C);
@@ -98,7 +103,9 @@ abstract final class AppColors {
   // buttons) and deliberately OUTSIDE the four status hues so "money" never
   // reads as the green "delivered" status.
   static const paymentCardBg = Color(0xFF4C535D); // neutral slate
-  static const paymentLabel = Color(0xFFB8BDC6); // soft light-slate label
+  // Soft light-slate label. Lifted from the mockup's #B8BDC6 (4.12:1 on the
+  // slate card) to clear AA; it is the label for the figure beside it.
+  static const paymentLabel = Color(0xFFC2C6CE);
   static const paymentSuffix = Color(0xFFD2D6DD); // "جم" suffix on the card
   static const paymentTile = Color(0x26FFFFFF); // rgba(255,255,255,.15) icon tile
   static const cashBright = Color(0xFFEDEFF3); // near-white cash glyph on slate

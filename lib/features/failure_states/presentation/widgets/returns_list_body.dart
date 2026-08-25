@@ -155,7 +155,7 @@ class _ReturnsHero extends StatelessWidget {
                     8.szW,
                     Text(
                       _ordersUnit(count),
-                      style: const TextStyle().setColor(AppColors.mutedOnDark).s16.semiBold,
+                      style: const TextStyle().setColor(AppColors.paymentLabel).s16.semiBold,
                     ),
                   ],
                 ),
@@ -164,7 +164,7 @@ class _ReturnsHero extends StatelessWidget {
                   '${_piecesLabel(pieces)} · '
                   '${LocaleKeys.failureReturnsHandedTo.tr(namedArgs: {'branch': branch})}',
                   style: const TextStyle()
-                      .setColor(AppColors.mutedOnDark)
+                      .setColor(AppColors.paymentLabel)
                       .s12
                       .regular
                       .withHeight(1.5),
