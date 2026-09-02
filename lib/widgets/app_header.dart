@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../app/shift_controller.dart';
 import '../config/res/config_imports.dart';
-import '../core/session/courier.dart';
 import '../data/order.dart';
 
 /// The unified app header — a solid white bar with a hairline bottom, shared
 /// by every tab page so the app reads the same wherever the courier is.
 ///
 /// It answers the questions a courier asks *between* screens, not the ones the
-/// page beneath answers: who am I riding for today (the merchant and the
-/// branch), how much is left, and how much cash am I carrying. Three signals
-/// join the second line only while they are true — a batch waiting at the
-/// branch, returns in custody, and the cash figure going red past the limit —
-/// so on an ordinary day the line stays quiet.
+/// page beneath answers: which branch am I on today, how much is left, and
+/// how much cash am I carrying. Nothing else
+/// joins that line: a batch waiting at the branch is already announced by its
+/// sheet, carried by the Orders tab's badge and spelled out on Home, so the
+/// header does not repeat it.
 ///
 /// Rebuilds with [ShiftController] so the numbers stay current as stops close.
 class AppHeader extends StatelessWidget {
@@ -21,7 +20,6 @@ class AppHeader extends StatelessWidget {
     super.key,
     this.onSearch,
     this.onOpenNotifications,
-    this.onOpenPendingBatch,
     this.notificationsBadge = true,
     this.notificationsActive = false,
   });
@@ -31,9 +29,6 @@ class AppHeader extends StatelessWidget {
 
   /// Opens (or, when [notificationsActive], closes) the notifications page.
   final VoidCallback? onOpenNotifications;
-
-  /// The amber «دفعة في الفرع» chip — jumps to the waiting batch.
-  final VoidCallback? onOpenPendingBatch;
 
   /// Shows the red dot on the bell.
   final bool notificationsBadge;
@@ -62,24 +57,17 @@ class AppHeader extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // The merchant mark — a multi-colour brand asset, so it
-                      // is drawn as-is rather than recoloured like an icon.
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(AppCircular.r10),
-                        child: IconWidget(
-                          icon: AppAssets.img.saleSucre,
-                          height: AppSize.sH36,
-                          width: 36.w,
-                        ),
-                      ),
-                      8.szW,
                       Expanded(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // The branch alone. The merchant never changes and
+                            // its mark was decoration in a bar that exists to
+                            // carry live facts; which branch you are on today
+                            // is the fact worth the line.
                             Text(
-                              '${Courier.merchantName} · ${shift.branchName}',
+                              shift.branchName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle()
@@ -88,10 +76,7 @@ class AppHeader extends StatelessWidget {
                                   .semiBold,
                             ),
                             4.szH,
-                            _StatusLine(
-                              shift: shift,
-                              onOpenPendingBatch: onOpenPendingBatch,
-                            ),
+                            _StatusLine(shift: shift),
                           ],
                         ),
                       ),
@@ -136,16 +121,15 @@ class AppHeader extends StatelessWidget {
   }
 }
 
-/// The header's second line, composed from the courier's status: what is
-/// left, the cash in hand (red past the limit), and the amber chip while a
-/// batch waits at the branch. Returns in custody are deliberately *not* here —
-/// they did not fit beside the chip at 12px, and Home's returning card and the
-/// settlement both carry them.
+/// The header's second line: where the courier is in the day, and the cash in
+/// hand — red, with an alert glyph, once it passes the branch's limit. Two
+/// facts only. Returns in custody and a batch waiting at the branch both have
+/// their own homes (Home's status card, the Orders tab), so neither crowds in
+/// here at 12px.
 class _StatusLine extends StatelessWidget {
-  const _StatusLine({required this.shift, this.onOpenPendingBatch});
+  const _StatusLine({required this.shift});
 
   final ShiftController shift;
-  final VoidCallback? onOpenPendingBatch;
 
   @override
   Widget build(BuildContext context) {
@@ -170,81 +154,27 @@ class _StatusLine extends StatelessWidget {
       namedArgs: {'amount': formatThousands(shift.cashInHand)},
     );
 
-    return Row(
-      children: [
-        Flexible(
-          child: Text.rich(
-            TextSpan(
-              style: quiet,
-              children: [
-                TextSpan(text: lead),
-                const TextSpan(text: ' · '),
-                if (over)
-                  WidgetSpan(
-                    alignment: PlaceholderAlignment.middle,
-                    child: IconWidget(
-                      icon: AppAssets.svg.alert,
-                      color: AppColors.failedText,
-                      height: AppSize.sH14,
-                      width: AppSize.sW14,
-                    ).paddingOnlyDirectional(end: AppPadding.pW4),
-                  ),
-                TextSpan(text: cash, style: cashStyle),
-              ],
+    return Text.rich(
+      TextSpan(
+        style: quiet,
+        children: [
+          TextSpan(text: lead),
+          const TextSpan(text: ' · '),
+          if (over)
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: IconWidget(
+                icon: AppAssets.svg.alert,
+                color: AppColors.failedText,
+                height: AppSize.sH14,
+                width: AppSize.sW14,
+              ).paddingOnlyDirectional(end: AppPadding.pW4),
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        if (shift.hasPendingBatch) ...[
-          6.szW,
-          _PendingBatchChip(onTap: onOpenPendingBatch),
+          TextSpan(text: cash, style: cashStyle),
         ],
-      ],
-    );
-  }
-}
-
-/// Amber «دفعة» with a parcel glyph — the one thing left behind after the
-/// mid-flight sheet is dismissed, so a waiting batch is never silently
-/// forgotten. Kept to one word so the cash figure beside it still fits.
-class _PendingBatchChip extends StatelessWidget {
-  const _PendingBatchChip({this.onTap});
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: onTap != null,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.heroCodPillBg,
-          borderRadius: BorderRadius.circular(AppCircular.r7),
-        ),
-        padding: EdgeInsets.symmetric(
-          horizontal: AppPadding.pW8,
-          vertical: AppPadding.pH2,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconWidget(
-              icon: AppAssets.svg.box,
-              color: AppColors.postponedText,
-              height: AppSize.sH12,
-              width: AppSize.sW12,
-            ),
-            4.szW,
-            Text(
-              LocaleKeys.headerPendingBatch.tr(),
-              style: const TextStyle()
-                  .setColor(AppColors.postponedText)
-                  .s10
-                  .semiBold,
-            ),
-          ],
-        ),
-      ).onClick(onTap: onTap),
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

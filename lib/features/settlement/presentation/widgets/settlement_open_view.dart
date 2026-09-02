@@ -10,14 +10,12 @@ class _SettlementOpenView extends StatefulWidget {
     required this.data,
     this.onSelectTab,
     this.onOpenNotifications,
-    this.onOpenPendingBatch,
     this.onOpenSearch,
   });
   final SettlementController vc;
   final SettlementData data;
   final ValueChanged<NavTab>? onSelectTab;
   final VoidCallback? onOpenNotifications;
-  final VoidCallback? onOpenPendingBatch;
   final VoidCallback? onOpenSearch;
 
   @override
@@ -66,7 +64,6 @@ class _SettlementOpenViewState extends State<_SettlementOpenView> {
               AppHeader(
                 onSearch: widget.onOpenSearch,
                 onOpenNotifications: widget.onOpenNotifications,
-                onOpenPendingBatch: widget.onOpenPendingBatch,
               ),
               _SettlementHeader(data: data, showBack: false, scrolled: false),
             ] else

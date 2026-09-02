@@ -12,8 +12,10 @@ part of '../imports/home_imports.dart';
 ///  * **settled** — the branch closed the day. Who took the cash and when, and
 ///    (dev only) a way to start the simulated day again.
 ///
-/// A batch waiting at the branch adds an amber «دفعة جديدة في انتظارك» row to
-/// any of the three, since collecting it is then the next thing to do.
+/// A batch waiting at the branch adds the amber «ارجع للفرع لاستلام دفعة»
+/// row to any of the three, since collecting it is then the next thing to do.
+/// That row also rides under the hero while the courier is still on route —
+/// see [HomeScreen].
 class _HomeStateCard extends StatelessWidget {
   const _HomeStateCard({
     required this.status,
@@ -172,16 +174,13 @@ class _ReturningBody extends StatelessWidget {
               ),
             ),
             4.szH,
+            // One class under the headline, matching the hero's address block:
+            // where the branch is and why you are going, not two type tiers.
             Text(
-              '${Courier.merchantName} · ${shift.branchName}',
-              style: const TextStyle().setTertiaryColor.s14.regular,
-            ),
-            4.szH,
-            Text(
-              LocaleKeys.homeReturnBody.tr(
-                namedArgs: {'km': formatKmArabic(OrderBatch.returnLegKm)},
-              ),
-              style: const TextStyle().setSecondaryColor.s12.regular,
+              '${Courier.merchantName} · ${shift.branchName}\n'
+              '${LocaleKeys.homeReturnBody.tr(namedArgs: {'km': formatKmArabic(OrderBatch.returnLegKm)})}',
+              style: const TextStyle().setTertiaryColor.s14.regular
+                  .withHeight(1.5),
             ),
           ],
         ).paddingOnly(
@@ -404,7 +403,13 @@ class _HandChip extends StatelessWidget {
   }
 }
 
-/// Amber «دفعة جديدة في انتظارك» → the Orders tab.
+/// «ارجع للفرع لاستلام دفعة جديدة» — shown wherever Home is, on route or not.
+///
+/// A batch dispatched mid-route is a reason to turn around *now*: the orders
+/// are not in the bag, and nothing else on Home would say so while the hero is
+/// busy with the stop in hand. So this row rides under the hero as well as
+/// inside the status card, and names what is waiting so the courier can judge
+/// whether it is worth the detour yet.
 class _PendingBatchRow extends StatelessWidget {
   const _PendingBatchRow({this.onTap});
   final VoidCallback? onTap;
@@ -412,39 +417,69 @@ class _PendingBatchRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pending = ShiftController.instance.pendingBatches;
-    final ids = pending.map((b) => b.id).join(' · ');
+    if (pending.isEmpty) return const SizedBox.shrink();
+    final orders = pending.fold<int>(0, (sum, b) => sum + b.count);
+    final cash = pending.fold<int>(0, (sum, b) => sum + b.codTotal);
+    final meta = LocaleKeys.homeCollectBatchMeta.tr(
+      namedArgs: {
+        // One waiting batch is named; several are counted, since a list of
+        // IDs would say less than "two batches" at this size.
+        'what': pending.length == 1
+            ? pending.single.id
+            : LocaleKeys.homeCollectBatchCount.tr(
+                namedArgs: {'n': arabicDigits(pending.length)},
+              ),
+        'orders': arabicDigits(orders),
+        'cash': formatThousands(cash),
+      },
+    );
     return Semantics(
       button: onTap != null,
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.postponedBannerBg,
-          borderRadius: BorderRadius.circular(AppCircular.r12),
+          borderRadius: BorderRadius.circular(AppCircular.r16),
           border: Border.all(color: AppColors.postponedBorder),
         ),
         padding: EdgeInsets.symmetric(
-          horizontal: AppPadding.pW12,
+          horizontal: AppPadding.pW16,
           vertical: AppPadding.pH12,
         ),
         child: Row(
           children: [
             IconWidget(
-              icon: AppAssets.svg.box,
+              icon: AppAssets.svg.store,
               color: AppColors.postponedText,
-              height: AppSize.sH18,
-              width: AppSize.sW18,
+              height: AppSize.sH20,
+              width: AppSize.sW20,
             ),
-            8.szW,
+            12.szW,
             Expanded(
-              child: Text(
-                '${LocaleKeys.homeNewBatchWaiting.tr()} · $ids',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle()
-                    .setColor(AppColors.postponedText)
-                    .s12
-                    .semiBold,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    LocaleKeys.homeCollectBatchTitle.tr(),
+                    style: const TextStyle()
+                        .setColor(AppColors.postponedText)
+                        .s14
+                        .semiBold,
+                  ),
+                  2.szH,
+                  Text(
+                    meta,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle()
+                        .setColor(AppColors.postponedTextStrong)
+                        .s12
+                        .regular
+                        .tabular,
+                  ),
+                ],
               ),
             ),
+            8.szW,
             IconWidget(
               icon: AppAssets.svg.chevronLeft,
               color: AppColors.postponedText,

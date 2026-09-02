@@ -14,7 +14,6 @@ class SettlementScreen extends StatefulWidget {
     this.startStage = SettlementStage.open,
     this.onSelectTab,
     this.onOpenNotifications,
-    this.onOpenPendingBatch,
     this.onOpenSearch,
   });
 
@@ -29,7 +28,6 @@ class SettlementScreen extends StatefulWidget {
 
   /// Unified-header actions (shell-tab mode).
   final VoidCallback? onOpenNotifications;
-  final VoidCallback? onOpenPendingBatch;
   final VoidCallback? onOpenSearch;
 
   @override
@@ -66,7 +64,6 @@ class _SettlementScreenState extends State<SettlementScreen> {
                     data: data,
                     onSelectTab: widget.onSelectTab,
                     onOpenNotifications: widget.onOpenNotifications,
-                    onOpenPendingBatch: widget.onOpenPendingBatch,
                     onOpenSearch: widget.onOpenSearch,
                   )
                 : _SettlementOpenView(
@@ -74,7 +71,6 @@ class _SettlementScreenState extends State<SettlementScreen> {
                     data: data,
                     onSelectTab: widget.onSelectTab,
                     onOpenNotifications: widget.onOpenNotifications,
-                    onOpenPendingBatch: widget.onOpenPendingBatch,
                     onOpenSearch: widget.onOpenSearch,
                   );
           },

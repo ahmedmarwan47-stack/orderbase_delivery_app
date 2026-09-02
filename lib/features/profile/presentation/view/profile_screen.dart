@@ -7,14 +7,12 @@ class ProfileScreen extends StatelessWidget {
     super.key,
     required this.onSelectTab,
     this.onOpenNotifications,
-    this.onOpenPendingBatch,
     this.onOpenSearch,
     this.onStartNewDay,
   });
 
   final ValueChanged<NavTab> onSelectTab;
   final VoidCallback? onOpenNotifications;
-  final VoidCallback? onOpenPendingBatch;
   final VoidCallback? onOpenSearch;
 
   /// Dev-only: reset the simulated day so the whole flow can be run again.
@@ -44,7 +42,6 @@ class ProfileScreen extends StatelessWidget {
               AppHeader(
                 onSearch: onOpenSearch,
                 onOpenNotifications: onOpenNotifications,
-                onOpenPendingBatch: onOpenPendingBatch,
               ),
               Expanded(
                 child: ListView(

@@ -419,7 +419,7 @@
   "settlement_back_home": "العودة للرئيسية",
   "settlement_locked_note": "الطلبات المدفوعة مسبقًا والطلبات المتعذّرة لا تدخل في التسوية.",
   "header_no_batch": "لا دفعات بعد",
-  "header_remaining": "{count} متبقية",
+  "header_remaining": "{count} طلبات متبقية",
   "header_expected_at_branch": "متوقَّع في الفرع ~{time}",
   "header_settled": "تمت تسوية اليوم",
   "header_cash_in_hand": "معك {amount} جم",
@@ -473,5 +473,10 @@
   "settlement_history_title": "الأيام السابقة",
   "settlement_history_meta": "{cash} جم · {batches} دفعات · {orders} طلبات",
   "settlement_yesterday": "أمس",
-  "settlement_settled_pill": "مُسوّاة"
+  "settlement_settled_pill": "مُسوّاة",
+  "home_note_hint": "العميل ساب ملاحظة على الطلب. افتح تفاصيل الطلب واقراها قبل ما توصّل.",
+  "home_note_hint_label": "ملاحظة من العميل",
+  "home_collect_batch_title": "ارجع للفرع لاستلام دفعة جديدة",
+  "home_collect_batch_meta": "{what} · {orders} طلبات · {cash} جم",
+  "home_collect_batch_count": "{n} دفعات"
 }

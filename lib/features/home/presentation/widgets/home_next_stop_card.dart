@@ -14,15 +14,16 @@ const bool kShowRouteLeg = false;
 ///  1. **The batch line** — which batch, where in it, and how the trip ends
 ///     (return time to the branch, trip kilometres, a tooltip on what those
 ///     mean).
-///  2. **The destination, bold** — area as the headline, then the street,
-///     then the door-level detail (building · floor · apartment).
+///  2. **The destination, bold** — area and street on one line at one weight,
+///     then the door (building · floor · apartment) a step quieter.
 ///  3. **The map strip** with the open-in-Maps badge. Per-stop distance and
 ///     ETA are gone on purpose: Maps answers both better.
-///  4. **One quiet meta row** — customer, order number, cash pill — and the
-///     promised time, which is a deadline rather than an estimate.
+///  4. **One quiet meta row** — customer, order number, a note badge when the
+///     customer left instructions, and the cash pill — plus the promised time,
+///     which is a deadline rather than an estimate.
 ///  5. **Two actions** — «تم تسليم الطلب» and call. WhatsApp lives on the
 ///     detail, which the whole card opens.
-class _HomeNextStopCard extends StatelessWidget {
+class _HomeNextStopCard extends StatefulWidget {
   const _HomeNextStopCard({this.onViewOrder, this.onDeliver, this.onCall});
 
   /// Opens the current order's detail — the whole card taps through to it.
@@ -34,6 +35,12 @@ class _HomeNextStopCard extends StatelessWidget {
   /// Dials the customer.
   final VoidCallback? onCall;
 
+  @override
+  State<_HomeNextStopCard> createState() => _HomeNextStopCardState();
+}
+
+class _HomeNextStopCardState extends State<_HomeNextStopCard>
+    with _InlineHintHost {
   @override
   Widget build(BuildContext context) {
     final shift = ShiftController.instance;
@@ -80,24 +87,24 @@ class _HomeNextStopCard extends StatelessWidget {
                 ),
               12.szH,
               // ── 2. the destination ──
+              // Area and street sit on ONE line at ONE weight and size: they
+              // are a single fact ("where am I going"), and setting the area
+              // three steps louder than its own street invented a hierarchy
+              // that isn't in the address. It wraps rather than shrinking.
               Text(
-                order.area,
-                style: const TextStyle().setMainTextColor.s20.bold.withHeight(
-                  1.3,
+                '${order.area} · ${order.addr}',
+                style: const TextStyle().setMainTextColor.s18.bold.withHeight(
+                  1.4,
                 ),
               ),
               4.szH,
+              // The door beneath, quieter — the last thing you read, at the
+              // door, and the only part that isn't on the map.
               Text(
-                order.addr,
-                style: const TextStyle().setTertiaryColor.s14.regular,
+                order.addrDetail ?? '',
+                style: const TextStyle().setTertiaryColor.s14.regular
+                    .withHeight(1.5),
               ),
-              if (order.addrDetail != null) ...[
-                4.szH,
-                Text(
-                  order.addrDetail!,
-                  style: const TextStyle().setSecondaryColor.s12.regular,
-                ),
-              ],
             ],
           ).paddingOnly(
             left: AppPadding.pW20,
@@ -147,6 +154,22 @@ class _HomeNextStopCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  // A customer note is a fact about the order the hero cannot
+                  // show in full — it is a paragraph. The badge says one
+                  // exists and sends the courier to the detail to read it,
+                  // which beats truncating someone's instructions.
+                  if (order.note != null) ...[
+                    4.szW,
+                    _HintDot(
+                      open: hintOpen,
+                      onTap: toggleHint,
+                      icon: AppAssets.svg.note,
+                      label: LocaleKeys.homeNoteHintLabel.tr(),
+                      tint: AppColors.postponedText,
+                      idleBorder: AppColors.postponedBorder,
+                      idleForeground: AppColors.postponedText,
+                    ),
+                  ],
                   8.szW,
                   _PayPill(isCod: isCod, amount: isCod ? order.cod : null),
                 ],
@@ -158,6 +181,12 @@ class _HomeNextStopCard extends StatelessWidget {
                   style: const TextStyle().setSecondaryColor.s12.regular,
                 ),
               ],
+              if (order.note != null)
+                _InlineHintNote(
+                  open: hintOpen,
+                  message: LocaleKeys.homeNoteHint.tr(),
+                  onTap: toggleHint,
+                ),
             ],
           ).paddingOnly(
             left: AppPadding.pW20,
@@ -199,7 +228,7 @@ class _HomeNextStopCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                ).onClick(onTap: onDeliver),
+                ).onClick(onTap: widget.onDeliver),
               ),
               12.szW,
               // Neutral tile (ink glyph, white fill, hairline) matching the
@@ -216,7 +245,7 @@ class _HomeNextStopCard extends StatelessWidget {
                   radius: AppCircular.r15,
                   background: AppColors.surface,
                   border: AppColors.iconButtonBorder,
-                ).onClick(onTap: onCall),
+                ).onClick(onTap: widget.onCall),
               ),
             ],
           ).paddingOnly(
@@ -230,7 +259,7 @@ class _HomeNextStopCard extends StatelessWidget {
       // The whole card opens the order. Everything inside that handles its own
       // tap — the deliver button, call, the open-in-Maps badge, the tooltip —
       // still wins the gesture arena, so only the "dead" areas fall through.
-    ).onClick(onTap: onViewOrder);
+    ).onClick(onTap: widget.onViewOrder);
   }
 }
 

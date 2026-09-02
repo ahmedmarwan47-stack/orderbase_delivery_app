@@ -12,6 +12,11 @@ enum NavTab { home, orders, settlement, profile }
 /// brand-red accent; the rest are muted. [active] is null on pages that are
 /// not a tab — notifications, opened from the header, sits inside the shell
 /// with no tab highlighted. Includes the home-indicator bar beneath it.
+///
+/// The Orders tab carries a red dot while a batch waits at the branch. That
+/// dot is the app's standing "something is waiting" signal, so this widget
+/// watches [ShiftController] directly instead of depending on its host to
+/// redraw.
 class BottomNav extends StatelessWidget {
   const BottomNav({
     super.key,
@@ -26,6 +31,17 @@ class BottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Listens to the shift itself rather than trusting the host page to
+    // rebuild: the Orders badge is now the ONLY signal that a batch is waiting
+    // at the branch (the header chip that used to say so is gone), and a batch
+    // can land while the courier is sitting still on a tab that never rebuilds.
+    return AnimatedBuilder(
+      animation: ShiftController.instance,
+      builder: (context, _) => _bar(context),
+    );
+  }
+
+  Widget _bar(BuildContext context) {
     return Container(
       color: AppColors.surface,
       child: Column(

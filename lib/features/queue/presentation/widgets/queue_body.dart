@@ -17,7 +17,6 @@ class _QueueBody extends StatelessWidget {
             AppHeader(
               onSearch: vc.openSearch,
               onOpenNotifications: vc.onOpenNotifications,
-              onOpenPendingBatch: vc.onOpenPendingBatch,
             ),
           searching ? _QueueSearchHeader(vc: vc) : _QueueBrowseHeader(vc: vc),
           Expanded(

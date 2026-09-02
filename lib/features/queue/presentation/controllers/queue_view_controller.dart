@@ -12,7 +12,6 @@ class QueueViewController {
     this.onSelectTab,
     this.onOpenOrder,
     this.onOpenNotifications,
-    this.onOpenPendingBatch,
     bool startSearching = false,
     String initialQuery = '',
     QueueFilter initialFilter = QueueFilter.all,
@@ -41,9 +40,6 @@ class QueueViewController {
 
   /// Opens the notifications screen from the unified header's bell (shell mode).
   final VoidCallback? onOpenNotifications;
-
-  /// The header's amber «دفعة في الفرع» chip (shell mode).
-  final VoidCallback? onOpenPendingBatch;
 
   /// Every order the courier can see today: the batches in hand *and* the
   /// ones still waiting at the branch (their orders are as good as in transit

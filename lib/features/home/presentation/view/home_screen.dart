@@ -57,7 +57,7 @@ class HomeScreen extends StatefulWidget {
   /// The cash cell → settlement.
   final VoidCallback? onOpenSettlement;
 
-  /// The header chip / the status card's «دفعة جديدة في انتظارك» → Orders.
+  /// The status card's «دفعة جديدة في انتظارك» row → the Orders tab.
   final VoidCallback? onOpenPendingBatch;
 
   /// Dev-only: reset the simulated day from the settled card.
@@ -91,7 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
               AppHeader(
                 onSearch: widget.onOpenSearch,
                 onOpenNotifications: widget.onOpenNotifications,
-                onOpenPendingBatch: widget.onOpenPendingBatch,
               ),
               Expanded(
                 child: AnimatedBuilder(
@@ -105,13 +104,24 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               if (status == CourierStatus.onRoute &&
-                                  shift.nextStop != null)
+                                  shift.nextStop != null) ...[
                                 _HomeNextStopCard(
                                   onViewOrder: widget.onOpenOrder,
                                   onDeliver: widget.onDeliverOrder,
                                   onCall: widget.onCallCustomer,
-                                )
-                              else
+                                ),
+                                // A batch dispatched mid-route is a reason to
+                                // turn around now — those orders are not in
+                                // the bag. The status card carries this row
+                                // when the hero is gone; on route it sits
+                                // under the hero instead of going unsaid.
+                                if (shift.hasPendingBatch) ...[
+                                  12.szH,
+                                  _PendingBatchRow(
+                                    onTap: widget.onOpenPendingBatch,
+                                  ),
+                                ],
+                              ] else
                                 _HomeStateCard(
                                   status: status,
                                   onCallBranch: widget.onCallBranch,

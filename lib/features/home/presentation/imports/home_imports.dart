@@ -31,6 +31,7 @@ part '../widgets/home_route_leg.dart';
 part '../widgets/home_stop_progress.dart';
 part '../widgets/home_stat_row.dart';
 part '../widgets/home_state_card.dart';
+part '../widgets/home_inline_hint.dart';
 part '../widgets/home_batch_line.dart';
 
 // Shared home-variant widgets (1b / 1c / 2a)

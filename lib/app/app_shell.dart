@@ -65,7 +65,6 @@ class _AppShellState extends State<AppShell>
     onSelectTab: _select,
     onOpenOrder: _openOrder,
     onOpenNotifications: _toggleNotifications,
-    onOpenPendingBatch: _openPendingBatch,
   );
 
   /// The branch's side of the day — dispatches batches, settles at the end.
@@ -211,8 +210,8 @@ class _AppShellState extends State<AppShell>
     _select(NavTab.orders);
   }
 
-  /// The header's amber chip / the sheet's «عرض الدفعة» → the Orders tab, all
-  /// filters cleared so the waiting batch is at the top.
+  /// The dispatch sheet's «عرض الدفعة» and Home's «دفعة جديدة في انتظارك» row
+  /// → the Orders tab, filters cleared so the waiting batch is at the top.
   void _openPendingBatch() {
     _ordersVc.closeSearch();
     _ordersVc.clearFilter();
@@ -254,13 +253,11 @@ class _AppShellState extends State<AppShell>
             SettlementScreen(
               onSelectTab: _select,
               onOpenNotifications: _toggleNotifications,
-              onOpenPendingBatch: _openPendingBatch,
               onOpenSearch: _openOrdersSearch,
             ),
             ProfileScreen(
               onSelectTab: _select,
               onOpenNotifications: _toggleNotifications,
-              onOpenPendingBatch: _openPendingBatch,
               onOpenSearch: _openOrdersSearch,
               onStartNewDay: _simulator.restart,
             ),
@@ -268,7 +265,6 @@ class _AppShellState extends State<AppShell>
               onSelectTab: _select,
               onClose: _toggleNotifications,
               onOpenOrder: _openOrderByNum,
-              onOpenPendingBatch: _openPendingBatch,
               onOpenSearch: _openOrdersSearch,
             ),
           ],
@@ -285,14 +281,12 @@ class _NotificationsPage extends StatelessWidget {
     required this.onSelectTab,
     required this.onClose,
     required this.onOpenOrder,
-    this.onOpenPendingBatch,
     this.onOpenSearch,
   });
 
   final ValueChanged<NavTab> onSelectTab;
   final VoidCallback onClose;
   final ValueChanged<String> onOpenOrder;
-  final VoidCallback? onOpenPendingBatch;
   final VoidCallback? onOpenSearch;
 
   @override
@@ -306,7 +300,6 @@ class _NotificationsPage extends StatelessWidget {
             AppHeader(
               onSearch: onOpenSearch,
               onOpenNotifications: onClose,
-              onOpenPendingBatch: onOpenPendingBatch,
               notificationsActive: true,
             ),
             Expanded(

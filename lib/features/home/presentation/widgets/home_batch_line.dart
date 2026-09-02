@@ -2,14 +2,19 @@ part of '../imports/home_imports.dart';
 
 /// The hero's first line — the batch and how its trip ends.
 ///
-/// Leading: «B #7877 · الطلب ٥ من ٨». Trailing: «عودة للفرع ~٥:٤٠ م · ٣٤ كم»
-/// with a small ⓘ. Tapping ⓘ explains the two figures: the time is the ride
-/// back to the branch after the last order, not counting stops and handoffs;
-/// the kilometres are the whole batch trip from the branch and back. Both are
-/// estimates from the orders' leg distances until the backend provides real
-/// ones, and the tooltip is how the courier is told not to treat them as
+/// Leading: «B #7877 · الطلب ٥ من ٨». Beneath it: «عودة للفرع ~٥:٤٠ م · ٣٤ كم»
+/// with a small ⓘ. Tapping ⓘ reveals what those two figures mean: the time is
+/// the ride back to the branch after the last order, not counting stops and
+/// handoffs; the kilometres are the whole batch trip from the branch and back.
+/// Both are estimates from the orders' leg distances until the backend gives
+/// real ones, and the note is how the courier is told not to read them as
 /// promises.
-class _HomeBatchLine extends StatelessWidget {
+///
+/// The note **expands in place** rather than floating over the card. A popover
+/// landed on top of the address — the one thing the courier came to the card
+/// to read — so the explanation now pushes the card open under the line it
+/// explains, and closes it again on a second tap.
+class _HomeBatchLine extends StatefulWidget {
   const _HomeBatchLine({
     required this.batch,
     required this.current,
@@ -33,19 +38,25 @@ class _HomeBatchLine extends StatelessWidget {
   final bool done;
 
   @override
+  State<_HomeBatchLine> createState() => _HomeBatchLineState();
+}
+
+class _HomeBatchLineState extends State<_HomeBatchLine>
+    with _InlineHintHost {
+  @override
   Widget build(BuildContext context) {
     final quiet = const TextStyle().setSecondaryColor.s12.semiBold;
-    final count = done
+    final count = widget.done
         ? LocaleKeys.homeBatchDone.tr(
             namedArgs: {
-              'done': arabicDigits(total),
-              'total': arabicDigits(total),
+              'done': arabicDigits(widget.total),
+              'total': arabicDigits(widget.total),
             },
           )
         : LocaleKeys.homeStopCount.tr(
             namedArgs: {
-              'current': arabicDigits(current),
-              'total': arabicDigits(total),
+              'current': arabicDigits(widget.current),
+              'total': arabicDigits(widget.total),
             },
           );
     return Column(
@@ -58,7 +69,7 @@ class _HomeBatchLine extends StatelessWidget {
               // The ID is Latin + digits: isolate it so the RTL line does not
               // re-order «B #7877» around the hash.
               TextSpan(
-                text: batch.id,
+                text: widget.batch.id,
                 style: const TextStyle().setMainTextColor.s12.bold.tabular,
               ),
               TextSpan(text: ' · $count'),
@@ -74,7 +85,10 @@ class _HomeBatchLine extends StatelessWidget {
             Flexible(
               child: Text(
                 LocaleKeys.homeReturnLine.tr(
-                  namedArgs: {'time': returnEta, 'km': formatKmArabic(routeKm)},
+                  namedArgs: {
+                    'time': widget.returnEta,
+                    'km': formatKmArabic(widget.routeKm),
+                  },
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -82,89 +96,19 @@ class _HomeBatchLine extends StatelessWidget {
               ),
             ),
             6.szW,
-            const _TripInfoTip(),
+            _HintDot(
+              open: hintOpen,
+              onTap: toggleHint,
+              label: LocaleKeys.homeTripTooltipLabel.tr(),
+            ),
           ],
         ),
-      ],
-    );
-  }
-}
-
-/// The ⓘ beside the trip line. A tap shows the explanation as an ink tooltip
-/// anchored under it; it dismisses on its own after a few seconds.
-///
-/// Shown manually (`ensureTooltipVisible`) from our own tap handler rather
-/// than through the tooltip's tap trigger: the hero card is itself tappable,
-/// and an explicit inner recognizer is the reliable way to keep this tap from
-/// falling through to it.
-class _TripInfoTip extends StatefulWidget {
-  const _TripInfoTip();
-
-  @override
-  State<_TripInfoTip> createState() => _TripInfoTipState();
-}
-
-class _TripInfoTipState extends State<_TripInfoTip> {
-  final GlobalKey<TooltipState> _tip = GlobalKey<TooltipState>();
-
-  void _show() {
-    AppHaptics.tick();
-    _tip.currentState?.ensureTooltipVisible();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      key: _tip,
-      message: LocaleKeys.homeTripTooltip.tr(),
-      triggerMode: TooltipTriggerMode.manual,
-      preferBelow: true,
-      showDuration: const Duration(seconds: 6),
-      textAlign: TextAlign.right,
-      margin: EdgeInsets.symmetric(horizontal: AppPadding.pW32),
-      padding: EdgeInsets.symmetric(
-        horizontal: AppPadding.pW12,
-        vertical: AppPadding.pH8,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.inkFill,
-        borderRadius: BorderRadius.circular(AppCircular.r10),
-      ),
-      textStyle: const TextStyle().setWhite.s12.regular.withHeight(1.5),
-      child: Semantics(
-        button: true,
-        label: LocaleKeys.homeTripTooltipLabel.tr(),
-        child: GestureDetector(
-          onTap: _show,
-          behavior: HitTestBehavior.opaque,
-          // The visual ring is 16pt; the hit area is padded out so it is
-          // reliably tappable beside a line of text.
-          child: Container(
-            width: AppSize.sH28,
-            height: AppSize.sH28,
-            alignment: Alignment.center,
-            child: Container(
-              width: AppSize.sH16,
-              height: AppSize.sH16,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.borderDefault),
-              ),
-              child: Center(
-                child: Text(
-                  'i',
-                  style: const TextStyle()
-                      .setTertiaryColor
-                      .s10
-                      .bold
-                      .withHeight(1)
-                      .copyWith(fontFamily: 'sans-serif'),
-                ),
-              ),
-            ),
-          ),
+        _InlineHintNote(
+          open: hintOpen,
+          message: LocaleKeys.homeTripTooltip.tr(),
+          onTap: toggleHint,
         ),
-      ),
+      ],
     );
   }
 }

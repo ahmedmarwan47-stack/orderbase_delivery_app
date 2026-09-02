@@ -419,7 +419,7 @@
   "settlement_back_home": "Back to home",
   "settlement_locked_note": "Prepaid orders and failed orders don't enter the settlement.",
   "header_no_batch": "No batch yet",
-  "header_remaining": "{count} left",
+  "header_remaining": "{count} orders left",
   "header_expected_at_branch": "Expected at branch ~{time}",
   "header_settled": "Day settled",
   "header_cash_in_hand": "Holding EGP {amount}",
@@ -473,5 +473,10 @@
   "settlement_history_title": "Previous days",
   "settlement_history_meta": "EGP {cash} · {batches} batches · {orders} orders",
   "settlement_yesterday": "Yesterday",
-  "settlement_settled_pill": "Settled"
+  "settlement_settled_pill": "Settled",
+  "home_note_hint": "The customer left a note on this order. Open the order details and read it before you deliver.",
+  "home_note_hint_label": "Customer note",
+  "home_collect_batch_title": "Head back to the branch to collect a new batch",
+  "home_collect_batch_meta": "{what} · {orders} orders · EGP {cash}",
+  "home_collect_batch_count": "{n} batches"
 }

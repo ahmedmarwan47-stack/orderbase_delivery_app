@@ -595,4 +595,9 @@ abstract final class LocaleKeys {
   static const String settlementHistoryMeta = 'settlement_history_meta';
   static const String settlementYesterday = 'settlement_yesterday';
   static const String settlementSettledPill = 'settlement_settled_pill';
+  static const String homeNoteHint = 'home_note_hint';
+  static const String homeNoteHintLabel = 'home_note_hint_label';
+  static const String homeCollectBatchTitle = 'home_collect_batch_title';
+  static const String homeCollectBatchMeta = 'home_collect_batch_meta';
+  static const String homeCollectBatchCount = 'home_collect_batch_count';
 }

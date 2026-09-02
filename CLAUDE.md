@@ -199,8 +199,10 @@ no longer linked from the tab bar.
 - `StatusBar` — mock `9:41` + signal/wifi/battery glyph (LTR). **No longer used** — the OS status
   bar is shown instead; kept only for the browser fallback / mockup parity.
 - `BottomNav` — the 4-tab bar (`NavTab { home, orders, settlement, profile }`), `active`-tab driven
-  (**nullable** — the notifications page highlights nothing), an Orders badge while a batch waits at
-  the branch; includes the `HomeIndicator`.
+  (**nullable** — the notifications page highlights nothing); includes the `HomeIndicator`. It
+  **watches `ShiftController` itself**: the Orders red dot is the standing "a batch is waiting"
+  signal now that the header chip is gone, and a batch can land while the courier sits on a tab
+  that would never otherwise rebuild.
 - `HomeIndicator` — the home-indicator pill on a white strip (used directly by screens with no tab
   bar, e.g. Pickup).
 - `MapView` — real `FlutterMap` + OSM raster tiles + red pin (Home strip and Order-detail map both
@@ -334,10 +336,26 @@ clock starts again.
 ## Home (`features/home/`)
 
 - **Hero hierarchy** (`_HomeNextStopCard`): batch line («B #7877 · الطلب ٥ من ٨» + «عودة للفرع
-  ~٥:٤٠ م · ٣٤ كم» ⓘ) → **destination bold** (area 20/bold, street, door detail) → map strip →
-  one meta row (customer · number · cash pill) + promised time → two actions (deliver, call).
-  Per-stop ETA/distance and the origin→destination bar are gone (`kShowRouteLeg = false` keeps the
-  leg widget; `kShowStopSegments` the older segment bar).
+  ~٥:٤٠ م · ٣٤ كم» ⓘ) → **destination bold** → map strip → one meta row (customer · number ·
+  note badge · cash pill) + promised time → two actions (deliver, call). Per-stop ETA/distance and
+  the origin→destination bar are gone (`kShowRouteLeg = false` keeps the leg widget;
+  `kShowStopSegments` the older segment bar).
+- **The address is two classes, not four.** Area and street share ONE line at one weight and size
+  (`«زهراء مدينة نصر · شارع بن عبدالعزيز»`, 18/bold) because they are one fact; the door
+  (`Order.addrDetail` — «عمارة ٤٢٩٠ · الدور ٥ · شقة ٥٢») sits under it at 14/regular. Setting the
+  area three steps louder than its own street invented a hierarchy that isn't in an address.
+- **Inline hints, never popovers** (`home_inline_hint.dart`): `_HintDot` (a round trigger that
+  fills when open) + `_InlineHintNote` (an ink note that unfurls **in place**, one tween driving
+  height, fade and a 6px settle, with a caret back at its trigger) + the `_InlineHintHost` mixin
+  (open state + an 8s auto-close). A Flutter `Tooltip` floated over the address — the one thing
+  the courier opened the card to read — so hints push the card open instead. Two use it: the ⓘ on
+  the trip line, and the **note badge** shown when `Order.note != null` («العميل ساب ملاحظة… افتح
+  تفاصيل الطلب») — the hero cannot show a paragraph, so it says one exists and sends them to the
+  detail rather than truncating a customer's instructions.
+- **A batch waiting mid-route says so under the hero.** `_PendingBatchRow` («ارجع للفرع لاستلام
+  دفعة جديدة» + id · orders · cash) renders under the hero while `status == onRoute &&
+  hasPendingBatch`, as well as inside the status card. Those orders are not in the bag, so it is a
+  reason to turn around now, not only when everything is closed.
 - **`_HomeStatRow`** — one four-cell strip under the hero (in progress · delivered · failed · cash)
   so hero and numbers fit without a scroll. The cash cell goes red over the limit.
 - **`_HomeStateCard`** replaces the hero when there is nothing to deliver: *idle* (no batch yet),
@@ -375,11 +393,13 @@ view is the designed confirmation plus the batches and the history.
 
 ## Unified header (`lib/widgets/app_header.dart`)
 
-Line 1: merchant logo + «Sale Sucre · فرع مدينة نصر» (`Courier.merchantName` ·
-`ShiftController.branchName` — the branch is assigned per day). Line 2 follows `CourierStatus`:
-«متبقٍ ٤ توصيلات» / «متوقَّع في الفرع ~٥:٤٠ م» / «تمت تسوية اليوم» / «لا دفعات بعد», then
-«معك 1,250 جم» (red + alert glyph over the limit), then «٣ مرتجعات» only while true, and the amber
-«دفعة في الفرع» chip only while a batch waits (tap → Orders). `notificationsActive` inverts the bell.
+Line 1: **the branch alone** — «فرع مدينة نصر» (`ShiftController.branchName`; assigned per day).
+The merchant logo and name were dropped: the merchant never changes, and this bar exists to carry
+live facts. Line 2 follows `CourierStatus`: «٤ طلبات متبقية» / «متوقَّع في الفرع ~٥:٤٠ م» / «تمت
+تسوية اليوم» / «لا دفعات بعد», then «معك 1,250 جم» — red with an alert glyph over the limit. That
+is all: the amber "batch waiting" chip was removed as a second signal for what the Orders tab badge
+and Home's collect row already say, and returns in custody live on Home and the settlement.
+`notificationsActive` inverts the bell.
 
 ## Live Activity / Dynamic Island (iOS, optional)
 

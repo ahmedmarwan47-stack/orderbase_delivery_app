@@ -11,14 +11,12 @@ class _SettlementSettledView extends StatelessWidget {
     required this.data,
     this.onSelectTab,
     this.onOpenNotifications,
-    this.onOpenPendingBatch,
     this.onOpenSearch,
   });
   final SettlementController vc;
   final SettlementData data;
   final ValueChanged<NavTab>? onSelectTab;
   final VoidCallback? onOpenNotifications;
-  final VoidCallback? onOpenPendingBatch;
   final VoidCallback? onOpenSearch;
 
   @override
@@ -34,7 +32,6 @@ class _SettlementSettledView extends StatelessWidget {
               AppHeader(
                 onSearch: onOpenSearch,
                 onOpenNotifications: onOpenNotifications,
-                onOpenPendingBatch: onOpenPendingBatch,
               ),
             Expanded(
               child: SingleChildScrollView(
