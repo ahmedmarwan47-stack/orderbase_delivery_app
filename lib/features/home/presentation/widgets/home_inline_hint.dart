@@ -1,221 +1,161 @@
 part of '../imports/home_imports.dart';
 
-/// The hero's shared "explain this" mechanism: a small round trigger sitting
-/// inline with a line of text, and an ink note that **expands in place** under
-/// it when tapped.
+/// The hero's "explain this" mechanism: a small control sitting inline with a
+/// line of text, and an ink tooltip that **floats above it** when tapped.
 ///
-/// It expands rather than floating because a popover landed on top of the
-/// address — the one thing the courier opened the card to read. Pushing the
-/// card open instead costs a few pixels and covers nothing.
+/// It floats rather than expanding the card. An earlier version pushed the
+/// card open like a disclosure, which moved everything under it; a tooltip is
+/// meant to hover and go away. It opens *upward* (`preferBelow: false`) so it
+/// never lands on the destination — the one thing the courier opened the card
+/// to read — and Flutter flips or clamps it when there is no room.
 ///
-/// Two hints use it today: the ⓘ on the trip line (what the return time and
-/// the kilometres actually mean) and the note badge on the meta row (the
-/// customer left a note; open the order to read it).
+/// Two hints use it: the ⓘ on the trip line (what the return time and the
+/// kilometres actually mean) and the note badge on the meta row (the customer
+/// left a note; open the order to read it).
 
-/// The round trigger. Quiet ring while closed, filled while its note is open,
-/// so the control shows which state it is in.
-class _HintDot extends StatelessWidget {
-  const _HintDot({
-    required this.open,
-    required this.onTap,
+/// Wraps any control in a manually-triggered tooltip.
+///
+/// Manual, not `TooltipTriggerMode.tap`: the whole hero card is tappable, so
+/// the trigger needs its own recognizer to win the gesture instead of opening
+/// the order underneath.
+class _HintAnchor extends StatefulWidget {
+  const _HintAnchor({
+    required this.message,
     required this.label,
-    this.icon,
-    this.tint = AppColors.inkFill,
-    this.idleBorder = AppColors.borderDefault,
-    this.idleForeground = AppColors.textTertiary,
+    required this.child,
   });
 
-  final bool open;
-  final VoidCallback onTap;
+  final String message;
 
   /// Screen-reader name for the hint this opens.
   final String label;
 
-  /// Glyph inside the ring; null draws a typographic "i".
-  final String? icon;
-
-  /// Fill (and border) once open.
-  final Color tint;
-  final Color idleBorder;
-  final Color idleForeground;
+  final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    final reduced = AppMotion.reduced(context);
-    final fg = open ? AppColors.surface : idleForeground;
-    return Semantics(
-      button: true,
-      expanded: open,
-      label: label,
-      // An explicit recognizer: the whole hero card is tappable, and this has
-      // to win the gesture rather than opening the order underneath.
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        // The ring is 18pt; the hit area is padded out to 28 so it stays
-        // reliably tappable beside a line of 12px text.
-        child: SizedBox(
-          width: AppSize.sH28,
-          height: AppSize.sH28,
-          child: Center(
-            child: AnimatedContainer(
-              duration: reduced ? Duration.zero : AppMotion.stamp,
-              curve: AppMotion.ease,
-              width: AppSize.sH18,
-              height: AppSize.sH18,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: open ? tint : Colors.transparent,
-                border: Border.all(color: open ? tint : idleBorder),
-              ),
-              child: Center(
-                child: icon == null
-                    ? Text(
-                        'i',
-                        style: const TextStyle()
-                            .setColor(fg)
-                            .s10
-                            .bold
-                            .withHeight(1)
-                            .copyWith(fontFamily: 'sans-serif'),
-                      )
-                    : IconWidget(
-                        icon: icon!,
-                        color: fg,
-                        height: AppSize.sH10,
-                        width: AppSize.sW10,
-                      ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  State<_HintAnchor> createState() => _HintAnchorState();
 }
 
-/// The note itself: ink, full width, growing out from under its trigger.
-///
-/// One value drives the whole arrival — the height unfurls, the body fades in
-/// and settles down the last few pixels, and the caret comes with it — so it
-/// reads as a single movement rather than three effects. Under Reduce Motion
-/// it is simply there or not.
-class _InlineHintNote extends StatelessWidget {
-  const _InlineHintNote({
-    required this.open,
-    required this.message,
-    required this.onTap,
-  });
+class _HintAnchorState extends State<_HintAnchor> {
+  final GlobalKey<TooltipState> _tip = GlobalKey<TooltipState>();
 
-  final bool open;
-  final String message;
-
-  /// Tapping the note dismisses it (and never opens the order beneath).
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final reduced = AppMotion.reduced(context);
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: open ? 1 : 0),
-      duration: reduced ? Duration.zero : AppMotion.settle,
-      curve: AppMotion.ease,
-      builder: (context, t, child) {
-        if (t == 0) return const SizedBox.shrink();
-        return ClipRect(
-          child: Align(
-            alignment: AlignmentDirectional.topCenter,
-            heightFactor: t,
-            child: Opacity(
-              opacity: t.clamp(0.0, 1.0),
-              child: Transform.translate(
-                offset: Offset(0, -6.h * (1 - t)),
-                child: child,
-              ),
-            ),
-          ),
-        );
-      },
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            6.szH,
-            // The caret ties the note back to the trigger it came from.
-            Align(
-              alignment: AlignmentDirectional.centerEnd,
-              child: Padding(
-                padding: EdgeInsetsDirectional.only(end: 8.w),
-                child: CustomPaint(
-                  size: Size(12.w, 6.h),
-                  painter: const _CaretPainter(color: AppColors.inkFill),
-                ),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.inkFill,
-                borderRadius: BorderRadius.circular(AppCircular.r12),
-              ),
-              padding: EdgeInsets.symmetric(
-                horizontal: AppPadding.pW12,
-                vertical: AppPadding.pH12,
-              ),
-              child: Text(
-                message,
-                style: const TextStyle().setWhite.s12.regular.withHeight(1.6),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// A small upward triangle — the note's pointer back at its trigger.
-class _CaretPainter extends CustomPainter {
-  const _CaretPainter({required this.color});
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final path = Path()
-      ..moveTo(size.width / 2, 0)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-    canvas.drawPath(path, Paint()..color = color);
-  }
-
-  @override
-  bool shouldRepaint(_CaretPainter old) => old.color != color;
-}
-
-/// Holds one inline hint open, and closes it again on its own after a while —
-/// it is an aside, and a courier who tapped it once should not have to tap it
-/// again to get their card back.
-mixin _InlineHintHost<T extends StatefulWidget> on State<T> {
-  bool hintOpen = false;
-  Timer? _autoClose;
-  static const Duration _linger = Duration(seconds: 8);
-
-  void toggleHint() {
+  void _show() {
     AppHaptics.tick();
-    setState(() => hintOpen = !hintOpen);
-    _autoClose?.cancel();
-    if (hintOpen) {
-      _autoClose = Timer(_linger, () {
-        if (mounted) setState(() => hintOpen = false);
-      });
-    }
+    _tip.currentState?.ensureTooltipVisible();
   }
 
   @override
-  void dispose() {
-    _autoClose?.cancel();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Tooltip(
+      key: _tip,
+      message: widget.message,
+      triggerMode: TooltipTriggerMode.manual,
+      // Above the control, clear of the address below it.
+      preferBelow: false,
+      verticalOffset: AppSize.sH20,
+      showDuration: const Duration(seconds: 8),
+      textAlign: TextAlign.right,
+      margin: EdgeInsets.symmetric(horizontal: AppPadding.pW20),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppPadding.pW12,
+        vertical: AppPadding.pH12,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.inkFill,
+        borderRadius: BorderRadius.circular(AppCircular.r12),
+        boxShadow: AppShadows.card,
+      ),
+      textStyle: const TextStyle().setWhite.s12.regular.withHeight(1.6),
+      child: Semantics(
+        button: true,
+        label: widget.label,
+        child: GestureDetector(
+          onTap: _show,
+          behavior: HitTestBehavior.opaque,
+          child: widget.child,
+        ),
+      ),
+    );
+  }
+}
+
+/// The ⓘ beside the trip line — a small ink ring, matching the black the line
+/// beside it is set in.
+class _HintDot extends StatelessWidget {
+  const _HintDot({required this.message, required this.label});
+
+  final String message;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return _HintAnchor(
+      message: message,
+      label: label,
+      // The ring is 16pt; the hit area is padded out to 28 so it stays
+      // reliably tappable beside a line of 12px text.
+      child: SizedBox(
+        width: AppSize.sH28,
+        height: AppSize.sH28,
+        child: Center(
+          child: Container(
+            width: AppSize.sH16,
+            height: AppSize.sH16,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.textPrimary),
+            ),
+            child: Center(
+              child: Text(
+                'i',
+                style: const TextStyle()
+                    .setMainTextColor
+                    .s10
+                    .bold
+                    .withHeight(1)
+                    .copyWith(fontFamily: 'sans-serif'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The customer-note badge on the meta row.
+///
+/// Built as a **pill, not a dot**, so it stands beside the cash pill as its
+/// twin: same corner, same padding, and — stretched by the row's
+/// [IntrinsicHeight] — exactly the same height. A circle next to a pill read
+/// as two unrelated things sharing a row.
+///
+/// The hero cannot show a note in full: it is a paragraph. The badge says one
+/// exists and sends the courier to the order detail to read it, which beats
+/// truncating someone's instructions.
+class _NotePill extends StatelessWidget {
+  const _NotePill();
+
+  @override
+  Widget build(BuildContext context) {
+    return _HintAnchor(
+      message: LocaleKeys.homeNoteHint.tr(),
+      label: LocaleKeys.homeNoteHintLabel.tr(),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.heroCodPillBg,
+          borderRadius: BorderRadius.circular(AppCircular.r8),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: AppPadding.pW8),
+        child: Center(
+          child: IconWidget(
+            icon: AppAssets.svg.note,
+            color: AppColors.postponedText,
+            height: AppSize.sH14,
+            width: AppSize.sW14,
+          ),
+        ),
+      ),
+    );
   }
 }

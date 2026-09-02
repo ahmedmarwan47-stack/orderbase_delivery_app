@@ -18,12 +18,12 @@ const bool kShowRouteLeg = false;
 ///     then the door (building · floor · apartment) a step quieter.
 ///  3. **The map strip** with the open-in-Maps badge. Per-stop distance and
 ///     ETA are gone on purpose: Maps answers both better.
-///  4. **One quiet meta row** — customer, order number, a note badge when the
-///     customer left instructions, and the cash pill — plus the promised time,
-///     which is a deadline rather than an estimate.
+///  4. **One quiet meta row** — customer, order number, then a matched pair of
+///     chips: a note badge when the customer left instructions, and the cash
+///     pill. Plus the promised time, a deadline rather than an estimate.
 ///  5. **Two actions** — «تم تسليم الطلب» and call. WhatsApp lives on the
 ///     detail, which the whole card opens.
-class _HomeNextStopCard extends StatefulWidget {
+class _HomeNextStopCard extends StatelessWidget {
   const _HomeNextStopCard({this.onViewOrder, this.onDeliver, this.onCall});
 
   /// Opens the current order's detail — the whole card taps through to it.
@@ -35,12 +35,6 @@ class _HomeNextStopCard extends StatefulWidget {
   /// Dials the customer.
   final VoidCallback? onCall;
 
-  @override
-  State<_HomeNextStopCard> createState() => _HomeNextStopCardState();
-}
-
-class _HomeNextStopCardState extends State<_HomeNextStopCard>
-    with _InlineHintHost {
   @override
   Widget build(BuildContext context) {
     final shift = ShiftController.instance;
@@ -154,24 +148,27 @@ class _HomeNextStopCardState extends State<_HomeNextStopCard>
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  // A customer note is a fact about the order the hero cannot
-                  // show in full — it is a paragraph. The badge says one
-                  // exists and sends the courier to the detail to read it,
-                  // which beats truncating someone's instructions.
-                  if (order.note != null) ...[
-                    4.szW,
-                    _HintDot(
-                      open: hintOpen,
-                      onTap: toggleHint,
-                      icon: AppAssets.svg.note,
-                      label: LocaleKeys.homeNoteHintLabel.tr(),
-                      tint: AppColors.postponedText,
-                      idleBorder: AppColors.postponedBorder,
-                      idleForeground: AppColors.postponedText,
-                    ),
-                  ],
                   8.szW,
-                  _PayPill(isCod: isCod, amount: isCod ? order.cod : null),
+                  // The note badge and the cash pill are one group, sized as
+                  // one: IntrinsicHeight + stretch makes the badge exactly as
+                  // tall as the pill beside it, so the row reads as two chips
+                  // rather than a chip and a dot.
+                  IntrinsicHeight(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (order.note != null) ...[
+                          const _NotePill(),
+                          6.szW,
+                        ],
+                        _PayPill(
+                          isCod: isCod,
+                          amount: isCod ? order.cod : null,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               if (order.due != null) ...[
@@ -181,12 +178,6 @@ class _HomeNextStopCardState extends State<_HomeNextStopCard>
                   style: const TextStyle().setSecondaryColor.s12.regular,
                 ),
               ],
-              if (order.note != null)
-                _InlineHintNote(
-                  open: hintOpen,
-                  message: LocaleKeys.homeNoteHint.tr(),
-                  onTap: toggleHint,
-                ),
             ],
           ).paddingOnly(
             left: AppPadding.pW20,
@@ -228,7 +219,7 @@ class _HomeNextStopCardState extends State<_HomeNextStopCard>
                       ],
                     ),
                   ),
-                ).onClick(onTap: widget.onDeliver),
+                ).onClick(onTap: onDeliver),
               ),
               12.szW,
               // Neutral tile (ink glyph, white fill, hairline) matching the
@@ -245,7 +236,7 @@ class _HomeNextStopCardState extends State<_HomeNextStopCard>
                   radius: AppCircular.r15,
                   background: AppColors.surface,
                   border: AppColors.iconButtonBorder,
-                ).onClick(onTap: widget.onCall),
+                ).onClick(onTap: onCall),
               ),
             ],
           ).paddingOnly(
@@ -259,7 +250,7 @@ class _HomeNextStopCardState extends State<_HomeNextStopCard>
       // The whole card opens the order. Everything inside that handles its own
       // tap — the deliver button, call, the open-in-Maps badge, the tooltip —
       // still wins the gesture arena, so only the "dead" areas fall through.
-    ).onClick(onTap: widget.onViewOrder);
+    ).onClick(onTap: onViewOrder);
   }
 }
 

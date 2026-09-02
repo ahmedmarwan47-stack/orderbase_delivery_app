@@ -354,14 +354,17 @@ whole day can be watched from zero to settled.
   (`«زهراء مدينة نصر · شارع بن عبدالعزيز»`, 18/bold) because they are one fact; the door
   (`Order.addrDetail` — «عمارة ٤٢٩٠ · الدور ٥ · شقة ٥٢») sits under it at 14/regular. Setting the
   area three steps louder than its own street invented a hierarchy that isn't in an address.
-- **Inline hints, never popovers** (`home_inline_hint.dart`): `_HintDot` (a round trigger that
-  fills when open) + `_InlineHintNote` (an ink note that unfurls **in place**, one tween driving
-  height, fade and a 6px settle, with a caret back at its trigger) + the `_InlineHintHost` mixin
-  (open state + an 8s auto-close). A Flutter `Tooltip` floated over the address — the one thing
-  the courier opened the card to read — so hints push the card open instead. Two use it: the ⓘ on
-  the trip line, and the **note badge** shown when `Order.note != null` («العميل ساب ملاحظة… افتح
-  تفاصيل الطلب») — the hero cannot show a paragraph, so it says one exists and sends them to the
-  detail rather than truncating a customer's instructions.
+- **Hints float above their trigger** (`home_inline_hint.dart`): `_HintAnchor` wraps a control in a
+  **manually-triggered `Tooltip`** (`triggerMode: manual` + `GlobalKey<TooltipState>` —
+  `TooltipTriggerMode.tap` loses the gesture to the tappable hero card) with `preferBelow: false`,
+  so the bubble opens *upward* and never lands on the destination. An in-place expanding version
+  was tried and rejected: a tooltip should hover and go away, not move the card. Two use it —
+  `_HintDot` (the ⓘ on the trip line, an ink ring matching the black line beside it) and
+  `_NotePill` (shown when `Order.note != null`). The hero cannot show a note in full — it is a
+  paragraph — so the badge says one exists and sends the courier to the detail.
+- **The note badge is a pill, not a dot.** It sits in an `IntrinsicHeight` row with
+  `CrossAxisAlignment.stretch` beside the cash pill, so the two are exactly the same height and
+  read as a matched pair. A circle next to a pill read as two unrelated things sharing a row.
 - **A batch waiting mid-route says so under the hero.** `_PendingBatchRow` («ارجع للفرع لاستلام
   دفعة جديدة» + id · orders · cash) renders under the hero while `status == onRoute &&
   hasPendingBatch`, as well as inside the status card. Those orders are not in the bag, so it is a

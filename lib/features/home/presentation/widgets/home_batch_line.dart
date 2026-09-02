@@ -3,18 +3,13 @@ part of '../imports/home_imports.dart';
 /// The hero's first line — the batch and how its trip ends.
 ///
 /// Leading: «B #7877 · الطلب ٥ من ٨». Beneath it: «عودة للفرع ~٥:٤٠ م · ٣٤ كم»
-/// with a small ⓘ. Tapping ⓘ reveals what those two figures mean: the time is
-/// the ride back to the branch after the last order, not counting stops and
-/// handoffs; the kilometres are the whole batch trip from the branch and back.
-/// Both are estimates from the orders' leg distances until the backend gives
-/// real ones, and the note is how the courier is told not to read them as
-/// promises.
-///
-/// The note **expands in place** rather than floating over the card. A popover
-/// landed on top of the address — the one thing the courier came to the card
-/// to read — so the explanation now pushes the card open under the line it
-/// explains, and closes it again on a second tap.
-class _HomeBatchLine extends StatefulWidget {
+/// with a small ⓘ. Tapping ⓘ floats a tooltip above it explaining what the two
+/// figures mean: the time is the ride back to the branch after the last order,
+/// not counting stops and handoffs; the kilometres are the whole batch trip
+/// from the branch and back. Both are estimates from the orders' leg distances
+/// until the backend gives real ones, and the tooltip is how the courier is
+/// told not to read them as promises.
+class _HomeBatchLine extends StatelessWidget {
   const _HomeBatchLine({
     required this.batch,
     required this.current,
@@ -44,24 +39,19 @@ class _HomeBatchLine extends StatefulWidget {
   final bool showTrip;
 
   @override
-  State<_HomeBatchLine> createState() => _HomeBatchLineState();
-}
-
-class _HomeBatchLineState extends State<_HomeBatchLine> with _InlineHintHost {
-  @override
   Widget build(BuildContext context) {
     final quiet = const TextStyle().setSecondaryColor.s12.semiBold;
-    final count = widget.done
+    final count = done
         ? LocaleKeys.homeBatchDone.tr(
             namedArgs: {
-              'done': arabicDigits(widget.total),
-              'total': arabicDigits(widget.total),
+              'done': arabicDigits(total),
+              'total': arabicDigits(total),
             },
           )
         : LocaleKeys.homeStopCount.tr(
             namedArgs: {
-              'current': arabicDigits(widget.current),
-              'total': arabicDigits(widget.total),
+              'current': arabicDigits(current),
+              'total': arabicDigits(total),
             },
           );
     return Column(
@@ -74,7 +64,7 @@ class _HomeBatchLineState extends State<_HomeBatchLine> with _InlineHintHost {
               // The ID is Latin + digits: isolate it so the RTL line does not
               // re-order «B #7877» around the hash.
               TextSpan(
-                text: widget.batch.id,
+                text: batch.id,
                 style: const TextStyle().setMainTextColor.s12.bold.tabular,
               ),
               TextSpan(text: ' · $count'),
@@ -84,7 +74,7 @@ class _HomeBatchLineState extends State<_HomeBatchLine> with _InlineHintHost {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        if (widget.showTrip) ...[
+        if (showTrip) ...[
           4.szH,
           Row(
             children: [
@@ -92,28 +82,24 @@ class _HomeBatchLineState extends State<_HomeBatchLine> with _InlineHintHost {
                 child: Text(
                   LocaleKeys.homeReturnLine.tr(
                     namedArgs: {
-                      'time': widget.returnEta,
-                      'km': formatKmArabic(widget.routeKm),
+                      'time': returnEta,
+                      'km': formatKmArabic(routeKm),
                     },
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  // Black, like the batch id above it: this is the line the
+                  // courier plans the rest of the batch around.
                   style:
-                      const TextStyle().setSecondaryColor.s12.regular.tabular,
+                      const TextStyle().setMainTextColor.s12.regular.tabular,
                 ),
               ),
               6.szW,
               _HintDot(
-                open: hintOpen,
-                onTap: toggleHint,
+                message: LocaleKeys.homeTripTooltip.tr(),
                 label: LocaleKeys.homeTripTooltipLabel.tr(),
               ),
             ],
-          ),
-          _InlineHintNote(
-            open: hintOpen,
-            message: LocaleKeys.homeTripTooltip.tr(),
-            onTap: toggleHint,
           ),
         ],
       ],
