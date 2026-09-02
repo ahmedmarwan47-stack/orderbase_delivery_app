@@ -303,18 +303,28 @@ The real entry point — `AuthGate` hands to `AppShell` once signed in. An `Inde
 ## The day is simulated (`lib/app/shift_simulator.dart`)
 
 There is no backend, so the branch's side of the day is played by `ShiftSimulator` — every timer
-lives there and nowhere else, so swapping it for push notifications touches one file:
+lives there and nowhere else, so swapping it for push notifications touches one file.
 
-| When | What |
+**The day is a chain, not a schedule.** A branch does not hand a courier their next batch while the
+last one is still on the shelf, so each dispatch waits for the courier to actually carry the
+previous one:
+
+| Trigger | What |
 |---|---|
-| app open | `B #7877` already in hand, partly delivered (`ShiftController._seed`) |
-| +30 s | `B #7878` dispatched → `assignBatch` → mid-flight sheet + notification + header chip |
-| +3 min | `B #7879` dispatched the same way |
-| status → `returning` +40 s | the cashier settles (`settleDay`) → notification, settlement flips to SETTLED, Home shows the settled card |
+| a fresh day begins | `firstBatchAfter` (10 s) → batch 1 dispatched |
+| the courier confirms carrying a batch | `nextBatchAfter` (20 s) → the next batch dispatched |
+| three batches dispatched | the branch is done sending |
+| status → `returning`, +40 s | the cashier settles (`settleDay`) → notification, settlement flips to SETTLED, Home shows the settled card |
 | cash crosses the limit | one `addCashOverLimit` notification per crossing |
 
-«بدء يوم جديد (تجريبي)» (settled card / Account tab) calls `restart()`: the shift goes idle and the
-clock starts again.
+Each dispatch raises the mid-flight sheet, files a notification, and lights the Orders badge.
+`demoDayBatches` (`lib/data/order.dart`) is the plan: `B #7877` (five orders, all `transit` via
+`Order.asFresh()` — a fresh day must not open with a batch already half closed), then `B #7878` and
+`B #7879`. The app's own seeded launch state counts as batch 1 against that plan, so a launched
+session and a restarted one both total three.
+
+«بدء يوم جديد (تجريبي)» (settled card / Account tab) calls `restart()`: the shift empties, and the
+whole day can be watched from zero to settled.
 
 ## Shift model (`lib/app/shift_controller.dart`)
 
@@ -396,7 +406,9 @@ dispatch sheet (`showPickupDispatchSheet(batch:, branch:)`) names the batch and 
 `SettlementData` is a **day**: `date`, `branch`, `batches` (`SettlementBatch` = cash lines +
 returns, or `pending`), `status` (`open` → `awaiting` once the courier is expected at the branch →
 `settled`), `cashierName`, `settledAt`. `shiftSettlement` builds today's live; `sampleSettlementHistory`
-seeds the last seven days. The page: status pill in the header (no button), the slate cash card
+seeds the last seven days. `_DayTotals` sits under the cash card on every settlement view — the
+day in orders (dispatched · delivered · returned), because the cash card answers "how much" and a
+cashier reconciles that against "out of what". The page: status pill in the header (no button), the slate cash card
 (red over the limit, «الدفعات» in its breakdown), `_BatchesSection` (collapsible per batch), the
 returns handover button (physically handing parcels back is still the courier's act), the locked
 note, then `_HistorySection` — rows that push `SettlementDayScreen(day)` read-only. The settled

@@ -73,17 +73,17 @@ class DeliveryActivityState {
   }
 
   Map<String, Object?> toMap() => <String, Object?>{
-        'orderNum': orderNum,
-        'customer': customer,
-        'area': area,
-        'addressDetail': addressDetail,
-        'stopNumber': stopNumber,
-        'totalStops': totalStops,
-        'codDue': codDue,
-        'prepaid': prepaid,
-        'dueLabel': dueLabel,
-        'phase': phase.name,
-      };
+    'orderNum': orderNum,
+    'customer': customer,
+    'area': area,
+    'addressDetail': addressDetail,
+    'stopNumber': stopNumber,
+    'totalStops': totalStops,
+    'codDue': codDue,
+    'prepaid': prepaid,
+    'dueLabel': dueLabel,
+    'phase': phase.name,
+  };
 
   @override
   bool operator ==(Object other) =>
@@ -100,8 +100,18 @@ class DeliveryActivityState {
       other.phase == phase;
 
   @override
-  int get hashCode => Object.hash(orderNum, customer, area, addressDetail,
-      stopNumber, totalStops, codDue, prepaid, dueLabel, phase);
+  int get hashCode => Object.hash(
+    orderNum,
+    customer,
+    area,
+    addressDetail,
+    stopNumber,
+    totalStops,
+    codDue,
+    prepaid,
+    dueLabel,
+    phase,
+  );
 }
 
 /// Thin wrapper over the `orderbase/live_activity` platform channel.
@@ -116,7 +126,9 @@ class LiveActivityService {
   LiveActivityService._();
   static final LiveActivityService instance = LiveActivityService._();
 
-  static const MethodChannel _channel = MethodChannel('orderbase/live_activity');
+  static const MethodChannel _channel = MethodChannel(
+    'orderbase/live_activity',
+  );
 
   bool? _supported;
 

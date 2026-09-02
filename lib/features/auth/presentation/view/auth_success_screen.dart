@@ -45,13 +45,19 @@ class AuthSuccessScreen extends StatelessWidget {
             ),
           ),
           24.szH,
-          Text(LocaleKeys.authSuccessTitle.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle().setMainTextColor.s20.bold),
+          Text(
+            LocaleKeys.authSuccessTitle.tr(),
+            textAlign: TextAlign.center,
+            style: const TextStyle().setMainTextColor.s20.bold,
+          ),
           8.szH,
-          Text(LocaleKeys.authSuccessBody.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle().setSecondaryColor.s14.regular.withHeight(1.5)),
+          Text(
+            LocaleKeys.authSuccessBody.tr(),
+            textAlign: TextAlign.center,
+            style: const TextStyle().setSecondaryColor.s14.regular.withHeight(
+              1.5,
+            ),
+          ),
         ],
       ),
       footer: Column(

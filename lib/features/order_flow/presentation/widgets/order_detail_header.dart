@@ -19,25 +19,28 @@ class _OrderDetailHeader extends StatelessWidget {
     // Status pill styling + label by order state. `active` keeps the mockup's
     // solid-blue "transit" pill exactly; `done`/`failed` reuse the green/red
     // pale-pill tokens shared with the orders list and result screen.
-    final (Color pillBg, Color pillFg, String pillLabel) =
-        switch (order.state) {
+    final (
+      Color pillBg,
+      Color pillFg,
+      String pillLabel,
+    ) = switch (order.state) {
       FlowOrderState.active => (
-          // Light pill (matching the pale delivered/failed pills) instead of the
-          // loud solid blue.
-          AppColors.transitPillBg,
-          AppColors.transitBg,
-          LocaleKeys.orderDetailStatusTransit.tr(),
-        ),
+        // Light pill (matching the pale delivered/failed pills) instead of the
+        // loud solid blue.
+        AppColors.transitPillBg,
+        AppColors.transitBg,
+        LocaleKeys.orderDetailStatusTransit.tr(),
+      ),
       FlowOrderState.done => (
-          AppColors.deliveredBg,
-          AppColors.deliveredText,
-          LocaleKeys.orderDetailStatusDone.tr(),
-        ),
+        AppColors.deliveredBg,
+        AppColors.deliveredText,
+        LocaleKeys.orderDetailStatusDone.tr(),
+      ),
       FlowOrderState.failed => (
-          AppColors.failedBg,
-          AppColors.failedText,
-          LocaleKeys.orderDetailStatusFailed.tr(),
-        ),
+        AppColors.failedBg,
+        AppColors.failedText,
+        LocaleKeys.orderDetailStatusFailed.tr(),
+      ),
     };
     return DecoratedBox(
       // Always solid white with a hairline — a proper header bar (matching the
@@ -46,74 +49,73 @@ class _OrderDetailHeader extends StatelessWidget {
         color: AppColors.surface,
         border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const HeaderBackButton(),
-          12.szW,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+      child:
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const HeaderBackButton(),
+              12.szW,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    IconWidget(
-                      icon: AppAssets.svg.chat,
-                      color: AppColors.textSecondary,
-                      height: 19.h, // between the 18/20 tokens
-                      width: 19.w,
+                    Row(
+                      children: [
+                        IconWidget(
+                          icon: AppAssets.svg.chat,
+                          color: AppColors.textSecondary,
+                          height: 19.h, // between the 18/20 tokens
+                          width: 19.w,
+                        ),
+                        8.szW,
+                        Text(
+                          order.num,
+                          textDirection: TextDirection.ltr,
+                          style: const TextStyle().setMainTextColor.s14.semiBold
+                              .withHeight(20 / 14)
+                              .tabular,
+                        ),
+                      ],
                     ),
-                    8.szW,
-                    Text(
-                      order.num,
-                      textDirection: TextDirection.ltr,
-                      style: const TextStyle()
-                          .setMainTextColor
-                          .s14
-                          .semiBold
-                          .withHeight(20 / 14)
-                          .tabular,
-                    ),
+                    // COD note sits directly under the order ID (red). Capped at a
+                    // single secondary line so the bar matches the unified header
+                    // height (the appointment time lives in the detail body).
+                    if (order.cod) ...[
+                      4.szH,
+                      Text(
+                        LocaleKeys.orderDetailCodNote.tr(),
+                        style: const TextStyle()
+                            .setColor(AppColors.failedText)
+                            .s12
+                            .medium,
+                      ),
+                    ],
                   ],
                 ),
-                // COD note sits directly under the order ID (red). Capped at a
-                // single secondary line so the bar matches the unified header
-                // height (the appointment time lives in the detail body).
-                if (order.cod) ...[
-                  4.szH,
-                  Text(
-                    LocaleKeys.orderDetailCodNote.tr(),
-                    style: const TextStyle()
-                        .setColor(AppColors.failedText)
-                        .s12
-                        .medium,
-                  ),
-                ],
-              ],
-            ),
+              ),
+              12.szW,
+              // Status badge — a single element (no dot), vertically centered.
+              Container(
+                decoration: BoxDecoration(
+                  color: pillBg,
+                  borderRadius: BorderRadius.circular(AppCircular.r8),
+                ),
+                child:
+                    Text(
+                      pillLabel,
+                      style: const TextStyle().setColor(pillFg).s12.semiBold,
+                    ).paddingSymmetric(
+                      horizontal: AppPadding.pW12,
+                      vertical: AppPadding.pH4,
+                    ),
+              ),
+            ],
+          ).paddingOnly(
+            left: AppPadding.pW20,
+            right: AppPadding.pW20,
+            top: AppPadding.pH12,
+            bottom: AppPadding.pH16,
           ),
-          12.szW,
-          // Status badge — a single element (no dot), vertically centered.
-          Container(
-            decoration: BoxDecoration(
-              color: pillBg,
-              borderRadius: BorderRadius.circular(AppCircular.r8),
-            ),
-            child: Text(
-              pillLabel,
-              style: const TextStyle().setColor(pillFg).s12.semiBold,
-            ).paddingSymmetric(
-              horizontal: AppPadding.pW12,
-              vertical: AppPadding.pH4,
-            ),
-          ),
-        ],
-      ).paddingOnly(
-        left: AppPadding.pW20,
-        right: AppPadding.pW20,
-        top: AppPadding.pH12,
-        bottom: AppPadding.pH16,
-      ),
     );
   }
 }

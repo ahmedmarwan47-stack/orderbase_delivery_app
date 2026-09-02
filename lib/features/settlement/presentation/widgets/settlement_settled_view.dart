@@ -65,6 +65,8 @@ class _SettlementSettledView extends StatelessWidget {
                     24.szH,
                     _SummaryCard(data: data),
                     12.szH,
+                    _DayTotals(data: data),
+                    12.szH,
                     const _BalanceCard(),
                     24.szH,
                     _BatchesSection(data: data),
@@ -258,11 +260,7 @@ class _BalanceCard extends StatelessWidget {
                   Text(
                     '0',
                     textDirection: TextDirection.ltr,
-                    style: const TextStyle()
-                        .setMainTextColor
-                        .s20
-                        .bold
-                        .tabular,
+                    style: const TextStyle().setMainTextColor.s20.bold.tabular,
                   ),
                   6.szW,
                   Text(

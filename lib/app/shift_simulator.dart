@@ -6,62 +6,81 @@ import '../features/notifications/presentation/imports/notifications_imports.dar
 import 'shift_controller.dart';
 
 /// Plays the branch's side of the day so the app behaves like a real shift
-/// without a backend: batches are dispatched on a clock, the cashier settles a
-/// while after the courier is expected back, and every event files the same
+/// without a backend: batches are dispatched one at a time, the cashier
+/// settles once the courier is expected back, and every event files the same
 /// notification a push would.
+///
+/// **The day is a chain, not a schedule.** A branch does not hand a courier
+/// their next batch while the last one is still on the shelf — it waits until
+/// they have actually carried it out. So the first batch lands [firstBatchAfter]
+/// a fresh day begins, and every batch after it lands [nextBatchAfter] the
+/// courier *confirms collecting* the previous one. Three batches, then the day
+/// runs to settlement.
 ///
 /// Every timer lives here and nowhere else, so swapping this for push
 /// notifications later touches one file. Start it once from the shell; call
-/// [restart] after «start new day».
+/// [restart] for «بدء يوم جديد».
 class ShiftSimulator {
   ShiftSimulator({required this.shift, required this.notifications});
 
   final ShiftController shift;
   final NotificationsStore notifications;
 
-  /// When the branch dispatches the second and third batches after the app
-  /// opens. Short on purpose — this is a demo of the flow, not a real shift.
-  static const Duration secondBatchAfter = Duration(seconds: 30);
-  static const Duration thirdBatchAfter = Duration(minutes: 3);
+  /// A fresh day is empty; the branch takes a moment to have anything ready.
+  static const Duration firstBatchAfter = Duration(seconds: 10);
+
+  /// From the courier confirming they carried a batch to the next one being
+  /// dispatched.
+  static const Duration nextBatchAfter = Duration(seconds: 20);
 
   /// How long after the courier is «expected at the branch» the cashier
   /// settles the day.
   static const Duration settleAfterReturning = Duration(seconds: 40);
 
-  final List<Timer> _timers = <Timer>[];
+  /// The day's batches, in the order the branch sends them.
+  final List<OrderBatch> _plan = demoDayBatches;
+
+  /// How many of [_plan] have already left the branch's hands.
+  int _dispatched = 0;
+
+  /// Carried-batch count at the last check, so a *rise* is the trigger.
+  int _carried = 0;
+
+  Timer? _dispatchTimer;
   Timer? _settleTimer;
   bool _wasOverLimit = false;
   bool _listening = false;
 
+  /// Batches still to come today — the Account tab's demo row could show it.
+  int get batchesLeft => _plan.length - _dispatched;
+
   void start() {
     stop();
+    // Anything already in the shift counts against the plan: the app's own
+    // seeded mid-day state opens with the first batch in hand, and the day
+    // should still total three.
+    _carried = shift.carriedBatches.length;
+    _dispatched = _carried + shift.pendingBatches.length;
     _wasOverLimit = shift.overCashLimit;
     if (!_listening) {
       shift.addListener(_onShiftChanged);
       _listening = true;
     }
-    _timers.add(
-      Timer(secondBatchAfter, () => _dispatch(sampleBatchTwoId, sampleBatchTwo)),
-    );
-    _timers.add(
-      Timer(
-        thirdBatchAfter,
-        () => _dispatch(sampleBatchThreeId, sampleBatchThree),
-      ),
-    );
+    // A day that has not started yet waits the short beat; one already under
+    // way is treated as if its last batch had just been carried.
+    _scheduleDispatch(_dispatched == 0 ? firstBatchAfter : nextBatchAfter);
   }
 
-  /// Cancel everything pending (the shell is going away or the day restarts).
+  /// Cancel everything pending (the shell is going away, or the day restarts).
   void stop() {
-    for (final t in _timers) {
-      t.cancel();
-    }
-    _timers.clear();
+    _dispatchTimer?.cancel();
+    _dispatchTimer = null;
     _settleTimer?.cancel();
     _settleTimer = null;
   }
 
-  /// «Start new day»: clear the shift and let the branch dispatch again.
+  /// «بدء يوم جديد»: clear the shift and let the branch start dispatching from
+  /// nothing, so the whole day can be watched from zero to settled.
   void restart() {
     stop();
     shift.startNewDay();
@@ -76,8 +95,17 @@ class ShiftSimulator {
     }
   }
 
-  void _dispatch(String id, List<Order> orders) {
-    final batch = OrderBatch(id: id, orders: List<Order>.unmodifiable(orders));
+  void _scheduleDispatch(Duration after) {
+    if (_dispatched >= _plan.length) return;
+    _dispatchTimer?.cancel();
+    _dispatchTimer = Timer(after, _dispatch);
+  }
+
+  void _dispatch() {
+    _dispatchTimer = null;
+    if (_dispatched >= _plan.length) return;
+    final batch = _plan[_dispatched];
+    _dispatched += 1;
     shift.assignBatch(batch);
     notifications.addBatchAssigned(batch, branch: shift.branchName);
   }
@@ -93,8 +121,18 @@ class ShiftSimulator {
     }
     _wasOverLimit = over;
 
+    // The courier just carried a batch out of the branch — start the clock on
+    // the next one.
+    final carried = shift.carriedBatches.length;
+    if (carried > _carried) {
+      _carried = carried;
+      _scheduleDispatch(nextBatchAfter);
+    } else if (carried < _carried) {
+      _carried = carried; // the day was reset from under us
+    }
+
     // Expected back at the branch → the cashier settles a little later. A new
-    // batch being carried in the meantime cancels it: the day is not over.
+    // batch carried in the meantime cancels it: the day is not over.
     if (shift.status == CourierStatus.returning) {
       _settleTimer ??= Timer(settleAfterReturning, _settle);
     } else {

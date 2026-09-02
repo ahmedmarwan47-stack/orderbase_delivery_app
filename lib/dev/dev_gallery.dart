@@ -30,36 +30,40 @@ class DevGallery extends StatelessWidget {
         const HomeScreen(preview: HomePreview.settled),
     'الاشعارات · Notifications': (_) => const NotificationsScreen(),
     'طلبات اليوم · Orders list': (context) => OrdersListScreen(
-          onOpenOrder: (_) => Navigator.of(context)
-              .push(MaterialPageRoute(builder: (_) => const OrderDetailScreen())),
-        ),
+      onOpenOrder: (_) => Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const OrderDetailScreen())),
+    ),
     'قائمة الطلبات · Queue (1b)': (_) => const QueueScreen(),
     'بحث · Queue search (1a)': (_) =>
         const QueueScreen(startSearching: true, initialQuery: 'زهراء'),
     'لا نتائج · Queue no-results (1c)': (_) =>
         const QueueScreen(startSearching: true, initialQuery: '89345'),
     'فاضية · Queue cleared (1d)': (_) => QueueScreen(
-          orders: sampleOrders
-              .where((o) => o.status == OrderStatus.postponed)
-              .toList(),
-        ),
+      orders: sampleOrders
+          .where((o) => o.status == OrderStatus.postponed)
+          .toList(),
+    ),
     'المؤجلة · Postponed (1e)': (_) => const PostponedScreen(),
     'تفاصيل الطلب · Order detail (COD)': (_) => const OrderDetailScreen(),
     'تفاصيل الطلب · Order detail (مدفوع/prepaid)': (_) =>
         const OrderDetailScreen(cod: false),
     'استلام من الفرع · Pickup': (_) => const PickupScreen(),
-    'نتيجة · Result — تم التسليم': (_) => const ResultScreen(kind: ResultKind.delivered),
-    'نتيجة · Result — لم يتم التسليم': (_) => const ResultScreen(kind: ResultKind.failed),
-    'نتيجة · Result — تأجيل': (_) => const ResultScreen(kind: ResultKind.postponed),
+    'نتيجة · Result — تم التسليم': (_) =>
+        const ResultScreen(kind: ResultKind.delivered),
+    'نتيجة · Result — لم يتم التسليم': (_) =>
+        const ResultScreen(kind: ResultKind.failed),
+    'نتيجة · Result — تأجيل': (_) =>
+        const ResultScreen(kind: ResultKind.postponed),
     'ورقة · COD 2a — تحصيل النقدية': (_) => SheetPreviewHost(
-          label: 'تحصيل النقدية',
-          open: (ctx) async => showCodCollectionSheet(
-            ctx,
-            due: 1200,
-            orderNum: '89289',
-            customerName: 'محمد حمدي',
-          ),
-        ),
+      label: 'تحصيل النقدية',
+      open: (ctx) async => showCodCollectionSheet(
+        ctx,
+        due: 1200,
+        orderNum: '89289',
+        customerName: 'محمد حمدي',
+      ),
+    ),
     'ورقة · Handoff sheet': (_) =>
         SheetPreviewHost(label: 'تأكيد التسليم', open: showHandoffSheet),
     'ورقة · Postpone sheet': (_) =>
@@ -84,9 +88,9 @@ class DevGallery extends StatelessWidget {
     'التسوية · Settlement (open)': (_) =>
         SettlementScreen(data: sampleSettlement),
     'التسوية · Settlement (settled)': (_) => SettlementScreen(
-          data: sampleSettlement,
-          startStage: SettlementStage.settled,
-        ),
+      data: sampleSettlement,
+      startStage: SettlementStage.settled,
+    ),
     'التسوية · يوم سابق (read-only)': (_) =>
         SettlementDayScreen(day: sampleSettlementHistory.first),
     'الرئيسية · Home 1b (Glance)': (_) => const HomeGlanceScreen(),
@@ -108,8 +112,10 @@ class DevGallery extends StatelessWidget {
         backgroundColor: AppColors.background,
         appBar: AppBar(
           backgroundColor: AppColors.surface,
-          title: const Text('Orderbase — الشاشات',
-              style: TextStyle(color: AppColors.textPrimary, fontSize: 18)),
+          title: const Text(
+            'Orderbase — الشاشات',
+            style: TextStyle(color: AppColors.textPrimary, fontSize: 18),
+          ),
         ),
         body: ListView(
           padding: const EdgeInsets.all(16),
@@ -122,10 +128,12 @@ class DevGallery extends StatelessWidget {
                     backgroundColor: AppColors.inkFill,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
-                  onPressed: () => Navigator.of(context)
-                      .push(MaterialPageRoute(builder: entry.value)),
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: entry.value)),
                   child: Text(entry.key, style: const TextStyle(fontSize: 16)),
                 ),
               ),

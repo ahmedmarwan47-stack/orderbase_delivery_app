@@ -7,36 +7,36 @@ enum NotifKind { assigned, batch, cancelled, note, wallet, cash, settled }
 
 extension NotifKindX on NotifKind {
   String get icon => switch (this) {
-        NotifKind.assigned => AppAssets.svg.box,
-        NotifKind.batch => AppAssets.svg.box,
-        NotifKind.cancelled => AppAssets.svg.x,
-        NotifKind.note => AppAssets.svg.note,
-        NotifKind.wallet => AppAssets.svg.wallet,
-        NotifKind.cash => AppAssets.svg.alert,
-        NotifKind.settled => AppAssets.svg.cash,
-      };
+    NotifKind.assigned => AppAssets.svg.box,
+    NotifKind.batch => AppAssets.svg.box,
+    NotifKind.cancelled => AppAssets.svg.x,
+    NotifKind.note => AppAssets.svg.note,
+    NotifKind.wallet => AppAssets.svg.wallet,
+    NotifKind.cash => AppAssets.svg.alert,
+    NotifKind.settled => AppAssets.svg.cash,
+  };
 
   Color get tileBg => switch (this) {
-        NotifKind.assigned => AppColors.transitPillBg,
-        NotifKind.batch => AppColors.transitPillBg,
-        NotifKind.cancelled => AppColors.failedBg,
-        NotifKind.note => AppColors.heroCodPillBg,
-        NotifKind.wallet => AppColors.deliveredBg,
-        // Over the cash limit is the one non-failure red in the app.
-        NotifKind.cash => AppColors.failedBg,
-        // Settlement is slate, like its card — never the delivered green.
-        NotifKind.settled => AppColors.paymentCardBg,
-      };
+    NotifKind.assigned => AppColors.transitPillBg,
+    NotifKind.batch => AppColors.transitPillBg,
+    NotifKind.cancelled => AppColors.failedBg,
+    NotifKind.note => AppColors.heroCodPillBg,
+    NotifKind.wallet => AppColors.deliveredBg,
+    // Over the cash limit is the one non-failure red in the app.
+    NotifKind.cash => AppColors.failedBg,
+    // Settlement is slate, like its card — never the delivered green.
+    NotifKind.settled => AppColors.paymentCardBg,
+  };
 
   Color get iconColor => switch (this) {
-        NotifKind.assigned => AppColors.transitBg,
-        NotifKind.batch => AppColors.transitBg,
-        NotifKind.cancelled => AppColors.failedText,
-        NotifKind.note => AppColors.postponedText,
-        NotifKind.wallet => AppColors.deliveredText,
-        NotifKind.cash => AppColors.failedText,
-        NotifKind.settled => AppColors.cashBright,
-      };
+    NotifKind.assigned => AppColors.transitBg,
+    NotifKind.batch => AppColors.transitBg,
+    NotifKind.cancelled => AppColors.failedText,
+    NotifKind.note => AppColors.postponedText,
+    NotifKind.wallet => AppColors.deliveredText,
+    NotifKind.cash => AppColors.failedText,
+    NotifKind.settled => AppColors.cashBright,
+  };
 }
 
 /// A single courier notification row.
@@ -85,8 +85,9 @@ List<AppNotification> sampleNotifications() {
       kind: NotifKind.assigned,
       orderNum: '89340',
       title: LocaleKeys.notifTitleAssigned.tr(namedArgs: {'num': '89340'}),
-      body: LocaleKeys.notifBodyAssigned
-          .tr(namedArgs: {'ready': '526689', 'branch': branch}),
+      body: LocaleKeys.notifBodyAssigned.tr(
+        namedArgs: {'ready': '526689', 'branch': branch},
+      ),
       time: LocaleKeys.notifMinutesAgo.tr(namedArgs: {'n': '١٠'}),
       unread: true,
     ),
@@ -94,8 +95,9 @@ List<AppNotification> sampleNotifications() {
       kind: NotifKind.cancelled,
       orderNum: '89355',
       title: LocaleKeys.notifTitleCancelled.tr(namedArgs: {'num': '89355'}),
-      body: LocaleKeys.notifBodyCancelled
-          .tr(namedArgs: {'num': '89355', 'branch': branch}),
+      body: LocaleKeys.notifBodyCancelled.tr(
+        namedArgs: {'num': '89355', 'branch': branch},
+      ),
       time: LocaleKeys.notifMinutesAgo.tr(namedArgs: {'n': '١٢'}),
       unread: true,
     ),
@@ -110,18 +112,21 @@ List<AppNotification> sampleNotifications() {
     AppNotification(
       kind: NotifKind.wallet,
       orderNum: '89298',
-      title: LocaleKeys.notifTitleWallet
-          .tr(namedArgs: {'amt': '٢٠', 'num': '89298'}),
-      body: LocaleKeys.notifBodyWallet
-          .tr(namedArgs: {'amt': '٢٠', 'num': '89298'}),
+      title: LocaleKeys.notifTitleWallet.tr(
+        namedArgs: {'amt': '٢٠', 'num': '89298'},
+      ),
+      body: LocaleKeys.notifBodyWallet.tr(
+        namedArgs: {'amt': '٢٠', 'num': '89298'},
+      ),
       time: LocaleKeys.notifHourAgo.tr(),
     ),
     AppNotification(
       kind: NotifKind.assigned,
       orderNum: '89293',
       title: LocaleKeys.notifTitleAssigned.tr(namedArgs: {'num': '89293'}),
-      body: LocaleKeys.notifBodyAssigned
-          .tr(namedArgs: {'ready': '526701', 'branch': branch}),
+      body: LocaleKeys.notifBodyAssigned.tr(
+        namedArgs: {'ready': '526701', 'branch': branch},
+      ),
       time: LocaleKeys.notifHoursAgo.tr(namedArgs: {'n': '٢'}),
     ),
     AppNotification(
@@ -134,10 +139,12 @@ List<AppNotification> sampleNotifications() {
     AppNotification(
       kind: NotifKind.wallet,
       orderNum: '89304',
-      title: LocaleKeys.notifTitleWallet
-          .tr(namedArgs: {'amt': '١٥', 'num': '89304'}),
-      body: LocaleKeys.notifBodyWallet
-          .tr(namedArgs: {'amt': '١٥', 'num': '89304'}),
+      title: LocaleKeys.notifTitleWallet.tr(
+        namedArgs: {'amt': '١٥', 'num': '89304'},
+      ),
+      body: LocaleKeys.notifBodyWallet.tr(
+        namedArgs: {'amt': '١٥', 'num': '89304'},
+      ),
       time: LocaleKeys.notifHoursAgo.tr(namedArgs: {'n': '٤'}),
     ),
   ];

@@ -6,9 +6,9 @@ class _HDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        height: AppSize.sH1,
-        child: const ColoredBox(color: AppColors.borderHeader),
-      );
+    height: AppSize.sH1,
+    child: const ColoredBox(color: AppColors.borderHeader),
+  );
 }
 
 /// A simple filled circle (status dot / timeline dot).

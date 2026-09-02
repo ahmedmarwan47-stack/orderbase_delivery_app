@@ -479,5 +479,9 @@
   "home_collect_batch_meta": "{what} · {orders} طلبات · {cash} جم",
   "home_collect_batch_count": "{n} دفعات",
   "home_collect_batch_ready": "دفعة جديدة جاهزة في الفرع",
-  "home_stat_cash_on_you": "معك نقدًا"
+  "home_stat_cash_on_you": "معك نقدًا",
+  "settlement_totals_title": "حصيلة اليوم",
+  "settlement_totals_orders": "الطلبات",
+  "settlement_totals_delivered": "تم التسليم",
+  "settlement_totals_returns": "مرتجعات"
 }

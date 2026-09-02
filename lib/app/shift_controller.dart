@@ -138,8 +138,7 @@ class ShiftController extends ChangeNotifier {
   }
 
   /// True once the branch has settled the day (until a new batch is carried).
-  bool get settled =>
-      _settlement != null && status != CourierStatus.onRoute;
+  bool get settled => _settlement != null && status != CourierStatus.onRoute;
   SettlementReceipt? get settlement => _settlement;
 
   // ── trip estimates ──
@@ -156,8 +155,8 @@ class ShiftController extends ChangeNotifier {
   /// stop, at city speed, counting from now. Riding time only — it does not
   /// include stops or handoffs, and the hero's tooltip says so.
   DateTime returnEtaOf(OrderBatch batch) {
-    final minutes =
-        (remainingKmOf(batch) / OrderBatch.cityKmPerHour * 60).round();
+    final minutes = (remainingKmOf(batch) / OrderBatch.cityKmPerHour * 60)
+        .round();
     return DateTime.now().add(Duration(minutes: minutes));
   }
 
@@ -183,9 +182,9 @@ class ShiftController extends ChangeNotifier {
   List<Order> get routeStops {
     final b = currentBatch;
     if (b == null) return const [];
-    return ordersOfBatch(b.id)
-        .where((o) => o.status != OrderStatus.postponed)
-        .toList();
+    return ordersOfBatch(
+      b.id,
+    ).where((o) => o.status != OrderStatus.postponed).toList();
   }
 
   int get closedStops =>

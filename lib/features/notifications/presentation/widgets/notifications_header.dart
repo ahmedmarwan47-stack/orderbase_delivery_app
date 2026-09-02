@@ -25,38 +25,41 @@ class _NotificationsHeader extends StatelessWidget {
           ),
         ),
       ),
-      child: Row(
-        children: [
-          const HeaderBackButton(),
-          12.szW,
-          Text(
-            LocaleKeys.navNotifications.tr(),
-            style: const TextStyle().setMainTextColor.s14.semiBold,
+      child:
+          Row(
+            children: [
+              const HeaderBackButton(),
+              12.szW,
+              Text(
+                LocaleKeys.navNotifications.tr(),
+                style: const TextStyle().setMainTextColor.s14.semiBold,
+              ),
+              const Spacer(),
+              if (unread > 0)
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.failedBg,
+                    borderRadius: BorderRadius.circular(AppCircular.r20),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppPadding.pW12,
+                    vertical: AppPadding.pH4,
+                  ),
+                  child: Text(
+                    LocaleKeys.notifNewCount.tr(namedArgs: {'n': '$unread'}),
+                    style: const TextStyle()
+                        .setColor(AppColors.failedText)
+                        .s12
+                        .semiBold,
+                  ),
+                ),
+            ],
+          ).paddingOnly(
+            left: AppPadding.pW20,
+            top: AppPadding.pH12,
+            right: AppPadding.pW20,
+            bottom: AppPadding.pH16,
           ),
-          const Spacer(),
-          if (unread > 0)
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.failedBg,
-                borderRadius: BorderRadius.circular(AppCircular.r20),
-              ),
-              padding: EdgeInsets.symmetric(
-                horizontal: AppPadding.pW12,
-                vertical: AppPadding.pH4,
-              ),
-              child: Text(
-                LocaleKeys.notifNewCount.tr(namedArgs: {'n': '$unread'}),
-                style:
-                    const TextStyle().setColor(AppColors.failedText).s12.semiBold,
-              ),
-            ),
-        ],
-      ).paddingOnly(
-        left: AppPadding.pW20,
-        top: AppPadding.pH12,
-        right: AppPadding.pW20,
-        bottom: AppPadding.pH16,
-      ),
     );
   }
 }

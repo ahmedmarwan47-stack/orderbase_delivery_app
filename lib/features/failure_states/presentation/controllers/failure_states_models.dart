@@ -25,31 +25,35 @@ enum FailureReason {
 
 extension FailureReasonX on FailureReason {
   ReasonOutcome get outcome => switch (this) {
-        FailureReason.notPresent => ReasonOutcome.returnsToBranch,
-        FailureReason.refused => ReasonOutcome.returnsToBranch,
-        FailureReason.mismatch => ReasonOutcome.returnsToBranch,
-        FailureReason.wrongAddress => ReasonOutcome.retryable,
-        FailureReason.traffic => ReasonOutcome.retryable,
-        FailureReason.other => ReasonOutcome.none,
-      };
+    FailureReason.notPresent => ReasonOutcome.returnsToBranch,
+    FailureReason.refused => ReasonOutcome.returnsToBranch,
+    FailureReason.mismatch => ReasonOutcome.returnsToBranch,
+    FailureReason.wrongAddress => ReasonOutcome.retryable,
+    FailureReason.traffic => ReasonOutcome.retryable,
+    FailureReason.other => ReasonOutcome.none,
+  };
 
   /// True for the three "final" reasons that funnel into the return-to-branch
   /// confirm screen (1e).
   bool get isFinal => outcome == ReasonOutcome.returnsToBranch;
 
   String get label => switch (this) {
-        FailureReason.notPresent => LocaleKeys.failureReasonNotPresent.tr(),
-        FailureReason.refused => LocaleKeys.failureReasonRefused.tr(),
-        FailureReason.mismatch => LocaleKeys.failureReasonMismatch.tr(),
-        FailureReason.wrongAddress => LocaleKeys.failureReasonWrongAddress.tr(),
-        FailureReason.traffic => LocaleKeys.failureReasonTraffic.tr(),
-        FailureReason.other => LocaleKeys.failureReasonOther.tr(),
-      };
+    FailureReason.notPresent => LocaleKeys.failureReasonNotPresent.tr(),
+    FailureReason.refused => LocaleKeys.failureReasonRefused.tr(),
+    FailureReason.mismatch => LocaleKeys.failureReasonMismatch.tr(),
+    FailureReason.wrongAddress => LocaleKeys.failureReasonWrongAddress.tr(),
+    FailureReason.traffic => LocaleKeys.failureReasonTraffic.tr(),
+    FailureReason.other => LocaleKeys.failureReasonOther.tr(),
+  };
 }
 
 /// A single logged contact attempt (1b).
 class ContactAttempt {
-  const ContactAttempt({required this.icon, required this.label, required this.time});
+  const ContactAttempt({
+    required this.icon,
+    required this.label,
+    required this.time,
+  });
   final String icon; // AppAssets.svg.*
   final String label;
   final String time; // "9:38"
@@ -90,29 +94,29 @@ class FailureContext {
 
 /// The mockup's fixed sample context (#89289).
 FailureContext sampleFailureContext() => FailureContext(
-      orderNum: '#89289',
-      customer: 'محمد حمدي',
-      area: 'التجمع الخامس',
-      address: LocaleKeys.failureSampleAddress.tr(),
-      addressDetail: LocaleKeys.failureSampleAddressDetail.tr(),
-      correctedAddress: LocaleKeys.failureSampleCorrectedAddress.tr(),
-      pieces: 2,
-      piecesLabel: LocaleKeys.failureSamplePiecesLabel.tr(),
-      branch: 'Sale Sucre — مدينة نصر',
-      attempts: [
-        ContactAttempt(
-          icon: AppAssets.svg.phone,
-          label: LocaleKeys.failureAttemptCallNoAnswer.tr(),
-          time: '9:38',
-        ),
-        ContactAttempt(
-          icon: AppAssets.svg.wa,
-          label: LocaleKeys.failureAttemptWhatsappNoReply.tr(),
-          time: '9:40',
-        ),
-      ],
-      laterSlots: const ['12:30', '1:30', '2:30'],
-    );
+  orderNum: '#89289',
+  customer: 'محمد حمدي',
+  area: 'التجمع الخامس',
+  address: LocaleKeys.failureSampleAddress.tr(),
+  addressDetail: LocaleKeys.failureSampleAddressDetail.tr(),
+  correctedAddress: LocaleKeys.failureSampleCorrectedAddress.tr(),
+  pieces: 2,
+  piecesLabel: LocaleKeys.failureSamplePiecesLabel.tr(),
+  branch: 'Sale Sucre — مدينة نصر',
+  attempts: [
+    ContactAttempt(
+      icon: AppAssets.svg.phone,
+      label: LocaleKeys.failureAttemptCallNoAnswer.tr(),
+      time: '9:38',
+    ),
+    ContactAttempt(
+      icon: AppAssets.svg.wa,
+      label: LocaleKeys.failureAttemptWhatsappNoReply.tr(),
+      time: '9:40',
+    ),
+  ],
+  laterSlots: const ['12:30', '1:30', '2:30'],
+);
 
 /// Which of the states the [FailureStatesHost] should open for preview.
 enum FailureStatePreview {
@@ -125,7 +129,12 @@ enum FailureStatePreview {
 
 /// The terminal outcome the flow hands back to its caller (e.g. order_flow).
 class FailureOutcome {
-  const FailureOutcome({required this.resolution, this.reason, this.note, this.retryTime});
+  const FailureOutcome({
+    required this.resolution,
+    this.reason,
+    this.note,
+    this.retryTime,
+  });
 
   final FailureResolution resolution;
   final FailureReason? reason;

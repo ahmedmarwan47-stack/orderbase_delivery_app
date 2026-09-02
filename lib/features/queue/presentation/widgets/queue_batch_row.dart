@@ -29,7 +29,9 @@ class _QueueBatchRow extends StatelessWidget {
       order.name,
       order.area,
       if (order.pieces > 0)
-        LocaleKeys.queuePieces.tr(namedArgs: {'count': arabicDigits(order.pieces)}),
+        LocaleKeys.queuePieces.tr(
+          namedArgs: {'count': arabicDigits(order.pieces)},
+        ),
     ].join(' · ');
 
     final Widget row = Container(

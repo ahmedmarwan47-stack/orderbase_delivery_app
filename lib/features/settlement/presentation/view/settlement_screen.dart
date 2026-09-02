@@ -108,6 +108,8 @@ class SettlementDayScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _CashInHandCard(data: day, showBreakdown: true),
+                      12.szH,
+                      _DayTotals(data: day),
                       if (day.settledAt != null) ...[
                         12.szH,
                         _ReceiptCard(data: day),

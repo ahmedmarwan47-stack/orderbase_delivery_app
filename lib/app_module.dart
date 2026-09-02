@@ -21,20 +21,24 @@ class AppModule extends Module {
   @override
   void routes(RouteManager r) {
     r.child('/', child: (_) => const AuthGate());
-    r.child('/auth',
-        child: (_) => LoginScreen(
-              onSubmit: () {
-                AuthSession.instance.logIn();
-                Modular.to.navigate('/');
-              },
-            ));
+    r.child(
+      '/auth',
+      child: (_) => LoginScreen(
+        onSubmit: () {
+          AuthSession.instance.logIn();
+          Modular.to.navigate('/');
+        },
+      ),
+    );
     r.child('/queue', child: (_) => const QueueScreen());
     r.child('/queue/postponed', child: (_) => const PostponedScreen());
     r.child('/order-detail', child: (_) => const OrderDetailScreen());
     r.child('/pickup', child: (_) => const PickupScreen());
     r.child('/settlement', child: (_) => const SettlementScreen());
-    r.child('/failure-states',
-        child: (_) => const FailureStatesHost(runFlow: true));
+    r.child(
+      '/failure-states',
+      child: (_) => const FailureStatesHost(runFlow: true),
+    );
     r.child('/returns', child: (_) => const ReturnsListScreen());
   }
 }

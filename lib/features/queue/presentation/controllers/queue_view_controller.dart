@@ -15,12 +15,12 @@ class QueueViewController {
     bool startSearching = false,
     String initialQuery = '',
     QueueFilter initialFilter = QueueFilter.all,
-  })  : _staticOrders = orders,
-        isSearching = ValueNotifier(startSearching),
-        startedInSearch = startSearching,
-        filter = ValueNotifier(initialFilter),
-        query = ValueNotifier(initialQuery.trim()),
-        searchController = TextEditingController(text: initialQuery) {
+  }) : _staticOrders = orders,
+       isSearching = ValueNotifier(startSearching),
+       startedInSearch = startSearching,
+       filter = ValueNotifier(initialFilter),
+       query = ValueNotifier(initialQuery.trim()),
+       searchController = TextEditingController(text: initialQuery) {
     _searchSub = _searchSubject
         .debounceTime(const Duration(milliseconds: 300))
         .distinct()
@@ -93,8 +93,7 @@ class QueueViewController {
   }
 
   /// How many batches the day has so far (in hand or waiting).
-  int get batchCount =>
-      _staticOrders != null
+  int get batchCount => _staticOrders != null
       ? 1
       : ShiftController.instance.carriedBatches.length +
             ShiftController.instance.pendingBatches.length;
@@ -139,8 +138,9 @@ class QueueViewController {
   /// top and handed-off / closed orders sink to the bottom of the "all" list
   /// (delivered last). Stable within a status group (keeps the source order).
   List<Order> get active {
-    final list =
-        orders.where((o) => o.status != OrderStatus.postponed).toList();
+    final list = orders
+        .where((o) => o.status != OrderStatus.postponed)
+        .toList();
     final indexed = list.indexed.toList()
       ..sort((a, b) {
         final r = _statusRank(a.$2.status).compareTo(_statusRank(b.$2.status));
@@ -151,33 +151,33 @@ class QueueViewController {
 
   /// Lower ranks list first: in-progress → failed → delivered (handed off last).
   int _statusRank(OrderStatus s) => switch (s) {
-        OrderStatus.transit => 0,
-        OrderStatus.failed => 1,
-        OrderStatus.delivered => 2,
-        OrderStatus.postponed => 3,
-      };
+    OrderStatus.transit => 0,
+    OrderStatus.failed => 1,
+    OrderStatus.delivered => 2,
+    OrderStatus.postponed => 3,
+  };
 
   int countFor(QueueFilter f) => switch (f) {
-        QueueFilter.all => active.length,
-        QueueFilter.transit =>
-          active.where((o) => o.status == OrderStatus.transit).length,
-        QueueFilter.delivered =>
-          active.where((o) => o.status == OrderStatus.delivered).length,
-        QueueFilter.failed =>
-          active.where((o) => o.status == OrderStatus.failed).length,
-        QueueFilter.postponed => postponed.length,
-      };
+    QueueFilter.all => active.length,
+    QueueFilter.transit =>
+      active.where((o) => o.status == OrderStatus.transit).length,
+    QueueFilter.delivered =>
+      active.where((o) => o.status == OrderStatus.delivered).length,
+    QueueFilter.failed =>
+      active.where((o) => o.status == OrderStatus.failed).length,
+    QueueFilter.postponed => postponed.length,
+  };
 
   List<Order> get filtered => switch (filter.value) {
-        QueueFilter.all => active,
-        QueueFilter.transit =>
-          active.where((o) => o.status == OrderStatus.transit).toList(),
-        QueueFilter.delivered =>
-          active.where((o) => o.status == OrderStatus.delivered).toList(),
-        QueueFilter.failed =>
-          active.where((o) => o.status == OrderStatus.failed).toList(),
-        QueueFilter.postponed => postponed,
-      };
+    QueueFilter.all => active,
+    QueueFilter.transit =>
+      active.where((o) => o.status == OrderStatus.transit).toList(),
+    QueueFilter.delivered =>
+      active.where((o) => o.status == OrderStatus.delivered).toList(),
+    QueueFilter.failed =>
+      active.where((o) => o.status == OrderStatus.failed).toList(),
+    QueueFilter.postponed => postponed,
+  };
 
   List<Order> get searchMatches =>
       orders.where((o) => matchKey(o) != null).toList();
@@ -197,12 +197,12 @@ class QueueViewController {
   }
 
   String filterLabelKey(QueueFilter f) => switch (f) {
-        QueueFilter.all => LocaleKeys.filterAll,
-        QueueFilter.transit => LocaleKeys.filterTransit,
-        QueueFilter.delivered => LocaleKeys.filterDelivered,
-        QueueFilter.failed => LocaleKeys.filterFailed,
-        QueueFilter.postponed => LocaleKeys.filterPostponed,
-      };
+    QueueFilter.all => LocaleKeys.filterAll,
+    QueueFilter.transit => LocaleKeys.filterTransit,
+    QueueFilter.delivered => LocaleKeys.filterDelivered,
+    QueueFilter.failed => LocaleKeys.filterFailed,
+    QueueFilter.postponed => LocaleKeys.filterPostponed,
+  };
 
   // ── handlers ──
   void openSearch() => isSearching.value = true;
@@ -239,9 +239,9 @@ class QueueViewController {
     if (onOpenOrder != null) {
       onOpenOrder!(flow);
     } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => OrderDetailScreen(order: flow)),
-      );
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => OrderDetailScreen(order: flow)));
     }
   }
 
@@ -287,7 +287,8 @@ class QueueBatchGroup {
   /// batch still at the branch).
   List<Order> get live => _live ?? batch.orders;
 
-  int get remaining => live.where((o) => o.status == OrderStatus.transit).length;
+  int get remaining =>
+      live.where((o) => o.status == OrderStatus.transit).length;
 
   /// Every order closed — nothing left to do in it.
   bool get complete =>

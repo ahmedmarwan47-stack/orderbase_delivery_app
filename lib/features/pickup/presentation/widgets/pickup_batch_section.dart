@@ -56,11 +56,7 @@ class _PickupBatchSectionState extends State<_PickupBatchSection> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          _PickupBatchHeader(
-            batch: widget.batch,
-            open: _open,
-            onTap: _toggle,
-          ),
+          _PickupBatchHeader(batch: widget.batch, open: _open, onTap: _toggle),
           // Collapse by animating the real height away, so the sections below
           // slide up rather than jump.
           ClipRect(

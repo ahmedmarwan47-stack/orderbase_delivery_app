@@ -30,10 +30,7 @@ class _CustomerSection extends StatelessWidget {
                 ),
               ],
             ),
-            Text(
-              name,
-              style: const TextStyle().setMainTextColor.s16.semiBold,
-            ),
+            Text(name, style: const TextStyle().setMainTextColor.s16.semiBold),
           ],
         ),
         16.szH,

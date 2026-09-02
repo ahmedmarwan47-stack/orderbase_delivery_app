@@ -69,8 +69,11 @@ class _SettlementOpenViewState extends State<_SettlementOpenView> {
             ] else
               ValueListenableBuilder<bool>(
                 valueListenable: _scrolled,
-                builder: (_, scrolled, _) =>
-                    _SettlementHeader(data: data, showBack: true, scrolled: scrolled),
+                builder: (_, scrolled, _) => _SettlementHeader(
+                  data: data,
+                  showBack: true,
+                  scrolled: scrolled,
+                ),
               ),
             Expanded(
               child: SingleChildScrollView(
@@ -87,6 +90,9 @@ class _SettlementOpenViewState extends State<_SettlementOpenView> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _CashInHandCard(data: data, showBreakdown: breakdown),
+                      12.szH,
+                      // The money above, what produced it right beneath.
+                      _DayTotals(data: data),
                       20.szH,
                       _BatchesSection(data: data),
                       // The parcels also going back to the branch — settling
@@ -164,7 +170,10 @@ class _SettlementHeader extends StatelessWidget {
                     ],
                     Text(
                       LocaleKeys.settlementSubtitle.tr(
-                        namedArgs: {'date': data.dateLabel, 'branch': data.branch},
+                        namedArgs: {
+                          'date': data.dateLabel,
+                          'branch': data.branch,
+                        },
                       ),
                       style: const TextStyle().setMainTextColor.s14.semiBold,
                     ),

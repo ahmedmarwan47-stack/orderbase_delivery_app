@@ -41,8 +41,9 @@ class _PostponeSheetState extends State<_PostponeSheet> {
   Widget build(BuildContext context) {
     return SheetShell(
       title: LocaleKeys.postponeTitle.tr(),
-      onBack: () => Navigator.of(context)
-          .pop(const PostponeOutcome(action: PostponeResult.back)),
+      onBack: () => Navigator.of(
+        context,
+      ).pop(const PostponeOutcome(action: PostponeResult.back)),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -96,7 +97,9 @@ class _PostponeSheetState extends State<_PostponeSheet> {
             height: AppSize.sH56,
             decoration: BoxDecoration(
               color: AppColors.inkFill,
-              borderRadius: BorderRadius.circular(AppCircular.r15), // mockup radius
+              borderRadius: BorderRadius.circular(
+                AppCircular.r15,
+              ), // mockup radius
             ),
             alignment: Alignment.center,
             child: Row(
@@ -174,10 +177,7 @@ class _PostponeSheetState extends State<_PostponeSheet> {
             width: AppSize.sW18,
           ),
           8.szW,
-          Text(
-            value,
-            style: const TextStyle().setMainTextColor.s16.semiBold,
-          ),
+          Text(value, style: const TextStyle().setMainTextColor.s16.semiBold),
           const Spacer(),
           // Edit affordance: signals the field opens a native picker on tap.
           IconWidget(
@@ -187,10 +187,7 @@ class _PostponeSheetState extends State<_PostponeSheet> {
             width: AppSize.sW18,
           ),
         ],
-      ).paddingSymmetric(
-        horizontal: AppPadding.pW16,
-        vertical: AppPadding.pH12,
-      ),
+      ).paddingSymmetric(horizontal: AppPadding.pW16, vertical: AppPadding.pH12),
     ).onClick(onTap: onTap);
   }
 }

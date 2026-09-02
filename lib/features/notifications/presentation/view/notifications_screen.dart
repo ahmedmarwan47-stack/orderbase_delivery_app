@@ -79,8 +79,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 separatorBuilder: (_, _) => 12.szH,
                 itemBuilder: (_, i) => _NotificationTile(
                   notification: items[i],
-                  onTap:
-                      widget.onOpenOrder == null || items[i].orderNum.isEmpty
+                  onTap: widget.onOpenOrder == null || items[i].orderNum.isEmpty
                       ? null
                       : () => widget.onOpenOrder!(items[i].orderNum),
                 ),

@@ -16,31 +16,32 @@ class _OrdersHeader extends StatelessWidget {
         color: AppColors.surface,
         border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child:
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                LocaleKeys.queueTitle.tr(),
-                style: const TextStyle().setMainTextColor.s14.semiBold,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    LocaleKeys.queueTitle.tr(),
+                    style: const TextStyle().setMainTextColor.s14.semiBold,
+                  ),
+                  4.szH,
+                  Text(
+                    LocaleKeys.ordersSubtitle.tr(),
+                    style: const TextStyle().setSecondaryColor.s12.medium,
+                  ),
+                ],
               ),
-              4.szH,
-              Text(
-                LocaleKeys.ordersSubtitle.tr(),
-                style: const TextStyle().setSecondaryColor.s12.medium,
-              ),
+              _SearchButton(onTap: () => _openQueueSearch(context)),
             ],
+          ).paddingOnlyDirectional(
+            start: AppPadding.pW20,
+            end: AppPadding.pW20,
+            top: AppPadding.pH12,
+            bottom: AppPadding.pH16,
           ),
-          _SearchButton(onTap: () => _openQueueSearch(context)),
-        ],
-      ).paddingOnlyDirectional(
-        start: AppPadding.pW20,
-        end: AppPadding.pW20,
-        top: AppPadding.pH12,
-        bottom: AppPadding.pH16,
-      ),
     );
   }
 

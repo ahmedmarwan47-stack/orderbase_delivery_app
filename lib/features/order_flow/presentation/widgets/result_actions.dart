@@ -16,7 +16,9 @@ class _ResultActions extends StatelessWidget {
           height: 54.h, // primary action height
           decoration: BoxDecoration(
             color: AppColors.inkFill,
-            borderRadius: BorderRadius.circular(AppCircular.r15), // mockup radius
+            borderRadius: BorderRadius.circular(
+              AppCircular.r15,
+            ), // mockup radius
           ),
           alignment: Alignment.center,
           child: Row(
@@ -41,7 +43,9 @@ class _ResultActions extends StatelessWidget {
           height: AppSize.sH48,
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppCircular.r15), // mockup radius
+            borderRadius: BorderRadius.circular(
+              AppCircular.r15,
+            ), // mockup radius
             border: Border.all(color: AppColors.borderDefault),
           ),
           alignment: Alignment.center,

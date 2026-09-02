@@ -134,12 +134,13 @@ class _SettlementBatchSectionState extends State<_SettlementBatchSection> {
                   Text(
                     b.id,
                     textDirection: TextDirection.ltr,
-                    style: (muted
-                            ? const TextStyle().setSecondaryColor
-                            : const TextStyle().setMainTextColor)
-                        .s14
-                        .bold
-                        .tabular,
+                    style:
+                        (muted
+                                ? const TextStyle().setSecondaryColor
+                                : const TextStyle().setMainTextColor)
+                            .s14
+                            .bold
+                            .tabular,
                   ),
                   if (b.pending) ...[
                     8.szW,

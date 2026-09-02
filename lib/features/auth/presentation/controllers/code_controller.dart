@@ -5,9 +5,9 @@ part of '../imports/auth_imports.dart';
 /// the mockup's `codeLength` prop. ValueNotifier-driven; no `setState`.
 class CodeController {
   CodeController({this.len = 6, String initial = ''})
-      : code = ValueNotifier(initial),
-        resendSeconds = ValueNotifier(0),
-        codeController = TextEditingController(text: initial);
+    : code = ValueNotifier(initial),
+      resendSeconds = ValueNotifier(0),
+      codeController = TextEditingController(text: initial);
 
   /// Number of digits in the code (mockup default 6; login flows may use 4).
   final int len;

@@ -479,5 +479,9 @@
   "home_collect_batch_meta": "{what} · {orders} orders · EGP {cash}",
   "home_collect_batch_count": "{n} batches",
   "home_collect_batch_ready": "A new batch is ready at the branch",
-  "home_stat_cash_on_you": "On you"
+  "home_stat_cash_on_you": "On you",
+  "settlement_totals_title": "The day's tally",
+  "settlement_totals_orders": "Orders",
+  "settlement_totals_delivered": "Delivered",
+  "settlement_totals_returns": "Returns"
 }

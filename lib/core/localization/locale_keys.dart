@@ -581,12 +581,14 @@ abstract final class LocaleKeys {
   static const String queuePieces = 'queue_pieces';
   static const String settlementAwaiting = 'settlement_awaiting';
   static const String settlementOverLimit = 'settlement_over_limit';
-  static const String settlementBreakdownBatches = 'settlement_breakdown_batches';
+  static const String settlementBreakdownBatches =
+      'settlement_breakdown_batches';
   static const String settlementBatchesTitle = 'settlement_batches_title';
   static const String settlementBatchPending = 'settlement_batch_pending';
   static const String settlementBatchNoCash = 'settlement_batch_no_cash';
   static const String settlementBatchCash = 'settlement_batch_cash';
-  static const String settlementBatchCashOrders = 'settlement_batch_cash_orders';
+  static const String settlementBatchCashOrders =
+      'settlement_batch_cash_orders';
   static const String settlementBatchReturns = 'settlement_batch_returns';
   static const String settlementReturnPill = 'settlement_return_pill';
   static const String settlementHandReturns = 'settlement_hand_returns';
@@ -601,4 +603,8 @@ abstract final class LocaleKeys {
   static const String homeCollectBatchCount = 'home_collect_batch_count';
   static const String homeCollectBatchReady = 'home_collect_batch_ready';
   static const String homeStatCashOnYou = 'home_stat_cash_on_you';
+  static const String settlementTotalsTitle = 'settlement_totals_title';
+  static const String settlementTotalsOrders = 'settlement_totals_orders';
+  static const String settlementTotalsDelivered = 'settlement_totals_delivered';
+  static const String settlementTotalsReturns = 'settlement_totals_returns';
 }

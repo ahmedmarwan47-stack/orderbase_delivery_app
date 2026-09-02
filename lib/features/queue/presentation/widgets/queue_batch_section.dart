@@ -123,7 +123,8 @@ class _QueueBatchSectionState extends State<_QueueBatchSection> {
                       last: order == rows.last && !g.pending,
                       onTap: () => widget.vc.openOrder(context, order),
                     ),
-                  if (g.pending) _CarryBatchButton(count: g.batch.count, onTap: _carry),
+                  if (g.pending)
+                    _CarryBatchButton(count: g.batch.count, onTap: _carry),
                 ],
               ),
             ),

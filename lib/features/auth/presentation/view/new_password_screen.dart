@@ -19,9 +19,9 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     super.dispose();
   }
 
-  void _save() => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const AuthSuccessScreen()),
-      );
+  void _save() => Navigator.of(
+    context,
+  ).push(MaterialPageRoute<void>(builder: (_) => const AuthSuccessScreen()));
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +33,15 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
           children: [
             _AuthBackLink(onTap: () => Navigator.of(context).maybePop()),
             20.szH,
-            Text(LocaleKeys.authNewTitle.tr(),
-                style: const TextStyle().setMainTextColor.s20.bold),
+            Text(
+              LocaleKeys.authNewTitle.tr(),
+              style: const TextStyle().setMainTextColor.s20.bold,
+            ),
             8.szH,
-            Text(LocaleKeys.authNewSubtitle.tr(),
-                style: const TextStyle().setSecondaryColor.s14.regular),
+            Text(
+              LocaleKeys.authNewSubtitle.tr(),
+              style: const TextStyle().setSecondaryColor.s14.regular,
+            ),
             24.szH,
             _AuthField(
               label: LocaleKeys.authNewPassword.tr(),
@@ -64,8 +68,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   : null,
             ),
             20.szH,
-            _AuthRulesCard(
-                lengthOk: _vc.isLongEnough, matchOk: _vc.isMatching),
+            _AuthRulesCard(lengthOk: _vc.isLongEnough, matchOk: _vc.isMatching),
           ],
         ),
       ),

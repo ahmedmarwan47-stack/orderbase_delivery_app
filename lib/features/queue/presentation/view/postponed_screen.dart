@@ -18,8 +18,9 @@ class _PostponedScreenState extends State<PostponedScreen> {
   late final ValueNotifier<List<Order>> _orders = ValueNotifier(
     List<Order>.from(
       widget.orders ??
-          ShiftController.instance.orders
-              .where((o) => o.status == OrderStatus.postponed),
+          ShiftController.instance.orders.where(
+            (o) => o.status == OrderStatus.postponed,
+          ),
     ),
   );
 
@@ -29,7 +30,9 @@ class _PostponedScreenState extends State<PostponedScreen> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text(LocaleKeys.returnedToQueue.tr(namedArgs: {'num': o.num})),
+          content: Text(
+            LocaleKeys.returnedToQueue.tr(namedArgs: {'num': o.num}),
+          ),
         ),
       );
   }

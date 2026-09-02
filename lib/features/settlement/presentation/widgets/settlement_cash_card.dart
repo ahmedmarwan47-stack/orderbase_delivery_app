@@ -25,131 +25,133 @@ class _CashInHandCard extends StatelessWidget {
         color: over ? AppColors.failedText : AppColors.paymentCardBg,
         borderRadius: BorderRadius.circular(AppCircular.r20),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+      child:
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      (data.isSettled
-                              ? LocaleKeys.settlementSummaryDelivered
-                              : LocaleKeys.settlementCashInHand)
-                          .tr(),
-                      style: const TextStyle()
-                          .setColor(labelColor)
-                          .s14
-                          .regular,
-                    ),
-                    8.szH,
-                    Row(
-                      textBaseline: TextBaseline.alphabetic,
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      mainAxisSize: MainAxisSize.min,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          formatThousands(data.cashTotal),
-                          textDirection: TextDirection.ltr,
-                          style: const TextStyle().setWhite.s24.bold.tabular,
-                        ),
-                        6.szW,
-                        Text(
-                          LocaleKeys.settlementCurrency.tr(),
+                          (data.isSettled
+                                  ? LocaleKeys.settlementSummaryDelivered
+                                  : LocaleKeys.settlementCashInHand)
+                              .tr(),
                           style: const TextStyle()
-                              .setColor(
-                                over
-                                    ? AppColors.overLimitLabel
-                                    : AppColors.paymentSuffix,
-                              )
-                              .s16
-                              .semiBold,
+                              .setColor(labelColor)
+                              .s14
+                              .regular,
                         ),
+                        8.szH,
+                        Row(
+                          textBaseline: TextBaseline.alphabetic,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              formatThousands(data.cashTotal),
+                              textDirection: TextDirection.ltr,
+                              style:
+                                  const TextStyle().setWhite.s24.bold.tabular,
+                            ),
+                            6.szW,
+                            Text(
+                              LocaleKeys.settlementCurrency.tr(),
+                              style: const TextStyle()
+                                  .setColor(
+                                    over
+                                        ? AppColors.overLimitLabel
+                                        : AppColors.paymentSuffix,
+                                  )
+                                  .s16
+                                  .semiBold,
+                            ),
+                          ],
+                        ),
+                        if (over) ...[
+                          6.szH,
+                          Text(
+                            LocaleKeys.settlementOverLimit.tr(
+                              namedArgs: {
+                                'limit': formatThousands(
+                                  ShiftController.cashThresholdEgp,
+                                ),
+                              },
+                            ),
+                            style: const TextStyle()
+                                .setColor(AppColors.overLimitLabel)
+                                .s12
+                                .semiBold,
+                          ),
+                        ],
                       ],
                     ),
-                    if (over) ...[
-                      6.szH,
-                      Text(
-                        LocaleKeys.settlementOverLimit.tr(
-                          namedArgs: {
-                            'limit': formatThousands(
-                              ShiftController.cashThresholdEgp,
-                            ),
-                          },
-                        ),
-                        style: const TextStyle()
-                            .setColor(AppColors.overLimitLabel)
-                            .s12
-                            .semiBold,
+                  ),
+                  12.szW,
+                  Container(
+                    width: AppSize.sW48,
+                    height: AppSize.sH48,
+                    decoration: BoxDecoration(
+                      color: AppColors.paymentTile,
+                      borderRadius: BorderRadius.circular(AppCircular.r16),
+                    ),
+                    child: Center(
+                      child: IconWidget(
+                        icon: over ? AppAssets.svg.alert : AppAssets.svg.cash,
+                        color: AppColors.cashBright,
+                        height: AppSize.sH24,
+                        width: AppSize.sW24,
                       ),
-                    ],
+                    ),
+                  ),
+                ],
+              ),
+              if (showBreakdown) ...[
+                16.szH,
+                const Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: AppColors.darkCardHairline,
+                ),
+                16.szH,
+                Row(
+                  children: [
+                    Expanded(
+                      child: _BreakdownCol(
+                        label: LocaleKeys.settlementBreakdownOrders.tr(),
+                        value: '${formatThousands(data.ordersTotal)} جم',
+                        labelColor: labelColor,
+                      ),
+                    ),
+                    Expanded(
+                      child: _BreakdownCol(
+                        label: LocaleKeys.settlementBreakdownWallet.tr(),
+                        value: '${formatThousands(data.walletTotal)} جم',
+                        valueColor: over
+                            ? AppColors.surface
+                            : AppColors.walletAmberOnDark,
+                        labelColor: labelColor,
+                      ),
+                    ),
+                    Expanded(
+                      child: _BreakdownCol(
+                        label: LocaleKeys.settlementBreakdownBatches.tr(),
+                        value: arabicDigits(data.carriedBatchCount),
+                        labelColor: labelColor,
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              12.szW,
-              Container(
-                width: AppSize.sW48,
-                height: AppSize.sH48,
-                decoration: BoxDecoration(
-                  color: AppColors.paymentTile,
-                  borderRadius: BorderRadius.circular(AppCircular.r16),
-                ),
-                child: Center(
-                  child: IconWidget(
-                    icon: over ? AppAssets.svg.alert : AppAssets.svg.cash,
-                    color: AppColors.cashBright,
-                    height: AppSize.sH24,
-                    width: AppSize.sW24,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (showBreakdown) ...[
-            16.szH,
-            const Divider(
-              height: 1,
-              thickness: 1,
-              color: AppColors.darkCardHairline,
-            ),
-            16.szH,
-            Row(
-              children: [
-                Expanded(
-                  child: _BreakdownCol(
-                    label: LocaleKeys.settlementBreakdownOrders.tr(),
-                    value: '${formatThousands(data.ordersTotal)} جم',
-                    labelColor: labelColor,
-                  ),
-                ),
-                Expanded(
-                  child: _BreakdownCol(
-                    label: LocaleKeys.settlementBreakdownWallet.tr(),
-                    value: '${formatThousands(data.walletTotal)} جم',
-                    valueColor: over
-                        ? AppColors.surface
-                        : AppColors.walletAmberOnDark,
-                    labelColor: labelColor,
-                  ),
-                ),
-                Expanded(
-                  child: _BreakdownCol(
-                    label: LocaleKeys.settlementBreakdownBatches.tr(),
-                    value: arabicDigits(data.carriedBatchCount),
-                    labelColor: labelColor,
-                  ),
-                ),
               ],
-            ),
-          ],
-        ],
-      ).paddingSymmetric(
-        horizontal: AppPadding.pW20,
-        vertical: AppPadding.pH20,
-      ),
+            ],
+          ).paddingSymmetric(
+            horizontal: AppPadding.pW20,
+            vertical: AppPadding.pH20,
+          ),
     );
   }
 }

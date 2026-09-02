@@ -12,7 +12,9 @@ import 'package:flutter/services.dart';
 class ExternalLinks {
   const ExternalLinks._();
 
-  static const MethodChannel _channel = MethodChannel('orderbase/live_activity');
+  static const MethodChannel _channel = MethodChannel(
+    'orderbase/live_activity',
+  );
 
   static Future<void> open(String url) async {
     try {

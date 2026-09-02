@@ -44,22 +44,22 @@ class ResultScreen extends StatefulWidget {
   State<ResultScreen> createState() => _ResultScreenState();
 
   Color get _tint => switch (kind) {
-        ResultKind.delivered => AppColors.greenAccent,
-        ResultKind.postponed => AppColors.postponedText,
-        ResultKind.failed => AppColors.brand,
-      };
+    ResultKind.delivered => AppColors.greenAccent,
+    ResultKind.postponed => AppColors.postponedText,
+    ResultKind.failed => AppColors.brand,
+  };
 
   Color get _tintBg => switch (kind) {
-        ResultKind.delivered => AppColors.deliveredBg,
-        ResultKind.postponed => AppColors.heroCodPillBg,
-        ResultKind.failed => AppColors.failedBg,
-      };
+    ResultKind.delivered => AppColors.deliveredBg,
+    ResultKind.postponed => AppColors.heroCodPillBg,
+    ResultKind.failed => AppColors.failedBg,
+  };
 
   String get _icon => switch (kind) {
-        ResultKind.delivered => AppAssets.svg.check,
-        ResultKind.postponed => AppAssets.svg.clock,
-        ResultKind.failed => AppAssets.svg.fail,
-      };
+    ResultKind.delivered => AppAssets.svg.check,
+    ResultKind.postponed => AppAssets.svg.clock,
+    ResultKind.failed => AppAssets.svg.fail,
+  };
 
   /// Delivered / failed show the isolated result photo; postponed keeps the
   /// tinted clock badge.
@@ -88,18 +88,16 @@ class ResultScreen extends StatefulWidget {
   }
 
   String get _title => switch (kind) {
-        ResultKind.delivered => LocaleKeys.resultDeliveredTitle,
-        ResultKind.postponed => LocaleKeys.resultPostponedTitle,
-        ResultKind.failed => LocaleKeys.resultFailedTitle,
-      }
-          .tr();
+    ResultKind.delivered => LocaleKeys.resultDeliveredTitle,
+    ResultKind.postponed => LocaleKeys.resultPostponedTitle,
+    ResultKind.failed => LocaleKeys.resultFailedTitle,
+  }.tr();
 
   String get _sub => switch (kind) {
-        ResultKind.delivered => LocaleKeys.resultDeliveredSub,
-        ResultKind.postponed => LocaleKeys.resultPostponedSub,
-        ResultKind.failed => LocaleKeys.resultFailedSub,
-      }
-          .tr();
+    ResultKind.delivered => LocaleKeys.resultDeliveredSub,
+    ResultKind.postponed => LocaleKeys.resultPostponedSub,
+    ResultKind.failed => LocaleKeys.resultFailedSub,
+  }.tr();
 }
 
 class _ResultScreenState extends State<ResultScreen>
@@ -109,19 +107,19 @@ class _ResultScreenState extends State<ResultScreen>
   /// Motion character by outcome: delivered gets the fullest, calmest settle;
   /// failed the shortest and quietest; postponed sits between.
   Duration get _entranceDuration => switch (widget.kind) {
-        ResultKind.delivered => const Duration(milliseconds: 500),
-        ResultKind.postponed => const Duration(milliseconds: 460),
-        ResultKind.failed => const Duration(milliseconds: 420),
-      };
+    ResultKind.delivered => const Duration(milliseconds: 500),
+    ResultKind.postponed => const Duration(milliseconds: 460),
+    ResultKind.failed => const Duration(milliseconds: 420),
+  };
 
   /// How far the photo/badge scales up on entry — a fuller settle for a
   /// delivered handoff, barely any for a failed one. Delivered starts a touch
   /// lower so the press-in reads as a stamp.
   double get _badgeScaleFrom => switch (widget.kind) {
-        ResultKind.delivered => 0.88,
-        ResultKind.postponed => 0.93,
-        ResultKind.failed => 0.96,
-      };
+    ResultKind.delivered => 0.88,
+    ResultKind.postponed => 0.93,
+    ResultKind.failed => 0.96,
+  };
 
   /// Fires the outcome haptic exactly once on arrival — the "stamp". Haptics
   /// are feedback, so this runs regardless of Reduce Motion.
@@ -211,9 +209,9 @@ class _ResultScreenState extends State<ResultScreen>
         final t = window.transform(_entrance.value);
         final double scale = t < settlePoint
             ? _badgeScaleFrom +
-                (overshoot - _badgeScaleFrom) * (t / settlePoint)
+                  (overshoot - _badgeScaleFrom) * (t / settlePoint)
             : overshoot +
-                (1.0 - overshoot) * ((t - settlePoint) / (1 - settlePoint));
+                  (1.0 - overshoot) * ((t - settlePoint) / (1 - settlePoint));
         return Transform.scale(scale: scale, child: ch);
       },
     );
@@ -249,8 +247,7 @@ class _ResultScreenState extends State<ResultScreen>
                       child: Text(
                         widget._title,
                         textAlign: TextAlign.center,
-                        style:
-                            const TextStyle().setMainTextColor.s20.bold,
+                        style: const TextStyle().setMainTextColor.s20.bold,
                       ),
                     ),
                     8.szH,
@@ -260,10 +257,7 @@ class _ResultScreenState extends State<ResultScreen>
                       child: Text(
                         widget._sub,
                         textAlign: TextAlign.center,
-                        style: const TextStyle()
-                            .setSecondaryColor
-                            .s14
-                            .regular
+                        style: const TextStyle().setSecondaryColor.s14.regular
                             .withHeight(1.5),
                       ),
                     ),
@@ -277,13 +271,17 @@ class _ResultScreenState extends State<ResultScreen>
                         orderNum: widget.orderNum,
                         customer: widget.customer,
                         codAmount:
-                            widget.codAmount ?? LocaleKeys.resultDefaultCod.tr(),
+                            widget.codAmount ??
+                            LocaleKeys.resultDefaultCod.tr(),
                         showWalletChange: widget.showWalletChange,
-                        walletChange: widget.walletChange ??
+                        walletChange:
+                            widget.walletChange ??
                             LocaleKeys.resultDefaultWallet.tr(),
-                        reasonLabel: widget.reasonLabel ??
+                        reasonLabel:
+                            widget.reasonLabel ??
                             LocaleKeys.resultDefaultReason.tr(),
-                        postponeDisplay: widget.postponeDisplay ??
+                        postponeDisplay:
+                            widget.postponeDisplay ??
                             LocaleKeys.resultDefaultPostpone.tr(),
                       ),
                     ),

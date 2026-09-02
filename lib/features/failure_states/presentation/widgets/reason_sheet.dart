@@ -4,9 +4,9 @@ part of '../imports/failure_states_imports.dart';
 class ReasonStepResult {
   const ReasonStepResult.next(this.reason, {this.note}) : postpone = false;
   const ReasonStepResult.postpone()
-      : reason = null,
-        note = null,
-        postpone = true;
+    : reason = null,
+      note = null,
+      postpone = true;
 
   final FailureReason? reason;
 
@@ -19,7 +19,10 @@ class ReasonStepResult {
 /// carries its outcome tag («يرجع للفرع» / «قابل للإعادة»). "التالي" advances to
 /// the reason's second step; the postpone button hands off to the postpone flow.
 class _ReasonSheet extends StatefulWidget {
-  const _ReasonSheet({required this.ctx, this.initial = FailureReason.notPresent});
+  const _ReasonSheet({
+    required this.ctx,
+    this.initial = FailureReason.notPresent,
+  });
   final FailureContext ctx;
   final FailureReason initial;
 
@@ -28,8 +31,9 @@ class _ReasonSheet extends StatefulWidget {
 }
 
 class _ReasonSheetState extends State<_ReasonSheet> {
-  late final ReasonStepController _c =
-      ReasonStepController(initial: widget.initial);
+  late final ReasonStepController _c = ReasonStepController(
+    initial: widget.initial,
+  );
 
   /// Optional free-text, revealed only when «سبب آخر» is selected.
   final _otherNote = TextEditingController();
@@ -77,7 +81,8 @@ class _ReasonSheetState extends State<_ReasonSheet> {
                 onTap: () => Navigator.of(context).pop(
                   ReasonStepResult.next(
                     selected,
-                    note: selected == FailureReason.other &&
+                    note:
+                        selected == FailureReason.other &&
                             _otherNote.text.trim().isNotEmpty
                         ? _otherNote.text.trim()
                         : null,
@@ -91,8 +96,9 @@ class _ReasonSheetState extends State<_ReasonSheet> {
                 leadingIconColor: AppColors.postponedText,
                 borderColor: AppColors.borderDefault,
                 borderWidth: 1.5,
-                onTap: () => Navigator.of(context)
-                    .pop(const ReasonStepResult.postpone()),
+                onTap: () => Navigator.of(
+                  context,
+                ).pop(const ReasonStepResult.postpone()),
               ),
             ],
           );

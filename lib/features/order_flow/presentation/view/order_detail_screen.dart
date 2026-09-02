@@ -95,49 +95,51 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               Expanded(
                 child: SingleChildScrollView(
                   controller: _scroll,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _CustomerSection(name: o.name),
-                      16.szH,
-                      const _HDivider(),
-                      16.szH,
-                      _AddressSection(address: o.address),
-                      16.szH,
-                      const _HDivider(),
-                      16.szH,
-                      _ItemsSection(items: o.items),
-                      16.szH,
-                      if (o.note != null) ...[
-                        _NotesCard(note: o.note!),
-                        16.szH,
-                      ],
-                      if (isCod) ...[
-                        _PaymentCard(amount: o.amount ?? ''),
-                        16.szH,
-                      ],
-                      if (isOpen) ...[
-                        _FailButton(
-                            onTap: () => controller.fail(context, order: o)),
-                        16.szH,
-                      ],
-                      _Timeline(pickedTime: o.pickedTime, assignedTime: o.assignedTime),
-                    ],
-                  ).paddingOnly(
-                    left: AppPadding.pW20,
-                    right: AppPadding.pW20,
-                    top: AppPadding.pH16,
-                    bottom: AppPadding.pH20,
-                  ),
+                  child:
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _CustomerSection(name: o.name),
+                          16.szH,
+                          const _HDivider(),
+                          16.szH,
+                          _AddressSection(address: o.address),
+                          16.szH,
+                          const _HDivider(),
+                          16.szH,
+                          _ItemsSection(items: o.items),
+                          16.szH,
+                          if (o.note != null) ...[
+                            _NotesCard(note: o.note!),
+                            16.szH,
+                          ],
+                          if (isCod) ...[
+                            _PaymentCard(amount: o.amount ?? ''),
+                            16.szH,
+                          ],
+                          if (isOpen) ...[
+                            _FailButton(
+                              onTap: () => controller.fail(context, order: o),
+                            ),
+                            16.szH,
+                          ],
+                          _Timeline(
+                            pickedTime: o.pickedTime,
+                            assignedTime: o.assignedTime,
+                          ),
+                        ],
+                      ).paddingOnly(
+                        left: AppPadding.pW20,
+                        right: AppPadding.pW20,
+                        top: AppPadding.pH16,
+                        bottom: AppPadding.pH20,
+                      ),
                 ),
               ),
               if (isOpen)
                 _DeliverBar(
-                  onDeliver: () => controller.deliver(
-                    context,
-                    cod: isCod,
-                    due: o.codDue,
-                  ),
+                  onDeliver: () =>
+                      controller.deliver(context, cod: isCod, due: o.codDue),
                 ),
               BottomNav(
                 active: NavTab.orders,

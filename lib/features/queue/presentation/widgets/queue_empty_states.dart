@@ -10,34 +10,43 @@ class _QueueClearState extends StatelessWidget {
   Widget build(BuildContext context) {
     final postponed = vc.postponed;
     return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(
-            child: _EmptyBadge(
-              bg: AppColors.deliveredBg,
-              icon: AppAssets.svg.check,
-              iconColor: AppColors.deliveredText,
-            ),
+      child:
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: _EmptyBadge(
+                  bg: AppColors.deliveredBg,
+                  icon: AppAssets.svg.check,
+                  iconColor: AppColors.deliveredText,
+                ),
+              ),
+              24.szH,
+              Text(
+                LocaleKeys.queueClearTitle.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle().setMainTextColor.s20.bold,
+              ),
+              8.szH,
+              Text(
+                LocaleKeys.queueClearDesc.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle().setSecondaryColor.s14.regular
+                    .withHeight(1.5),
+              ),
+              24.szH,
+              if (postponed.isNotEmpty)
+                _PostponedHandoffCard(
+                  postponed: postponed,
+                  onView: vc.openPostponed,
+                ),
+            ],
+          ).paddingOnlyDirectional(
+            start: AppPadding.pW24,
+            end: AppPadding.pW24,
+            top: AppPadding.pH56,
+            bottom: AppPadding.pH24,
           ),
-          24.szH,
-          Text(LocaleKeys.queueClearTitle.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle().setMainTextColor.s20.bold),
-          8.szH,
-          Text(LocaleKeys.queueClearDesc.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle().setSecondaryColor.s14.regular.withHeight(1.5)),
-          24.szH,
-          if (postponed.isNotEmpty)
-            _PostponedHandoffCard(postponed: postponed, onView: vc.openPostponed),
-        ],
-      ).paddingOnlyDirectional(
-        start: AppPadding.pW24,
-        end: AppPadding.pW24,
-        top: AppPadding.pH56,
-        bottom: AppPadding.pH24,
-      ),
     );
   }
 }
@@ -73,28 +82,37 @@ class _PostponedHandoffCard extends StatelessWidget {
                   ),
                   8.szW,
                   Text(
-                    LocaleKeys.postponedWithYou
-                        .tr(namedArgs: {'count': arabicDigits(postponed.length)}),
-                    style: const TextStyle().setColor(AppColors.postponedText).s14.semiBold,
+                    LocaleKeys.postponedWithYou.tr(
+                      namedArgs: {'count': arabicDigits(postponed.length)},
+                    ),
+                    style: const TextStyle()
+                        .setColor(AppColors.postponedText)
+                        .s14
+                        .semiBold,
                   ),
                 ],
               ),
               if (postponed.first.returns != null)
                 Text(
-                  LocaleKeys.nearestReturns
-                      .tr(namedArgs: {'time': postponed.first.returns!}),
-                  style:
-                      const TextStyle().setColor(AppColors.postponedTextStrong).s12.semiBold,
+                  LocaleKeys.nearestReturns.tr(
+                    namedArgs: {'time': postponed.first.returns!},
+                  ),
+                  style: const TextStyle()
+                      .setColor(AppColors.postponedTextStrong)
+                      .s12
+                      .semiBold,
                 ),
             ],
           ),
           12.szH,
-          Text(LocaleKeys.postponedNote.tr(),
-              style: const TextStyle()
-                  .setColor(AppColors.postponedTextStrong)
-                  .s12
-                  .regular
-                  .withHeight(1.5)),
+          Text(
+            LocaleKeys.postponedNote.tr(),
+            style: const TextStyle()
+                .setColor(AppColors.postponedTextStrong)
+                .s12
+                .regular
+                .withHeight(1.5),
+          ),
           12.szH,
           _OutlinedPillButton(
             labelKey: LocaleKeys.viewPostponed,
@@ -117,29 +135,32 @@ class _QueueSearchPrompt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(
-            child: _EmptyBadge(
-              bg: AppColors.surfaceSubtle,
-              icon: AppAssets.svg.search,
-              iconColor: AppColors.chipCountMuted,
-            ),
+      child:
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: _EmptyBadge(
+                  bg: AppColors.surfaceSubtle,
+                  icon: AppAssets.svg.search,
+                  iconColor: AppColors.chipCountMuted,
+                ),
+              ),
+              24.szH,
+              Text(
+                LocaleKeys.searchPrompt.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle().setMainTextColor.s20.bold,
+              ),
+              24.szH,
+              _ScopeCard(),
+            ],
+          ).paddingOnlyDirectional(
+            start: AppPadding.pW32,
+            end: AppPadding.pW32,
+            top: AppPadding.pH64,
+            bottom: AppPadding.pH24,
           ),
-          24.szH,
-          Text(LocaleKeys.searchPrompt.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle().setMainTextColor.s20.bold),
-          24.szH,
-          _ScopeCard(),
-        ],
-      ).paddingOnlyDirectional(
-        start: AppPadding.pW32,
-        end: AppPadding.pW32,
-        top: AppPadding.pH64,
-        bottom: AppPadding.pH24,
-      ),
     );
   }
 }
@@ -154,37 +175,43 @@ class _QueueNoResults extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(
-            child: _EmptyBadge(
-              bg: AppColors.surfaceSubtle,
-              icon: AppAssets.svg.search,
-              iconColor: AppColors.chipCountMuted,
-            ),
+      child:
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: _EmptyBadge(
+                  bg: AppColors.surfaceSubtle,
+                  icon: AppAssets.svg.search,
+                  iconColor: AppColors.chipCountMuted,
+                ),
+              ),
+              24.szH,
+              Text(
+                LocaleKeys.noResultsTitle.tr(
+                  namedArgs: {'query': query.trim()},
+                ),
+                textAlign: TextAlign.center,
+                style: const TextStyle().setMainTextColor.s20.bold,
+              ),
+              8.szH,
+              Text(
+                LocaleKeys.noResultsDesc.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle().setSecondaryColor.s14.regular
+                    .withHeight(1.5),
+              ),
+              24.szH,
+              Center(child: _ClearSearchButton(onTap: vc.clearSearch)),
+              24.szH,
+              _ScopeCard(),
+            ],
+          ).paddingOnlyDirectional(
+            start: AppPadding.pW32,
+            end: AppPadding.pW32,
+            top: AppPadding.pH64,
+            bottom: AppPadding.pH24,
           ),
-          24.szH,
-          Text(LocaleKeys.noResultsTitle.tr(namedArgs: {'query': query.trim()}),
-              textAlign: TextAlign.center,
-              style: const TextStyle().setMainTextColor.s20.bold),
-          8.szH,
-          Text(LocaleKeys.noResultsDesc.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle().setSecondaryColor.s14.regular.withHeight(1.5)),
-          24.szH,
-          Center(
-            child: _ClearSearchButton(onTap: vc.clearSearch),
-          ),
-          24.szH,
-          _ScopeCard(),
-        ],
-      ).paddingOnlyDirectional(
-        start: AppPadding.pW32,
-        end: AppPadding.pW32,
-        top: AppPadding.pH64,
-        bottom: AppPadding.pH24,
-      ),
     );
   }
 }
@@ -212,8 +239,10 @@ class _ClearSearchButton extends StatelessWidget {
             width: AppSize.sW18,
           ),
           8.szW,
-          Text(LocaleKeys.clearSearch.tr(),
-              style: const TextStyle().setWhite.s14.semiBold),
+          Text(
+            LocaleKeys.clearSearch.tr(),
+            style: const TextStyle().setWhite.s14.semiBold,
+          ),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW20),
     ).onClick(onTap: onTap);
@@ -235,11 +264,17 @@ class _ScopeCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(LocaleKeys.searchScopeTitle.tr(),
-              style: const TextStyle().setMainTextColor.s12.semiBold),
+          Text(
+            LocaleKeys.searchScopeTitle.tr(),
+            style: const TextStyle().setMainTextColor.s12.semiBold,
+          ),
           8.szH,
-          Text(LocaleKeys.searchScopeDesc.tr(),
-              style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.5)),
+          Text(
+            LocaleKeys.searchScopeDesc.tr(),
+            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(
+              1.5,
+            ),
+          ),
         ],
       ).paddingAll(AppPadding.pH16),
     );
@@ -248,7 +283,11 @@ class _ScopeCard extends StatelessWidget {
 
 /// 72×72 rounded badge behind an empty-state icon.
 class _EmptyBadge extends StatelessWidget {
-  const _EmptyBadge({required this.bg, required this.icon, required this.iconColor});
+  const _EmptyBadge({
+    required this.bg,
+    required this.icon,
+    required this.iconColor,
+  });
   final Color bg;
   final String icon;
   final Color iconColor;

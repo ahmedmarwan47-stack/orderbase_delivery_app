@@ -91,6 +91,28 @@ class Order {
     return double.tryParse(match?.group(0) ?? '');
   }
 
+  /// The same order as it leaves the branch: in transit, with no outcome yet.
+  /// The sample day ships some orders already delivered / failed / postponed
+  /// so the app opens mid-shift; a *fresh* day has to start them all at zero
+  /// or "start a new day" would hand the courier a batch already half closed.
+  Order asFresh() => Order(
+    num: num,
+    name: name,
+    addr: addr,
+    area: area,
+    status: OrderStatus.transit,
+    due: due,
+    cod: cod,
+    prepaid: prepaid,
+    dist: dist,
+    items: items,
+    note: note,
+    phone: phone,
+    place: place,
+    addrDetail: addrDetail,
+    // reason / returns / postponedAt / collected are outcomes — dropped.
+  );
+
   Order copyWith({OrderStatus? status, String? reason, int? collected}) {
     return Order(
       num: num,
@@ -444,6 +466,18 @@ final List<Order> sampleBatchThree = [
   ),
 ];
 
+/// The three batches a simulated day dispatches, in order. The branch sends
+/// them one at a time — the next only after the courier has carried the last
+/// out of the door — so this is a plan, not a schedule.
+List<OrderBatch> get demoDayBatches => [
+  OrderBatch(
+    id: sampleBatchOneId,
+    orders: [for (final o in sampleOrders.take(5)) o.asFresh()],
+  ),
+  OrderBatch(id: sampleBatchTwoId, orders: sampleBatchTwo),
+  OrderBatch(id: sampleBatchThreeId, orders: sampleBatchThree),
+];
+
 /// Builds the rich per-order [FlowOrder] the order-flow screens expect straight
 /// from a queue [Order]. Items, note, COD/prepaid and piece count all carry
 /// across, so a tapped card and its detail always agree. Shared by the queue
@@ -501,11 +535,27 @@ String formatClockArabic(DateTime t) {
 String formatKmArabic(double km) => '${arabicDigits(km.round())} كم';
 
 const List<String> _arabicMonths = [
-  'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-  'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+  'يناير',
+  'فبراير',
+  'مارس',
+  'أبريل',
+  'مايو',
+  'يونيو',
+  'يوليو',
+  'أغسطس',
+  'سبتمبر',
+  'أكتوبر',
+  'نوفمبر',
+  'ديسمبر',
 ];
 const List<String> _arabicWeekdays = [
-  'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد',
+  'الاثنين',
+  'الثلاثاء',
+  'الأربعاء',
+  'الخميس',
+  'الجمعة',
+  'السبت',
+  'الأحد',
 ];
 
 /// "١٣ سبتمبر" — day and month, Eastern digits.

@@ -105,10 +105,7 @@ Future<bool?> showCarryBatchSheet(
   BuildContext context, {
   required OrderBatch batch,
 }) {
-  return showAppSheet<bool>(
-    context,
-    child: _PickupCarrySheet(batch: batch),
-  );
+  return showAppSheet<bool>(context, child: _PickupCarrySheet(batch: batch));
 }
 
 class _PickupCarrySheet extends StatelessWidget {

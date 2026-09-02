@@ -104,13 +104,18 @@ class _FilterChip extends StatelessWidget {
       height: AppSize.sH28,
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(100), // full pill (radii 4px-exempt)
+        borderRadius: BorderRadius.circular(
+          100,
+        ), // full pill (radii 4px-exempt)
         border: border,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(labelKey.tr(), style: const TextStyle().setColor(fg).s12.semiBold),
+          Text(
+            labelKey.tr(),
+            style: const TextStyle().setColor(fg).s12.semiBold,
+          ),
           8.szW,
           _CountBadge(
             count: count,

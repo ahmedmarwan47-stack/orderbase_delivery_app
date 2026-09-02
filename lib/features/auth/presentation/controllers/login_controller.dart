@@ -5,8 +5,9 @@ part of '../imports/auth_imports.dart';
 /// toggle lives locally in the field; the button listens to [formListenable].
 class LoginController {
   final TextEditingController merchant = TextEditingController(text: '10248');
-  final TextEditingController username =
-      TextEditingController(text: 'mahmoud.ezzat');
+  final TextEditingController username = TextEditingController(
+    text: 'mahmoud.ezzat',
+  );
   final TextEditingController password = TextEditingController();
 
   /// Rebuilds the submit button whenever any field changes.

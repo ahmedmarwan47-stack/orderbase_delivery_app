@@ -5,8 +5,8 @@ part of '../imports/cod_imports.dart';
 /// the amount field's raw text (digits + grouping commas) and the order [due].
 class CodAmount {
   CodAmount({required String raw, required this.due})
-      : amount = int.tryParse(raw.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
-        isEmpty = raw.replaceAll(RegExp(r'[^0-9]'), '').isEmpty;
+    : amount = int.tryParse(raw.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0,
+      isEmpty = raw.replaceAll(RegExp(r'[^0-9]'), '').isEmpty;
 
   final int due;
   final int amount;

@@ -33,7 +33,9 @@ class _ReturnToBranchSheetState extends State<_ReturnToBranchSheet> {
         children: [
           Text(
             LocaleKeys.failureReturnToBranchIntro.tr(),
-            style: const TextStyle().setSecondaryColor.s14.regular.withHeight(1.5),
+            style: const TextStyle().setSecondaryColor.s14.regular.withHeight(
+              1.5,
+            ),
           ),
           16.szH,
           _summaryCard(ctx),
@@ -132,7 +134,9 @@ class _SummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var style = const TextStyle().setColor(valueColor ?? AppColors.textPrimary).s14;
+    var style = const TextStyle()
+        .setColor(valueColor ?? AppColors.textPrimary)
+        .s14;
     style = emphasize ? style.bold : style.semiBold;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -196,7 +200,8 @@ class _ConfirmCustodyRow extends StatelessWidget {
             Expanded(
               child: Text(
                 LocaleKeys.failureCustodyConfirm.tr(),
-                style: const TextStyle().setMainTextColor.s14.semiBold.withHeight(1.5),
+                style: const TextStyle().setMainTextColor.s14.semiBold
+                    .withHeight(1.5),
               ),
             ),
           ],

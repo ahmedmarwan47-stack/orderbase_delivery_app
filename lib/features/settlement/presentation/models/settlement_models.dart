@@ -49,6 +49,7 @@ class SettlementBatch {
   const SettlementBatch({
     required this.id,
     required this.orderCount,
+    this.deliveredCount = 0,
     this.lines = const [],
     this.returns = const [],
     this.pending = false,
@@ -56,6 +57,10 @@ class SettlementBatch {
 
   final String id;
   final int orderCount;
+
+  /// Orders handed over — including prepaid ones, which produce no cash line
+  /// and so cannot be counted from [lines].
+  final int deliveredCount;
   final List<SettlementLine> lines;
   final List<SettlementReturn> returns;
 
@@ -108,9 +113,7 @@ class SettlementData {
   /// Every cash line across the day's batches.
   List<SettlementLine> get lines => [for (final b in batches) ...b.lines];
 
-  List<SettlementReturn> get returns => [
-    for (final b in batches) ...b.returns,
-  ];
+  List<SettlementReturn> get returns => [for (final b in batches) ...b.returns];
 
   /// Total cash in hand = Σ paid (what the cashier receives).
   int get cashTotal => lines.fold(0, (sum, l) => sum + l.paid);
@@ -123,6 +126,12 @@ class SettlementData {
 
   /// Number of cash orders in the settlement.
   int get rowCount => lines.length;
+
+  /// The day in orders: everything dispatched, how much of it was delivered,
+  /// and how much came back. The money is the card above these; this is what
+  /// produced it.
+  int get deliveredCount => batches.fold(0, (sum, b) => sum + b.deliveredCount);
+  int get returnCount => returns.length;
 
   /// Batches that actually reached the courier's hands.
   int get carriedBatchCount => batches.where((b) => !b.pending).length;
@@ -155,17 +164,29 @@ SettlementData get sampleSettlement => SettlementData(
     SettlementBatch(
       id: sampleBatchOneId,
       orderCount: 6,
+      deliveredCount: 5,
       lines: [
-        SettlementLine(num: '#89289', name: 'محمد حمدي', order: 1200, paid: 1250),
+        SettlementLine(
+          num: '#89289',
+          name: 'محمد حمدي',
+          order: 1200,
+          paid: 1250,
+        ),
         SettlementLine(num: '#89285', name: 'منى خالد', order: 800, paid: 800),
       ],
     ),
     SettlementBatch(
       id: sampleBatchTwoId,
       orderCount: 4,
+      deliveredCount: 4,
       lines: [
         SettlementLine(num: '#89291', name: 'أحمد فؤاد', order: 450, paid: 500),
-        SettlementLine(num: '#89272', name: 'ياسمين عادل', order: 620, paid: 620),
+        SettlementLine(
+          num: '#89272',
+          name: 'ياسمين عادل',
+          order: 620,
+          paid: 620,
+        ),
       ],
     ),
   ],
@@ -183,6 +204,10 @@ SettlementData get shiftSettlement {
       SettlementBatch(
         id: b.id,
         orderCount: b.count,
+        deliveredCount: shift
+            .ordersOfBatch(b.id)
+            .where((o) => o.status == OrderStatus.delivered)
+            .length,
         lines: [
           for (final o in shift.ordersOfBatch(b.id))
             if (o.status == OrderStatus.delivered &&
@@ -249,72 +274,169 @@ List<SettlementData> get sampleSettlementHistory {
   }
 
   return [
-    day(1, const [
-      SettlementBatch(
-        id: 'B #7871',
-        orderCount: 6,
-        lines: [
-          SettlementLine(num: '#89201', name: 'منى خالد', order: 800, paid: 800),
-          SettlementLine(num: '#89207', name: 'كريم سعيد', order: 1150, paid: 1200),
-          SettlementLine(num: '#89214', name: 'هدى مراد', order: 420, paid: 420),
-        ],
-        returns: [
-          SettlementReturn(num: '#89209', name: 'سامي رشاد', reason: 'العميل رفض الاستلام', pieces: 1),
-        ],
-      ),
-      SettlementBatch(
-        id: 'B #7873',
-        orderCount: 3,
-        lines: [
-          SettlementLine(num: '#89228', name: 'أحمد فؤاد', order: 750, paid: 750),
-        ],
-      ),
-    ], hour: 20, minute: 45),
+    day(
+      1,
+      const [
+        SettlementBatch(
+          id: 'B #7871',
+          orderCount: 6,
+          deliveredCount: 5,
+          lines: [
+            SettlementLine(
+              num: '#89201',
+              name: 'منى خالد',
+              order: 800,
+              paid: 800,
+            ),
+            SettlementLine(
+              num: '#89207',
+              name: 'كريم سعيد',
+              order: 1150,
+              paid: 1200,
+            ),
+            SettlementLine(
+              num: '#89214',
+              name: 'هدى مراد',
+              order: 420,
+              paid: 420,
+            ),
+          ],
+          returns: [
+            SettlementReturn(
+              num: '#89209',
+              name: 'سامي رشاد',
+              reason: 'العميل رفض الاستلام',
+              pieces: 1,
+            ),
+          ],
+        ),
+        SettlementBatch(
+          id: 'B #7873',
+          orderCount: 3,
+          deliveredCount: 3,
+          lines: [
+            SettlementLine(
+              num: '#89228',
+              name: 'أحمد فؤاد',
+              order: 750,
+              paid: 750,
+            ),
+          ],
+        ),
+      ],
+      hour: 20,
+      minute: 45,
+    ),
     day(2, const [
       SettlementBatch(
         id: 'B #7864',
         orderCount: 7,
+        deliveredCount: 6,
         lines: [
-          SettlementLine(num: '#89150', name: 'ياسمين عادل', order: 620, paid: 620),
-          SettlementLine(num: '#89154', name: 'عمر الشناوي', order: 980, paid: 1000),
-          SettlementLine(num: '#89161', name: 'رنا صبري', order: 1040, paid: 1040),
+          SettlementLine(
+            num: '#89150',
+            name: 'ياسمين عادل',
+            order: 620,
+            paid: 620,
+          ),
+          SettlementLine(
+            num: '#89154',
+            name: 'عمر الشناوي',
+            order: 980,
+            paid: 1000,
+          ),
+          SettlementLine(
+            num: '#89161',
+            name: 'رنا صبري',
+            order: 1040,
+            paid: 1040,
+          ),
         ],
       ),
     ]),
-    day(3, const [
-      SettlementBatch(
-        id: 'B #7852',
-        orderCount: 5,
-        lines: [
-          SettlementLine(num: '#89088', name: 'محمود عزت', order: 1300, paid: 1300),
-          SettlementLine(num: '#89092', name: 'نهى فتحي', order: 560, paid: 600),
-        ],
-      ),
-      SettlementBatch(
-        id: 'B #7855',
-        orderCount: 4,
-        lines: [
-          SettlementLine(num: '#89104', name: 'شريف عادل', order: 890, paid: 890),
-          SettlementLine(num: '#89110', name: 'دينا سمير', order: 1270, paid: 1270),
-        ],
-        returns: [
-          SettlementReturn(num: '#89107', name: 'ليلى فتحي', reason: 'العميل غير متواجد', pieces: 2),
-        ],
-      ),
-      SettlementBatch(
-        id: 'B #7858',
-        orderCount: 2,
-        lines: [],
-      ),
-    ], hour: 21, minute: 30),
+    day(
+      3,
+      const [
+        SettlementBatch(
+          id: 'B #7852',
+          orderCount: 5,
+          deliveredCount: 4,
+          lines: [
+            SettlementLine(
+              num: '#89088',
+              name: 'محمود عزت',
+              order: 1300,
+              paid: 1300,
+            ),
+            SettlementLine(
+              num: '#89092',
+              name: 'نهى فتحي',
+              order: 560,
+              paid: 600,
+            ),
+          ],
+        ),
+        SettlementBatch(
+          id: 'B #7855',
+          orderCount: 4,
+          deliveredCount: 3,
+          lines: [
+            SettlementLine(
+              num: '#89104',
+              name: 'شريف عادل',
+              order: 890,
+              paid: 890,
+            ),
+            SettlementLine(
+              num: '#89110',
+              name: 'دينا سمير',
+              order: 1270,
+              paid: 1270,
+            ),
+          ],
+          returns: [
+            SettlementReturn(
+              num: '#89107',
+              name: 'ليلى فتحي',
+              reason: 'العميل غير متواجد',
+              pieces: 2,
+            ),
+          ],
+        ),
+        SettlementBatch(
+          id: 'B #7858',
+          orderCount: 2,
+          deliveredCount: 2,
+          lines: [],
+        ),
+      ],
+      hour: 21,
+      minute: 30,
+    ),
     day(4, const [
       SettlementBatch(
         id: 'B #7840',
         orderCount: 6,
+        deliveredCount: 5,
         lines: [
-          SettlementLine(num: '#89012', name: 'طارق الشناوي', order: 640, paid: 640),
-          SettlementLine(num: '#89019', name: 'سلمى فؤاد', order: 1120, paid: 1150),
-          SettlementLine(num: '#89023', name: 'خالد سمير', order: 480, paid: 480),
+          SettlementLine(
+            num: '#89012',
+            name: 'طارق الشناوي',
+            order: 640,
+            paid: 640,
+          ),
+          SettlementLine(
+            num: '#89019',
+            name: 'سلمى فؤاد',
+            order: 1120,
+            paid: 1150,
+          ),
+          SettlementLine(
+            num: '#89023',
+            name: 'خالد سمير',
+            order: 480,
+            paid: 480,
+          ),
         ],
       ),
     ]),
@@ -322,10 +444,26 @@ List<SettlementData> get sampleSettlementHistory {
       SettlementBatch(
         id: 'B #7831',
         orderCount: 8,
+        deliveredCount: 7,
         lines: [
-          SettlementLine(num: '#88940', name: 'نور عادل', order: 700, paid: 700),
-          SettlementLine(num: '#88946', name: 'هناء مصطفى', order: 1500, paid: 1500),
-          SettlementLine(num: '#88951', name: 'يوسف كمال', order: 920, paid: 950),
+          SettlementLine(
+            num: '#88940',
+            name: 'نور عادل',
+            order: 700,
+            paid: 700,
+          ),
+          SettlementLine(
+            num: '#88946',
+            name: 'هناء مصطفى',
+            order: 1500,
+            paid: 1500,
+          ),
+          SettlementLine(
+            num: '#88951',
+            name: 'يوسف كمال',
+            order: 920,
+            paid: 950,
+          ),
           SettlementLine(num: '#88957', name: 'مي حسن', order: 380, paid: 380),
         ],
       ),
@@ -334,9 +472,20 @@ List<SettlementData> get sampleSettlementHistory {
       SettlementBatch(
         id: 'B #7822',
         orderCount: 4,
+        deliveredCount: 4,
         lines: [
-          SettlementLine(num: '#88870', name: 'عمر شريف', order: 1050, paid: 1050),
-          SettlementLine(num: '#88874', name: 'سارة علي', order: 640, paid: 700),
+          SettlementLine(
+            num: '#88870',
+            name: 'عمر شريف',
+            order: 1050,
+            paid: 1050,
+          ),
+          SettlementLine(
+            num: '#88874',
+            name: 'سارة علي',
+            order: 640,
+            paid: 700,
+          ),
         ],
       ),
     ]),
@@ -344,10 +493,26 @@ List<SettlementData> get sampleSettlementHistory {
       SettlementBatch(
         id: 'B #7810',
         orderCount: 5,
+        deliveredCount: 5,
         lines: [
-          SettlementLine(num: '#88801', name: 'كريم عادل', order: 450, paid: 450),
-          SettlementLine(num: '#88805', name: 'منى سعيد', order: 1330, paid: 1350),
-          SettlementLine(num: '#88811', name: 'أحمد فؤاد', order: 860, paid: 860),
+          SettlementLine(
+            num: '#88801',
+            name: 'كريم عادل',
+            order: 450,
+            paid: 450,
+          ),
+          SettlementLine(
+            num: '#88805',
+            name: 'منى سعيد',
+            order: 1330,
+            paid: 1350,
+          ),
+          SettlementLine(
+            num: '#88811',
+            name: 'أحمد فؤاد',
+            order: 860,
+            paid: 860,
+          ),
         ],
       ),
     ]),

@@ -12,23 +12,24 @@ class _QueueSearchHeader extends StatelessWidget {
         color: AppColors.surface,
         border: Border(bottom: BorderSide(color: AppColors.borderHeader)),
       ),
-      child: Row(
-        children: [
-          _SquareIconButton(
-            icon: AppAssets.svg.chevronRight,
-            onTap: () => _onBack(context),
-            size: AppSize.sH40,
-            label: LocaleKeys.a11yBack.tr(),
+      child:
+          Row(
+            children: [
+              _SquareIconButton(
+                icon: AppAssets.svg.chevronRight,
+                onTap: () => _onBack(context),
+                size: AppSize.sH40,
+                label: LocaleKeys.a11yBack.tr(),
+              ),
+              12.szW,
+              Expanded(child: _SearchField(vc: vc)),
+            ],
+          ).paddingOnlyDirectional(
+            start: AppPadding.pW20,
+            end: AppPadding.pW20,
+            top: AppPadding.pH12,
+            bottom: AppPadding.pH16,
           ),
-          12.szW,
-          Expanded(child: _SearchField(vc: vc)),
-        ],
-      ).paddingOnlyDirectional(
-        start: AppPadding.pW20,
-        end: AppPadding.pW20,
-        top: AppPadding.pH12,
-        bottom: AppPadding.pH16,
-      ),
     );
   }
 
@@ -82,8 +83,10 @@ class _SearchField extends StatelessWidget {
                 isCollapsed: true,
                 border: InputBorder.none,
                 hintText: LocaleKeys.searchHint.tr(),
-                hintStyle:
-                    const TextStyle().setColor(AppColors.chipCountMuted).s16.semiBold,
+                hintStyle: const TextStyle()
+                    .setColor(AppColors.chipCountMuted)
+                    .s16
+                    .semiBold,
               ),
             ),
           ),
@@ -91,7 +94,9 @@ class _SearchField extends StatelessWidget {
             valueListenable: vc.searchController,
             builder: (_, value, _) => value.text.isEmpty
                 ? const SizedBox.shrink()
-                : _ClearChip(onTap: vc.clearSearch).paddingStart(AppPadding.pW8),
+                : _ClearChip(
+                    onTap: vc.clearSearch,
+                  ).paddingStart(AppPadding.pW8),
           ),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW12),

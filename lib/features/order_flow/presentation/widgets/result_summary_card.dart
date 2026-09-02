@@ -121,7 +121,9 @@ class _ResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var valueStyle = const TextStyle().setColor(valueColor).copyWith(
+    var valueStyle = const TextStyle()
+        .setColor(valueColor)
+        .copyWith(
           fontSize: valueBig ? FontSizeManager.s16 : FontSizeManager.s14,
           fontWeight: valueWeight,
         );

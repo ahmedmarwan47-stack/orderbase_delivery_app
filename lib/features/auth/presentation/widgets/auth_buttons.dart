@@ -77,7 +77,10 @@ class _AuthOutlinedButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppCircular.r16),
           border: Border.all(color: AppColors.borderDefault),
         ),
-        child: Text(label, style: const TextStyle().setMainTextColor.s14.semiBold),
+        child: Text(
+          label,
+          style: const TextStyle().setMainTextColor.s14.semiBold,
+        ),
       ).onClick(onTap: onTap),
     );
   }

@@ -74,10 +74,7 @@ class _NotificationTile extends StatelessWidget {
                 6.szH,
                 Text(
                   n.body,
-                  style: const TextStyle()
-                      .setSecondaryColor
-                      .s12
-                      .regular
+                  style: const TextStyle().setSecondaryColor.s12.regular
                       .withHeight(1.5),
                 ),
               ],

@@ -29,7 +29,10 @@ class _Timeline extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.brand,
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.timelineRing, width: 3),
+                      border: Border.all(
+                        color: AppColors.timelineRing,
+                        width: 3,
+                      ),
                     ),
                   ),
                   Expanded(
@@ -169,12 +172,18 @@ class _TimelineText extends StatelessWidget {
       children: [
         Text(
           titleKey.tr(),
-          style: const TextStyle().setColor(titleColor).s14.semiBold.withHeight(20 / 14),
+          style: const TextStyle()
+              .setColor(titleColor)
+              .s14
+              .semiBold
+              .withHeight(20 / 14),
         ),
         Text(
           time,
           textDirection: TextDirection.ltr,
-          style: const TextStyle().setSecondaryColor.s12.regular.withHeight(16 / 12),
+          style: const TextStyle().setSecondaryColor.s12.regular.withHeight(
+            16 / 12,
+          ),
         ),
       ],
     );
