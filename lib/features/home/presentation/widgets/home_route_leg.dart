@@ -11,20 +11,13 @@ part of '../imports/home_imports.dart';
 /// the destination is the customer's own address kind (apartment block or
 /// villa), so the two ends genuinely differ from leg to leg.
 class _HomeRouteLeg extends StatefulWidget {
-  const _HomeRouteLeg({
-    required this.origin,
-    required this.destination,
-    this.etaMinutes,
-  });
+  const _HomeRouteLeg({required this.origin, required this.destination});
 
   /// Where this leg starts — the branch, or the last door the courier closed.
   final PlaceKind origin;
 
   /// Where it ends — the current order's address kind.
   final PlaceKind destination;
-
-  /// Estimated ride time in minutes; null hides the timer.
-  final int? etaMinutes;
 
   @override
   State<_HomeRouteLeg> createState() => _HomeRouteLegState();
@@ -59,12 +52,10 @@ class _HomeRouteLegState extends State<_HomeRouteLeg>
   @override
   Widget build(BuildContext context) {
     final reduced = AppMotion.reduced(context);
-    final mins = widget.etaMinutes;
     return Semantics(
       container: true,
       label:
-          '${_placeLabel(widget.origin)} ← ${_placeLabel(widget.destination)}'
-          '${mins == null ? '' : ' · ${LocaleKeys.homeLegEta.tr(namedArgs: {'mins': arabicDigits(mins)})}'}',
+          '${_placeLabel(widget.origin)} ← ${_placeLabel(widget.destination)}',
       excludeSemantics: true,
       child:
           Row(
@@ -86,23 +77,6 @@ class _HomeRouteLegState extends State<_HomeRouteLeg>
               ),
               8.szW,
               _LegEnd(place: widget.destination, isDestination: true),
-              if (mins != null) ...[
-                8.szW,
-                IconWidget(
-                  icon: AppAssets.svg.clock,
-                  color: AppColors.textTertiary,
-                  height: AppSize.sH14,
-                  width: AppSize.sW14,
-                ),
-                4.szW,
-                Text(
-                  LocaleKeys.homeLegEta.tr(
-                    namedArgs: {'mins': arabicDigits(mins)},
-                  ),
-                  style:
-                      const TextStyle().setTertiaryColor.s12.semiBold.tabular,
-                ),
-              ],
             ],
           ).paddingOnlyDirectional(
             start: AppPadding.pW20,
@@ -200,18 +174,3 @@ String _placeLabel(PlaceKind place) => switch (place) {
   PlaceKind.building => LocaleKeys.homeLegBuilding.tr(),
   PlaceKind.villa => LocaleKeys.homeLegVilla.tr(),
 };
-
-/// Ride time for a leg, estimated from the order's distance label ("4.2 كم")
-/// at an average city speed. There is no routing service behind the app yet and
-/// [Order.due] is a formatted string rather than a timestamp, so this is an
-/// honest estimate rather than a live countdown — swap it for a real ETA the
-/// moment the backend can give one.
-int? _legEtaMinutes(Order order) {
-  final dist = order.dist;
-  if (dist == null) return null;
-  final match = RegExp(r'[\d.]+').firstMatch(dist);
-  final km = double.tryParse(match?.group(0) ?? '');
-  if (km == null || km <= 0) return null;
-  const cityKmPerHour = 22; // dense Cairo traffic on a bike
-  return (km / cityKmPerHour * 60).round().clamp(1, 999);
-}

@@ -11,8 +11,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/shift_controller.dart';
 import '../../../../config/res/config_imports.dart';
-import '../../../../data/order.dart'
-    show Order, OrderStatus, arabicDigits, formatThousands;
+import '../../../../data/order.dart';
 import '../../../failure_states/presentation/imports/failure_states_imports.dart';
 import '../../../../theme/shadows.dart';
 import '../../../../widgets/app_header.dart';
@@ -36,3 +35,4 @@ part '../widgets/settlement_collections_section.dart';
 part '../widgets/settlement_returns_section.dart';
 part '../widgets/settlement_locked_note.dart';
 part '../widgets/settlement_settled_view.dart';
+part '../widgets/settlement_history_section.dart';

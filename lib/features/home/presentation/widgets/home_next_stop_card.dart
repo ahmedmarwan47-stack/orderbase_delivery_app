@@ -1,21 +1,29 @@
 part of '../imports/home_imports.dart';
 
-/// Shows the old one-segment-per-order progress bar instead of the single
-/// origin → destination leg. **Off**: the segment bar was replaced, not
-/// deleted — [_HomeStopProgress] and its per-segment tooltip are kept intact
-/// so flipping this back to `true` restores them exactly as they were.
+/// Shows the old one-segment-per-order progress bar. **Off**: replaced, not
+/// deleted — [_HomeStopProgress] and its tooltip are intact behind this flag.
 const bool kShowStopSegments = false;
 
-/// The next-stop hero card — the current leg, a map strip, the *current*
-/// order's details, and the primary "handed over" + call/chat actions.
-/// Everything is driven by [ShiftController.nextStop]; when the route is
-/// finished it collapses to a "route complete" state.
+/// Shows the origin → destination leg bar under the batch line. **Off**: it
+/// carried the per-stop ETA, which the courier asked to lose, and repeated
+/// what the map strip shows. [_HomeRouteLeg] is kept intact behind this flag.
+const bool kShowRouteLeg = false;
+
+/// The next-order hero card, in the order a courier reads it at a glance:
 ///
-/// The card **is** the link to the order: tapping anywhere on it opens the
-/// order detail, which frees the black button to carry the one action the
-/// courier actually takes at the door — handing the order over.
+///  1. **The batch line** — which batch, where in it, and how the trip ends
+///     (return time to the branch, trip kilometres, a tooltip on what those
+///     mean).
+///  2. **The destination, bold** — area as the headline, then the street,
+///     then the door-level detail (building · floor · apartment).
+///  3. **The map strip** with the open-in-Maps badge. Per-stop distance and
+///     ETA are gone on purpose: Maps answers both better.
+///  4. **One quiet meta row** — customer, order number, cash pill — and the
+///     promised time, which is a deadline rather than an estimate.
+///  5. **Two actions** — «تم تسليم الطلب» and call. WhatsApp lives on the
+///     detail, which the whole card opens.
 class _HomeNextStopCard extends StatelessWidget {
-  const _HomeNextStopCard({this.onViewOrder, this.onDeliver});
+  const _HomeNextStopCard({this.onViewOrder, this.onDeliver, this.onCall});
 
   /// Opens the current order's detail — the whole card taps through to it.
   final VoidCallback? onViewOrder;
@@ -23,18 +31,18 @@ class _HomeNextStopCard extends StatelessWidget {
   /// Marks the order handed over (handoff sheet → COD collection → result).
   final VoidCallback? onDeliver;
 
+  /// Dials the customer.
+  final VoidCallback? onCall;
+
   @override
   Widget build(BuildContext context) {
     final shift = ShiftController.instance;
     final order = shift.nextStop;
-    if (order == null) return const _HomeRouteCompleteCard();
-
+    if (order == null) return const SizedBox.shrink();
+    final batch = shift.currentBatch;
     final isCod = order.cod != null && !order.prepaid;
 
-    // Order the progress segments the way the route reads — closed stops
-    // (delivered/failed) first, then the current stop, then the upcoming ones —
-    // so the bar shows real sequence. In RTL the Row fills from the start
-    // (right), so progress runs right → left; raw list order didn't.
+    // Only read when the legacy segment bar is on.
     final closed = shift.routeStops
         .where(
           (s) =>
@@ -58,168 +66,36 @@ class _HomeNextStopCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── header: "next stop" + station count ──
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  IconWidget(
-                    icon: AppAssets.svg.nav,
-                    color: AppColors.brand,
-                    height: AppSize.sH18,
-                    width: AppSize.sW18,
-                  ),
-                  8.szW,
-                  Text(
-                    LocaleKeys.homeNextStop.tr(),
-                    style: const TextStyle().setMainTextColor.s14.semiBold,
-                  ),
-                ],
-              ),
-              // Which batch this order came in, and where in it the courier
-              // is. Two pills for two short facts was more chrome than
-              // content — as one quiet line they take a third of the room and
-              // still read at a glance.
-              Flexible(
-                child: Text(
-                  '${LocaleKeys.homeBatchLabel.tr(namedArgs: {'n': arabicDigits(shift.currentBatchNumber)})}'
-                  ' · '
-                  '${LocaleKeys.homeStopCount.tr(namedArgs: {'current': arabicDigits(shift.currentStopNumber), 'total': arabicDigits(shift.totalStops)})}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.end,
-                  style: const TextStyle().setSecondaryColor.s12.semiBold,
-                ),
-              ),
-            ],
-          ).paddingOnly(
-            left: AppPadding.pW20,
-            top: AppPadding.pH16,
-            right: AppPadding.pW20,
-            // 8px less than before — the leg below pads itself by 8px on top,
-            // so the bar keeps its original 12px gap from the header.
-            bottom: AppPadding.pH4,
-          ),
-          // ── the current leg: where from → where to, and how long ──
-          // One bar, not one-per-order: the courier runs a single leg at a
-          // time. The old per-stop segment bar is kept behind
-          // [kShowStopSegments] in case it is wanted back.
-          if (kShowStopSegments)
-            _HomeStopProgress(stops: orderedStops, current: order)
-          else
-            _HomeRouteLeg(
-              origin: shift.legOrigin,
-              destination: order.place,
-              etaMinutes: _legEtaMinutes(order),
-            ),
-          // ── map strip ──
-          MapView(
-            height: AppSize.sH120,
-            showHairlines: true,
-            destinationLabel: order.fullAddress,
-          ),
-          // ── order info ──
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    LocaleKeys.homeOrderNo.tr(
-                      namedArgs: {'num': order.num.replaceAll('#', '')},
-                    ),
-                    style:
-                        const TextStyle().setMainTextColor.s16.semiBold.tabular,
-                  ),
-                  // The pill carries a cash figure now, so it can no longer
-                  // be assumed to fit: let it take the room that is left and
-                  // scale down rather than overflow on a long amount.
-                  Flexible(
-                    child: Align(
-                      alignment: AlignmentDirectional.centerEnd,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: AlignmentDirectional.centerEnd,
-                        child: _PayPill(
-                          isCod: isCod,
-                          amount: isCod ? order.cod : null,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              8.szH,
+              // ── 1. the batch line ──
+              if (batch != null)
+                _HomeBatchLine(
+                  batch: batch,
+                  current: shift.currentStopNumber,
+                  total: shift.totalStops,
+                  returnEta: formatClockArabic(shift.returnEtaOf(batch)),
+                  routeKm: batch.routeKm,
+                ),
+              12.szH,
+              // ── 2. the destination ──
               Text(
-                order.name,
-                style: const TextStyle().setMainTextColor.s18.semiBold,
+                order.area,
+                style: const TextStyle().setMainTextColor.s20.bold.withHeight(
+                  1.3,
+                ),
               ),
-              8.szH,
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  IconWidget(
-                    icon: AppAssets.svg.pin,
-                    color: AppColors.brand,
-                    height: AppSize.sH16,
-                    width: AppSize.sW16,
-                  ),
-                  8.szW,
-                  Expanded(
-                    child: Text(
-                      order.fullAddress,
-                      style: const TextStyle().setTertiaryColor.s14.regular
-                          .withHeight(1.5),
-                    ),
-                  ),
-                ],
+              4.szH,
+              Text(
+                order.addr,
+                style: const TextStyle().setTertiaryColor.s14.regular,
               ),
-              if (order.due != null || order.dist != null) ...[
-                8.szH,
-                Row(
-                  children: [
-                    if (order.due != null) ...[
-                      // Matched to the address row above — same 16px glyph,
-                      // same 14/regular type. Address and promised time are one
-                      // class of fact ("where and when"), so they read as one.
-                      IconWidget(
-                        icon: AppAssets.svg.clock,
-                        color: AppColors.textTertiary,
-                        height: AppSize.sH16,
-                        width: AppSize.sW16,
-                      ),
-                      8.szW,
-                      Text(
-                        LocaleKeys.promisedAt.tr(
-                          namedArgs: {'time': order.due!},
-                        ),
-                        style: const TextStyle().setTertiaryColor.s14.regular,
-                      ),
-                    ],
-                    if (order.due != null && order.dist != null) ...[
-                      12.szW,
-                      Container(
-                        width: 3.w, // 3px separator dot (off the 4px grid)
-                        height: 3.h,
-                        decoration: const BoxDecoration(
-                          color: AppColors.textSecondary,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      12.szW,
-                    ],
-                    if (order.dist != null)
-                      Text(
-                        order.dist!,
-                        style: const TextStyle()
-                            .setTertiaryColor
-                            .s14
-                            .regular
-                            .tabular,
-                      ),
-                  ],
+              if (order.addrDetail != null) ...[
+                4.szH,
+                Text(
+                  order.addrDetail!,
+                  style: const TextStyle().setSecondaryColor.s12.regular,
                 ),
               ],
             ],
@@ -227,9 +103,69 @@ class _HomeNextStopCard extends StatelessWidget {
             left: AppPadding.pW20,
             top: AppPadding.pH16,
             right: AppPadding.pW20,
+            bottom: AppPadding.pH12,
+          ),
+          if (kShowStopSegments)
+            _HomeStopProgress(stops: orderedStops, current: order)
+          else if (kShowRouteLeg)
+            _HomeRouteLeg(origin: shift.legOrigin, destination: order.place),
+          // ── 3. map strip ──
+          MapView(
+            height: AppSize.sH120,
+            showHairlines: true,
+            destinationLabel: order.fullAddress,
+          ),
+          // ── 4. meta ──
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: order.name,
+                            style: const TextStyle()
+                                .setMainTextColor
+                                .s14
+                                .semiBold,
+                          ),
+                          const TextSpan(text: '  '),
+                          TextSpan(
+                            text: order.num,
+                            style: const TextStyle()
+                                .setSecondaryColor
+                                .s12
+                                .regular
+                                .tabular,
+                          ),
+                        ],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  8.szW,
+                  _PayPill(isCod: isCod, amount: isCod ? order.cod : null),
+                ],
+              ),
+              if (order.due != null) ...[
+                4.szH,
+                Text(
+                  LocaleKeys.promisedAt.tr(namedArgs: {'time': order.due!}),
+                  style: const TextStyle().setSecondaryColor.s12.regular,
+                ),
+              ],
+            ],
+          ).paddingOnly(
+            left: AppPadding.pW20,
+            top: AppPadding.pH12,
+            right: AppPadding.pW20,
             bottom: AppPadding.pH4,
           ),
-          // ── actions ──
+          // ── 5. actions ──
           Row(
             children: [
               Expanded(
@@ -252,9 +188,6 @@ class _HomeNextStopCard extends StatelessWidget {
                           width: AppSize.sW18,
                         ),
                         8.szW,
-                        // The hero's one action is the one taken at the door.
-                        // Opening the order is the card's own tap, so the
-                        // button no longer has to spend itself on navigation.
                         Flexible(
                           child: Text(
                             LocaleKeys.homeDeliver.tr(),
@@ -269,49 +202,43 @@ class _HomeNextStopCard extends StatelessWidget {
                 ).onClick(onTap: onDeliver),
               ),
               12.szW,
-              // Neutral tiles (ink glyph, white fill, hairline) matching the
-              // header actions — kept off the status hues so call/chat never read
-              // as the failed-red / delivered-green states.
-              _HomeSquareIconButton(
-                icon: AppAssets.svg.phone,
-                iconColor: AppColors.textPrimary,
-                size: AppSize.sH52,
-                iconSize: 21.h, // mockup glyph 21px (off the 4px grid)
-                radius: AppCircular.r15,
-                background: AppColors.surface,
-                border: AppColors.iconButtonBorder,
-              ),
-              12.szW,
-              _HomeSquareIconButton(
-                icon: AppAssets.svg.chat,
-                iconColor: AppColors.textPrimary,
-                size: AppSize.sH52,
-                iconSize: 21.h,
-                radius: AppCircular.r15,
-                background: AppColors.surface,
-                border: AppColors.iconButtonBorder,
+              // Neutral tile (ink glyph, white fill, hairline) matching the
+              // header actions — kept off the status hues so call never
+              // reads as the failed-red / delivered-green states.
+              Semantics(
+                button: true,
+                label: LocaleKeys.orderDetailCall.tr(),
+                child: _HomeSquareIconButton(
+                  icon: AppAssets.svg.phone,
+                  iconColor: AppColors.textPrimary,
+                  size: AppSize.sH52,
+                  iconSize: 21.h, // mockup glyph 21px (off the 4px grid)
+                  radius: AppCircular.r15,
+                  background: AppColors.surface,
+                  border: AppColors.iconButtonBorder,
+                ).onClick(onTap: onCall),
               ),
             ],
           ).paddingOnly(
             left: AppPadding.pW20,
-            top: AppPadding.pH16,
+            top: AppPadding.pH12,
             right: AppPadding.pW20,
             bottom: AppPadding.pH16,
           ),
         ],
       ),
       // The whole card opens the order. Everything inside that handles its own
-      // tap — the deliver button, call/chat, the open-in-Maps badge — still
-      // wins the gesture arena, so only the "dead" areas fall through here.
+      // tap — the deliver button, call, the open-in-Maps badge, the tooltip —
+      // still wins the gesture arena, so only the "dead" areas fall through.
     ).onClick(onTap: onViewOrder);
   }
 }
 
-/// The COD / prepaid pill in the hero header.
+/// The COD / prepaid pill in the hero's meta row.
 ///
 /// On a cash order the pill carries the figure the courier has to collect —
-/// knowing there IS cash due is not much use without knowing how much, and the
-/// hero is the one place they look before setting off.
+/// the amount IS the payment type, so «الدفع عند الاستلام» beside it is noise.
+/// Prepaid has no figure, so there the label is the whole message.
 class _PayPill extends StatelessWidget {
   const _PayPill({required this.isCod, this.amount});
   final bool isCod;
@@ -321,9 +248,6 @@ class _PayPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The figure IS the state: a cash amount can only mean cash on delivery, so
-    // spelling that out beside it is noise. Prepaid has no figure, so there the
-    // label is the whole message.
     final text = amount != null
         ? LocaleKeys.amountEgp.tr(
             namedArgs: {'amount': formatThousands(amount!)},
@@ -339,93 +263,9 @@ class _PayPill extends StatelessWidget {
         style: const TextStyle()
             .setColor(isCod ? AppColors.postponedText : AppColors.deliveredText)
             .s12
-            .semiBold,
+            .semiBold
+            .tabular,
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
-    );
-  }
-}
-
-/// Shown in place of the hero once every stop on the route is closed.
-class _HomeRouteCompleteCard extends StatelessWidget {
-  const _HomeRouteCompleteCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final shift = ShiftController.instance;
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppCircular.r22),
-        border: Border.all(color: AppColors.borderCardFaint),
-        boxShadow: AppShadows.heroCard,
-      ),
-      padding: EdgeInsets.symmetric(
-        horizontal: AppPadding.pW20,
-        vertical: AppPadding.pH32,
-      ),
-      child: Column(
-        children: [
-          // The green check settles in once — a single scale + fade arrival.
-          // Reduce Motion starts (and stays) fully settled.
-          TweenAnimationBuilder<double>(
-            tween: Tween<double>(
-              begin: AppMotion.reduced(context) ? 1.0 : 0.0,
-              end: 1.0,
-            ),
-            duration: AppMotion.reduced(context)
-                ? Duration.zero
-                : AppMotion.settle,
-            curve: AppMotion.ease,
-            builder: (context, t, child) => Opacity(
-              opacity: t.clamp(0.0, 1.0),
-              child: Transform.scale(scale: t, child: child),
-            ),
-            child: Container(
-              width: AppSize.sW64,
-              height: AppSize.sH64,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.deliveredBg,
-              ),
-              child: Center(
-                child: IconWidget(
-                  icon: AppAssets.svg.check,
-                  color: AppColors.greenAccent,
-                  height: AppSize.sH32,
-                  width: AppSize.sH32,
-                ),
-              ),
-            ),
-          ),
-          16.szH,
-          Text(
-            LocaleKeys.homeRouteCompleteTitle.tr(),
-            textAlign: TextAlign.center,
-            style: const TextStyle().setMainTextColor.s18.bold,
-          ),
-          8.szH,
-          Text(
-            LocaleKeys.homeRouteCompleteSub.tr(),
-            textAlign: TextAlign.center,
-            style: const TextStyle().setSecondaryColor.s14.regular.withHeight(
-              1.5,
-            ),
-          ),
-          // Warm end-of-day tally — how many stops and how much cash.
-          8.szH,
-          Text(
-            LocaleKeys.homeRouteCompleteStats.tr(
-              namedArgs: {
-                'done': '${shift.deliveredCount}',
-                'total': '${shift.totalStops}',
-                'cash': formatThousands(shift.collectedEgp),
-              },
-            ),
-            textAlign: TextAlign.center,
-            style: const TextStyle().setTertiaryColor.s12.semiBold,
-          ),
-        ],
-      ),
     );
   }
 }

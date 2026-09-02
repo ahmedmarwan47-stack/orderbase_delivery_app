@@ -27,6 +27,7 @@ class Order {
     this.collected,
     this.phone,
     this.place = PlaceKind.building,
+    this.addrDetail,
   });
 
   final String num;
@@ -64,12 +65,31 @@ class Order {
   /// button and the Live Activity's "اتصال بالعميل" — null simply hides both.
   final String? phone;
 
+  /// The last-metres part of the address — building, floor and apartment (or
+  /// villa number and gate). The street gets the courier to the block; this
+  /// gets them to the door, so the hero shows it as its own line.
+  final String? addrDetail;
+
   /// Number of pieces = the sum of item quantities. Reflected on the card meta
   /// ("<area> · N قطعة") and on the detail.
   int get pieces => items.fold(0, (sum, it) => sum + it.qty);
 
-  /// Full delivery address ("street - area") for the hero + detail.
+  /// Full delivery address ("street - area") for the maps badge + search.
   String get fullAddress => '$addr - $area';
+
+  /// The address with its door-level detail, for the order detail screen:
+  /// "street، building · floor · apartment - area".
+  String get detailedAddress =>
+      addrDetail == null ? fullAddress : '$addr، $addrDetail - $area';
+
+  /// The order's leg distance as a number (from the "4.2 كم" label), or null
+  /// when there is none. Feeds the batch trip estimate.
+  double? get distanceKm {
+    final d = dist;
+    if (d == null) return null;
+    final match = RegExp(r'[\d.]+').firstMatch(d);
+    return double.tryParse(match?.group(0) ?? '');
+  }
 
   Order copyWith({OrderStatus? status, String? reason, int? collected}) {
     return Order(
@@ -90,6 +110,7 @@ class Order {
       collected: collected ?? this.collected,
       phone: phone,
       place: place,
+      addrDetail: addrDetail,
     );
   }
 }
@@ -103,11 +124,26 @@ class Order {
 class OrderBatch {
   const OrderBatch({required this.id, required this.orders});
 
-  /// Stable identity — used to carry one batch without touching the others.
+  /// The batch's identity as the branch prints it — «B #7877». Shown on the
+  /// hero, the Orders tab and the settlement, so the courier and the cashier
+  /// are always talking about the same thing.
   final String id;
   final List<Order> orders;
 
+  /// The ride from the last door back to the branch, in km. There is no
+  /// routing service yet, so one city figure stands in for it.
+  static const double returnLegKm = 6;
+
+  /// Average city speed the estimates assume (dense Cairo traffic on a bike).
+  static const double cityKmPerHour = 22;
+
   int get count => orders.length;
+
+  /// The whole trip: every leg to a stop, plus the ride back to the branch.
+  /// A sum of the orders' own leg distances — an estimate, not a route.
+  double get routeKm =>
+      orders.fold<double>(0, (sum, o) => sum + (o.distanceKm ?? 0)) +
+      returnLegKm;
 
   /// Total cash due across the batch, so the courier can size up what they are
   /// about to carry before accepting it.
@@ -119,6 +155,11 @@ class OrderBatch {
 /// still being delivered*, which is the normal case in the field: a courier can
 /// hold several batches in one day. Announced by the dispatch sheet and waits in
 /// [ShiftController.pendingPickup] until it is carried from the branch.
+/// The batch the day opens with — already in hand, partly delivered.
+const String sampleBatchOneId = 'B #7877';
+const String sampleBatchTwoId = 'B #7878';
+const String sampleBatchThreeId = 'B #7879';
+
 final List<Order> sampleBatchTwo = [
   const Order(
     num: '#89412',
@@ -126,6 +167,7 @@ final List<Order> sampleBatchTwo = [
     name: 'سلمى فؤاد',
     addr: 'شارع مصدق',
     area: 'الدقي',
+    addrDetail: 'عمارة ٧ · الدور ٣ · شقة ١٢',
     status: OrderStatus.transit,
     due: '٥:٢٠ م',
     cod: 640,
@@ -137,6 +179,7 @@ final List<Order> sampleBatchTwo = [
     name: 'طارق الشناوي',
     addr: 'شارع التسعين الشمالي',
     area: 'التجمع الخامس',
+    addrDetail: 'فيلا ١٨ · بوابة ٢',
     status: OrderStatus.transit,
     place: PlaceKind.villa,
     due: '٥:٥٠ م',
@@ -149,6 +192,7 @@ final List<Order> sampleBatchTwo = [
     name: 'دينا سمير',
     addr: 'شارع جسر السويس',
     area: 'مصر الجديدة',
+    addrDetail: 'عمارة ٢٢ · الدور ١ · شقة ٤',
     status: OrderStatus.transit,
     due: '٦:١٥ م',
     cod: 980,
@@ -163,6 +207,7 @@ final List<Order> sampleOrders = [
     name: 'محمد حمدي',
     addr: 'شارع بن عبدالعزيز',
     area: 'زهراء مدينة نصر',
+    addrDetail: 'عمارة ٤٢٩٠ · الدور ٥ · شقة ٥٢',
     status: OrderStatus.transit,
     due: '٢:٤٥ م',
     cod: 1200,
@@ -190,6 +235,8 @@ final List<Order> sampleOrders = [
     name: 'سارة علي',
     addr: 'شارع ١٠',
     area: 'زهراء مدينة نصر',
+    addrDetail: 'عمارة ١٥ · الدور ٢ · شقة ٨',
+    dist: '2.1 كم',
     status: OrderStatus.postponed,
     returns: '٤:٣٠ م',
     reason: 'العميل طلب التوصيل بعد ساعتين',
@@ -209,8 +256,11 @@ final List<Order> sampleOrders = [
     name: 'نور عادل',
     addr: 'شارع ٢٦',
     area: 'زهراء مدينة نصر',
+    addrDetail: 'عمارة ٣٣ · الدور الأرضي · شقة ١',
+    dist: '1.8 كم',
     status: OrderStatus.delivered,
-    collected: 0,
+    cod: 350,
+    collected: 350,
     items: [
       FlowOrderItem(
         name: 'مافن فانيليا',
@@ -225,6 +275,7 @@ final List<Order> sampleOrders = [
     name: 'يوسف كمال',
     addr: 'شارع النصر',
     area: 'مصر الجديدة',
+    addrDetail: 'فيلا ٤٢ · شارع فرعي ٣',
     status: OrderStatus.transit,
     place: PlaceKind.villa,
     due: '٣:١٥ م',
@@ -246,6 +297,7 @@ final List<Order> sampleOrders = [
     name: 'هناء مصطفى',
     addr: 'شارع التسعين',
     area: 'المعادي',
+    addrDetail: 'عمارة ١٤ · الدور ٢ · شقة ٧',
     status: OrderStatus.transit,
     due: '٣:٤٠ م',
     cod: 640,
@@ -269,6 +321,8 @@ final List<Order> sampleOrders = [
     name: 'عمر شريف',
     addr: 'شارع ٩',
     area: 'المقطم',
+    addrDetail: 'عمارة ٩ · الدور ٤ · شقة ١٦',
+    dist: '2.4 كم',
     status: OrderStatus.postponed,
     returns: '٦:٠٠ م',
     reason: 'العميل مش في البيت قبل ٦ م',
@@ -289,6 +343,7 @@ final List<Order> sampleOrders = [
     name: 'كريم عادل',
     addr: 'شارع الثورة',
     area: 'مدينة نصر',
+    addrDetail: 'فيلا ٦ · بوابة ١',
     status: OrderStatus.transit,
     place: PlaceKind.villa,
     due: '٤:٠٠ م',
@@ -308,6 +363,8 @@ final List<Order> sampleOrders = [
     name: 'ليلى فتحي',
     addr: 'شارع الحرية',
     area: 'مدينة نصر',
+    addrDetail: 'عمارة ٢١ · الدور ٦ · شقة ٢٤',
+    dist: '3.2 كم',
     status: OrderStatus.failed,
     reason: 'تعذّر التواصل مع العميل',
     items: [
@@ -324,6 +381,8 @@ final List<Order> sampleOrders = [
     name: 'خالد سمير',
     addr: 'شارع ٩',
     area: 'المعادي',
+    addrDetail: 'عمارة ٥ · الدور ١ · شقة ٣',
+    dist: '2.6 كم',
     status: OrderStatus.failed,
     reason: 'العميل رفض استلام الطلب',
     items: [
@@ -341,6 +400,8 @@ final List<Order> sampleOrders = [
     name: 'منى سعيد',
     addr: 'شارع الميرغني',
     area: 'مصر الجديدة',
+    addrDetail: 'عمارة ١٢ · الدور ٣ · شقة ٩',
+    dist: '1.9 كم',
     status: OrderStatus.failed,
     reason: 'عدم تطابق المنتج',
     items: [
@@ -351,6 +412,35 @@ final List<Order> sampleOrders = [
         qty: 2,
       ),
     ],
+  ),
+];
+
+/// A third batch, dispatched later in the day so two batches can be open at
+/// once — the normal case in the field.
+final List<Order> sampleBatchThree = [
+  const Order(
+    num: '#89431',
+    phone: '+201118820',
+    name: 'أحمد فؤاد',
+    addr: 'شارع عباس العقاد',
+    area: 'مدينة نصر',
+    addrDetail: 'عمارة ٦٠ · الدور ٧ · شقة ٢٨',
+    status: OrderStatus.transit,
+    due: '٧:٣٠ م',
+    cod: 450,
+    dist: '3.4 كم',
+  ),
+  const Order(
+    num: '#89436',
+    phone: '+201005531',
+    name: 'ياسمين عادل',
+    addr: 'شارع الخليفة المأمون',
+    area: 'مصر الجديدة',
+    addrDetail: 'عمارة ٣ · الدور ٢ · شقة ٥',
+    status: OrderStatus.transit,
+    due: '٨:٠٠ م',
+    cod: 620,
+    dist: '5.5 كم',
   ),
 ];
 
@@ -370,7 +460,7 @@ FlowOrder orderToFlow(Order o) {
     },
     cod: o.cod != null && !o.prepaid,
     amount: o.cod != null ? formatThousands(o.cod!) : null,
-    address: o.fullAddress,
+    address: o.detailedAddress,
     items: o.items,
     note: o.note,
     assignedTime: o.due ?? '',
@@ -398,3 +488,29 @@ String arabicDigits(Object value) {
   }
   return s;
 }
+
+/// A wall-clock label in the app's Arabic 12-hour form — "٥:٤٠ م".
+String formatClockArabic(DateTime t) {
+  final h12 = t.hour % 12 == 0 ? 12 : t.hour % 12;
+  final mm = t.minute.toString().padLeft(2, '0');
+  final suffix = t.hour < 12 ? 'ص' : 'م';
+  return '${arabicDigits(h12)}:${arabicDigits(mm)} $suffix';
+}
+
+/// A km figure for Arabic copy — "٣٤ كم" (rounded, Eastern digits).
+String formatKmArabic(double km) => '${arabicDigits(km.round())} كم';
+
+const List<String> _arabicMonths = [
+  'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+  'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+];
+const List<String> _arabicWeekdays = [
+  'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد',
+];
+
+/// "١٣ سبتمبر" — day and month, Eastern digits.
+String formatDateArabic(DateTime d) =>
+    '${arabicDigits(d.day)} ${_arabicMonths[d.month - 1]}';
+
+/// "الخميس" for a date.
+String weekdayArabic(DateTime d) => _arabicWeekdays[d.weekday - 1];

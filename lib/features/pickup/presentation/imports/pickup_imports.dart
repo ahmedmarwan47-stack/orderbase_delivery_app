@@ -6,11 +6,10 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/shift_controller.dart';
 import '../../../../config/res/config_imports.dart';
+import '../../../../core/session/courier.dart';
 import '../../../../data/flow_order.dart';
 import '../../../../data/order.dart';
-import '../../../../widgets/app_header.dart';
 import '../../../../widgets/app_sheet.dart';
-import '../../../../widgets/bottom_nav.dart';
 import '../../../../widgets/header_back_button.dart';
 import '../../../../widgets/home_indicator.dart';
 

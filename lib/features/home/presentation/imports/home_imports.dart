@@ -9,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../app/shift_controller.dart';
 import '../../../../config/res/config_imports.dart';
+import '../../../../core/session/courier.dart';
 import '../../../../data/order.dart';
 import '../../../../features/queue/presentation/imports/queue_imports.dart';
 import '../../../../theme/shadows.dart';
@@ -28,8 +29,9 @@ part '../widgets/home_next_stop_card.dart';
 part '../widgets/home_progress_seg.dart';
 part '../widgets/home_route_leg.dart';
 part '../widgets/home_stop_progress.dart';
-part '../widgets/home_today_stats.dart';
-part '../widgets/home_stat_card.dart';
+part '../widgets/home_stat_row.dart';
+part '../widgets/home_state_card.dart';
+part '../widgets/home_batch_line.dart';
 
 // Shared home-variant widgets (1b / 1c / 2a)
 part '../widgets/home_progress_bar.dart';

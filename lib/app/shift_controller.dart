@@ -2,101 +2,173 @@ import 'package:flutter/foundation.dart';
 
 import '../data/order.dart';
 
-/// The single source of truth for today's shift — the working set of orders and
-/// whether the courier has collected the batch from the branch yet. Every
-/// dynamic surface reads from here (Home's next-stop + KPIs, the Orders/Queue
-/// list, the Returns list); the delivery/failure outcomes mutate it, so closing
-/// a stop advances the next-stop, updates the counters and files the return in
-/// one place.
+/// Where the courier is in their day. Home's hero, the header's status line and
+/// the settlement page all read this one value rather than re-deriving it.
+enum CourierStatus {
+  /// No batch has been dispatched yet — the day has not started.
+  idle,
+
+  /// At least one order in hand is still in transit.
+  onRoute,
+
+  /// Everything in hand is closed; the courier is expected back at the branch
+  /// to hand over cash and returns, or to collect the next batch.
+  returning,
+
+  /// The branch has settled the day. Nothing is owed until a new batch lands.
+  settled,
+}
+
+/// What the branch recorded when it settled the day.
+class SettlementReceipt {
+  const SettlementReceipt({
+    required this.cashier,
+    required this.at,
+    required this.cash,
+    required this.walletChange,
+    required this.orderCount,
+  });
+
+  final String cashier;
+  final DateTime at;
+  final int cash;
+  final int walletChange;
+  final int orderCount;
+}
+
+/// The single source of truth for today's shift — the batches in hand, the
+/// batches waiting at the branch, every order's live status, the cash the
+/// courier is carrying, and where they are in the day. Every dynamic surface
+/// reads from here; the delivery/failure outcomes, carrying a batch and the
+/// branch's settlement all mutate it, so one change lands everywhere at once.
 ///
 /// A [ChangeNotifier] singleton (Flutter_Base ViewController style — no bloc):
 /// listen with `ListenableBuilder(listenable: ShiftController.instance, …)`.
 class ShiftController extends ChangeNotifier {
-  ShiftController._();
+  ShiftController._() {
+    _seed();
+  }
   static final ShiftController instance = ShiftController._();
 
-  /// Seeded from the sample batch; mutated in place as stops are closed.
-  List<Order> _orders = List<Order>.from(sampleOrders);
-  bool _accepted = false;
+  /// The most cash a courier should be carrying before heading back to the
+  /// branch. A merchant setting in production; one demo figure here.
+  static const int cashThresholdEgp = 3000;
+
+  /// The branch the courier is assigned to today — where batches are collected
+  /// and where cash and returns go back to.
+  String get branchName => 'فرع مدينة نصر';
+  String get branchAddress => 'Sale Sucre — مدينة نصر';
+  String get branchPhone => '+20222600123';
+
+  /// The branch the returns are physically handed back to.
+  String get returnsBranch => branchAddress;
+
+  /// Batches the courier has carried out of the branch, oldest first.
+  final List<OrderBatch> _carried = <OrderBatch>[];
+
+  /// Batches dispatched to this courier but not yet carried, oldest first.
+  final List<OrderBatch> _pending = <OrderBatch>[];
+
+  /// Live copies of every order in hand (status mutates as stops close).
+  List<Order> _orders = <Order>[];
+
+  /// Which carried batch each order arrived in, keyed by order number.
+  final Map<String, String> _batchOf = <String, String>{};
+
+  /// A batch that has arrived but whose announcement has not been shown yet.
+  /// Read once via [takeAnnouncement] so it cannot announce twice.
+  OrderBatch? _announcement;
+
   bool _returnsHandedOver = false;
 
-  /// Batches dispatched to this courier but not yet carried out of the branch,
-  /// oldest first. A day holds several — a new one often lands while the
-  /// previous is still being delivered — and each keeps its identity so the
-  /// Pickup tab can present them as the separate batches they are.
-  final List<OrderBatch> _pendingBatches = <OrderBatch>[];
+  /// Orders whose cash the branch has already taken — they no longer count
+  /// toward [cashInHand].
+  final Set<String> _settledOrderNums = <String>{};
+  SettlementReceipt? _settlement;
 
-  /// Sequence behind the generated batch ids.
-  int _batchSeq = 1;
+  // ── batches ──
+  List<OrderBatch> get carriedBatches => List.unmodifiable(_carried);
+  List<OrderBatch> get pendingBatches => List.unmodifiable(_pending);
+  bool get hasPendingBatch => _pending.isNotEmpty;
 
-  /// A batch that has arrived but whose announcement sheet has not been shown
-  /// yet. Read once via [takeAnnouncement] so it cannot announce twice.
-  List<Order>? _announcement;
+  /// Every order waiting at the branch, flattened across batches.
+  List<Order> get pendingOrders => [for (final b in _pending) ...b.orders];
+
+  /// True once anything has been carried — the Live Activity gates on this.
+  bool get accepted => _carried.isNotEmpty;
 
   List<Order> get orders => _orders;
 
-  /// Batches waiting at the branch. The Pickup tab renders one group per entry;
-  /// carrying one merges its orders into the route and grows [totalStops].
-  List<OrderBatch> get pendingBatches => List.unmodifiable(_pendingBatches);
+  /// Live orders of one carried batch, in carry order.
+  List<Order> ordersOfBatch(String batchId) =>
+      _orders.where((o) => _batchOf[o.num] == batchId).toList();
 
-  bool get hasPendingPickup => _pendingBatches.isNotEmpty;
+  /// The batch an order was carried in; null for an order still at the branch.
+  String? batchIdOf(String orderNum) => _batchOf[orderNum];
 
-  /// Every order waiting at the branch, flattened across batches.
-  List<Order> get pendingPickup => [
-    for (final b in _pendingBatches) ...b.orders,
-  ];
-
-  /// The branch the returns are physically handed back to.
-  String get returnsBranch => 'Sale Sucre — مدينة نصر';
-
-  /// True once the courier confirmed the branch pickup — until then the app
-  /// opens on the "collect from branch" screen instead of Home.
-  bool get accepted => _accepted;
-
-  /// Order numbers belonging to the batches the courier is actually carrying.
-  /// Grows as further batches are carried, so the route is always "what is in
-  /// the bag", never the whole day's history.
-  final Set<String> _carried = <String>{};
-
-  /// Which carried batch each order arrived in, keyed by order number. The
-  /// Home hero names it ("الدفعة ٢") so the courier can tell *which* batch the
-  /// order in hand belongs to when several are open at once.
-  final Map<String, int> _batchOf = <String, int>{};
-
-  /// How many batches have been carried out of the branch so far — the number
-  /// the next one gets.
-  int _carriedSeq = 0;
-
-  /// Record a batch as being in hand. Union, not replace: carrying a second
-  /// batch adds to the route rather than starting a new one, and it keeps its
-  /// own number so the hero can say which batch an order came in.
-  void _markCarried(Iterable<Order> batch) {
-    final incoming = batch.toList();
-    if (incoming.isEmpty) return;
-    _carriedSeq += 1;
-    for (final o in incoming) {
-      _carried.add(o.num);
-      _batchOf[o.num] = _carriedSeq;
-    }
-  }
-
-  /// The 1-based batch an order was carried in. Falls back to the first batch:
-  /// before anything is carried, the orders on screen *are* that first batch.
-  int batchNumberOf(String orderNum) => _batchOf[orderNum] ?? 1;
+  /// 1-based position of a batch in the day, for copy that counts them.
+  int batchNumberOf(String batchId) =>
+      _carried.indexWhere((b) => b.id == batchId) + 1;
 
   /// The batch the courier is delivering right now — the one the next stop
-  /// belongs to.
-  int get currentBatchNumber =>
-      nextStop == null ? _carriedSeq : batchNumberOf(nextStop!.num);
+  /// belongs to, else the last one carried.
+  OrderBatch? get currentBatch {
+    final next = nextStop;
+    if (next != null) {
+      final id = _batchOf[next.num];
+      for (final b in _carried) {
+        if (b.id == id) return b;
+      }
+    }
+    return _carried.isEmpty ? null : _carried.last;
+  }
 
-  /// How many batches are in hand (at least one — the day always starts with a
-  /// batch to carry).
-  int get carriedBatchCount => _carriedSeq == 0 ? 1 : _carriedSeq;
+  // ── status ──
+  CourierStatus get status {
+    if (inProgress > 0) return CourierStatus.onRoute;
+    final unsettled = _orders.any(
+      (o) =>
+          o.status == OrderStatus.delivered &&
+          !_settledOrderNums.contains(o.num),
+    );
+    if (unsettled || pendingReturns.isNotEmpty) return CourierStatus.returning;
+    if (_settlement != null) return CourierStatus.settled;
+    if (_carried.isNotEmpty) return CourierStatus.returning;
+    return CourierStatus.idle;
+  }
+
+  /// True once the branch has settled the day (until a new batch is carried).
+  bool get settled =>
+      _settlement != null && status != CourierStatus.onRoute;
+  SettlementReceipt? get settlement => _settlement;
+
+  // ── trip estimates ──
+  /// Kilometres still to ride: the legs to the remaining stops of [batch]
+  /// (all of it, before anything closes) plus the ride back to the branch.
+  double remainingKmOf(OrderBatch batch) {
+    final left = ordersOfBatch(batch.id)
+        .where((o) => o.status == OrderStatus.transit)
+        .fold<double>(0, (sum, o) => sum + (o.distanceKm ?? 0));
+    return left + OrderBatch.returnLegKm;
+  }
+
+  /// When the courier is expected back at the branch after [batch]'s last
+  /// stop, at city speed, counting from now. Riding time only — it does not
+  /// include stops or handoffs, and the hero's tooltip says so.
+  DateTime returnEtaOf(OrderBatch batch) {
+    final minutes =
+        (remainingKmOf(batch) / OrderBatch.cityKmPerHour * 60).round();
+    return DateTime.now().add(Duration(minutes: minutes));
+  }
+
+  /// "٥:٤٠ م" for [currentBatch]; null before anything is carried.
+  String? get returnEtaLabel {
+    final b = currentBatch;
+    return b == null ? null : formatClockArabic(returnEtaOf(b));
+  }
 
   /// Where the courier is travelling *from* on the current leg: the branch
-  /// until the first stop of the day closes, then the door they just left.
-  /// This is what makes the hero's leg read branch → building on the first
-  /// order and building → villa on the next.
+  /// until the first stop closes, then the door they just left.
   PlaceKind get legOrigin {
     Order? lastClosed;
     for (final o in routeStops) {
@@ -107,27 +179,15 @@ class ShiftController extends ChangeNotifier {
     return lastClosed?.place ?? PlaceKind.branch;
   }
 
-  // ── route (the batches being delivered — postponed orders leave the route) ──
-  //
-  // Scoped to what has actually been carried, so the counters are driven by the
-  // real batch instead of a fixed day: carry four orders and the hero reads
-  // "الطلب ١ من ٤", and it climbs as each one closes. Before anything is
-  // carried there is no batch to scope to, so this falls back to the full set.
+  // ── route (the current batch — postponed orders leave the route) ──
   List<Order> get routeStops {
-    if (_carried.isEmpty) {
-      // Nothing carried yet: the batch about to be collected is what the hero
-      // should describe, so scope to what is still to deliver rather than the
-      // whole day. Otherwise the courier lands on Home reading a count that
-      // includes orders they closed hours ago.
-      return _orders.where((o) => o.status == OrderStatus.transit).toList();
-    }
-    return _orders
-        .where((o) => _carried.contains(o.num))
+    final b = currentBatch;
+    if (b == null) return const [];
+    return ordersOfBatch(b.id)
         .where((o) => o.status != OrderStatus.postponed)
         .toList();
   }
 
-  /// Stops already closed today (delivered or failed).
   int get closedStops =>
       routeStops.where((o) => o.status != OrderStatus.transit).length;
 
@@ -137,8 +197,8 @@ class ShiftController extends ChangeNotifier {
   int get currentStopNumber =>
       totalStops == 0 ? 0 : (closedStops + 1).clamp(1, totalStops);
 
-  /// The next order to deliver — the first still in transit, or null when the
-  /// route is complete.
+  /// The next order to deliver — the first still in transit, or null when
+  /// everything in hand is closed.
   Order? get nextStop {
     for (final o in _orders) {
       if (o.status == OrderStatus.transit) return o;
@@ -146,7 +206,7 @@ class ShiftController extends ChangeNotifier {
     return null;
   }
 
-  // ── KPI counters ──
+  // ── KPI counters (the whole day) ──
   int get inProgress =>
       _orders.where((o) => o.status == OrderStatus.transit).length;
   int get deliveredCount =>
@@ -154,93 +214,99 @@ class ShiftController extends ChangeNotifier {
   int get failedCount =>
       _orders.where((o) => o.status == OrderStatus.failed).length;
 
-  /// Cash collected today = the real collected amount on each delivered COD
-  /// order (falls back to the due amount when a specific figure wasn't recorded).
+  /// Cash collected today across every delivered COD order.
   int get collectedEgp => _orders
       .where((o) => o.status == OrderStatus.delivered && !o.prepaid)
       .fold(0, (sum, o) => sum + (o.collected ?? o.cod ?? 0));
 
-  /// Cash still to collect = COD due on the orders still in transit (not prepaid).
+  /// Cash physically on the courier: collected and not yet taken by the branch.
+  int get cashInHand => _orders
+      .where(
+        (o) =>
+            o.status == OrderStatus.delivered &&
+            !o.prepaid &&
+            !_settledOrderNums.contains(o.num),
+      )
+      .fold(0, (sum, o) => sum + (o.collected ?? o.cod ?? 0));
+
+  /// Cash still to collect = COD due on the orders still in transit.
   int get toCollectEgp => _orders
       .where((o) => o.status == OrderStatus.transit && !o.prepaid)
       .fold(0, (sum, o) => sum + (o.cod ?? 0));
+
+  /// The courier is carrying more than the branch allows.
+  bool get overCashLimit => cashInHand > cashThresholdEgp;
 
   /// Orders returned to the branch (a failed delivery sends the pieces back).
   List<Order> get returns =>
       _orders.where((o) => o.status == OrderStatus.failed).toList();
 
-  /// Returns still in the courier's custody — the same [returns] until the
-  /// courier hands the batch to the branch, then empty (drives the returns
-  /// page's empty state).
+  /// Returns still in the courier's custody — empty once handed over.
   List<Order> get pendingReturns => _returnsHandedOver ? const [] : returns;
 
-  /// Total pieces across the pending returns (sum of item quantities).
   int get returnPieces => pendingReturns.fold(0, (sum, o) => sum + o.pieces);
 
-  /// True once the courier confirmed handing the returns to the branch.
   bool get returnsHandedOver => _returnsHandedOver;
 
   Order? orderByNum(String number) {
     for (final o in _orders) {
       if (o.num == number) return o;
     }
+    for (final o in pendingOrders) {
+      if (o.num == number) return o;
+    }
     return null;
   }
 
   // ── mutations ──
-  /// Dispatch a new batch to the courier mid-day. The orders wait at the branch
-  /// until [carryPendingBatch] moves them onto the route; the batch is also
-  /// parked in [_announcement] so the shell can surface the dispatch sheet.
-  void assignBatch(List<Order> batch) {
-    if (batch.isEmpty) return;
-    _batchSeq += 1;
-    _pendingBatches.add(
-      OrderBatch(
-        id: 'batch-$_batchSeq',
-        orders: List<Order>.unmodifiable(batch),
-      ),
-    );
-    _announcement = List<Order>.unmodifiable(batch);
+  /// A batch has been dispatched to the courier. It waits at the branch until
+  /// [carryBatch] moves it onto the route, and is parked in [_announcement]
+  /// so the shell can raise the mid-flight sheet exactly once.
+  void assignBatch(OrderBatch batch) {
+    if (batch.orders.isEmpty) return;
+    if (_pending.any((b) => b.id == batch.id) ||
+        _carried.any((b) => b.id == batch.id)) {
+      return;
+    }
+    _pending.add(batch);
+    _announcement = batch;
     notifyListeners();
   }
 
-  /// Returns a newly-arrived batch exactly once, so a rebuild cannot re-announce
-  /// a batch the courier has already been told about.
-  List<Order>? takeAnnouncement() {
+  /// Returns a newly-arrived batch exactly once.
+  OrderBatch? takeAnnouncement() {
     final batch = _announcement;
     _announcement = null;
     return batch;
   }
 
-  void acceptBatch() {
-    if (_accepted) return;
-    _accepted = true;
-    // The day's first batch is whatever is still to deliver at this point.
-    _markCarried(_orders.where((o) => o.status == OrderStatus.transit));
-    notifyListeners();
-  }
-
-  /// Carry one batch onto the active route. Totals grow, so "الطلب ٥ من ٨"
-  /// becomes "الطلب ٥ من ١١" the moment this lands.
+  /// Carry one waiting batch onto the route. Totals grow, so «الطلب ٥ من ٨»
+  /// becomes the new batch's «الطلب ١ من ٣» the moment its first stop is next.
   void carryBatch(String id) {
-    final i = _pendingBatches.indexWhere((b) => b.id == id);
+    final i = _pending.indexWhere((b) => b.id == id);
     if (i < 0) return;
-    final batch = _pendingBatches.removeAt(i);
-    _orders = [..._orders, ...batch.orders];
-    _markCarried(batch.orders);
-    _accepted = true;
+    _carry(_pending.removeAt(i));
     notifyListeners();
   }
 
   /// Carry everything waiting at the branch in one action.
-  void carryPendingBatch() {
-    if (_pendingBatches.isEmpty) return;
-    final incoming = pendingPickup;
-    _orders = [..._orders, ...incoming];
-    _markCarried(incoming);
-    _pendingBatches.clear();
-    _accepted = true;
+  void carryAllPending() {
+    if (_pending.isEmpty) return;
+    for (final b in List<OrderBatch>.of(_pending)) {
+      _carry(b);
+    }
+    _pending.clear();
     notifyListeners();
+  }
+
+  void _carry(OrderBatch batch) {
+    _carried.add(batch);
+    _orders = [..._orders, ...batch.orders];
+    for (final o in batch.orders) {
+      _batchOf[o.num] = batch.id;
+    }
+    // A new batch reopens the day: returns and cash start accruing again.
+    _returnsHandedOver = false;
   }
 
   void markDelivered(String number, {int? collected}) => _update(
@@ -259,8 +325,7 @@ class ShiftController extends ChangeNotifier {
   void markPostponed(String number) =>
       _update(number, (o) => o.copyWith(status: OrderStatus.postponed));
 
-  /// Hand the whole returns batch to the branch — the returns leave the
-  /// courier's custody, so the returns page flips to its empty state.
+  /// Hand the returns to the branch — they leave the courier's custody.
   void handOverReturns() {
     if (_returnsHandedOver) return;
     _returnsHandedOver = true;
@@ -271,18 +336,66 @@ class ShiftController extends ChangeNotifier {
   void returnToQueue(String number) =>
       _update(number, (o) => o.copyWith(status: OrderStatus.transit));
 
-  /// Reset the shift (used on logout) — re-seed the batch, un-accept it.
-  void reset() {
-    _orders = List<Order>.from(sampleOrders);
-    _pendingBatches.clear();
-    _carried.clear();
-    _batchOf.clear();
-    _carriedSeq = 0;
-    _batchSeq = 1;
-    _announcement = null;
-    _accepted = false;
-    _returnsHandedOver = false;
+  /// The branch settles the day from its dashboard: it takes the cash the
+  /// courier is holding and the returns, and records who did it and when. The
+  /// app only reports this — there is deliberately no button for it.
+  void settleDay({required String cashier}) {
+    final lines = _orders.where(
+      (o) =>
+          o.status == OrderStatus.delivered &&
+          !o.prepaid &&
+          !_settledOrderNums.contains(o.num),
+    );
+    var cash = 0;
+    var wallet = 0;
+    var count = 0;
+    for (final o in lines) {
+      final paid = o.collected ?? o.cod ?? 0;
+      cash += paid;
+      wallet += paid > (o.cod ?? 0) ? paid - (o.cod ?? 0) : 0;
+      count += 1;
+      _settledOrderNums.add(o.num);
+    }
+    _settlement = SettlementReceipt(
+      cashier: cashier,
+      at: DateTime.now(),
+      cash: cash,
+      walletChange: wallet,
+      orderCount: count,
+    );
+    _returnsHandedOver = true;
     notifyListeners();
+  }
+
+  /// A fresh day with nothing dispatched yet — the idle state. The simulator
+  /// restarts from here.
+  void startNewDay() {
+    _clear();
+    notifyListeners();
+  }
+
+  /// Reset the shift (used on logout) — back to the seeded mid-day state.
+  void reset() {
+    _clear();
+    _seed();
+    notifyListeners();
+  }
+
+  void _clear() {
+    _carried.clear();
+    _pending.clear();
+    _orders = <Order>[];
+    _batchOf.clear();
+    _announcement = null;
+    _returnsHandedOver = false;
+    _settledOrderNums.clear();
+    _settlement = null;
+  }
+
+  /// The demo opens mid-day: the first batch is in hand and partly delivered,
+  /// which is the state a courier actually spends most of the day in.
+  void _seed() {
+    _carry(OrderBatch(id: sampleBatchOneId, orders: sampleOrders));
   }
 
   void _update(String number, Order Function(Order) transform) {

@@ -7,12 +7,18 @@ class ProfileScreen extends StatelessWidget {
     super.key,
     required this.onSelectTab,
     this.onOpenNotifications,
+    this.onOpenPendingBatch,
     this.onOpenSearch,
+    this.onStartNewDay,
   });
 
   final ValueChanged<NavTab> onSelectTab;
   final VoidCallback? onOpenNotifications;
+  final VoidCallback? onOpenPendingBatch;
   final VoidCallback? onOpenSearch;
+
+  /// Dev-only: reset the simulated day so the whole flow can be run again.
+  final VoidCallback? onStartNewDay;
 
   void _push(BuildContext context, Widget screen) => Navigator.of(
     context,
@@ -38,6 +44,7 @@ class ProfileScreen extends StatelessWidget {
               AppHeader(
                 onSearch: onOpenSearch,
                 onOpenNotifications: onOpenNotifications,
+                onOpenPendingBatch: onOpenPendingBatch,
               ),
               Expanded(
                 child: ListView(
@@ -60,6 +67,15 @@ class ProfileScreen extends StatelessWidget {
                           label: LocaleKeys.profileDevScreens.tr(),
                           onTap: () => _push(context, const DevGallery()),
                         ),
+                        if (onStartNewDay != null)
+                          _ProfileRow(
+                            icon: AppAssets.svg.box,
+                            label: LocaleKeys.homeStartNewDay.tr(),
+                            onTap: () {
+                              onStartNewDay!();
+                              onSelectTab(NavTab.home);
+                            },
+                          ),
                         _ProfileRow(
                           icon: AppAssets.svg.undo,
                           label: LocaleKeys.authLogout.tr(),

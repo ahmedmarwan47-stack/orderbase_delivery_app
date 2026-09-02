@@ -22,6 +22,12 @@ class DevGallery extends StatelessWidget {
 
   static final _screens = <String, WidgetBuilder>{
     'الرئيسية · Home (1a)': (_) => const HomeScreen(),
+    'الرئيسية · Home — لا دفعة بعد': (_) =>
+        const HomeScreen(preview: HomePreview.idle),
+    'الرئيسية · Home — متوقَّع في الفرع': (_) =>
+        const HomeScreen(preview: HomePreview.returning),
+    'الرئيسية · Home — تمت التسوية': (_) =>
+        const HomeScreen(preview: HomePreview.settled),
     'الاشعارات · Notifications': (_) => const NotificationsScreen(),
     'طلبات اليوم · Orders list': (context) => OrdersListScreen(
           onOpenOrder: (_) => Navigator.of(context)
@@ -74,9 +80,15 @@ class DevGallery extends StatelessWidget {
     'تعذّر · 1e — الإرجاع للفرع': (_) =>
         const FailureStatesHost(preview: FailureStatePreview.returnToBranch),
     'تعذّر · 1g — مرتجعات للفرع': (_) => const ReturnsListScreen(),
-    'التسوية · Settlement (open)': (_) => const SettlementScreen(),
-    'التسوية · Settlement (settled)': (_) =>
-        const SettlementScreen(startStage: SettlementStage.settled),
+    'التسوية · Settlement (اليوم، حيّة)': (_) => const SettlementScreen(),
+    'التسوية · Settlement (open)': (_) =>
+        SettlementScreen(data: sampleSettlement),
+    'التسوية · Settlement (settled)': (_) => SettlementScreen(
+          data: sampleSettlement,
+          startStage: SettlementStage.settled,
+        ),
+    'التسوية · يوم سابق (read-only)': (_) =>
+        SettlementDayScreen(day: sampleSettlementHistory.first),
     'الرئيسية · Home 1b (Glance)': (_) => const HomeGlanceScreen(),
     'الرئيسية · Home 1c (Compact)': (_) => const HomeCompactScreen(),
     'الرئيسية · Home 2a (Flat)': (_) => const HomeFlatScreen(),

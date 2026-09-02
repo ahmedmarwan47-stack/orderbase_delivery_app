@@ -16,15 +16,11 @@ part of '../imports/pickup_imports.dart';
 class _PickupBatchSection extends StatefulWidget {
   const _PickupBatchSection({
     required this.batch,
-    required this.index,
     this.initiallyExpanded = true,
     this.last = false,
   });
 
   final OrderBatch batch;
-
-  /// 1-based position, used for the "الدفعة ٢" label.
-  final int index;
 
   /// Whether the section starts open. The first batch does — it is the one the
   /// courier is about to carry.
@@ -62,7 +58,6 @@ class _PickupBatchSectionState extends State<_PickupBatchSection> {
         children: [
           _PickupBatchHeader(
             batch: widget.batch,
-            index: widget.index,
             open: _open,
             onTap: _toggle,
           ),
@@ -97,13 +92,11 @@ class _PickupBatchSectionState extends State<_PickupBatchSection> {
 class _PickupBatchHeader extends StatelessWidget {
   const _PickupBatchHeader({
     required this.batch,
-    required this.index,
     required this.open,
     required this.onTap,
   });
 
   final OrderBatch batch;
-  final int index;
   final bool open;
   final VoidCallback onTap;
 
@@ -120,17 +113,15 @@ class _PickupBatchHeader extends StatelessWidget {
     return Semantics(
       button: true,
       expanded: open,
-      label: LocaleKeys.pickupBatchLabel.tr(
-        namedArgs: {'n': arabicDigits(index)},
-      ),
+      label: batch.id,
       child:
           Row(
             children: [
+              // The ID as the branch prints it — «B #7877».
               Text(
-                LocaleKeys.pickupBatchLabel.tr(
-                  namedArgs: {'n': arabicDigits(index)},
-                ),
-                style: const TextStyle().setMainTextColor.s14.bold,
+                batch.id,
+                textDirection: TextDirection.ltr,
+                style: const TextStyle().setMainTextColor.s14.bold.tabular,
               ),
               12.szW,
               // Only the cash total is picked out — black and a step heavier —

@@ -80,29 +80,17 @@ class _StatusBadge extends StatelessWidget {
 /// Pay label — COD (amber, the COD semaphore) vs prepaid (green). Amber keeps
 /// red reserved as a locator (The One Red Rule) and matches the home hero pill.
 class _PayLabel extends StatelessWidget {
-  const _PayLabel({required this.prepaid, this.amount});
+  const _PayLabel({required this.prepaid});
   final bool prepaid;
-
-  /// Cash due, on a COD order. The figure IS the payment type — an amount can
-  /// only mean cash on delivery — so it replaces the «الدفع عند الاستلام»
-  /// label rather than sitting under it in a row of its own. Same rule the
-  /// hero pill and the batch rows follow.
-  final int? amount;
 
   @override
   Widget build(BuildContext context) {
-    final showAmount = !prepaid && amount != null;
     return Text(
-      showAmount
-          ? LocaleKeys.amountEgp.tr(
-              namedArgs: {'amount': formatThousands(amount!)},
-            )
-          : (prepaid ? LocaleKeys.payPrepaid : LocaleKeys.payCod).tr(),
+      (prepaid ? LocaleKeys.payPrepaid : LocaleKeys.payCod).tr(),
       style: const TextStyle()
           .setColor(prepaid ? AppColors.deliveredText : AppColors.postponedText)
           .s12
-          .semiBold
-          .tabular,
+          .semiBold,
     );
   }
 }

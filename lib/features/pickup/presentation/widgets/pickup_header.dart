@@ -63,7 +63,7 @@ class _PickupHeader extends StatelessWidget {
                         4.szH,
                       ],
                       Text(
-                        LocaleKeys.pickupMerchant.tr(),
+                        '${Courier.merchantName} · ${ShiftController.instance.branchName}',
                         style: const TextStyle().setMainTextColor.s14.semiBold,
                       ),
                     ],

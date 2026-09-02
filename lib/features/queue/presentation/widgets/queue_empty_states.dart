@@ -29,11 +29,8 @@ class _QueueClearState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle().setSecondaryColor.s14.regular.withHeight(1.5)),
           24.szH,
-          if (postponed.isNotEmpty) ...[
+          if (postponed.isNotEmpty)
             _PostponedHandoffCard(postponed: postponed, onView: vc.openPostponed),
-            12.szH,
-          ],
-          const _SettlementButton(),
         ],
       ).paddingOnlyDirectional(
         start: AppPadding.pW24,
@@ -108,24 +105,6 @@ class _PostponedHandoffCard extends StatelessWidget {
           ),
         ],
       ).paddingAll(AppPadding.pH16),
-    );
-  }
-}
-
-/// End-of-day settlement entry.
-class _SettlementButton extends StatelessWidget {
-  const _SettlementButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return _OutlinedPillButton(
-      labelKey: LocaleKeys.settlement,
-      labelArgs: const {'amount': '4,320'},
-      labelColor: AppColors.textPrimary,
-      borderColor: AppColors.borderDefault,
-      leading: AppAssets.svg.wallet,
-      leadingColor: AppColors.brand,
-      tabular: true,
     );
   }
 }
@@ -295,35 +274,25 @@ class _EmptyBadge extends StatelessWidget {
   }
 }
 
-/// White/outline pill button with optional leading/trailing icon (used by the
-/// settlement and view-postponed actions).
+/// White/outline pill button with an optional trailing icon (the
+/// view-postponed action).
 class _OutlinedPillButton extends StatelessWidget {
   const _OutlinedPillButton({
     required this.labelKey,
     required this.labelColor,
     required this.borderColor,
-    this.labelArgs,
-    this.leading,
-    this.leadingColor,
     this.trailing,
-    this.tabular = false,
     this.onTap,
   });
 
   final String labelKey;
-  final Map<String, String>? labelArgs;
   final Color labelColor;
   final Color borderColor;
-  final String? leading;
-  final Color? leadingColor;
   final String? trailing;
-  final bool tabular;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    var style = const TextStyle().setColor(labelColor).s14.semiBold;
-    if (tabular) style = style.tabular;
     return Container(
       height: AppSize.sH48,
       decoration: BoxDecoration(
@@ -335,16 +304,10 @@ class _OutlinedPillButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (leading != null) ...[
-            IconWidget(
-              icon: leading!,
-              color: leadingColor ?? labelColor,
-              height: AppSize.sH18,
-              width: AppSize.sW18,
-            ),
-            8.szW,
-          ],
-          Text(labelKey.tr(namedArgs: labelArgs), style: style),
+          Text(
+            labelKey.tr(),
+            style: const TextStyle().setColor(labelColor).s14.semiBold,
+          ),
           if (trailing != null) ...[
             8.szW,
             IconWidget(

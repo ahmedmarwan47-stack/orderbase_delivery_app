@@ -198,8 +198,9 @@ no longer linked from the tab bar.
 
 - `StatusBar` — mock `9:41` + signal/wifi/battery glyph (LTR). **No longer used** — the OS status
   bar is shown instead; kept only for the browser fallback / mockup parity.
-- `BottomNav` — the 4-tab bar, `active`-tab driven, optional notifications badge; includes the
-  `HomeIndicator`.
+- `BottomNav` — the 4-tab bar (`NavTab { home, orders, settlement, profile }`), `active`-tab driven
+  (**nullable** — the notifications page highlights nothing), an Orders badge while a batch waits at
+  the branch; includes the `HomeIndicator`.
 - `HomeIndicator` — the home-indicator pill on a white strip (used directly by screens with no tab
   bar, e.g. Pickup).
 - `MapView` — real `FlutterMap` + OSM raster tiles + red pin (Home strip and Order-detail map both
@@ -208,7 +209,8 @@ no longer linked from the tab bar.
   `IgnorePointer` so it can't fight the surrounding scroll or swallow the Home hero's tap. Navigation
   is the Google-Maps badge's job, and that badge stays live either way. Carries the
   **open-in-Google-Maps badge**: pass `destinationLabel` so Maps opens on the address rather than a
-  bare coordinate. The badge draws `assets/brand/google_maps.svg` through `SvgPicture` directly —
+  bare coordinate; `pinColor` swaps the brand-red pin for ink when the map points at the courier's
+  own branch. The badge draws `assets/brand/google_maps.svg` through `SvgPicture` directly —
   it is a multi-colour brand mark, so it must NOT go through `IconWidget`, which recolours the
   monochrome icon set via a `srcIn` filter.
 - Opening a URL goes through `ExternalLinks` (`lib/core/live_activity/external_links.dart`), which
@@ -277,21 +279,107 @@ Sample data mirrors each mockup's `state`, kept identical so screens are compara
 
 ## App shell (`lib/app/app_shell.dart`)
 
-The real entry point — `main.dart` sets `home: const AppShell()`. It's an `IndexedStack` +
-`BottomNav` tab host:
-- Five tabs: **الرئيسية · الطلبات · الدفعات · التسوية · الحساب**. The last one is the courier's own
-  profile (`features/profile/`) — name, avatar, «الحساب وكلمة المرور» → the existing
-  `ChangePasswordScreen`, the DevGallery, and sign-out. It replaced the old «المزيد» link menu:
-  a tab bar names a section, and the section is the person.
-- The pickup tab is labelled **الدفعات** (`nav_pickup`), not "الاستلام": a tab bar names sections,
-  not actions, and the tab now lists the batches waiting at the branch.
+The real entry point — `AuthGate` hands to `AppShell` once signed in. An `IndexedStack` +
+`BottomNav` host:
+- **Four tabs: الرئيسية · الطلبات · التسوية · الحساب.** The old «الدفعات» tab was **merged into
+  Orders** (see *Orders tab*). The last tab is the courier's own profile (`features/profile/`) —
+  name, avatar, «الحساب وكلمة المرور», the DevGallery, a dev-only «بدء يوم جديد», and sign-out.
+- **Notifications is a page, not a route.** The header bell swaps the `IndexedStack` to a fifth
+  child (`_NotificationsPage`: `AppHeader(notificationsActive: true)` + `NotificationsScreen(
+  embedded: true)` + `BottomNav(active: null)`), so the header and tab bar never move and no tab is
+  highlighted; the bell inverts to ink and tapping it again returns to the previous tab.
 - **The Home hero card itself opens the order** (tap anywhere on it); its black button is the
   *action* — «تم تسليم الطلب» runs the same handoff → COD → result flow the detail's sticky bar runs
-  (`_deliverNextStop`). An **order row** (Orders) pushes the order-detail flow *over* the shell. The Result screen's buttons pop the whole flow back via
-  `popUntil((r) => r.isFirst)`; "العودة للرئيسية" also switches to the Home tab.
+  (`_deliverNextStop`). The call tile dials the customer through the Live Activity channel's
+  `dial`. An **order row** (Orders) pushes the order-detail flow *over* the shell. The Result
+  screen's buttons pop the whole flow back via `popUntil((r) => r.isFirst)`.
 - Screens forward `BottomNav.onTap` up through an `onSelectTab` callback; the shell owns the
   selected `NavTab`. `OrderDetailScreen` takes `onFinishToNext` / `onFinishToHome` / `onSelectTab`.
-- **Not yet in the shell:** Pickup and the standalone Result variants — reach them via DevGallery.
+- The shell owns the **`ShiftSimulator`** (below) and raises the mid-flight «دفعة جديدة في الفرع»
+  sheet whenever `ShiftController.takeAnnouncement()` hands it a batch.
+
+## The day is simulated (`lib/app/shift_simulator.dart`)
+
+There is no backend, so the branch's side of the day is played by `ShiftSimulator` — every timer
+lives there and nowhere else, so swapping it for push notifications touches one file:
+
+| When | What |
+|---|---|
+| app open | `B #7877` already in hand, partly delivered (`ShiftController._seed`) |
+| +30 s | `B #7878` dispatched → `assignBatch` → mid-flight sheet + notification + header chip |
+| +3 min | `B #7879` dispatched the same way |
+| status → `returning` +40 s | the cashier settles (`settleDay`) → notification, settlement flips to SETTLED, Home shows the settled card |
+| cash crosses the limit | one `addCashOverLimit` notification per crossing |
+
+«بدء يوم جديد (تجريبي)» (settled card / Account tab) calls `restart()`: the shift goes idle and the
+clock starts again.
+
+## Shift model (`lib/app/shift_controller.dart`)
+
+- **Batches carry the branch's ID** — `OrderBatch.id` is «B #7877» — and every surface shows it:
+  the hero's batch line, Orders sections, settlement sections, the dispatch sheet.
+- `CourierStatus { idle, onRoute, returning, settled }` is the one value Home, the header and the
+  settlement read. `returning` = everything in hand closed and cash/returns not yet taken.
+- **`cashInHand`** (collected, not yet settled) vs `collectedEgp` (the day). `cashThresholdEgp`
+  (3,000 demo) → `overCashLimit` turns the figure red in the header, the Home cash cell and the
+  settlement card. Red warns; it never blocks. **No banner** — the figure itself is the alarm.
+- **Trip estimates** are honest maths, not routing: `OrderBatch.routeKm` = Σ order leg distances
+  + `returnLegKm`; `returnEtaOf(batch)` = remaining km at `cityKmPerHour` from `DateTime.now()`.
+  The hero's ⓘ tooltip (`_TripInfoTip`) tells the courier exactly that.
+- **Settlement is the branch's act.** `settleDay(cashier:)` is only ever called by the simulator
+  (the admin dashboard in production). There is deliberately **no settle button** in the app.
+- `Order.addrDetail` («عمارة ٤٢٩٠ · الدور ٥ · شقة ٥٢») is the door-level line; `detailedAddress`
+  feeds the order detail, `fullAddress` the maps badge and search.
+
+## Home (`features/home/`)
+
+- **Hero hierarchy** (`_HomeNextStopCard`): batch line («B #7877 · الطلب ٥ من ٨» + «عودة للفرع
+  ~٥:٤٠ م · ٣٤ كم» ⓘ) → **destination bold** (area 20/bold, street, door detail) → map strip →
+  one meta row (customer · number · cash pill) + promised time → two actions (deliver, call).
+  Per-stop ETA/distance and the origin→destination bar are gone (`kShowRouteLeg = false` keeps the
+  leg widget; `kShowStopSegments` the older segment bar).
+- **`_HomeStatRow`** — one four-cell strip under the hero (in progress · delivered · failed · cash)
+  so hero and numbers fit without a scroll. The cash cell goes red over the limit.
+- **`_HomeStateCard`** replaces the hero when there is nothing to deliver: *idle* (no batch yet),
+  *returning* («ارجع للفرع», the return ETA pill, what to hand over, map pinned on the branch in
+  ink, call the branch), *settled* (who took the cash and when). A pending batch adds an amber
+  «دفعة جديدة في انتظارك» row to any of them. `HomeScreen(preview: HomePreview.x)` pins one for
+  the DevGallery.
+
+## Orders tab = batches (`features/queue/`)
+
+One tab, grouped by batch, the queue's search + filters on top. `QueueViewController.batchGroups`
+returns `QueueBatchGroup`s — batches **waiting at the branch first** (they need an action), then the
+ones in hand newest first — each holding only the rows that survive the active filter; an empty
+group is dropped. `_QueueBatchSection` is the collapsible section (ID · state pill «في الفرع» /
+«معك» / «مكتملة» · «٨ طلبات · ٤ متبقية · ٣٤ كم · عودة ~٥:٤٠ م»); a waiting batch closes with its own
+«تأكيد استلام الدفعة» button → `showCarryBatchSheet` (pickup feature, public) → `carryBatch`.
+`_QueueBatchRow` is the row (number · cash pill / outcome badge · name · area · pieces · promised
+time). The postponed filter keeps its rich cards. The old order card with the merchant thumbnail is
+gone; `_MerchantThumb` survives only on the postponed card.
+
+`PickupScreen` (`/pickup`, DevGallery) is the standalone "carry everything waiting" page; the
+dispatch sheet (`showPickupDispatchSheet(batch:, branch:)`) names the batch and offers «عرض
+الدفعة في الطلبات» / «لاحقًا».
+
+## Settlement (`features/settlement/`)
+
+`SettlementData` is a **day**: `date`, `branch`, `batches` (`SettlementBatch` = cash lines +
+returns, or `pending`), `status` (`open` → `awaiting` once the courier is expected at the branch →
+`settled`), `cashierName`, `settledAt`. `shiftSettlement` builds today's live; `sampleSettlementHistory`
+seeds the last seven days. The page: status pill in the header (no button), the slate cash card
+(red over the limit, «الدفعات» in its breakdown), `_BatchesSection` (collapsible per batch), the
+returns handover button (physically handing parcels back is still the courier's act), the locked
+note, then `_HistorySection` — rows that push `SettlementDayScreen(day)` read-only. The settled
+view is the designed confirmation plus the batches and the history.
+
+## Unified header (`lib/widgets/app_header.dart`)
+
+Line 1: merchant logo + «Sale Sucre · فرع مدينة نصر» (`Courier.merchantName` ·
+`ShiftController.branchName` — the branch is assigned per day). Line 2 follows `CourierStatus`:
+«متبقٍ ٤ توصيلات» / «متوقَّع في الفرع ~٥:٤٠ م» / «تمت تسوية اليوم» / «لا دفعات بعد», then
+«معك 1,250 جم» (red + alert glyph over the limit), then «٣ مرتجعات» only while true, and the amber
+«دفعة في الفرع» chip only while a batch waits (tap → Orders). `notificationsActive` inverts the bell.
 
 ## Live Activity / Dynamic Island (iOS, optional)
 
@@ -347,28 +435,6 @@ Not built yet: APNs `liveactivity` pushes (so the island goes stale once iOS
 suspends the app), a real countdown (`Order.due` is a formatted string, not a
 timestamp), an `arrived` trigger (no geofence), and any Android equivalent.
 
-## Home hero — the next-order card (`_HomeNextStopCard`)
-
-- **One leg, not one segment per order.** `_HomeRouteLeg` draws where the courier is coming *from*,
-  where they are going, and roughly how long: `[origin] ——— [destination] · ١١ دقيقة`. Origin is the
-  branch on the first order of a batch and the door they just closed after that
-  (`ShiftController.legOrigin`); destination is the customer's own `Order.place`
-  (`PlaceKind.building` / `.villa`), so the two ends genuinely differ leg to leg.
-- The old per-order segment bar is **hidden, not deleted** — `kShowStopSegments = false` in
-  `home_next_stop_card.dart`. `_HomeStopProgress` (with its per-segment tooltip) is intact; flip the
-  flag to bring it back.
-- The ETA is derived from `Order.dist` at ~22 km/h (`_legEtaMinutes`). There is no routing service
-  and `Order.due` is a formatted string, not a timestamp — so it is an honest estimate, not a
-  countdown. Replace it the moment the backend can give a real one.
-- **The card is the link; the button is the action.** Tapping anywhere on the card opens the order
-  detail (`onViewOrder`); the black button is «تم تسليم الطلب» (`onDeliver`) and runs the *same*
-  handoff → COD → result flow the detail's sticky bar runs. Keep the hero label short — the button
-  shares its row with the call/chat tiles and a longer string truncates.
-- The header line reads «الدفعة ١ · الطلب ١ من ٤» as plain text, not two pills: two short facts did
-  not warrant two filled chips.
-- The address row and the promised-time/distance row are deliberately one type class (16px glyph,
-  14/regular) — both answer "where and when".
-
 ## Lists are flat (Orders + Batches)
 
 Neither tab uses cards any more. Rows run edge to edge **straight on the page background** — no fill
@@ -385,38 +451,8 @@ search results, the postponed list, and the batch sections.
 the same thing twice — an amount can only mean cash on delivery. The queue row, the hero pill and the
 batch rows all follow this; prepaid keeps its «مدفوع مقدمًا» label, since it has no figure.
 
-## Batches (`OrderBatch` + `ShiftController`)
-
-A courier's day is a **sequence of batches**, not one hand-off: another batch can
-be dispatched while the previous one is still being delivered.
-
-- `OrderBatch` (`lib/data/order.dart`) — `id` + `orders`, with `count`/`codTotal`.
-- `ShiftController` — `assignBatch()` files a new batch into `pendingBatches` and
-  parks it in `_announcement`; `takeAnnouncement()` hands it over exactly once
-  (so a rebuild cannot re-announce); `carryBatch(id)` / `carryPendingBatch()`
-  move batches onto the route and record them in `_carried`.
-- **`routeStops` is scoped to `_carried`**, which is what makes the Home hero
-  read "الطلب ١ من ٤" — the batch in hand — instead of a fixed day count. Before
-  anything is carried it falls back to the still-to-deliver orders, so the hero
-  never counts orders closed hours ago.
-- The **الدفعات** tab (`features/pickup/`) renders one `_PickupBatchSection` per
-  batch, each a **collapsible** header (label · count · cash · chevron) over
-  `_PickupOrderRow` rows — the same row the dispatch sheet uses, so a batch looks
-  the same wherever it appears. The first batch opens; later ones stay folded
-  until wanted. `_PickupOrderRow(inset: false)` drops the row's own side padding
-  for the dispatch sheet, whose `SheetShell` already pads its body.
-- A batch pill shows the **cash figure alone** on a COD order: the amount already
-  implies cash on delivery, so the "الدفع عند الاستلام" label beside it was noise.
-
-> **Only one batch ships today.** `sampleBatchTwo`, `assignBatch`,
-> `takeAnnouncement`, `carryBatch` and `NotificationsStore.addBatchAssigned` are
-> deliberately unreferenced — they are the one-line re-enable for a second batch
-> arriving mid-route (previously on a 30s timer in `AppShell`). Don't delete them
-> as dead code.
-
 **Copy rule:** an order is never a "stop" or a "destination". It is **الطلب ٥ من ٨**
-(`home_stop_count`) / **الطلب التالي** (`home_next_stop`), in `ar.json`, `en.json`
-*and* `OrderbaseTheme.stopLabel` on the Swift side.
+(`home_stop_count`), in `ar.json`, `en.json` *and* `OrderbaseTheme.stopLabel` on the Swift side.
 
 ## DevGallery (`lib/dev/dev_gallery.dart`)
 

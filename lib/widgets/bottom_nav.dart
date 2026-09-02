@@ -4,11 +4,14 @@ import '../app/shift_controller.dart';
 import '../config/res/config_imports.dart';
 import 'home_indicator.dart';
 
-enum NavTab { home, orders, pickup, settlement, profile }
+/// The four sections of the app. Batches and orders are one tab: a batch is
+/// how orders arrive, so the Orders tab lists them grouped by batch.
+enum NavTab { home, orders, settlement, profile }
 
 /// Shared bottom tab bar used across screens. The active tab renders in the
-/// brand-red accent; the rest are muted. The notifications tab can show a red
-/// dot. Includes the home-indicator bar beneath it, as in the mockups.
+/// brand-red accent; the rest are muted. [active] is null on pages that are
+/// not a tab — notifications, opened from the header, sits inside the shell
+/// with no tab highlighted. Includes the home-indicator bar beneath it.
 class BottomNav extends StatelessWidget {
   const BottomNav({
     super.key,
@@ -17,7 +20,7 @@ class BottomNav extends StatelessWidget {
     this.onTap,
   });
 
-  final NavTab active;
+  final NavTab? active;
   final bool notificationsBadge;
   final ValueChanged<NavTab>? onTap;
 
@@ -52,17 +55,9 @@ class BottomNav extends StatelessWidget {
                   AppAssets.svg.orders,
                   LocaleKeys.navOrders.tr(),
                   activeIcon: AppAssets.svg.ordersFilled,
-                ),
-                _item(
-                  NavTab.pickup,
-                  AppAssets.svg.store,
-                  LocaleKeys.navPickup.tr(),
-                  activeIcon: AppAssets.svg.storeFilled,
-                  // Red dot only while there's still a batch to carry from the
-                  // branch (cleared once picked up / accepted).
-                  badge:
-                      !ShiftController.instance.accepted &&
-                      ShiftController.instance.inProgress > 0,
+                  // Red dot while a batch is waiting to be carried from the
+                  // branch — it clears the moment the batch is in hand.
+                  badge: ShiftController.instance.hasPendingBatch,
                 ),
                 _item(
                   NavTab.settlement,

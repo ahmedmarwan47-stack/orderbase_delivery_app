@@ -1,9 +1,12 @@
 part of '../imports/settlement_imports.dart';
 
-/// Settlement — end-of-day cash settlement. Ported from Settlement.dc.html.
-/// A single screen with two sub-views (OPEN review → SETTLED confirmation); the
-/// Screen owns the [SettlementController] lifecycle and swaps views on its
-/// `stage`. [startStage] seeds the mockup's `startScreen` prop.
+/// Settlement — the day's cash, batch by batch, and the week before it.
+/// Ported from Settlement.dc.html and grown: one screen with two sub-views.
+/// OPEN shows what the courier is carrying (per batch) with a status pill
+/// that moves from «غير مُسوّاة» to «بانتظار التسوية» once they are expected
+/// at the branch; there is no settle button — the branch settles from its
+/// dashboard, and when it does the view flips to SETTLED on its own. Both
+/// views end with the last seven days.
 class SettlementScreen extends StatefulWidget {
   const SettlementScreen({
     super.key,
@@ -11,12 +14,12 @@ class SettlementScreen extends StatefulWidget {
     this.startStage = SettlementStage.open,
     this.onSelectTab,
     this.onOpenNotifications,
+    this.onOpenPendingBatch,
     this.onOpenSearch,
   });
 
-  /// Defaults to [shiftSettlement] (built live from today's shift) when null, so
-  /// the app shell shows real settlement data. Preview/DevGallery callers pass an
-  /// explicit [data] (e.g. [sampleSettlement]).
+  /// Defaults to [shiftSettlement] (built live from today's shift) when null.
+  /// Preview/DevGallery callers pass an explicit [data] (e.g. [sampleSettlement]).
   final SettlementData? data;
   final SettlementStage startStage;
 
@@ -26,6 +29,7 @@ class SettlementScreen extends StatefulWidget {
 
   /// Unified-header actions (shell-tab mode).
   final VoidCallback? onOpenNotifications;
+  final VoidCallback? onOpenPendingBatch;
   final VoidCallback? onOpenSearch;
 
   @override
@@ -48,24 +52,78 @@ class _SettlementScreenState extends State<SettlementScreen> {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      // Rebuild as the shift mutates so the live settlement figures stay current
-      // (the controller reads shift data live; this drives the redraw).
+      // Rebuild as the shift mutates so the live figures stay current and the
+      // branch's settlement flips the view.
       child: AnimatedBuilder(
         animation: ShiftController.instance,
         builder: (_, _) => ValueListenableBuilder<SettlementStage>(
           valueListenable: _vc.stage,
-          builder: (_, stage, _) => switch (stage) {
-            SettlementStage.open => _SettlementOpenView(
-              vc: _vc,
-              onSelectTab: widget.onSelectTab,
-              onOpenNotifications: widget.onOpenNotifications,
-              onOpenSearch: widget.onOpenSearch,
-            ),
-            SettlementStage.settled => _SettlementSettledView(
-              vc: _vc,
-              onSelectTab: widget.onSelectTab,
-            ),
+          builder: (_, _, _) {
+            final data = _vc.data;
+            return data.isSettled
+                ? _SettlementSettledView(
+                    vc: _vc,
+                    data: data,
+                    onSelectTab: widget.onSelectTab,
+                    onOpenNotifications: widget.onOpenNotifications,
+                    onOpenPendingBatch: widget.onOpenPendingBatch,
+                    onOpenSearch: widget.onOpenSearch,
+                  )
+                : _SettlementOpenView(
+                    vc: _vc,
+                    data: data,
+                    onSelectTab: widget.onSelectTab,
+                    onOpenNotifications: widget.onOpenNotifications,
+                    onOpenPendingBatch: widget.onOpenPendingBatch,
+                    onOpenSearch: widget.onOpenSearch,
+                  );
           },
+        ),
+      ),
+    );
+  }
+}
+
+/// One past day, read-only — reached from «الأيام السابقة». The same page
+/// shape as today (cash card, batches, receipt) with a back button.
+class SettlementDayScreen extends StatelessWidget {
+  const SettlementDayScreen({super.key, required this.day});
+  final SettlementData day;
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: Column(
+            children: [
+              _SettlementHeader(data: day, showBack: true, scrolled: true),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsetsDirectional.only(
+                    start: AppPadding.pW20,
+                    end: AppPadding.pW20,
+                    top: AppPadding.pH8,
+                    bottom: AppPadding.pH24,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _CashInHandCard(data: day, showBreakdown: true),
+                      if (day.settledAt != null) ...[
+                        12.szH,
+                        _ReceiptCard(data: day),
+                      ],
+                      20.szH,
+                      _BatchesSection(data: day),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

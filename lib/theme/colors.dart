@@ -109,6 +109,9 @@ abstract final class AppColors {
   static const paymentSuffix = Color(0xFFD2D6DD); // "جم" suffix on the card
   static const paymentTile = Color(0x26FFFFFF); // rgba(255,255,255,.15) icon tile
   static const cashBright = Color(0xFFEDEFF3); // near-white cash glyph on slate
+  // Label on the cash cell once it has turned red (over the cash limit) —
+  // the pale twin of failedBg, readable on failedText (8.9:1).
+  static const overLimitLabel = Color(0xFFFBD5D4);
 
   // Timeline (order route)
   static const timelineRing = Color(0xFFF7D7D6); // ring around the active red dot

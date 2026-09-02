@@ -3,7 +3,7 @@ part of '../imports/notifications_imports.dart';
 /// The kind of a courier notification — drives the tinted icon tile, matching
 /// the status palette used across the app (transit blue / failed red /
 /// postponed amber / delivered green).
-enum NotifKind { assigned, batch, cancelled, note, wallet }
+enum NotifKind { assigned, batch, cancelled, note, wallet, cash, settled }
 
 extension NotifKindX on NotifKind {
   String get icon => switch (this) {
@@ -12,6 +12,8 @@ extension NotifKindX on NotifKind {
         NotifKind.cancelled => AppAssets.svg.x,
         NotifKind.note => AppAssets.svg.note,
         NotifKind.wallet => AppAssets.svg.wallet,
+        NotifKind.cash => AppAssets.svg.alert,
+        NotifKind.settled => AppAssets.svg.cash,
       };
 
   Color get tileBg => switch (this) {
@@ -20,6 +22,10 @@ extension NotifKindX on NotifKind {
         NotifKind.cancelled => AppColors.failedBg,
         NotifKind.note => AppColors.heroCodPillBg,
         NotifKind.wallet => AppColors.deliveredBg,
+        // Over the cash limit is the one non-failure red in the app.
+        NotifKind.cash => AppColors.failedBg,
+        // Settlement is slate, like its card — never the delivered green.
+        NotifKind.settled => AppColors.paymentCardBg,
       };
 
   Color get iconColor => switch (this) {
@@ -28,6 +34,8 @@ extension NotifKindX on NotifKind {
         NotifKind.cancelled => AppColors.failedText,
         NotifKind.note => AppColors.postponedText,
         NotifKind.wallet => AppColors.deliveredText,
+        NotifKind.cash => AppColors.failedText,
+        NotifKind.settled => AppColors.cashBright,
       };
 }
 
@@ -64,7 +72,9 @@ List<AppNotification> sampleNotifications() {
     AppNotification(
       kind: NotifKind.batch,
       orderNum: '89289',
-      title: LocaleKeys.notifTitleBatch.tr(namedArgs: {'count': '4'}),
+      title: LocaleKeys.notifTitleBatch.tr(
+        namedArgs: {'id': sampleBatchOneId, 'count': '٨'},
+      ),
       body: LocaleKeys.notifBodyBatch.tr(
         namedArgs: {'branch': branch, 'cash': '2,290'},
       ),
@@ -161,7 +171,7 @@ class NotificationsStore extends ChangeNotifier {
         kind: NotifKind.batch,
         orderNum: batch.orders.first.num.replaceAll('#', '').trim(),
         title: LocaleKeys.notifTitleBatch.tr(
-          namedArgs: {'count': '${batch.count}'},
+          namedArgs: {'id': batch.id, 'count': arabicDigits(batch.count)},
         ),
         body: LocaleKeys.notifBodyBatch.tr(
           namedArgs: {
@@ -170,6 +180,40 @@ class NotificationsStore extends ChangeNotifier {
           },
         ),
         time: LocaleKeys.notifMinutesAgo.tr(namedArgs: {'n': '١'}),
+        unread: true,
+      ),
+    );
+  }
+
+  /// The courier crossed the cash limit — once per crossing.
+  void addCashOverLimit({required int cash, required int limit}) {
+    add(
+      AppNotification(
+        kind: NotifKind.cash,
+        orderNum: '',
+        title: LocaleKeys.notifTitleCash.tr(
+          namedArgs: {'cash': formatThousands(cash)},
+        ),
+        body: LocaleKeys.notifBodyCash.tr(
+          namedArgs: {'limit': formatThousands(limit)},
+        ),
+        time: LocaleKeys.notifJustNow.tr(),
+        unread: true,
+      ),
+    );
+  }
+
+  /// The branch settled the day from its dashboard.
+  void addDaySettled({required int cash, required String cashier}) {
+    add(
+      AppNotification(
+        kind: NotifKind.settled,
+        orderNum: '',
+        title: LocaleKeys.notifTitleSettled.tr(),
+        body: LocaleKeys.notifBodySettled.tr(
+          namedArgs: {'cash': formatThousands(cash), 'cashier': cashier},
+        ),
+        time: LocaleKeys.notifJustNow.tr(),
         unread: true,
       ),
     );

@@ -33,7 +33,12 @@ class MapView extends StatefulWidget {
     this.destinationLabel,
     this.showOpenInMaps = true,
     this.interactive = false,
+    this.pinColor = AppColors.brand,
   });
+
+  /// The pin's fill. Brand red for a customer's door; ink when the map points
+  /// at the courier's own branch (the expected-at-branch card).
+  final Color pinColor;
 
   final double height;
   final double borderRadius;
@@ -146,7 +151,7 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
       width: pinDiameter,
       height: pinDiameter,
       decoration: BoxDecoration(
-        color: AppColors.brand,
+        color: widget.pinColor,
         shape: BoxShape.circle,
         boxShadow: AppShadows.pin,
       ),

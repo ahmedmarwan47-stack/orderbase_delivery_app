@@ -14,7 +14,10 @@ class _QueueBrowseHeader extends StatelessWidget {
       children: [
         Text(
           LocaleKeys.queueSubtitle.tr(
-            namedArgs: {'count': arabicDigits(vc.active.length)},
+            namedArgs: {
+              'count': arabicDigits(vc.active.length),
+              'batches': arabicDigits(vc.batchCount),
+            },
           ),
           style: const TextStyle().setMainTextColor.s14.bold,
         ).paddingOnlyDirectional(start: AppPadding.pW20, end: AppPadding.pW20),
