@@ -22,6 +22,7 @@ class _HomeBatchLine extends StatefulWidget {
     required this.returnEta,
     required this.routeKm,
     this.done = false,
+    this.showTrip = true,
   });
 
   final OrderBatch batch;
@@ -37,12 +38,16 @@ class _HomeBatchLine extends StatefulWidget {
   /// The batch is complete: the count reads «اكتملت ٨ من ٨».
   final bool done;
 
+  /// Show the «عودة للفرع ~٥:٤٠ م · ٣٤ كم» row and its ⓘ. Off once the batch
+  /// is closed: the ride back is no longer an estimate about the route, it is
+  /// the one thing the card is about, and it is stated there instead.
+  final bool showTrip;
+
   @override
   State<_HomeBatchLine> createState() => _HomeBatchLineState();
 }
 
-class _HomeBatchLineState extends State<_HomeBatchLine>
-    with _InlineHintHost {
+class _HomeBatchLineState extends State<_HomeBatchLine> with _InlineHintHost {
   @override
   Widget build(BuildContext context) {
     final quiet = const TextStyle().setSecondaryColor.s12.semiBold;
@@ -79,35 +84,38 @@ class _HomeBatchLineState extends State<_HomeBatchLine>
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        4.szH,
-        Row(
-          children: [
-            Flexible(
-              child: Text(
-                LocaleKeys.homeReturnLine.tr(
-                  namedArgs: {
-                    'time': widget.returnEta,
-                    'km': formatKmArabic(widget.routeKm),
-                  },
+        if (widget.showTrip) ...[
+          4.szH,
+          Row(
+            children: [
+              Flexible(
+                child: Text(
+                  LocaleKeys.homeReturnLine.tr(
+                    namedArgs: {
+                      'time': widget.returnEta,
+                      'km': formatKmArabic(widget.routeKm),
+                    },
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style:
+                      const TextStyle().setSecondaryColor.s12.regular.tabular,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle().setSecondaryColor.s12.regular.tabular,
               ),
-            ),
-            6.szW,
-            _HintDot(
-              open: hintOpen,
-              onTap: toggleHint,
-              label: LocaleKeys.homeTripTooltipLabel.tr(),
-            ),
-          ],
-        ),
-        _InlineHintNote(
-          open: hintOpen,
-          message: LocaleKeys.homeTripTooltip.tr(),
-          onTap: toggleHint,
-        ),
+              6.szW,
+              _HintDot(
+                open: hintOpen,
+                onTap: toggleHint,
+                label: LocaleKeys.homeTripTooltipLabel.tr(),
+              ),
+            ],
+          ),
+          _InlineHintNote(
+            open: hintOpen,
+            message: LocaleKeys.homeTripTooltip.tr(),
+            onTap: toggleHint,
+          ),
+        ],
       ],
     );
   }

@@ -51,8 +51,9 @@ class _HomeRemainingStopRow extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: badgeBg,
-              borderRadius:
-                  badgeCircle ? null : BorderRadius.circular(AppCircular.r8),
+              borderRadius: badgeCircle
+                  ? null
+                  : BorderRadius.circular(AppCircular.r8),
               shape: badgeCircle ? BoxShape.circle : BoxShape.rectangle,
             ),
             child: Text(
@@ -70,20 +71,13 @@ class _HomeRemainingStopRow extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: const TextStyle()
-                      .setMainTextColor
-                      .copyWith(
-                        fontSize: nameSize,
-                        fontWeight: nameWeight,
-                      )
+                  style: const TextStyle().setMainTextColor
+                      .copyWith(fontSize: nameSize, fontWeight: nameWeight)
                       .withHeight(1.33),
                 ),
                 Text(
                   area,
-                  style: const TextStyle()
-                      .setSecondaryColor
-                      .s12
-                      .regular
+                  style: const TextStyle().setSecondaryColor.s12.regular
                       .withHeight(1.33),
                 ),
               ],

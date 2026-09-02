@@ -145,9 +145,9 @@ class _StatusLine extends StatelessWidget {
       CourierStatus.onRoute => LocaleKeys.headerRemaining.tr(
         namedArgs: {'count': arabicDigits(shift.inProgress)},
       ),
-      CourierStatus.returning => LocaleKeys.headerExpectedAtBranch.tr(
-        namedArgs: {'time': shift.returnEtaLabel ?? ''},
-      ),
+      // No time here: Home's card prints the estimate, and one screen should
+      // not carry the same figure twice.
+      CourierStatus.returning => LocaleKeys.headerExpectedAtBranch.tr(),
       CourierStatus.settled => LocaleKeys.headerSettled.tr(),
     };
     final cash = LocaleKeys.headerCashInHand.tr(

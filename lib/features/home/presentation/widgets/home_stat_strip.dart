@@ -54,10 +54,10 @@ class _HomeStatStrip extends StatelessWidget {
   }
 
   Widget _divider() => Container(
-        width: 1.w,
-        margin: EdgeInsets.symmetric(vertical: AppMargin.mH12),
-        color: AppColors.borderHeader,
-      );
+    width: 1.w,
+    margin: EdgeInsets.symmetric(vertical: AppMargin.mH12),
+    color: AppColors.borderHeader,
+  );
 
   Widget _cell({
     required String icon,
@@ -69,7 +69,12 @@ class _HomeStatStrip extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        IconWidget(icon: icon, color: iconColor, height: AppSize.sH20, width: AppSize.sW20),
+        IconWidget(
+          icon: icon,
+          color: iconColor,
+          height: AppSize.sH20,
+          width: AppSize.sW20,
+        ),
         8.szH,
         Text(
           value,

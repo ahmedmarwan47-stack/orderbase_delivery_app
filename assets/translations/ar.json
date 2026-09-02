@@ -420,7 +420,7 @@
   "settlement_locked_note": "الطلبات المدفوعة مسبقًا والطلبات المتعذّرة لا تدخل في التسوية.",
   "header_no_batch": "لا دفعات بعد",
   "header_remaining": "{count} طلبات متبقية",
-  "header_expected_at_branch": "متوقَّع في الفرع ~{time}",
+  "header_expected_at_branch": "متوقَّع في الفرع",
   "header_settled": "تمت تسوية اليوم",
   "header_cash_in_hand": "معك {amount} جم",
   "header_returns": "{count} مرتجعات",
@@ -437,9 +437,8 @@
   "home_stat_over_limit": "فوق الحد",
   "home_idle_title": "لم تُسند لك دفعة بعد",
   "home_idle_body": "هنبلّغك أول ما الفرع يجهّز دفعة. استلامها من تبويب الطلبات.",
-  "home_return_expected": "متوقَّع في الفرع ~{time}",
+  "home_return_expected": "متوقَّع ~{time}",
   "home_return_title": "ارجع للفرع",
-  "home_return_body": "للتسوية أو استلام دفعة جديدة · {km}",
   "home_hand_to_branch": "تسلّم للفرع",
   "home_return_hand_cash": "{amount} جم نقدًا",
   "home_return_hand_returns": "{count} مرتجعات",
@@ -478,5 +477,7 @@
   "home_note_hint_label": "ملاحظة من العميل",
   "home_collect_batch_title": "ارجع للفرع لاستلام دفعة جديدة",
   "home_collect_batch_meta": "{what} · {orders} طلبات · {cash} جم",
-  "home_collect_batch_count": "{n} دفعات"
+  "home_collect_batch_count": "{n} دفعات",
+  "home_collect_batch_ready": "دفعة جديدة جاهزة في الفرع",
+  "home_stat_cash_on_you": "معك نقدًا"
 }

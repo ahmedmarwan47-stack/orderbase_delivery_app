@@ -48,8 +48,10 @@ class _HomeFlatHeader extends StatelessWidget {
                     ),
                     Text(
                       '· ${LocaleKeys.homeMerchantName.tr()}',
-                      style:
-                          const TextStyle().setColor(AppColors.flatMuted).s12.regular,
+                      style: const TextStyle()
+                          .setColor(AppColors.flatMuted)
+                          .s12
+                          .regular,
                     ),
                   ],
                 ),

@@ -75,7 +75,7 @@ class _IdleBody extends StatelessWidget {
         Text(
           LocaleKeys.homeIdleTitle.tr(),
           textAlign: TextAlign.center,
-          style: const TextStyle().setMainTextColor.s18.bold,
+          style: const TextStyle().setMainTextColor.s16.bold,
         ),
         8.szH,
         Text(
@@ -96,10 +96,7 @@ class _IdleBody extends StatelessWidget {
           _PendingBatchRow(onTap: onOpenPendingBatch),
         ],
       ],
-    ).paddingSymmetric(
-      horizontal: AppPadding.pW20,
-      vertical: AppPadding.pH32,
-    );
+    ).paddingSymmetric(horizontal: AppPadding.pW20, vertical: AppPadding.pH32);
   }
 }
 
@@ -126,61 +123,35 @@ class _ReturningBody extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // The batch, closed. Its trip row is off: the ride back is the
+            // whole point of this card and is stated once, in the pill below.
+            if (batch != null)
+              _HomeBatchLine(
+                batch: batch,
+                current: shift.totalStops,
+                total: shift.totalStops,
+                returnEta: eta,
+                routeKm: batch.routeKm,
+                done: true,
+                showTrip: false,
+              ),
+            12.szH,
+            // Instruction and the one time it names. The branch's name, and
+            // the reason for going, are left out: the map below is the branch
+            // and the chips under it are the reason.
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (batch != null)
-                  Expanded(
-                    child: _HomeBatchLine(
-                      batch: batch,
-                      current: shift.totalStops,
-                      total: shift.totalStops,
-                      returnEta: eta,
-                      routeKm: batch.routeKm,
-                      done: true,
-                    ),
-                  )
-                else
-                  const Spacer(),
+                Expanded(
+                  child: Text(
+                    LocaleKeys.homeReturnTitle.tr(),
+                    style: const TextStyle().setMainTextColor.s16.bold
+                        .withHeight(1.3),
+                  ),
+                ),
+                12.szW,
+                _ExpectedAtPill(eta: eta),
               ],
-            ),
-            12.szH,
-            // The status pill — the one fact the branch and the courier share.
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.transitPillBg,
-                  borderRadius: BorderRadius.circular(AppCircular.r8),
-                ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppPadding.pW8,
-                  vertical: AppPadding.pH4,
-                ),
-                child: Text(
-                  LocaleKeys.homeReturnExpected.tr(namedArgs: {'time': eta}),
-                  style: const TextStyle()
-                      .setColor(AppColors.transitBg)
-                      .s12
-                      .semiBold
-                      .tabular,
-                ),
-              ),
-            ),
-            12.szH,
-            Text(
-              LocaleKeys.homeReturnTitle.tr(),
-              style: const TextStyle().setMainTextColor.s20.bold.withHeight(
-                1.3,
-              ),
-            ),
-            4.szH,
-            // One class under the headline, matching the hero's address block:
-            // where the branch is and why you are going, not two type tiers.
-            Text(
-              '${Courier.merchantName} · ${shift.branchName}\n'
-              '${LocaleKeys.homeReturnBody.tr(namedArgs: {'km': formatKmArabic(OrderBatch.returnLegKm)})}',
-              style: const TextStyle().setTertiaryColor.s14.regular
-                  .withHeight(1.5),
             ),
           ],
         ).paddingOnly(
@@ -232,7 +203,8 @@ class _ReturningBody extends StatelessWidget {
             ),
             if (shift.hasPendingBatch) ...[
               12.szH,
-              _PendingBatchRow(onTap: onOpenPendingBatch),
+              // Already told to go back, so this row only names what is there.
+              _PendingBatchRow(onTap: onOpenPendingBatch, returning: true),
             ],
             12.szH,
             _OutlineButton(
@@ -248,6 +220,37 @@ class _ReturningBody extends StatelessWidget {
           bottom: AppPadding.pH16,
         ),
       ],
+    );
+  }
+}
+
+/// «متوقَّع ~٥:٤٤ م» — the estimate, stated once and only here. The header
+/// says «متوقَّع في الفرع» with no time, and the title beside this pill has
+/// already named the branch, so neither the phrase nor the figure is printed
+/// twice on one screen.
+class _ExpectedAtPill extends StatelessWidget {
+  const _ExpectedAtPill({required this.eta});
+  final String eta;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.transitPillBg,
+        borderRadius: BorderRadius.circular(AppCircular.r8),
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppPadding.pW8,
+        vertical: AppPadding.pH4,
+      ),
+      child: Text(
+        LocaleKeys.homeReturnExpected.tr(namedArgs: {'time': eta}),
+        style: const TextStyle()
+            .setColor(AppColors.transitBg)
+            .s12
+            .semiBold
+            .tabular,
+      ),
     );
   }
 }
@@ -292,7 +295,7 @@ class _SettledBody extends StatelessWidget {
         Text(
           LocaleKeys.homeSettledTitle.tr(),
           textAlign: TextAlign.center,
-          style: const TextStyle().setMainTextColor.s18.bold,
+          style: const TextStyle().setMainTextColor.s16.bold,
         ),
         8.szH,
         Text(
@@ -335,10 +338,7 @@ class _SettledBody extends StatelessWidget {
           ),
         ],
       ],
-    ).paddingSymmetric(
-      horizontal: AppPadding.pW20,
-      vertical: AppPadding.pH32,
-    );
+    ).paddingSymmetric(horizontal: AppPadding.pW20, vertical: AppPadding.pH32);
   }
 }
 
@@ -411,8 +411,12 @@ class _HandChip extends StatelessWidget {
 /// inside the status card, and names what is waiting so the courier can judge
 /// whether it is worth the detour yet.
 class _PendingBatchRow extends StatelessWidget {
-  const _PendingBatchRow({this.onTap});
+  const _PendingBatchRow({this.onTap, this.returning = false});
   final VoidCallback? onTap;
+
+  /// The courier has already been told to head back, so the row drops the
+  /// instruction and just names what is waiting.
+  final bool returning;
 
   @override
   Widget build(BuildContext context) {
@@ -459,7 +463,10 @@ class _PendingBatchRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    LocaleKeys.homeCollectBatchTitle.tr(),
+                    (returning
+                            ? LocaleKeys.homeCollectBatchReady
+                            : LocaleKeys.homeCollectBatchTitle)
+                        .tr(),
                     style: const TextStyle()
                         .setColor(AppColors.postponedText)
                         .s14

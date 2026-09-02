@@ -22,20 +22,21 @@ class HomeFlatScreen extends StatelessWidget {
               const _HomeFlatHeader(),
               Expanded(
                 child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _HomeFlatNextStop(onViewOrder: onOpenOrder),
-                      16.szH,
-                      _HomeOverviewCard(
-                        onTap: () => onSelectTab?.call(NavTab.orders),
+                  child:
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _HomeFlatNextStop(onViewOrder: onOpenOrder),
+                          16.szH,
+                          _HomeOverviewCard(
+                            onTap: () => onSelectTab?.call(NavTab.orders),
+                          ),
+                        ],
+                      ).paddingOnly(
+                        left: AppPadding.pW20,
+                        right: AppPadding.pW20,
+                        bottom: AppPadding.pH20,
                       ),
-                    ],
-                  ).paddingOnly(
-                    left: AppPadding.pW20,
-                    right: AppPadding.pW20,
-                    bottom: AppPadding.pH20,
-                  ),
                 ),
               ),
               BottomNav(

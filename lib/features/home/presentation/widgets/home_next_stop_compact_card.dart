@@ -122,58 +122,58 @@ class _HomeNextStopCompactCard extends StatelessWidget {
   }
 
   Widget _codPill(String text) => Container(
-        decoration: BoxDecoration(
-          color: AppColors.heroCodPillBg,
-          borderRadius: BorderRadius.circular(AppCircular.r8),
-        ),
-        padding: EdgeInsets.symmetric(
-          horizontal: AppPadding.pW12,
-          vertical: AppPadding.pH4,
-        ),
-        child: Text(
-          text,
-          style: const TextStyle().setColor(AppColors.postponedText).s12.semiBold,
-        ),
-      );
+    decoration: BoxDecoration(
+      color: AppColors.heroCodPillBg,
+      borderRadius: BorderRadius.circular(AppCircular.r8),
+    ),
+    padding: EdgeInsets.symmetric(
+      horizontal: AppPadding.pW12,
+      vertical: AppPadding.pH4,
+    ),
+    child: Text(
+      text,
+      style: const TextStyle().setColor(AppColors.postponedText).s12.semiBold,
+    ),
+  );
 
   Widget _metaRow() => Row(
-        children: [
-          IconWidget(
-            icon: AppAssets.svg.clock,
-            color: AppColors.textTertiary,
-            height: 15.h, // mockup glyph 15px
-            width: 15.w,
-          ),
-          4.szW,
-          Text(
-            LocaleKeys.homeEtaMinutes.tr(namedArgs: {'mins': '15'}),
-            style: const TextStyle().setTertiaryColor.s12.regular,
-          ),
-          12.szW,
-          _dot(),
-          12.szW,
-          Text(
-            LocaleKeys.homeDistanceKm.tr(namedArgs: {'dist': '1.2'}),
-            style: const TextStyle().setTertiaryColor.s12.regular.tabular,
-          ),
-          12.szW,
-          _dot(),
-          12.szW,
-          Text(
-            LocaleKeys.homeOrderNo.tr(namedArgs: {'num': '89289'}),
-            style: const TextStyle().setTertiaryColor.s12.regular.tabular,
-          ),
-        ],
-      );
+    children: [
+      IconWidget(
+        icon: AppAssets.svg.clock,
+        color: AppColors.textTertiary,
+        height: 15.h, // mockup glyph 15px
+        width: 15.w,
+      ),
+      4.szW,
+      Text(
+        LocaleKeys.homeEtaMinutes.tr(namedArgs: {'mins': '15'}),
+        style: const TextStyle().setTertiaryColor.s12.regular,
+      ),
+      12.szW,
+      _dot(),
+      12.szW,
+      Text(
+        LocaleKeys.homeDistanceKm.tr(namedArgs: {'dist': '1.2'}),
+        style: const TextStyle().setTertiaryColor.s12.regular.tabular,
+      ),
+      12.szW,
+      _dot(),
+      12.szW,
+      Text(
+        LocaleKeys.homeOrderNo.tr(namedArgs: {'num': '89289'}),
+        style: const TextStyle().setTertiaryColor.s12.regular.tabular,
+      ),
+    ],
+  );
 
   Widget _dot() => Container(
-        width: 3.w, // 3px separator dot (off the 4px grid)
-        height: 3.h,
-        decoration: const BoxDecoration(
-          color: AppColors.textSecondary,
-          shape: BoxShape.circle,
-        ),
-      );
+    width: 3.w, // 3px separator dot (off the 4px grid)
+    height: 3.h,
+    decoration: const BoxDecoration(
+      color: AppColors.textSecondary,
+      shape: BoxShape.circle,
+    ),
+  );
 }
 
 /// The red "station 2 of 5" pill reused across the home variants.

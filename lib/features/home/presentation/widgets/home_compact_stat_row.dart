@@ -119,7 +119,10 @@ class _HomeCompactStatRow extends StatelessWidget {
           4.szH,
           Text(
             LocaleKeys.homeEgp.tr(),
-            style: const TextStyle().setColor(AppColors.cashSuffixGreen).s12.semiBold,
+            style: const TextStyle()
+                .setColor(AppColors.cashSuffixGreen)
+                .s12
+                .semiBold,
           ),
         ],
       ),

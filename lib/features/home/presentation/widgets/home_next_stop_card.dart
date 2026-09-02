@@ -93,7 +93,9 @@ class _HomeNextStopCardState extends State<_HomeNextStopCard>
               // that isn't in the address. It wraps rather than shrinking.
               Text(
                 '${order.area} · ${order.addr}',
-                style: const TextStyle().setMainTextColor.s18.bold.withHeight(
+                // 16 — the hero slot's one headline size, shared with the
+                // idle / returning / settled titles that take its place.
+                style: const TextStyle().setMainTextColor.s16.bold.withHeight(
                   1.4,
                 ),
               ),
@@ -134,10 +136,8 @@ class _HomeNextStopCardState extends State<_HomeNextStopCard>
                         children: [
                           TextSpan(
                             text: order.name,
-                            style: const TextStyle()
-                                .setMainTextColor
-                                .s14
-                                .semiBold,
+                            style:
+                                const TextStyle().setMainTextColor.s14.semiBold,
                           ),
                           const TextSpan(text: '  '),
                           TextSpan(

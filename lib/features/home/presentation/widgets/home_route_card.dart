@@ -59,10 +59,13 @@ class _HomeRouteCard extends StatelessWidget {
                   vertical: AppPadding.pH4,
                 ),
                 child: Text(
-                  LocaleKeys.homeStopCount
-                      .tr(namedArgs: {'current': '2', 'total': '5'}),
-                  style:
-                      const TextStyle().setColor(AppColors.stopCountText).s12.semiBold,
+                  LocaleKeys.homeStopCount.tr(
+                    namedArgs: {'current': '2', 'total': '5'},
+                  ),
+                  style: const TextStyle()
+                      .setColor(AppColors.stopCountText)
+                      .s12
+                      .semiBold,
                 ),
               ),
             ],
@@ -91,11 +94,7 @@ class _HomeRouteCard extends StatelessWidget {
                   border: Border.all(color: AppColors.borderHeader),
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: MapView(
-                  height: 78.h,
-                  pinDiameter: 26,
-                  pinIconSize: 14,
-                ),
+                child: MapView(height: 78.h, pinDiameter: 26, pinIconSize: 14),
               ),
               Expanded(
                 child: Column(
@@ -106,7 +105,8 @@ class _HomeRouteCard extends StatelessWidget {
                       children: [
                         Text(
                           LocaleKeys.homeCustomerName.tr(),
-                          style: const TextStyle().setMainTextColor.s14.semiBold,
+                          style:
+                              const TextStyle().setMainTextColor.s14.semiBold,
                         ),
                         Container(
                           decoration: BoxDecoration(
@@ -130,10 +130,7 @@ class _HomeRouteCard extends StatelessWidget {
                     4.szH,
                     Text(
                       LocaleKeys.homeCustomerAddress.tr(),
-                      style: const TextStyle()
-                          .setTertiaryColor
-                          .s12
-                          .regular
+                      style: const TextStyle().setTertiaryColor.s12.regular
                           .withHeight(1.45),
                     ),
                     4.szH,
@@ -284,41 +281,41 @@ class _HomeRouteCard extends StatelessWidget {
   }
 
   Widget _metaRow() => Row(
-        children: [
-          IconWidget(
-            icon: AppAssets.svg.clock,
-            color: AppColors.textTertiary,
-            height: 13.h, // mockup glyph 13px
-            width: 13.w,
-          ),
-          4.szW,
-          Text(
-            LocaleKeys.homeEtaShort.tr(),
-            style: const TextStyle().setTertiaryColor.s12.regular,
-          ),
-          8.szW,
-          _dot(),
-          8.szW,
-          Text(
-            LocaleKeys.homeDistanceKm.tr(namedArgs: {'dist': '1.2'}),
-            style: const TextStyle().setTertiaryColor.s12.regular.tabular,
-          ),
-          8.szW,
-          _dot(),
-          8.szW,
-          Text(
-            LocaleKeys.homeOrderNoShort.tr(),
-            style: const TextStyle().setTertiaryColor.s12.regular.tabular,
-          ),
-        ],
-      );
+    children: [
+      IconWidget(
+        icon: AppAssets.svg.clock,
+        color: AppColors.textTertiary,
+        height: 13.h, // mockup glyph 13px
+        width: 13.w,
+      ),
+      4.szW,
+      Text(
+        LocaleKeys.homeEtaShort.tr(),
+        style: const TextStyle().setTertiaryColor.s12.regular,
+      ),
+      8.szW,
+      _dot(),
+      8.szW,
+      Text(
+        LocaleKeys.homeDistanceKm.tr(namedArgs: {'dist': '1.2'}),
+        style: const TextStyle().setTertiaryColor.s12.regular.tabular,
+      ),
+      8.szW,
+      _dot(),
+      8.szW,
+      Text(
+        LocaleKeys.homeOrderNoShort.tr(),
+        style: const TextStyle().setTertiaryColor.s12.regular.tabular,
+      ),
+    ],
+  );
 
   Widget _dot() => Container(
-        width: 3.w,
-        height: 3.h,
-        decoration: const BoxDecoration(
-          color: AppColors.textSecondary,
-          shape: BoxShape.circle,
-        ),
-      );
+    width: 3.w,
+    height: 3.h,
+    decoration: const BoxDecoration(
+      color: AppColors.textSecondary,
+      shape: BoxShape.circle,
+    ),
+  );
 }

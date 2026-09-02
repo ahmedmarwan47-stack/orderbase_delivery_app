@@ -24,8 +24,9 @@ class StatusPill extends StatelessWidget {
     // the label cross-fades instead of hard-swapping. Shape / padding / size
     // stay identical. Reduce Motion collapses every duration to zero for an
     // instant swap.
-    final Duration duration =
-        AppMotion.reduced(context) ? Duration.zero : AppMotion.fill;
+    final Duration duration = AppMotion.reduced(context)
+        ? Duration.zero
+        : AppMotion.fill;
 
     return AnimatedContainer(
       duration: duration,
@@ -50,7 +51,10 @@ class StatusPill extends StatelessWidget {
               curve: AppMotion.ease,
               builder: (context, color, child) => Text(
                 label,
-                style: const TextStyle().setColor(color ?? foreground).s12.semiBold,
+                style: const TextStyle()
+                    .setColor(color ?? foreground)
+                    .s12
+                    .semiBold,
               ),
             ),
           ),

@@ -1,7 +1,7 @@
 part of '../imports/home_imports.dart';
 
 /// The day's four numbers as one strip under the hero: in progress, delivered,
-/// failed, cash collected. It replaced a 2×2 grid of tiles so the hero *and*
+/// failed, and the cash the courier is carrying. It replaced a 2×2 grid of tiles so the hero *and*
 /// the numbers fit on screen without a scroll — the courier asked for both
 /// upfront, with the hero still the biggest thing on the page.
 ///
@@ -63,14 +63,20 @@ class _HomeStatRow extends StatelessWidget {
             Expanded(
               flex: 4,
               child: _StatCell(
-                value: formatThousands(shift.collectedEgp),
+                // Cash IN HAND, the same figure the header states — not the
+                // day's gross. They diverge the moment the branch settles a
+                // batch, and two different money totals on one screen read as
+                // a bug whichever one you trust.
+                value: formatThousands(shift.cashInHand),
                 suffix: LocaleKeys.homeEgp.tr(),
                 label: over
                     ? LocaleKeys.homeStatOverLimit.tr()
-                    : LocaleKeys.homeCollectionShort.tr(),
+                    : LocaleKeys.homeStatCashOnYou.tr(),
                 // Slate for money; the one non-failure red in the app when
                 // the courier is carrying more than the branch allows.
-                background: over ? AppColors.failedText : AppColors.paymentCardBg,
+                background: over
+                    ? AppColors.failedText
+                    : AppColors.paymentCardBg,
                 valueColor: AppColors.surface,
                 labelColor: over
                     ? AppColors.overLimitLabel

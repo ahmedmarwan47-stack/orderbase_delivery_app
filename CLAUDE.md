@@ -359,10 +359,21 @@ clock starts again.
 - **`_HomeStatRow`** — one four-cell strip under the hero (in progress · delivered · failed · cash)
   so hero and numbers fit without a scroll. The cash cell goes red over the limit.
 - **`_HomeStateCard`** replaces the hero when there is nothing to deliver: *idle* (no batch yet),
-  *returning* («ارجع للفرع», the return ETA pill, what to hand over, map pinned on the branch in
-  ink, call the branch), *settled* (who took the cash and when). A pending batch adds an amber
-  «دفعة جديدة في انتظارك» row to any of them. `HomeScreen(preview: HomePreview.x)` pins one for
-  the DevGallery.
+  *returning* («ارجع للفرع» + a «متوقَّع ~٦:١٦ م» pill, what to hand over, map pinned on the branch
+  in ink, call the branch), *settled* (who took the cash and when). A pending batch adds the amber
+  collect row to any of them. `HomeScreen(preview: HomePreview.x)` pins one for the DevGallery.
+- **Say each fact once.** The returning card used to print the return estimate three times (header
+  lead, the batch line's trip row, its own pill) and the branch twice. Now the **time appears only
+  in the card's pill** — the header's returning lead is «متوقَّع في الفرع» with no figure, and
+  `_HomeBatchLine(showTrip: false)` drops the trip row once the batch is closed. The branch name
+  and the reason for going were deleted outright: the map *is* the branch and the hand-over chips
+  *are* the reason.
+- **One money figure on Home.** The stat strip shows `cashInHand` — the same number the header
+  states — not `collectedEgp`. The two diverge the moment the branch settles a batch, and two
+  different totals on one screen read as a bug whichever one you trust. The day's gross lives on
+  the settlement page, which is what that page is for.
+- **One headline size.** Everything that occupies the hero slot's title — the destination on route
+  and the idle / returning / settled titles — is `.s16.bold`.
 
 ## Orders tab = batches (`features/queue/`)
 

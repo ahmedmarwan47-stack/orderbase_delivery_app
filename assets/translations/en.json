@@ -420,7 +420,7 @@
   "settlement_locked_note": "Prepaid orders and failed orders don't enter the settlement.",
   "header_no_batch": "No batch yet",
   "header_remaining": "{count} orders left",
-  "header_expected_at_branch": "Expected at branch ~{time}",
+  "header_expected_at_branch": "Expected at branch",
   "header_settled": "Day settled",
   "header_cash_in_hand": "Holding EGP {amount}",
   "header_returns": "{count} returns",
@@ -437,9 +437,8 @@
   "home_stat_over_limit": "Over limit",
   "home_idle_title": "No batch assigned yet",
   "home_idle_body": "We'll let you know as soon as the branch has a batch ready. Collect it from the Orders tab.",
-  "home_return_expected": "Expected at branch ~{time}",
+  "home_return_expected": "Expected ~{time}",
   "home_return_title": "Head back to the branch",
-  "home_return_body": "To settle or collect a new batch · {km}",
   "home_hand_to_branch": "Hand over",
   "home_return_hand_cash": "EGP {amount} cash",
   "home_return_hand_returns": "{count} returns",
@@ -478,5 +477,7 @@
   "home_note_hint_label": "Customer note",
   "home_collect_batch_title": "Head back to the branch to collect a new batch",
   "home_collect_batch_meta": "{what} · {orders} orders · EGP {cash}",
-  "home_collect_batch_count": "{n} batches"
+  "home_collect_batch_count": "{n} batches",
+  "home_collect_batch_ready": "A new batch is ready at the branch",
+  "home_stat_cash_on_you": "On you"
 }

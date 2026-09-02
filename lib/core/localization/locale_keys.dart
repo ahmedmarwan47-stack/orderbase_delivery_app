@@ -560,7 +560,6 @@ abstract final class LocaleKeys {
   static const String homeIdleBody = 'home_idle_body';
   static const String homeReturnExpected = 'home_return_expected';
   static const String homeReturnTitle = 'home_return_title';
-  static const String homeReturnBody = 'home_return_body';
   static const String homeHandToBranch = 'home_hand_to_branch';
   static const String homeReturnHandCash = 'home_return_hand_cash';
   static const String homeReturnHandReturns = 'home_return_hand_returns';
@@ -600,4 +599,6 @@ abstract final class LocaleKeys {
   static const String homeCollectBatchTitle = 'home_collect_batch_title';
   static const String homeCollectBatchMeta = 'home_collect_batch_meta';
   static const String homeCollectBatchCount = 'home_collect_batch_count';
+  static const String homeCollectBatchReady = 'home_collect_batch_ready';
+  static const String homeStatCashOnYou = 'home_stat_cash_on_you';
 }

@@ -31,7 +31,12 @@ Future<T?> showAppSheet<T>(BuildContext context, {required Widget child}) {
 /// The white sheet panel: grabber handle, a header row (optional back button,
 /// title, close button), then [body]. The body scrolls if it overflows.
 class SheetShell extends StatelessWidget {
-  const SheetShell({super.key, required this.title, required this.body, this.onBack});
+  const SheetShell({
+    super.key,
+    required this.title,
+    required this.body,
+    this.onBack,
+  });
 
   final String title;
   final Widget body;
@@ -42,7 +47,9 @@ class SheetShell extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppCircular.r26)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppCircular.r26),
+        ),
       ),
       // Add the device's bottom inset (home indicator) so the sheet's last
       // control never sits under it. showModalBottomSheet doesn't do this for us.
