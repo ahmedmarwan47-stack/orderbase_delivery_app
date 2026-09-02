@@ -354,14 +354,17 @@ whole day can be watched from zero to settled.
   (`«زهراء مدينة نصر · شارع بن عبدالعزيز»`, 18/bold) because they are one fact; the door
   (`Order.addrDetail` — «عمارة ٤٢٩٠ · الدور ٥ · شقة ٥٢») sits under it at 14/regular. Setting the
   area three steps louder than its own street invented a hierarchy that isn't in an address.
-- **Hints float above their trigger** (`home_inline_hint.dart`): `_HintAnchor` wraps a control in a
-  **manually-triggered `Tooltip`** (`triggerMode: manual` + `GlobalKey<TooltipState>` —
-  `TooltipTriggerMode.tap` loses the gesture to the tappable hero card) with `preferBelow: false`,
-  so the bubble opens *upward* and never lands on the destination. An in-place expanding version
-  was tried and rejected: a tooltip should hover and go away, not move the card. Two use it —
-  `_HintDot` (the ⓘ on the trip line, an ink ring matching the black line beside it) and
-  `_NotePill` (shown when `Order.note != null`). The hero cannot show a note in full — it is a
-  paragraph — so the badge says one exists and sends the courier to the detail.
+- **Hints are a hand-built overlay** (`home_inline_hint.dart`). Flutter's `Tooltip` was dropped:
+  shown manually — the only way to stop the tappable hero card stealing the gesture — it never
+  auto-dismisses (`showDuration` only applies to its own tap/long-press paths) and its fade has no
+  relationship to the control. `_HintAnchor` measures the trigger's global rect on tap, raises an
+  `OverlayPortal` bubble **above** it (never over the destination), and **scales it up from the
+  caret at the trigger's own x** — the motion says *this belongs to that icon*. It arrives over
+  `AppMotion.fill`, leaves over the shorter `AppMotion.stamp` (an exit as slow as the entrance
+  reads as lag), and dismisses itself after a dwell scaled off the message length (4–9s), on a tap
+  anywhere, or on any scroll — a bubble pinned to a stale rect while the page moves looks broken.
+  Reduce Motion jumps to both ends but still auto-dismisses. Two use it: `_HintDot` (the ⓘ on the
+  trip line, an ink ring matching the black line beside it) and `_NotePill`.
 - **The note badge is a pill, not a dot.** It sits in an `IntrinsicHeight` row with
   `CrossAxisAlignment.stretch` beside the cash pill, so the two are exactly the same height and
   read as a matched pair. A circle next to a pill read as two unrelated things sharing a row.
