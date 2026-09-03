@@ -314,7 +314,6 @@ previous one:
 | a fresh day begins | `firstBatchAfter` (10 s) → batch 1 dispatched |
 | the courier confirms carrying a batch | `nextBatchAfter` (20 s) → the next batch dispatched |
 | three batches dispatched | the branch is done sending |
-| «محاكاة تسوية الفرع (تجريبي)» on the Account tab (only shown while `returning`) | the cashier settles (`settleNow` → `settleDay`) → notification, settlement flips to SETTLED, Home shows the settled card. **Not on a timer** — a self-settling day read as a bug |
 | cash crosses the limit | one `addCashOverLimit` notification per crossing |
 
 Each dispatch raises the mid-flight sheet, files a notification, and lights the Orders badge. The
@@ -326,8 +325,11 @@ is the one event of the day the courier did not cause; a silent sheet is missed 
 session and a restarted one both total three.
 
 «بدء يوم جديد (تجريبي)» (settled card / Account tab) calls `restart()`: the shift empties, and the
-whole day can be watched from zero to settled. Settlement used to fire 40 s after the courier went
-`returning`; that timer is gone — it looked like the app settling itself.
+whole day can be watched from zero to «متوقَّع في الفرع». **The simulator never settles the day** —
+it used to fire `settleDay` 40 s after the courier went `returning`, then briefly had a demo row for
+it; both read as the app settling itself and are gone. `settleDay` now has no caller in the app; the
+settled Home card and settled settlement view are reachable only as DevGallery previews until the
+branch dashboard exists.
 
 ## Shift model (`lib/app/shift_controller.dart`)
 

@@ -1,23 +1,21 @@
 import 'dart:async';
 
-import '../config/res/config_imports.dart';
 import '../data/order.dart';
 import '../features/notifications/presentation/imports/notifications_imports.dart';
 import 'shift_controller.dart';
 
 /// Plays the branch's side of the day so the app behaves like a real shift
 /// without a backend: batches are dispatched one at a time, and every event
-/// files the same notification a push would. Settlement is **not** on a
-/// timer: a cashier taking the cash forty seconds after the last stop looked
-/// like the app settling itself. It is a demo action on the Account tab
-/// ([settleNow]) until the real dashboard does it.
+/// files the same notification a push would. It never settles the day:
+/// settlement is the branch dashboard's act, and nothing in this app — timer
+/// or button — stands in for it.
 ///
 /// **The day is a chain, not a schedule.** A branch does not hand a courier
 /// their next batch while the last one is still on the shelf — it waits until
 /// they have actually carried it out. So the first batch lands [firstBatchAfter]
 /// a fresh day begins, and every batch after it lands [nextBatchAfter] the
-/// courier *confirms collecting* the previous one. Three batches, then the day
-/// runs to settlement.
+/// courier *confirms collecting* the previous one. Three batches, then the
+/// branch is done sending.
 ///
 /// Every timer lives here and nowhere else, so swapping this for push
 /// notifications later touches one file. Start it once from the shell; call
@@ -125,20 +123,5 @@ class ShiftSimulator {
     } else if (carried < _carried) {
       _carried = carried; // the day was reset from under us
     }
-  }
-
-  /// «محاكاة تسوية الفرع»: the cashier takes the cash and the returns now.
-  /// Stands in for the admin dashboard. Only when the courier is done and
-  /// expected at the branch — there is nothing to settle mid-route.
-  /// Returns false when there was nothing to do.
-  bool settleNow() {
-    if (shift.status != CourierStatus.returning) return false;
-    final cashier = LocaleKeys.settlementCashierDefault.tr();
-    shift.settleDay(cashier: cashier);
-    final receipt = shift.settlement;
-    if (receipt != null) {
-      notifications.addDaySettled(cash: receipt.cash, cashier: cashier);
-    }
-    return true;
   }
 }

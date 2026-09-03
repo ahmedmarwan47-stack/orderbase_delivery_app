@@ -9,7 +9,6 @@ class ProfileScreen extends StatelessWidget {
     this.onOpenNotifications,
     this.onOpenSearch,
     this.onStartNewDay,
-    this.onSettleDay,
   });
 
   final ValueChanged<NavTab> onSelectTab;
@@ -18,10 +17,6 @@ class ProfileScreen extends StatelessWidget {
 
   /// Dev-only: reset the simulated day so the whole flow can be run again.
   final VoidCallback? onStartNewDay;
-
-  /// Dev-only: play the cashier — settle the day now. Stands in for the
-  /// branch dashboard; returns false when there is nothing to settle.
-  final bool Function()? onSettleDay;
 
   void _push(BuildContext context, Widget screen) => Navigator.of(
     context,
@@ -82,26 +77,6 @@ class ProfileScreen extends StatelessWidget {
                               onStartNewDay!();
                               onSelectTab(NavTab.home);
                             },
-                          ),
-                        if (onSettleDay != null)
-                          // Only while the courier is done and expected at the
-                          // branch — the one moment a cashier could settle.
-                          ListenableBuilder(
-                            listenable: ShiftController.instance,
-                            builder: (_, _) =>
-                                ShiftController.instance.status ==
-                                    CourierStatus.returning
-                                ? _ProfileRow(
-                                    icon: AppAssets.svg.cash,
-                                    label: LocaleKeys.profileSettleDemo.tr(),
-                                    onTap: () {
-                                      if (onSettleDay!()) {
-                                        AppHaptics.confirm();
-                                        onSelectTab(NavTab.settlement);
-                                      }
-                                    },
-                                  )
-                                : const SizedBox.shrink(),
                           ),
                         _ProfileRow(
                           icon: AppAssets.svg.undo,

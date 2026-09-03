@@ -9,7 +9,6 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../../../app/road_mode.dart';
-import '../../../../app/shift_controller.dart';
 import '../../../../config/res/config_imports.dart';
 import '../../../../core/session/auth_session.dart';
 import '../../../../core/session/courier.dart';

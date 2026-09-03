@@ -260,7 +260,6 @@ class _AppShellState extends State<AppShell>
               onOpenNotifications: _toggleNotifications,
               onOpenSearch: _openOrdersSearch,
               onStartNewDay: _simulator.restart,
-              onSettleDay: _simulator.settleNow,
             ),
             _NotificationsPage(
               onSelectTab: _select,

@@ -209,20 +209,4 @@ class NotificationsStore extends ChangeNotifier {
       ),
     );
   }
-
-  /// The branch settled the day from its dashboard.
-  void addDaySettled({required int cash, required String cashier}) {
-    add(
-      AppNotification(
-        kind: NotifKind.settled,
-        orderNum: '',
-        title: LocaleKeys.notifTitleSettled.tr(),
-        body: LocaleKeys.notifBodySettled.tr(
-          namedArgs: {'cash': formatThousands(cash), 'cashier': cashier},
-        ),
-        time: LocaleKeys.notifJustNow.tr(),
-        unread: true,
-      ),
-    );
-  }
 }
