@@ -83,6 +83,7 @@
   "profile_road_mode_desc": "خط أكبر وأزرار أعلى وتباين أقوى على الرئيسية وتفاصيل الطلب",
   "profile_road_auto": "تشغيل تلقائي على الطريق",
   "profile_road_auto_desc": "يشتغل مع أول طلب ويقفل لما ترجع للفرع",
+  "profile_settle_demo": "محاكاة تسوية الفرع (تجريبي)",
   "home_courier_name": "محمد عبدالرحمن",
   "home_merchant_name": "Sale Sucre",
   "home_shift_remaining": "متبقٍ {count} توصيلات",

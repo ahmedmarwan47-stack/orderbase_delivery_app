@@ -99,6 +99,7 @@ abstract final class LocaleKeys {
   static const String profileRoadModeDesc = 'profile_road_mode_desc';
   static const String profileRoadAuto = 'profile_road_auto';
   static const String profileRoadAutoDesc = 'profile_road_auto_desc';
+  static const String profileSettleDemo = 'profile_settle_demo';
   static const String navHome = 'nav_home';
   static const String navOrders = 'nav_orders';
   static const String navNotifications = 'nav_notifications';

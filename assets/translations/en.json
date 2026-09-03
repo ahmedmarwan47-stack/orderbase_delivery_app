@@ -83,6 +83,7 @@
   "profile_road_mode_desc": "Bigger type, taller buttons and stronger contrast on Home and the order detail",
   "profile_road_auto": "Turn on automatically on route",
   "profile_road_auto_desc": "Comes on with the first order, off when you are back at the branch",
+  "profile_settle_demo": "Simulate branch settlement (demo)",
   "home_courier_name": "Mohamed Abdelrahman",
   "home_merchant_name": "Sale Sucre",
   "home_shift_remaining": "{count} deliveries left",

@@ -6,9 +6,11 @@ import '../features/notifications/presentation/imports/notifications_imports.dar
 import 'shift_controller.dart';
 
 /// Plays the branch's side of the day so the app behaves like a real shift
-/// without a backend: batches are dispatched one at a time, the cashier
-/// settles once the courier is expected back, and every event files the same
-/// notification a push would.
+/// without a backend: batches are dispatched one at a time, and every event
+/// files the same notification a push would. Settlement is **not** on a
+/// timer: a cashier taking the cash forty seconds after the last stop looked
+/// like the app settling itself. It is a demo action on the Account tab
+/// ([settleNow]) until the real dashboard does it.
 ///
 /// **The day is a chain, not a schedule.** A branch does not hand a courier
 /// their next batch while the last one is still on the shelf — it waits until
@@ -33,10 +35,6 @@ class ShiftSimulator {
   /// dispatched.
   static const Duration nextBatchAfter = Duration(seconds: 20);
 
-  /// How long after the courier is «expected at the branch» the cashier
-  /// settles the day.
-  static const Duration settleAfterReturning = Duration(seconds: 40);
-
   /// The day's batches, in the order the branch sends them.
   final List<OrderBatch> _plan = demoDayBatches;
 
@@ -47,7 +45,6 @@ class ShiftSimulator {
   int _carried = 0;
 
   Timer? _dispatchTimer;
-  Timer? _settleTimer;
   bool _wasOverLimit = false;
   bool _listening = false;
 
@@ -75,8 +72,6 @@ class ShiftSimulator {
   void stop() {
     _dispatchTimer?.cancel();
     _dispatchTimer = null;
-    _settleTimer?.cancel();
-    _settleTimer = null;
   }
 
   /// «بدء يوم جديد»: clear the shift and let the branch start dispatching from
@@ -130,25 +125,20 @@ class ShiftSimulator {
     } else if (carried < _carried) {
       _carried = carried; // the day was reset from under us
     }
-
-    // Expected back at the branch → the cashier settles a little later. A new
-    // batch carried in the meantime cancels it: the day is not over.
-    if (shift.status == CourierStatus.returning) {
-      _settleTimer ??= Timer(settleAfterReturning, _settle);
-    } else {
-      _settleTimer?.cancel();
-      _settleTimer = null;
-    }
   }
 
-  void _settle() {
-    _settleTimer = null;
-    if (shift.status != CourierStatus.returning) return;
+  /// «محاكاة تسوية الفرع»: the cashier takes the cash and the returns now.
+  /// Stands in for the admin dashboard. Only when the courier is done and
+  /// expected at the branch — there is nothing to settle mid-route.
+  /// Returns false when there was nothing to do.
+  bool settleNow() {
+    if (shift.status != CourierStatus.returning) return false;
     final cashier = LocaleKeys.settlementCashierDefault.tr();
     shift.settleDay(cashier: cashier);
     final receipt = shift.settlement;
     if (receipt != null) {
       notifications.addDaySettled(cash: receipt.cash, cashier: cashier);
     }
+    return true;
   }
 }
