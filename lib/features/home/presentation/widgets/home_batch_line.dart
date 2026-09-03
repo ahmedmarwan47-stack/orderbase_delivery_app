@@ -40,7 +40,8 @@ class _HomeBatchLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final quiet = const TextStyle().setSecondaryColor.s12.semiBold;
+    final road = RoadMode.instance.on;
+    final quiet = const TextStyle().setSecondaryColor.s12.semiBold.road(road);
     final count = done
         ? LocaleKeys.homeBatchDone.tr(
             namedArgs: {
@@ -65,7 +66,9 @@ class _HomeBatchLine extends StatelessWidget {
               // re-order «B #7877» around the hash.
               TextSpan(
                 text: batch.id,
-                style: const TextStyle().setMainTextColor.s12.bold.tabular,
+                style: const TextStyle().setMainTextColor.s12.bold.tabular.road(
+                  road,
+                ),
               ),
               TextSpan(text: ' · $count'),
             ],
@@ -90,8 +93,8 @@ class _HomeBatchLine extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   // Black, like the batch id above it: this is the line the
                   // courier plans the rest of the batch around.
-                  style:
-                      const TextStyle().setMainTextColor.s12.regular.tabular,
+                  style: const TextStyle().setMainTextColor.s12.regular.tabular
+                      .road(road),
                 ),
               ),
               6.szW,

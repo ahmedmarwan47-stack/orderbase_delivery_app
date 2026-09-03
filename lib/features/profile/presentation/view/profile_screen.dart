@@ -49,6 +49,11 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     const _ProfileIdentity(),
                     16.szH,
+                    // «وضع الطريق» and its auto switch, on their own surface
+                    // above the account rows: a setting the courier flips on
+                    // the bike, not an account chore.
+                    const _RoadModeGroup(),
+                    16.szH,
                     // Rows on one surface, hairline-separated — the same flat
                     // list treatment the orders and batches now use.
                     _ProfileGroup(

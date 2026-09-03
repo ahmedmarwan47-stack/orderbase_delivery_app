@@ -42,6 +42,9 @@ class _HomeNextStopCard extends StatelessWidget {
     if (order == null) return const SizedBox.shrink();
     final batch = shift.currentBatch;
     final isCod = order.cod != null && !order.prepaid;
+    // Road mode: one type step up, taller controls, a shorter map to pay for
+    // it, and a firmer outline. See [RoadMode].
+    final road = RoadMode.instance.on;
 
     // Only read when the legacy segment bar is on.
     final closed = shift.routeStops
@@ -60,7 +63,9 @@ class _HomeNextStopCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppCircular.r22),
-        border: Border.all(color: AppColors.borderCardFaint),
+        border: road
+            ? Border.all(color: AppColors.borderDefault, width: 2)
+            : Border.all(color: AppColors.borderCardFaint),
         boxShadow: AppShadows.heroCard,
       ),
       clipBehavior: Clip.antiAlias,
@@ -89,9 +94,9 @@ class _HomeNextStopCard extends StatelessWidget {
                 '${order.area} · ${order.addr}',
                 // 16 — the hero slot's one headline size, shared with the
                 // idle / returning / settled titles that take its place.
-                style: const TextStyle().setMainTextColor.s16.bold.withHeight(
-                  1.4,
-                ),
+                style: const TextStyle().setMainTextColor.s16.bold
+                    .road(road)
+                    .withHeight(1.4),
               ),
               4.szH,
               // The door beneath, quieter — the last thing you read, at the
@@ -99,6 +104,7 @@ class _HomeNextStopCard extends StatelessWidget {
               Text(
                 order.addrDetail ?? '',
                 style: const TextStyle().setTertiaryColor.s14.regular
+                    .road(road)
                     .withHeight(1.5),
               ),
             ],
@@ -113,8 +119,10 @@ class _HomeNextStopCard extends StatelessWidget {
           else if (kShowRouteLeg)
             _HomeRouteLeg(origin: shift.legOrigin, destination: order.place),
           // ── 3. map strip ──
+          // The map gives back the height the type takes: Maps is the map's
+          // job, the strip only confirms the pin.
           MapView(
-            height: AppSize.sH120,
+            height: road ? AppSize.sH96 : AppSize.sH120,
             showHairlines: true,
             destinationLabel: order.fullAddress,
           ),
@@ -130,8 +138,11 @@ class _HomeNextStopCard extends StatelessWidget {
                         children: [
                           TextSpan(
                             text: order.name,
-                            style:
-                                const TextStyle().setMainTextColor.s14.semiBold,
+                            style: const TextStyle()
+                                .setMainTextColor
+                                .s14
+                                .semiBold
+                                .road(road),
                           ),
                           const TextSpan(text: '  '),
                           TextSpan(
@@ -140,7 +151,8 @@ class _HomeNextStopCard extends StatelessWidget {
                                 .setSecondaryColor
                                 .s12
                                 .regular
-                                .tabular,
+                                .tabular
+                                .road(road),
                           ),
                         ],
                       ),
@@ -159,12 +171,13 @@ class _HomeNextStopCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         if (order.note != null) ...[
-                          const _NotePill(),
+                          _NotePill(road: road),
                           6.szW,
                         ],
                         _PayPill(
                           isCod: isCod,
                           amount: isCod ? order.cod : null,
+                          road: road,
                         ),
                       ],
                     ),
@@ -175,7 +188,9 @@ class _HomeNextStopCard extends StatelessWidget {
                 4.szH,
                 Text(
                   LocaleKeys.promisedAt.tr(namedArgs: {'time': order.due!}),
-                  style: const TextStyle().setSecondaryColor.s12.regular,
+                  style: const TextStyle().setSecondaryColor.s12.regular.road(
+                    road,
+                  ),
                 ),
               ],
             ],
@@ -190,7 +205,7 @@ class _HomeNextStopCard extends StatelessWidget {
             children: [
               Expanded(
                 child: SizedBox(
-                  height: AppSize.sH52,
+                  height: road ? AppSize.sH64 : AppSize.sH52,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: AppColors.inkFill,
@@ -213,7 +228,9 @@ class _HomeNextStopCard extends StatelessWidget {
                             LocaleKeys.homeDeliver.tr(),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle().setWhite.s14.semiBold,
+                            style: const TextStyle().setWhite.s14.semiBold.road(
+                              road,
+                            ),
                           ),
                         ),
                       ],
@@ -231,8 +248,8 @@ class _HomeNextStopCard extends StatelessWidget {
                 child: _HomeSquareIconButton(
                   icon: AppAssets.svg.phone,
                   iconColor: AppColors.textPrimary,
-                  size: AppSize.sH52,
-                  iconSize: 21.h, // mockup glyph 21px (off the 4px grid)
+                  size: road ? AppSize.sH64 : AppSize.sH52,
+                  iconSize: road ? AppSize.sH24 : 21.h, // mockup glyph 21px
                   radius: AppCircular.r15,
                   background: AppColors.surface,
                   border: AppColors.iconButtonBorder,
@@ -260,8 +277,11 @@ class _HomeNextStopCard extends StatelessWidget {
 /// the amount IS the payment type, so «الدفع عند الاستلام» beside it is noise.
 /// Prepaid has no figure, so there the label is the whole message.
 class _PayPill extends StatelessWidget {
-  const _PayPill({required this.isCod, this.amount});
+  const _PayPill({required this.isCod, this.amount, this.road = false});
   final bool isCod;
+
+  /// Road mode: the figure one type step up.
+  final bool road;
 
   /// Cash due in EGP. Null on a prepaid order, where there is nothing to show.
   final int? amount;
@@ -284,7 +304,8 @@ class _PayPill extends StatelessWidget {
             .setColor(isCod ? AppColors.postponedText : AppColors.deliveredText)
             .s12
             .semiBold
-            .tabular,
+            .tabular
+            .road(road),
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
   }

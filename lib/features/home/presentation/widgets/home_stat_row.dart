@@ -22,11 +22,14 @@ class _HomeStatRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final shift = ShiftController.instance;
     final over = shift.overCashLimit;
+    final road = RoadMode.instance.on;
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppCircular.r18), // radii exempt
-        border: Border.all(color: AppColors.borderCardFaint),
+        border: road
+            ? Border.all(color: AppColors.borderDefault, width: 2)
+            : Border.all(color: AppColors.borderCardFaint),
         boxShadow: AppShadows.card,
       ),
       clipBehavior: Clip.antiAlias,
@@ -39,6 +42,7 @@ class _HomeStatRow extends StatelessWidget {
               child: _StatCell(
                 value: _pad(shift.inProgress),
                 label: LocaleKeys.filterTransit.tr(),
+                road: road,
                 onTap: () => onOpenOrdersFilter?.call(QueueFilter.transit),
               ),
             ),
@@ -48,6 +52,7 @@ class _HomeStatRow extends StatelessWidget {
               child: _StatCell(
                 value: _pad(shift.deliveredCount),
                 label: LocaleKeys.filterDelivered.tr(),
+                road: road,
                 onTap: () => onOpenOrdersFilter?.call(QueueFilter.delivered),
               ),
             ),
@@ -57,6 +62,7 @@ class _HomeStatRow extends StatelessWidget {
               child: _StatCell(
                 value: _pad(shift.failedCount),
                 label: LocaleKeys.homeStatFailedShort.tr(),
+                road: road,
                 onTap: () => onOpenOrdersFilter?.call(QueueFilter.failed),
               ),
             ),
@@ -81,6 +87,7 @@ class _HomeStatRow extends StatelessWidget {
                 labelColor: over
                     ? AppColors.overLimitLabel
                     : AppColors.paymentLabel,
+                road: road,
                 onTap: onOpenSettlement,
               ),
             ),
@@ -99,7 +106,8 @@ class _StatCell extends StatelessWidget {
     this.suffix,
     this.background,
     this.valueColor = AppColors.textPrimary,
-    this.labelColor = AppColors.textSecondary,
+    this.labelColor,
+    this.road = false,
     this.onTap,
   });
 
@@ -108,11 +116,20 @@ class _StatCell extends StatelessWidget {
   final String? suffix;
   final Color? background;
   final Color valueColor;
-  final Color labelColor;
+
+  /// Null picks the default label colour: secondary, or tertiary (darker,
+  /// 7.6:1) on the road.
+  final Color? labelColor;
+
+  /// Road mode: number and label one step up.
+  final bool road;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final labelColor =
+        this.labelColor ??
+        (road ? AppColors.textTertiary : AppColors.textSecondary);
     return Semantics(
       button: onTap != null,
       label: '$value ${suffix ?? ''} $label'.trim(),
@@ -135,6 +152,7 @@ class _StatCell extends StatelessWidget {
                     .s20
                     .bold
                     .tabular
+                    .road(road)
                     .withHeight(1),
                 children: suffix == null
                     ? null
@@ -144,7 +162,8 @@ class _StatCell extends StatelessWidget {
                           style: const TextStyle()
                               .setColor(valueColor)
                               .s12
-                              .semiBold,
+                              .semiBold
+                              .road(road),
                         ),
                       ],
               ),
@@ -156,7 +175,12 @@ class _StatCell extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle().setColor(labelColor).s12.regular,
+              style: const TextStyle()
+                  .setColor(labelColor)
+                  // Stays 12 on the road: four cells across 328pt leave no
+                  // room for «في الطريق» at 14. The darker colour does the work.
+                  .s12
+                  .regular,
             ),
           ],
         ),

@@ -95,6 +95,10 @@ abstract final class LocaleKeys {
   static const String profileAccountPassword = 'profile_account_password';
   static const String profileDevScreens = 'profile_dev_screens';
   static const String profileMerchantNo = 'profile_merchant_no';
+  static const String profileRoadMode = 'profile_road_mode';
+  static const String profileRoadModeDesc = 'profile_road_mode_desc';
+  static const String profileRoadAuto = 'profile_road_auto';
+  static const String profileRoadAutoDesc = 'profile_road_auto_desc';
   static const String navHome = 'nav_home';
   static const String navOrders = 'nav_orders';
   static const String navNotifications = 'nav_notifications';

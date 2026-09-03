@@ -422,6 +422,24 @@ returns handover button (physically handing parcels back is still the courier's 
 note, then `_HistorySection` — rows that push `SettlementDayScreen(day)` read-only. The settled
 view is the designed confirmation plus the batches and the history.
 
+## Road mode (`lib/app/road_mode.dart`)
+
+«وضع الطريق» — for sun on the screen and gloves on the grips. `RoadMode.instance.on` grows only the
+surfaces the courier uses **while moving**: the Home hero and stat strip, the order detail's sticky
+deliver bar, and the result actions. Lists stay as they are (Orders and settlement are read standing
+still). What changes, all on the 4px scale: type one step up via `TextStyleEx.road(bool)`
+(12→14, 14→16, 16→20, 20→24 — chain it **last**), buttons 52/56→64 and the result secondary 48→56,
+the hero map 120→96 to pay for it, stat labels `textSecondary`→`textTertiary` (they **stay 12** — four cells
+across 328pt cannot fit «في الطريق» at 14), and the hero/strip
+outline becomes a 2px `borderDefault`. No new colours.
+
+Two switches on the Account tab (`_RoadModeGroup`): the mode itself, and «تشغيل تلقائي على
+الطريق» (default on) — phones give apps no ambient-light reading, so the mode follows the day: it
+flips on when `CourierStatus` *transitions* to `onRoute` and off when it leaves. Only transitions
+move it, so a manual flip mid-route holds until the next route event, and the switch always shows
+`on` itself so the hero and the switch never disagree. In-memory only (no preferences plugin — it
+would put native code back into the iOS build).
+
 ## Unified header (`lib/widgets/app_header.dart`)
 
 Line 1: **the branch alone** — «فرع مدينة نصر» (`ShiftController.branchName`; assigned per day).

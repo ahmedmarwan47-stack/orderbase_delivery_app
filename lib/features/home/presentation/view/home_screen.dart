@@ -94,7 +94,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Expanded(
                 child: AnimatedBuilder(
-                  animation: ShiftController.instance,
+                  animation: Listenable.merge([
+                    ShiftController.instance,
+                    RoadMode.instance,
+                  ]),
                   builder: (_, _) {
                     final shift = ShiftController.instance;
                     final status = _status(shift);

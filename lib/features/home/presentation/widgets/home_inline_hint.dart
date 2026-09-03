@@ -285,10 +285,7 @@ class _HintDot extends StatelessWidget {
             child: Center(
               child: Text(
                 'i',
-                style: const TextStyle()
-                    .setMainTextColor
-                    .s10
-                    .bold
+                style: const TextStyle().setMainTextColor.s10.bold
                     .withHeight(1)
                     .copyWith(fontFamily: 'sans-serif'),
               ),
@@ -311,7 +308,10 @@ class _HintDot extends StatelessWidget {
 /// exists and sends the courier to the order detail to read it, which beats
 /// truncating someone's instructions.
 class _NotePill extends StatelessWidget {
-  const _NotePill();
+  const _NotePill({this.road = false});
+
+  /// Road mode: the glyph grows with the cash pill it is paired with.
+  final bool road;
 
   @override
   Widget build(BuildContext context) {
@@ -328,8 +328,8 @@ class _NotePill extends StatelessWidget {
           child: IconWidget(
             icon: AppAssets.svg.note,
             color: AppColors.postponedText,
-            height: AppSize.sH14,
-            width: AppSize.sW14,
+            height: road ? AppSize.sH16 : AppSize.sH14,
+            width: road ? AppSize.sW16 : AppSize.sW14,
           ),
         ),
       ),
