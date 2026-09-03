@@ -17,7 +17,9 @@ class _AuthInfoCard extends StatelessWidget {
         border: Border.all(color: AppColors.deliveredBorder),
       ),
       padding: EdgeInsets.symmetric(
-          horizontal: AppPadding.pW16, vertical: AppPadding.pH12),
+        horizontal: AppPadding.pW16,
+        vertical: AppPadding.pH12,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -32,18 +34,22 @@ class _AuthInfoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle()
-                        .setColor(AppColors.deliveredText)
-                        .s14
-                        .semiBold),
+                Text(
+                  title,
+                  style: const TextStyle()
+                      .setColor(AppColors.deliveredText)
+                      .s14
+                      .semiBold,
+                ),
                 4.szH,
-                Text(body,
-                    style: const TextStyle()
-                        .setColor(AppColors.deliveredText)
-                        .s14
-                        .regular
-                        .withHeight(1.5)),
+                Text(
+                  body,
+                  style: const TextStyle()
+                      .setColor(AppColors.deliveredText)
+                      .s14
+                      .regular
+                      .withHeight(1.5),
+                ),
               ],
             ),
           ),

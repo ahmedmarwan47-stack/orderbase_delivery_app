@@ -89,7 +89,11 @@ class _ReturnsContent extends StatelessWidget {
               vertical: AppPadding.pH16,
             ),
             children: [
-              _ReturnsHero(count: returns.length, pieces: pieces, branch: branch),
+              _ReturnsHero(
+                count: returns.length,
+                pieces: pieces,
+                branch: branch,
+              ),
               20.szH,
               Align(
                 alignment: AlignmentDirectional.centerStart,
@@ -155,7 +159,10 @@ class _ReturnsHero extends StatelessWidget {
                     8.szW,
                     Text(
                       _ordersUnit(count),
-                      style: const TextStyle().setColor(AppColors.mutedOnDark).s16.semiBold,
+                      style: const TextStyle()
+                          .setColor(AppColors.paymentLabel)
+                          .s16
+                          .semiBold,
                     ),
                   ],
                 ),
@@ -164,7 +171,7 @@ class _ReturnsHero extends StatelessWidget {
                   '${_piecesLabel(pieces)} · '
                   '${LocaleKeys.failureReturnsHandedTo.tr(namedArgs: {'branch': branch})}',
                   style: const TextStyle()
-                      .setColor(AppColors.mutedOnDark)
+                      .setColor(AppColors.paymentLabel)
                       .s12
                       .regular
                       .withHeight(1.5),
@@ -338,11 +345,9 @@ class _ReturnsEmptyState extends StatelessWidget {
             Text(
               LocaleKeys.failureReturnsDoneBody.tr(),
               textAlign: TextAlign.center,
-              style: const TextStyle()
-                  .setSecondaryColor
-                  .s14
-                  .regular
-                  .withHeight(1.5),
+              style: const TextStyle().setSecondaryColor.s14.regular.withHeight(
+                1.5,
+              ),
             ),
           ],
         ),

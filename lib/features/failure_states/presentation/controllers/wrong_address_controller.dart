@@ -17,8 +17,8 @@ class WrongAddressController {
   WrongAddressController({
     required String correctedAddress,
     WrongAddressChoice initial = WrongAddressChoice.tryAgain,
-  })  : address = TextEditingController(text: correctedAddress),
-        choice = ValueNotifier(initial);
+  }) : address = TextEditingController(text: correctedAddress),
+       choice = ValueNotifier(initial);
 
   /// The corrected address the courier edits (RTL, prefilled).
   final TextEditingController address;

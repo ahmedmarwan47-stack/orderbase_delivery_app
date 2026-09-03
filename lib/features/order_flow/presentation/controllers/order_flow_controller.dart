@@ -81,15 +81,25 @@ class OrderFlowController {
       );
       return;
     }
+    // The island switches to its "collecting" face while the sheet is up; if
+    // the courier backs out it goes straight back to the en-route face.
+    await LiveActivityBridge.instance.setPhase(DeliveryPhase.collecting);
+    if (!context.mounted) return;
     final collected = await showCodCollectionSheet(
       context,
       due: due,
       orderNum: orderNum.replaceAll('#', '').trim(),
       customerName: customer,
     );
-    if (collected != null && context.mounted) {
-      ShiftController.instance
-          .markDelivered(orderNum, collected: collected.amount);
+    if (collected == null) {
+      await LiveActivityBridge.instance.setPhase(DeliveryPhase.enRoute);
+      return;
+    }
+    if (context.mounted) {
+      ShiftController.instance.markDelivered(
+        orderNum,
+        collected: collected.amount,
+      );
       final hasWalletChange = collected.walletChange > 0;
       final unit = LocaleKeys.orderDetailEgpSuffix.tr();
       _openResult(
@@ -97,8 +107,9 @@ class OrderFlowController {
         ResultKind.delivered,
         codAmount: '${formatThousands(collected.amount)} $unit',
         showWalletChange: hasWalletChange,
-        walletChange:
-            hasWalletChange ? '+${formatThousands(collected.walletChange)} $unit' : null,
+        walletChange: hasWalletChange
+            ? '+${formatThousands(collected.walletChange)} $unit'
+            : null,
       );
     }
   }
@@ -117,14 +128,18 @@ class OrderFlowController {
   /// customer / number / address (via [_failureContextFor]) instead of the
   /// packaged sample — mirroring how [deliver] receives its per-order data.
   Future<void> fail(BuildContext context, {required FlowOrder order}) async {
-    final outcome =
-        await showFailureFlow(context, context_: _failureContextFor(order));
+    final outcome = await showFailureFlow(
+      context,
+      context_: _failureContextFor(order),
+    );
     if (!context.mounted || outcome == null) return;
 
     switch (outcome.resolution) {
       case FailureResolution.returnedToBranch:
-        ShiftController.instance
-            .markFailed(orderNum, reason: outcome.reason?.label);
+        ShiftController.instance.markFailed(
+          orderNum,
+          reason: outcome.reason?.label,
+        );
         _openResult(
           context,
           ResultKind.failed,
@@ -170,7 +185,7 @@ FailureContext _failureContextFor(FlowOrder order) {
   final piecesLabel = parts.length > 1 ? parts[1].trim() : sample.piecesLabel;
   final pieces =
       int.tryParse(RegExp(r'\d+').firstMatch(piecesLabel)?.group(0) ?? '') ??
-          sample.pieces;
+      sample.pieces;
   return FailureContext(
     orderNum: order.num,
     customer: order.name,

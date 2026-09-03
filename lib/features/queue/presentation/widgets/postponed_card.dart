@@ -3,18 +3,19 @@ part of '../imports/queue_imports.dart';
 /// A single postponed order — number, pay, return time, identity, reason box,
 /// and the return / call actions.
 class _PostponedCard extends StatelessWidget {
-  const _PostponedCard({required this.order, required this.onReturn});
+  const _PostponedCard({
+    required this.order,
+    required this.onReturn,
+    this.last = false,
+  });
   final Order order;
   final VoidCallback onReturn;
+  final bool last;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppCircular.r16),
-        border: Border.all(color: AppColors.borderCard),
-      ),
+    return _ListRow(
+      last: last,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -23,9 +24,11 @@ class _PostponedCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text(order.num,
-                      textDirection: TextDirection.ltr,
-                      style: const TextStyle().setMainTextColor.s16.bold),
+                  Text(
+                    order.num,
+                    textDirection: TextDirection.ltr,
+                    style: const TextStyle().setMainTextColor.s16.bold,
+                  ),
                   8.szW,
                   _PayLabel(prepaid: order.prepaid),
                 ],
@@ -42,19 +45,28 @@ class _PostponedCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(order.name, style: const TextStyle().setMainTextColor.s18.semiBold),
+                    Text(
+                      order.name,
+                      style: const TextStyle().setMainTextColor.s18.semiBold,
+                    ),
                     4.szH,
                     Text(
-                      LocaleKeys.addrArea
-                          .tr(namedArgs: {'addr': order.addr, 'area': order.area}),
+                      LocaleKeys.addrArea.tr(
+                        namedArgs: {'addr': order.addr, 'area': order.area},
+                      ),
                       style: const TextStyle().setHintColor.s14.regular,
                     ),
                     if (order.cod != null) ...[
                       4.szH,
                       Text(
-                        LocaleKeys.collectEgp
-                            .tr(namedArgs: {'amount': formatThousands(order.cod!)}),
-                        style: const TextStyle().setTertiaryColor.s12.semiBold.tabular,
+                        LocaleKeys.collectEgp.tr(
+                          namedArgs: {'amount': formatThousands(order.cod!)},
+                        ),
+                        style: const TextStyle()
+                            .setTertiaryColor
+                            .s12
+                            .semiBold
+                            .tabular,
                       ),
                     ],
                   ],
@@ -73,7 +85,7 @@ class _PostponedCard extends StatelessWidget {
             ],
           ),
         ],
-      ).paddingAll(AppPadding.pH16),
+      ),
     );
   }
 }
@@ -101,8 +113,13 @@ class _ReturnBadge extends StatelessWidget {
             width: AppSize.sW14,
           ),
           4.szW,
-          Text(LocaleKeys.returnsAt.tr(namedArgs: {'time': time}),
-              style: const TextStyle().setColor(AppColors.postponedText).s12.semiBold),
+          Text(
+            LocaleKeys.returnsAt.tr(namedArgs: {'time': time}),
+            style: const TextStyle()
+                .setColor(AppColors.postponedText)
+                .s12
+                .semiBold,
+          ),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
@@ -124,15 +141,21 @@ class _ReasonBox extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(LocaleKeys.postponeReasonLabel.tr(),
-              style: const TextStyle().setTertiaryColor.s12.semiBold),
+          Text(
+            LocaleKeys.postponeReasonLabel.tr(),
+            style: const TextStyle().setTertiaryColor.s12.semiBold,
+          ),
           4.szH,
           Text(
-            LocaleKeys.postponeReasonValue.tr(namedArgs: {
-              'reason': order.reason ?? '',
-              'time': order.postponedAt ?? '',
-            }),
-            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.5),
+            LocaleKeys.postponeReasonValue.tr(
+              namedArgs: {
+                'reason': order.reason ?? '',
+                'time': order.postponedAt ?? '',
+              },
+            ),
+            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(
+              1.5,
+            ),
           ),
         ],
       ).paddingAll(AppPadding.pH12),
@@ -164,8 +187,10 @@ class _ReturnButton extends StatelessWidget {
             width: AppSize.sW18,
           ),
           8.szW,
-          Text(LocaleKeys.returnToQueue.tr(),
-              style: const TextStyle().setMainTextColor.s14.semiBold),
+          Text(
+            LocaleKeys.returnToQueue.tr(),
+            style: const TextStyle().setMainTextColor.s14.semiBold,
+          ),
         ],
       ),
     ).onClick(onTap: onTap);

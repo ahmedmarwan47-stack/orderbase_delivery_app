@@ -4,9 +4,9 @@ part of '../imports/order_flow_imports.dart';
 /// plus the labels derived from them. No `setState`.
 class PostponeSheetController {
   PostponeSheetController()
-      : date = ValueNotifier(DateTime(2024, 9, 13)),
-        time = ValueNotifier(const TimeOfDay(hour: 16, minute: 0)),
-        selectedSlot = ValueNotifier<int?>(null);
+    : date = ValueNotifier(DateTime(2024, 9, 13)),
+      time = ValueNotifier(const TimeOfDay(hour: 16, minute: 0)),
+      selectedSlot = ValueNotifier<int?>(null);
 
   final ValueNotifier<DateTime> date;
   final ValueNotifier<TimeOfDay> time;
@@ -18,8 +18,18 @@ class PostponeSheetController {
   // Arabic month names used only to format the date label (locale formatting
   // data, not UI copy).
   static const List<String> _months = [
-    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+    'يناير',
+    'فبراير',
+    'مارس',
+    'أبريل',
+    'مايو',
+    'يونيو',
+    'يوليو',
+    'أغسطس',
+    'سبتمبر',
+    'أكتوبر',
+    'نوفمبر',
+    'ديسمبر',
   ];
 
   String get dateLabel {

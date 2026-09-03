@@ -9,14 +9,24 @@ class _ResultActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: RoadMode.instance,
+      builder: (context, _) => _build(context, RoadMode.instance.on),
+    );
+  }
+
+  Widget _build(BuildContext context, bool road) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          height: 54.h, // primary action height
+          // 54 is the mockup's; 64 on the road.
+          height: road ? AppSize.sH64 : 54.h,
           decoration: BoxDecoration(
             color: AppColors.inkFill,
-            borderRadius: BorderRadius.circular(AppCircular.r15), // mockup radius
+            borderRadius: BorderRadius.circular(
+              AppCircular.r15,
+            ), // mockup radius
           ),
           alignment: Alignment.center,
           child: Row(
@@ -31,23 +41,25 @@ class _ResultActions extends StatelessWidget {
               8.szW,
               Text(
                 LocaleKeys.resultContinue.tr(),
-                style: const TextStyle().setWhite.s14.semiBold,
+                style: const TextStyle().setWhite.s14.semiBold.road(road),
               ),
             ],
           ),
         ).onClick(onTap: onContinue),
         12.szH,
         Container(
-          height: AppSize.sH48,
+          height: road ? AppSize.sH56 : AppSize.sH48,
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppCircular.r15), // mockup radius
+            borderRadius: BorderRadius.circular(
+              AppCircular.r15,
+            ), // mockup radius
             border: Border.all(color: AppColors.borderDefault),
           ),
           alignment: Alignment.center,
           child: Text(
             LocaleKeys.resultHome.tr(),
-            style: const TextStyle().setTertiaryColor.s14.semiBold,
+            style: const TextStyle().setTertiaryColor.s14.semiBold.road(road),
           ),
         ).onClick(onTap: onHome ?? () => Navigator.of(context).maybePop()),
       ],

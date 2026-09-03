@@ -8,6 +8,13 @@ class _DeliverBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: RoadMode.instance,
+      builder: (_, _) => _build(RoadMode.instance.on),
+    );
+  }
+
+  Widget _build(bool road) {
     return Container(
       padding: EdgeInsets.only(
         left: AppPadding.pW20,
@@ -20,7 +27,8 @@ class _DeliverBar extends StatelessWidget {
         border: Border(top: BorderSide(color: AppColors.borderHeader)),
       ),
       child: Container(
-        height: AppSize.sH56,
+        // 64 on the road — a gloved thumb's target.
+        height: road ? AppSize.sH64 : AppSize.sH56,
         decoration: BoxDecoration(
           color: AppColors.inkFill,
           borderRadius: BorderRadius.circular(AppCircular.r15), // mockup radius
@@ -38,7 +46,7 @@ class _DeliverBar extends StatelessWidget {
             8.szW,
             Text(
               LocaleKeys.orderDetailDeliver.tr(),
-              style: const TextStyle().setWhite.s14.semiBold,
+              style: const TextStyle().setWhite.s14.semiBold.road(road),
             ),
           ],
         ),

@@ -19,13 +19,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     super.dispose();
   }
 
-  void _update() => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const AuthSuccessScreen()),
-      );
+  void _update() => Navigator.of(
+    context,
+  ).push(MaterialPageRoute<void>(builder: (_) => const AuthSuccessScreen()));
 
-  void _openForgot() => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const ForgotPasswordScreen()),
-      );
+  void _openForgot() => Navigator.of(
+    context,
+  ).push(MaterialPageRoute<void>(builder: (_) => const ForgotPasswordScreen()));
 
   /// Ends the in-memory session and pops back to the app root, which
   /// reactively shows the login screen again ([AuthGate] listens to
@@ -43,14 +43,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         children: [
           _AuthBackLink(onTap: () => Navigator.of(context).maybePop()),
           20.szH,
-          Text(LocaleKeys.authChangeTitle.tr(),
-              style: const TextStyle().setMainTextColor.s20.bold),
+          Text(
+            LocaleKeys.authChangeTitle.tr(),
+            style: const TextStyle().setMainTextColor.s20.bold,
+          ),
           20.szH,
+          // Same identity the profile tab shows — one source, so the two
+          // screens can never disagree about who is signed in.
           _AuthProfileCard(
-            initials: 'م ع',
-            name: 'Mahmoud Ezzat',
-            username: 'mahmoud.ezzat',
-            merchant: '10248',
+            initials: Courier.initials,
+            name: Courier.name,
+            username: Courier.username,
+            merchant: Courier.merchant,
           ),
           20.szH,
           _AuthField(
@@ -60,7 +64,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             obscure: true,
             showToggle: true,
             labelTrailing: _AuthLink(
-                label: LocaleKeys.authForgotItLink.tr(), onTap: _openForgot),
+              label: LocaleKeys.authForgotItLink.tr(),
+              onTap: _openForgot,
+            ),
           ),
           16.szH,
           Container(height: 1, color: AppColors.borderHeader),
@@ -83,8 +89,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             hint: LocaleKeys.authConfirmHint.tr(),
           ),
           16.szH,
-          Text(LocaleKeys.authChangeNote.tr(),
-              style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.5)),
+          Text(
+            LocaleKeys.authChangeNote.tr(),
+            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(
+              1.5,
+            ),
+          ),
           24.szH,
           Center(
             child: _AuthLink(label: LocaleKeys.authLogout.tr(), onTap: _logout),

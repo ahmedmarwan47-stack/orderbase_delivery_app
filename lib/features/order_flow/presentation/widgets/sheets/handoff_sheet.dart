@@ -96,22 +96,25 @@ class _HandoffSheetState extends State<_HandoffSheet> {
           ValueListenableBuilder<bool>(
             valueListenable: _controller.photo,
             builder: (_, captured, _) {
-              final fg =
-                  captured ? AppColors.surface : AppColors.chipCountMuted;
+              final fg = captured
+                  ? AppColors.surface
+                  : AppColors.chipCountMuted;
               return Container(
                 height: AppSize.sH56,
                 decoration: BoxDecoration(
                   color: captured ? AppColors.inkFill : AppColors.borderDefault,
-                  borderRadius:
-                      BorderRadius.circular(AppCircular.r15), // mockup radius
+                  borderRadius: BorderRadius.circular(
+                    AppCircular.r15,
+                  ), // mockup radius
                 ),
                 alignment: Alignment.center,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconWidget(
-                      icon:
-                          widget.cod ? AppAssets.svg.cash : AppAssets.svg.check,
+                      icon: widget.cod
+                          ? AppAssets.svg.cash
+                          : AppAssets.svg.check,
                       color: fg,
                       height: AppSize.sH20,
                       width: AppSize.sW20,
@@ -126,9 +129,7 @@ class _HandoffSheetState extends State<_HandoffSheet> {
                   ],
                 ),
               ).onClick(
-                onTap: captured
-                    ? () => Navigator.of(context).pop(true)
-                    : null,
+                onTap: captured ? () => Navigator.of(context).pop(true) : null,
               );
             },
           ),
@@ -153,7 +154,9 @@ class _HandoffSheetState extends State<_HandoffSheet> {
             height: 52.h,
             decoration: BoxDecoration(
               color: AppColors.photoTile,
-              borderRadius: BorderRadius.circular(AppCircular.r14), // mockup radius
+              borderRadius: BorderRadius.circular(
+                AppCircular.r14,
+              ), // mockup radius
             ),
             child: Center(
               child: IconWidget(
@@ -230,7 +233,9 @@ class _HandoffSheetState extends State<_HandoffSheet> {
                 height: 32.h,
                 decoration: BoxDecoration(
                   color: AppColors.scrim,
-                  borderRadius: BorderRadius.circular(AppCircular.r9), // mockup radius
+                  borderRadius: BorderRadius.circular(
+                    AppCircular.r9,
+                  ), // mockup radius
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -255,5 +260,4 @@ class _HandoffSheetState extends State<_HandoffSheet> {
       ),
     );
   }
-
 }

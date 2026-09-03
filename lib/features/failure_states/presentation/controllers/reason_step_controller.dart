@@ -5,7 +5,7 @@ part of '../imports/failure_states_imports.dart';
 /// via [ValueListenableBuilder].
 class ReasonStepController {
   ReasonStepController({FailureReason initial = FailureReason.notPresent})
-      : selected = ValueNotifier(initial);
+    : selected = ValueNotifier(initial);
 
   final ValueNotifier<FailureReason> selected;
 

@@ -30,9 +30,9 @@ class _CodeEntryScreenState extends State<CodeEntryScreen> {
     super.dispose();
   }
 
-  void _confirm() => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const NewPasswordScreen()),
-      );
+  void _confirm() => Navigator.of(
+    context,
+  ).push(MaterialPageRoute<void>(builder: (_) => const NewPasswordScreen()));
 
   @override
   Widget build(BuildContext context) {
@@ -43,20 +43,28 @@ class _CodeEntryScreenState extends State<CodeEntryScreen> {
         children: [
           _AuthBackLink(onTap: () => Navigator.of(context).maybePop()),
           20.szH,
-          Text(LocaleKeys.authCodeTitle.tr(),
-              style: const TextStyle().setMainTextColor.s20.bold),
+          Text(
+            LocaleKeys.authCodeTitle.tr(),
+            style: const TextStyle().setMainTextColor.s20.bold,
+          ),
           8.szH,
           Text(
             LocaleKeys.authCodeSubtitle.tr(namedArgs: {'phone': phone}),
-            style: const TextStyle().setSecondaryColor.s14.regular.withHeight(1.5),
+            style: const TextStyle().setSecondaryColor.s14.regular.withHeight(
+              1.5,
+            ),
           ),
           24.szH,
           _AuthCodeBoxes(vc: _vc),
           20.szH,
           _AuthResendRow(vc: _vc),
           16.szH,
-          Text(LocaleKeys.authCodeHelp.tr(),
-              style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.5)),
+          Text(
+            LocaleKeys.authCodeHelp.tr(),
+            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(
+              1.5,
+            ),
+          ),
         ],
       ),
       footer: AnimatedBuilder(
@@ -94,7 +102,9 @@ class _AuthResendRow extends StatelessWidget {
               ),
               8.szW,
               Text(
-                LocaleKeys.authResendIn.tr(namedArgs: {'clock': vc.resendClock}),
+                LocaleKeys.authResendIn.tr(
+                  namedArgs: {'clock': vc.resendClock},
+                ),
                 style: const TextStyle().setSecondaryColor.s14.regular,
               ),
             ],
@@ -102,9 +112,10 @@ class _AuthResendRow extends StatelessWidget {
         }
         return Align(
           alignment: Alignment.center,
-          child: Text(LocaleKeys.authResend.tr(),
-                  style: const TextStyle().setMainTextColor.s14.semiBold)
-              .onClick(onTap: vc.resend),
+          child: Text(
+            LocaleKeys.authResend.tr(),
+            style: const TextStyle().setMainTextColor.s14.semiBold,
+          ).onClick(onTap: vc.resend),
         );
       },
     );

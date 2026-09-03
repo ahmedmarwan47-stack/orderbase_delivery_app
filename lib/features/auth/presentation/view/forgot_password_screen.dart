@@ -19,9 +19,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  void _send() => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const CodeEntryScreen()),
-      );
+  void _send() => Navigator.of(
+    context,
+  ).push(MaterialPageRoute<void>(builder: (_) => const CodeEntryScreen()));
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +31,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         children: [
           _AuthBackLink(onTap: () => Navigator.of(context).maybePop()),
           20.szH,
-          Text(LocaleKeys.authForgotTitle.tr(),
-              style: const TextStyle().setMainTextColor.s20.bold),
+          Text(
+            LocaleKeys.authForgotTitle.tr(),
+            style: const TextStyle().setMainTextColor.s20.bold,
+          ),
           8.szH,
-          Text(LocaleKeys.authForgotSubtitle.tr(),
-              style: const TextStyle().setSecondaryColor.s14.regular.withHeight(1.5)),
+          Text(
+            LocaleKeys.authForgotSubtitle.tr(),
+            style: const TextStyle().setSecondaryColor.s14.regular.withHeight(
+              1.5,
+            ),
+          ),
           24.szH,
           _AuthField(
             label: LocaleKeys.authMerchant.tr(),

@@ -34,9 +34,13 @@ class _AuthStrengthMeter extends StatelessWidget {
         ),
         8.szH,
         Text(
-          LocaleKeys.authStrengthLabel
-              .tr(namedArgs: {'level': strength.labelKey!.tr()}),
-          style: const TextStyle().setColor(AppColors.deliveredText).s12.semiBold,
+          LocaleKeys.authStrengthLabel.tr(
+            namedArgs: {'level': strength.labelKey!.tr()},
+          ),
+          style: const TextStyle()
+              .setColor(AppColors.deliveredText)
+              .s12
+              .semiBold,
         ),
       ],
     );
@@ -59,7 +63,9 @@ class _AuthRulesCard extends StatelessWidget {
         border: Border.all(color: AppColors.borderDefault),
       ),
       padding: EdgeInsets.symmetric(
-          horizontal: AppPadding.pW16, vertical: AppPadding.pH12),
+        horizontal: AppPadding.pW16,
+        vertical: AppPadding.pH12,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

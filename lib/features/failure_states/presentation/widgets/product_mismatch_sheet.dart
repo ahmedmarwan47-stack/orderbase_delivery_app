@@ -37,7 +37,9 @@ class _ProductMismatchSheetState extends State<_ProductMismatchSheet> {
           8.szH,
           Text(
             LocaleKeys.failurePhotoHint.tr(),
-            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.5),
+            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(
+              1.5,
+            ),
           ),
           16.szH,
           _FieldLabel(LocaleKeys.failureDiffNoteLabel.tr()),
@@ -104,11 +106,15 @@ class _PhotoCaptureButton extends StatelessWidget {
                 ),
               ),
               4.szH,
-              Text(LocaleKeys.failureCaptureWrongProduct.tr(),
-                  style: const TextStyle().setMainTextColor.s14.semiBold),
+              Text(
+                LocaleKeys.failureCaptureWrongProduct.tr(),
+                style: const TextStyle().setMainTextColor.s14.semiBold,
+              ),
               4.szH,
-              Text(LocaleKeys.failureCaptureHint.tr(),
-                  style: const TextStyle().setSecondaryColor.s12.regular),
+              Text(
+                LocaleKeys.failureCaptureHint.tr(),
+                style: const TextStyle().setSecondaryColor.s12.regular,
+              ),
             ],
           ),
         ),
@@ -145,10 +151,7 @@ class _DashedRectPainter extends CustomPainter {
     for (final metric in path.computeMetrics()) {
       var distance = 0.0;
       while (distance < metric.length) {
-        canvas.drawPath(
-          metric.extractPath(distance, distance + dash),
-          paint,
-        );
+        canvas.drawPath(metric.extractPath(distance, distance + dash), paint);
         distance += dash + gap;
       }
     }
@@ -156,5 +159,7 @@ class _DashedRectPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_DashedRectPainter old) =>
-      old.color != color || old.radius != radius || old.strokeWidth != strokeWidth;
+      old.color != color ||
+      old.radius != radius ||
+      old.strokeWidth != strokeWidth;
 }

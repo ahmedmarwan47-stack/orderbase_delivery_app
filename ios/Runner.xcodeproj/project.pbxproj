@@ -7,11 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		78DA100F2EC3CC0700C6371E /* OrderbaseLiveActivityBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DA100B2EC3CC0700C6371A /* OrderbaseLiveActivityBundle.swift */; };
+		78DA10102EC3CC0700C6371F /* DeliveryLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DA100C2EC3CC0700C6371B /* DeliveryLiveActivity.swift */; };
+		78DA10112EC3CC0700C63720 /* OrderbaseTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DA100D2EC3CC0700C6371C /* OrderbaseTheme.swift */; };
+		78DA10122EC3CC0700C63721 /* DeliveryActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8932EC3CC0400C63704 /* DeliveryActivityAttributes.swift */; };
+		78DA10172EC3CC0700C63726 /* NotoKufiArabic-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 78DA10132EC3CC0700C63722 /* NotoKufiArabic-Regular.ttf */; };
+		78DA10182EC3CC0700C63727 /* NotoKufiArabic-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 78DA10142EC3CC0700C63723 /* NotoKufiArabic-SemiBold.ttf */; };
+		78DA10192EC3CC0700C63728 /* NotoKufiArabic-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 78DA10152EC3CC0700C63724 /* NotoKufiArabic-Bold.ttf */; };
+		78DA101A2EC3CC0700C63729 /* NotoKufiArabic-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 78DA10162EC3CC0700C63725 /* NotoKufiArabic-ExtraBold.ttf */; };
+		78DA101C2EC3CC0700C6372B /* OrderbaseLiveActivity.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 78DA10092EC3CC0700C63718 /* OrderbaseLiveActivity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
+		7884E8902EC3CC0700C63701 /* LiveActivityChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8912EC3CC0400C63702 /* LiveActivityChannel.swift */; };
+		7884E8922EC3CC0700C63703 /* DeliveryActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8932EC3CC0400C63704 /* DeliveryActivityAttributes.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
@@ -19,6 +30,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		78DA101E2EC3CC0700C6372D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 78DA10012EC3CC0700C63710;
+			remoteInfo = OrderbaseLiveActivity;
+		};
 		331C8085294A63A400263BE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
@@ -29,6 +47,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		78DA101B2EC3CC0700C6372A /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				78DA101C2EC3CC0700C6372B /* OrderbaseLiveActivity.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9705A1C41CF9048500538489 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -42,6 +71,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		78DA100B2EC3CC0700C6371A /* OrderbaseLiveActivityBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OrderbaseLiveActivityBundle.swift; path = LiveActivity/OrderbaseLiveActivityBundle.swift; sourceTree = SOURCE_ROOT; };
+		78DA100C2EC3CC0700C6371B /* DeliveryLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeliveryLiveActivity.swift; path = LiveActivity/DeliveryLiveActivity.swift; sourceTree = SOURCE_ROOT; };
+		78DA100D2EC3CC0700C6371C /* OrderbaseTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OrderbaseTheme.swift; path = LiveActivity/OrderbaseTheme.swift; sourceTree = SOURCE_ROOT; };
+		78DA100E2EC3CC0700C6371D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = LiveActivity/Info.plist; sourceTree = SOURCE_ROOT; };
+		78DA10132EC3CC0700C63722 /* NotoKufiArabic-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "NotoKufiArabic-Regular.ttf"; path = "../assets/fonts/NotoKufiArabic-Regular.ttf"; sourceTree = SOURCE_ROOT; };
+		78DA10142EC3CC0700C63723 /* NotoKufiArabic-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "NotoKufiArabic-SemiBold.ttf"; path = "../assets/fonts/NotoKufiArabic-SemiBold.ttf"; sourceTree = SOURCE_ROOT; };
+		78DA10152EC3CC0700C63724 /* NotoKufiArabic-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "NotoKufiArabic-Bold.ttf"; path = "../assets/fonts/NotoKufiArabic-Bold.ttf"; sourceTree = SOURCE_ROOT; };
+		78DA10162EC3CC0700C63725 /* NotoKufiArabic-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "NotoKufiArabic-ExtraBold.ttf"; path = "../assets/fonts/NotoKufiArabic-ExtraBold.ttf"; sourceTree = SOURCE_ROOT; };
+		78DA10092EC3CC0700C63718 /* OrderbaseLiveActivity.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrderbaseLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
@@ -50,6 +88,8 @@
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		7884E8912EC3CC0400C63702 /* LiveActivityChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityChannel.swift; sourceTree = "<group>"; };
+		7884E8932EC3CC0400C63704 /* DeliveryActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DeliveryActivityAttributes.swift; path = Shared/DeliveryActivityAttributes.swift; sourceTree = SOURCE_ROOT; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
@@ -62,6 +102,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		78DA10072EC3CC0700C63716 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		97C146EB1CF9000F007C117D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -73,6 +120,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		78DA100A2EC3CC0700C63719 /* LiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				78DA100B2EC3CC0700C6371A /* OrderbaseLiveActivityBundle.swift */,
+				78DA100C2EC3CC0700C6371B /* DeliveryLiveActivity.swift */,
+				78DA100D2EC3CC0700C6371C /* OrderbaseTheme.swift */,
+				78DA100E2EC3CC0700C6371D /* Info.plist */,
+				78DA10132EC3CC0700C63722 /* NotoKufiArabic-Regular.ttf */,
+				78DA10142EC3CC0700C63723 /* NotoKufiArabic-SemiBold.ttf */,
+				78DA10152EC3CC0700C63724 /* NotoKufiArabic-Bold.ttf */,
+				78DA10162EC3CC0700C63725 /* NotoKufiArabic-ExtraBold.ttf */,
+			);
+			name = LiveActivity;
+			sourceTree = "<group>";
+		};
 		331C8082294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -100,6 +162,7 @@
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
+				78DA100A2EC3CC0700C63719 /* LiveActivity */,
 			);
 			sourceTree = "<group>";
 		};
@@ -108,6 +171,7 @@
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
+				78DA10092EC3CC0700C63718 /* OrderbaseLiveActivity.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -123,6 +187,8 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
+				7884E8912EC3CC0400C63702 /* LiveActivityChannel.swift */,
+				7884E8932EC3CC0400C63704 /* DeliveryActivityAttributes.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
 			path = Runner;
@@ -131,6 +197,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		78DA10012EC3CC0700C63710 /* OrderbaseLiveActivity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 78DA10022EC3CC0700C63711 /* Build configuration list for PBXNativeTarget "OrderbaseLiveActivity" */;
+			buildPhases = (
+				78DA10062EC3CC0700C63715 /* Sources */,
+				78DA10072EC3CC0700C63716 /* Frameworks */,
+				78DA10082EC3CC0700C63717 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OrderbaseLiveActivity;
+			productName = OrderbaseLiveActivity;
+			productReference = 78DA10092EC3CC0700C63718 /* OrderbaseLiveActivity.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		331C8080294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
@@ -157,11 +240,13 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				78DA101B2EC3CC0700C6372A /* Embed App Extensions */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				78DA101D2EC3CC0700C6372C /* PBXTargetDependency */,
 			);
 			name = Runner;
 			packageProductDependencies = (
@@ -181,6 +266,9 @@
 				LastUpgradeCheck = 1510;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
+					78DA10012EC3CC0700C63710 = {
+						CreatedOnToolsVersion = 15.1;
+					};
 					331C8080294A63A400263BE5 = {
 						CreatedOnToolsVersion = 14.0;
 						TestTargetID = 97C146ED1CF9000F007C117D;
@@ -209,11 +297,23 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
+				78DA10012EC3CC0700C63710 /* OrderbaseLiveActivity */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		78DA10082EC3CC0700C63717 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				78DA10172EC3CC0700C63726 /* NotoKufiArabic-Regular.ttf in Resources */,
+				78DA10182EC3CC0700C63727 /* NotoKufiArabic-SemiBold.ttf in Resources */,
+				78DA10192EC3CC0700C63728 /* NotoKufiArabic-Bold.ttf in Resources */,
+				78DA101A2EC3CC0700C63729 /* NotoKufiArabic-ExtraBold.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		331C807F294A63A400263BE5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -269,6 +369,17 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		78DA10062EC3CC0700C63715 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				78DA100F2EC3CC0700C6371E /* OrderbaseLiveActivityBundle.swift in Sources */,
+				78DA10102EC3CC0700C6371F /* DeliveryLiveActivity.swift in Sources */,
+				78DA10112EC3CC0700C63720 /* OrderbaseTheme.swift in Sources */,
+				78DA10122EC3CC0700C63721 /* DeliveryActivityAttributes.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		331C807D294A63A400263BE5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -284,12 +395,19 @@
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
+				7884E8902EC3CC0700C63701 /* LiveActivityChannel.swift in Sources */,
+				7884E8922EC3CC0700C63703 /* DeliveryActivityAttributes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		78DA101D2EC3CC0700C6372C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 78DA10012EC3CC0700C63710 /* OrderbaseLiveActivity */;
+			targetProxy = 78DA101E2EC3CC0700C6372D /* PBXContainerItemProxy */;
+		};
 		331C8086294A63A400263BE5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 97C146ED1CF9000F007C117D /* Runner */;
@@ -317,9 +435,96 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		78DA10032EC3CC0700C63712 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = CZNP9H9A65;
+				ENABLE_BITCODE = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LiveActivity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mitchdesigns.orderbase.OrderbaseLiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		78DA10042EC3CC0700C63713 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = CZNP9H9A65;
+				ENABLE_BITCODE = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LiveActivity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mitchdesigns.orderbase.OrderbaseLiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		78DA10052EC3CC0700C63714 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = CZNP9H9A65;
+				ENABLE_BITCODE = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LiveActivity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mitchdesigns.orderbase.OrderbaseLiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Profile;
+		};
 		249021D3217E4FDB00AE95B9 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-weak_framework",
+					ActivityKit,
+				);
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -553,6 +758,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
 			buildSettings = {
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-weak_framework",
+					ActivityKit,
+				);
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
@@ -576,6 +786,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-weak_framework",
+					ActivityKit,
+				);
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
@@ -597,6 +812,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		78DA10022EC3CC0700C63711 /* Build configuration list for PBXNativeTarget "OrderbaseLiveActivity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				78DA10032EC3CC0700C63712 /* Debug */,
+				78DA10042EC3CC0700C63713 /* Release */,
+				78DA10052EC3CC0700C63714 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

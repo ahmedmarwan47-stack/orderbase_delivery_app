@@ -15,12 +15,12 @@ class QueueViewController {
     bool startSearching = false,
     String initialQuery = '',
     QueueFilter initialFilter = QueueFilter.all,
-  })  : _staticOrders = orders,
-        isSearching = ValueNotifier(startSearching),
-        startedInSearch = startSearching,
-        filter = ValueNotifier(initialFilter),
-        query = ValueNotifier(initialQuery.trim()),
-        searchController = TextEditingController(text: initialQuery) {
+  }) : _staticOrders = orders,
+       isSearching = ValueNotifier(startSearching),
+       startedInSearch = startSearching,
+       filter = ValueNotifier(initialFilter),
+       query = ValueNotifier(initialQuery.trim()),
+       searchController = TextEditingController(text: initialQuery) {
     _searchSub = _searchSubject
         .debounceTime(const Duration(milliseconds: 300))
         .distinct()
@@ -41,7 +41,65 @@ class QueueViewController {
   /// Opens the notifications screen from the unified header's bell (shell mode).
   final VoidCallback? onOpenNotifications;
 
-  List<Order> get orders => _staticOrders ?? ShiftController.instance.orders;
+  /// Every order the courier can see today: the batches in hand *and* the
+  /// ones still waiting at the branch (their orders are as good as in transit
+  /// for counting and searching). The static override wins for previews.
+  List<Order> get orders =>
+      _staticOrders ??
+      [
+        ...ShiftController.instance.orders,
+        ...ShiftController.instance.pendingOrders,
+      ];
+
+  /// The day as batch groups, in the order the tab lists them: batches
+  /// waiting at the branch first (they need an action), then the ones in
+  /// hand, newest first. Each group carries only the rows that survive the
+  /// active filter; a group with none is dropped, so «تم التسليم» shows only
+  /// the batches that have a delivered order.
+  List<QueueBatchGroup> get batchGroups {
+    final shift = ShiftController.instance;
+    if (_staticOrders != null) {
+      return [
+        QueueBatchGroup(
+          batch: OrderBatch(id: sampleBatchOneId, orders: _staticOrders),
+          pending: false,
+          rows: filtered,
+        ),
+      ];
+    }
+    bool keep(Order o) => switch (filter.value) {
+      QueueFilter.all => o.status != OrderStatus.postponed,
+      QueueFilter.transit => o.status == OrderStatus.transit,
+      QueueFilter.delivered => o.status == OrderStatus.delivered,
+      QueueFilter.failed => o.status == OrderStatus.failed,
+      QueueFilter.postponed => o.status == OrderStatus.postponed,
+    };
+    final groups = <QueueBatchGroup>[
+      for (final b in shift.pendingBatches)
+        QueueBatchGroup(
+          batch: b,
+          pending: true,
+          rows: b.orders.where(keep).toList(),
+        ),
+      for (final b in shift.carriedBatches.reversed)
+        QueueBatchGroup(
+          batch: b,
+          pending: false,
+          rows: shift.ordersOfBatch(b.id).where(keep).toList(),
+          liveOrders: shift.ordersOfBatch(b.id),
+        ),
+    ];
+    return groups.where((g) => g.rows.isNotEmpty).toList();
+  }
+
+  /// How many batches the day has so far (in hand or waiting).
+  int get batchCount => _staticOrders != null
+      ? 1
+      : ShiftController.instance.carriedBatches.length +
+            ShiftController.instance.pendingBatches.length;
+
+  /// Physically carry a waiting batch (after the confirmation sheet).
+  void carryBatch(String id) => ShiftController.instance.carryBatch(id);
 
   /// True when the screen was opened directly into search mode (pushed as a
   /// route from Home/Orders). There's no browse mode to fall back to, so the
@@ -80,8 +138,9 @@ class QueueViewController {
   /// top and handed-off / closed orders sink to the bottom of the "all" list
   /// (delivered last). Stable within a status group (keeps the source order).
   List<Order> get active {
-    final list =
-        orders.where((o) => o.status != OrderStatus.postponed).toList();
+    final list = orders
+        .where((o) => o.status != OrderStatus.postponed)
+        .toList();
     final indexed = list.indexed.toList()
       ..sort((a, b) {
         final r = _statusRank(a.$2.status).compareTo(_statusRank(b.$2.status));
@@ -92,33 +151,33 @@ class QueueViewController {
 
   /// Lower ranks list first: in-progress → failed → delivered (handed off last).
   int _statusRank(OrderStatus s) => switch (s) {
-        OrderStatus.transit => 0,
-        OrderStatus.failed => 1,
-        OrderStatus.delivered => 2,
-        OrderStatus.postponed => 3,
-      };
+    OrderStatus.transit => 0,
+    OrderStatus.failed => 1,
+    OrderStatus.delivered => 2,
+    OrderStatus.postponed => 3,
+  };
 
   int countFor(QueueFilter f) => switch (f) {
-        QueueFilter.all => active.length,
-        QueueFilter.transit =>
-          active.where((o) => o.status == OrderStatus.transit).length,
-        QueueFilter.delivered =>
-          active.where((o) => o.status == OrderStatus.delivered).length,
-        QueueFilter.failed =>
-          active.where((o) => o.status == OrderStatus.failed).length,
-        QueueFilter.postponed => postponed.length,
-      };
+    QueueFilter.all => active.length,
+    QueueFilter.transit =>
+      active.where((o) => o.status == OrderStatus.transit).length,
+    QueueFilter.delivered =>
+      active.where((o) => o.status == OrderStatus.delivered).length,
+    QueueFilter.failed =>
+      active.where((o) => o.status == OrderStatus.failed).length,
+    QueueFilter.postponed => postponed.length,
+  };
 
   List<Order> get filtered => switch (filter.value) {
-        QueueFilter.all => active,
-        QueueFilter.transit =>
-          active.where((o) => o.status == OrderStatus.transit).toList(),
-        QueueFilter.delivered =>
-          active.where((o) => o.status == OrderStatus.delivered).toList(),
-        QueueFilter.failed =>
-          active.where((o) => o.status == OrderStatus.failed).toList(),
-        QueueFilter.postponed => postponed,
-      };
+    QueueFilter.all => active,
+    QueueFilter.transit =>
+      active.where((o) => o.status == OrderStatus.transit).toList(),
+    QueueFilter.delivered =>
+      active.where((o) => o.status == OrderStatus.delivered).toList(),
+    QueueFilter.failed =>
+      active.where((o) => o.status == OrderStatus.failed).toList(),
+    QueueFilter.postponed => postponed,
+  };
 
   List<Order> get searchMatches =>
       orders.where((o) => matchKey(o) != null).toList();
@@ -138,12 +197,12 @@ class QueueViewController {
   }
 
   String filterLabelKey(QueueFilter f) => switch (f) {
-        QueueFilter.all => LocaleKeys.filterAll,
-        QueueFilter.transit => LocaleKeys.filterTransit,
-        QueueFilter.delivered => LocaleKeys.filterDelivered,
-        QueueFilter.failed => LocaleKeys.filterFailed,
-        QueueFilter.postponed => LocaleKeys.filterPostponed,
-      };
+    QueueFilter.all => LocaleKeys.filterAll,
+    QueueFilter.transit => LocaleKeys.filterTransit,
+    QueueFilter.delivered => LocaleKeys.filterDelivered,
+    QueueFilter.failed => LocaleKeys.filterFailed,
+    QueueFilter.postponed => LocaleKeys.filterPostponed,
+  };
 
   // ── handlers ──
   void openSearch() => isSearching.value = true;
@@ -180,9 +239,9 @@ class QueueViewController {
     if (onOpenOrder != null) {
       onOpenOrder!(flow);
     } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => OrderDetailScreen(order: flow)),
-      );
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => OrderDetailScreen(order: flow)));
     }
   }
 
@@ -207,4 +266,36 @@ class QueueViewController {
     _searchSub.cancel();
     _searchSubject.close();
   }
+}
+
+/// One batch as the Orders tab shows it: the batch, whether it is still at the
+/// branch, and the rows left after filtering.
+class QueueBatchGroup {
+  const QueueBatchGroup({
+    required this.batch,
+    required this.pending,
+    required this.rows,
+    List<Order>? liveOrders,
+  }) : _live = liveOrders;
+
+  final OrderBatch batch;
+  final bool pending;
+  final List<Order> rows;
+  final List<Order>? _live;
+
+  /// The batch's orders with their live status (the dispatch copy for a
+  /// batch still at the branch).
+  List<Order> get live => _live ?? batch.orders;
+
+  int get remaining =>
+      live.where((o) => o.status == OrderStatus.transit).length;
+
+  /// Every order closed — nothing left to do in it.
+  bool get complete =>
+      !pending && live.every((o) => o.status != OrderStatus.transit);
+
+  /// Cash still due across the batch's open orders.
+  int get cashDue => live
+      .where((o) => o.status == OrderStatus.transit && !o.prepaid)
+      .fold(0, (sum, o) => sum + (o.cod ?? 0));
 }

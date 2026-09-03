@@ -48,7 +48,9 @@ class _SheetScaffold extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppCircular.r26)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppCircular.r26),
+        ),
       ),
       padding: EdgeInsets.only(
         left: AppPadding.pW20,
@@ -84,7 +86,10 @@ class _SheetScaffold extends StatelessWidget {
               alignment: AlignmentDirectional.centerStart,
               child: Text(
                 stepCaption!,
-                style: const TextStyle().setColor(AppColors.chipCountMuted).s12.semiBold,
+                style: const TextStyle()
+                    .setColor(AppColors.chipCountMuted)
+                    .s12
+                    .semiBold,
               ),
             ),
           ],
@@ -457,7 +462,11 @@ class _Callout extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle().setColor(textColor).s12.regular.withHeight(1.5),
+              style: const TextStyle()
+                  .setColor(textColor)
+                  .s12
+                  .regular
+                  .withHeight(1.5),
             ),
           ),
         ],
@@ -474,7 +483,11 @@ class _Callout extends StatelessWidget {
 /// (back tile · order number · customer/area · optional status badge) on the
 /// paper ground. The OS status bar is the only one shown (no fake 9:41).
 class _OrderContextBackground extends StatelessWidget {
-  const _OrderContextBackground({required this.ctx, this.statusBadge, this.body});
+  const _OrderContextBackground({
+    required this.ctx,
+    this.statusBadge,
+    this.body,
+  });
   final FailureContext ctx;
   final Widget? statusBadge;
   final Widget? body;

@@ -79,7 +79,10 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
         final t = interval.transform(_reveal.value);
         Widget out = ch!;
         if (dy != 0) {
-          out = Transform.translate(offset: Offset(0, (1 - t) * dy), child: out);
+          out = Transform.translate(
+            offset: Offset(0, (1 - t) * dy),
+            child: out,
+          );
         }
         if (scaleFrom != 1.0) {
           out = Transform.scale(
@@ -97,7 +100,9 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppCircular.r26)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppCircular.r26),
+        ),
       ),
       padding: EdgeInsets.only(
         left: AppPadding.pW20,
@@ -148,21 +153,20 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
                   16.szH,
                   Text(
                     hasExtra
-                        ? LocaleKeys.codSheetTitleExtra
-                            .tr(namedArgs: {'amount': formatThousands(extra)})
+                        ? LocaleKeys.codSheetTitleExtra.tr(
+                            namedArgs: {'amount': formatThousands(extra)},
+                          )
                         : LocaleKeys.codSheetTitleMatch.tr(),
                     style: const TextStyle().setMainTextColor.s20.bold,
                   ),
                   8.szH,
                   Text(
                     hasExtra
-                        ? LocaleKeys.codSheetBodyExtra
-                            .tr(namedArgs: {'total': formatThousands(amount)})
+                        ? LocaleKeys.codSheetBodyExtra.tr(
+                            namedArgs: {'total': formatThousands(amount)},
+                          )
                         : LocaleKeys.codSheetBodyMatch.tr(),
-                    style: const TextStyle()
-                        .setSecondaryColor
-                        .s14
-                        .regular
+                    style: const TextStyle().setSecondaryColor.s14.regular
                         .withHeight(1.5),
                   ),
                   20.szH,
@@ -233,62 +237,69 @@ class _CodConfirmSheetState extends State<_CodConfirmSheet>
         color: AppColors.paymentCardBg,
         borderRadius: BorderRadius.circular(AppCircular.r16),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  LocaleKeys.codSettlementLabel.tr(),
-                  style:
-                      const TextStyle().setColor(AppColors.paymentLabel).s12.regular,
-                ),
-                4.szH,
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
+      child:
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CountUpText(
-                      value: amount,
-                      format: formatThousands,
-                      textDirection: TextDirection.ltr,
-                      duration: AppMotion.focal,
-                      animate: !AppMotion.reduced(context),
-                      style: const TextStyle()
-                          .setWhite
-                          .s20
-                          .bold
-                          .withHeight(1)
-                          .tabular,
-                    ),
-                    4.szW,
                     Text(
-                      _unit,
+                      LocaleKeys.codSettlementLabel.tr(),
                       style: const TextStyle()
-                          .setColor(AppColors.paymentSuffix)
-                          .s14
-                          .semiBold,
+                          .setColor(AppColors.paymentLabel)
+                          .s12
+                          .regular,
+                    ),
+                    4.szH,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        CountUpText(
+                          value: amount,
+                          format: formatThousands,
+                          textDirection: TextDirection.ltr,
+                          duration: AppMotion.focal,
+                          animate: !AppMotion.reduced(context),
+                          style: const TextStyle().setWhite.s20.bold
+                              .withHeight(1)
+                              .tabular,
+                        ),
+                        4.szW,
+                        Text(
+                          _unit,
+                          style: const TextStyle()
+                              .setColor(AppColors.paymentSuffix)
+                              .s14
+                              .semiBold,
+                        ),
+                      ],
+                    ),
+                    4.szH,
+                    Text(
+                      LocaleKeys.codSettlementBreakdown.tr(
+                        namedArgs: {
+                          'due': formatThousands(due),
+                          'extra': formatThousands(extra),
+                        },
+                      ),
+                      style: const TextStyle()
+                          .setColor(AppColors.paymentLabel)
+                          .s12
+                          .regular,
                     ),
                   ],
                 ),
-                4.szH,
-                Text(
-                  LocaleKeys.codSettlementBreakdown.tr(namedArgs: {
-                    'due': formatThousands(due),
-                    'extra': formatThousands(extra),
-                  }),
-                  style:
-                      const TextStyle().setColor(AppColors.paymentLabel).s12.regular,
-                ),
-              ],
-            ),
+              ),
+              12.szW,
+              _cashTile(),
+            ],
+          ).paddingSymmetric(
+            horizontal: AppPadding.pW20,
+            vertical: AppPadding.pH16,
           ),
-          12.szW,
-          _cashTile(),
-        ],
-      ).paddingSymmetric(horizontal: AppPadding.pW20, vertical: AppPadding.pH16),
     );
   }
 
@@ -360,8 +371,7 @@ class _SummaryRow extends StatelessWidget {
               ),
               8.szW,
             ],
-            Text(label,
-                style: const TextStyle().setSecondaryColor.s14.regular),
+            Text(label, style: const TextStyle().setSecondaryColor.s14.regular),
           ],
         ),
         Text(

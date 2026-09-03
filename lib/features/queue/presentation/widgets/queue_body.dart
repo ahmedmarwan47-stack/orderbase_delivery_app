@@ -85,7 +85,8 @@ class _QueueBrowseList extends StatelessWidget {
                 );
         } else {
           final showBar = filter != QueueFilter.all;
-          content = items.isEmpty
+          final groups = vc.batchGroups;
+          content = groups.isEmpty
               ? _QueueClearState(vc: vc)
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -100,17 +101,9 @@ class _QueueBrowseList extends StatelessWidget {
                         bottom: AppPadding.pH12,
                       ),
                     Expanded(
-                      child: _AnimatedQueueList(
-                        orders: items,
-                        vc: vc,
-                        reduced: reduced,
-                        padding: EdgeInsetsDirectional.only(
-                          start: AppPadding.pW20,
-                          end: AppPadding.pW20,
-                          top: showBar ? 0 : AppPadding.pH8,
-                          bottom: AppPadding.pH20,
-                        ),
-                      ),
+                      // The day as batch sections. Rows carry their own side
+                      // padding, so the list itself is edge to edge.
+                      child: _QueueBatchList(groups: groups, vc: vc),
                     ),
                   ],
                 );
@@ -141,121 +134,6 @@ class _QueueRow {
   const _QueueRow(this.order, {this.removing = false});
   final Order order;
   final bool removing;
-}
-
-/// A robust, implicit animated list: rows are keyed by the stable order number,
-/// so it can never desync the way raw [AnimatedList] index bookkeeping can.
-///
-/// When an order disappears from [orders] its row is kept in place, marked
-/// [_QueueRow.removing], and [_CollapsibleRow] collapses + fades it before it's
-/// pruned. Under Reduce Motion departures are dropped instantly (no tracking).
-class _AnimatedQueueList extends StatefulWidget {
-  const _AnimatedQueueList({
-    required this.orders,
-    required this.vc,
-    required this.padding,
-    required this.reduced,
-  });
-
-  final List<Order> orders;
-  final QueueViewController vc;
-  final EdgeInsetsGeometry padding;
-  final bool reduced;
-
-  @override
-  State<_AnimatedQueueList> createState() => _AnimatedQueueListState();
-}
-
-class _AnimatedQueueListState extends State<_AnimatedQueueList> {
-  /// Rows in visual order. Departed rows linger here (removing: true) until
-  /// their collapse finishes and [_prune] drops them.
-  final List<_QueueRow> _rows = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _rows.addAll(widget.orders.map((o) => _QueueRow(o)));
-  }
-
-  @override
-  void didUpdateWidget(covariant _AnimatedQueueList old) {
-    super.didUpdateWidget(old);
-    _sync();
-  }
-
-  /// Diff [widget.orders] against the current display order by order number:
-  /// survivors keep their slot (with refreshed data), departures stay put and
-  /// start collapsing, genuine new arrivals are appended.
-  void _sync() {
-    final incoming = {for (final o in widget.orders) o.num: o};
-    final seen = <String>{};
-    final next = <_QueueRow>[];
-    for (final row in _rows) {
-      final fresh = incoming[row.order.num];
-      if (fresh != null) {
-        next.add(_QueueRow(fresh));
-        seen.add(fresh.num);
-      } else if (!widget.reduced) {
-        next.add(_QueueRow(row.order, removing: true));
-      }
-      // Reduce Motion: skip departed rows entirely (instant removal).
-    }
-    for (final o in widget.orders) {
-      if (!seen.contains(o.num)) next.add(_QueueRow(o));
-    }
-    _rows
-      ..clear()
-      ..addAll(next);
-  }
-
-  void _prune(String orderNum) {
-    if (!mounted) return;
-    setState(
-      () => _rows.removeWhere((r) => r.removing && r.order.num == orderNum),
-    );
-  }
-
-  /// Pull-to-refresh re-checks today's orders. The queue reads live, in-memory
-  /// shift state, so there's nothing to fetch yet — the gesture re-reads and
-  /// settles; it becomes a real sync when the data layer goes async.
-  Future<void> _refresh() async {
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-    if (mounted) setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final duration = widget.reduced ? Duration.zero : AppMotion.fill;
-    return RefreshIndicator(
-      onRefresh: _refresh,
-      color: AppColors.brand,
-      backgroundColor: AppColors.surface,
-      child: ListView(
-        // Drives the scroll-reactive browse header (offset > 2 ⇒ header fades
-        // in its surface + hairline). Only this browse list attaches it.
-        controller: widget.vc.scrollController,
-        // Always scrollable so the pull works even with a short list.
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: widget.padding,
-        children: [
-          for (final row in _rows)
-            _CollapsibleRow(
-              key: ValueKey(row.order.num),
-              removing: row.removing,
-              duration: duration,
-              onRemoved: () => _prune(row.order.num),
-              child: Padding(
-                padding: EdgeInsetsDirectional.only(bottom: AppPadding.pH12),
-                child: _QueueCard(
-                  order: row.order,
-                  onTap: () => widget.vc.openOrder(context, row.order),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
 }
 
 /// Wraps a row so removal reads as a collapse + fade rather than a jump. Driven
@@ -320,18 +198,14 @@ class _QueueSearchResults extends StatelessWidget {
               total: vc.orders.length,
             ).paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH12),
             Expanded(
-              child: ListView.separated(
-                padding: EdgeInsetsDirectional.only(
-                  start: AppPadding.pW20,
-                  end: AppPadding.pW20,
-                  bottom: AppPadding.pH20,
-                ),
+              child: ListView.builder(
+                padding: EdgeInsetsDirectional.only(bottom: AppPadding.pH20),
                 itemCount: matches.length,
-                separatorBuilder: (_, _) => 12.szH,
                 itemBuilder: (context, i) => _SearchResultCard(
                   order: matches[i],
                   query: query,
                   reasonKey: vc.matchKey(matches[i]),
+                  last: i == matches.length - 1,
                   onTap: () => vc.openOrder(context, matches[i]),
                 ),
               ),

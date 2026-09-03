@@ -50,25 +50,27 @@ class _FailureStatesHostState extends State<FailureStatesHost> {
       FailureStatePreview.notPresent => _NotPresentSheet(ctx: _ctx),
       FailureStatePreview.wrongAddress => _WrongAddressSheet(ctx: _ctx),
       FailureStatePreview.productMismatch => _ProductMismatchSheet(ctx: _ctx),
-      FailureStatePreview.returnToBranch =>
-        _ReturnToBranchSheet(ctx: _ctx, reason: FailureReason.notPresent),
+      FailureStatePreview.returnToBranch => _ReturnToBranchSheet(
+        ctx: _ctx,
+        reason: FailureReason.notPresent,
+      ),
     };
     return showAppSheet<Object?>(context, child: child);
   }
 
   Widget? get _statusBadge => switch (widget.preview) {
-        FailureStatePreview.reason || null => _StatusPill(
-            label: LocaleKeys.failureStatusInTransit.tr(),
-            bg: AppColors.transitPillBg,
-            fg: AppColors.transitBg,
-          ),
-        _ => null,
-      };
+    FailureStatePreview.reason || null => _StatusPill(
+      label: LocaleKeys.failureStatusInTransit.tr(),
+      bg: AppColors.transitPillBg,
+      fg: AppColors.transitBg,
+    ),
+    _ => null,
+  };
 
   @override
   Widget build(BuildContext context) {
-    final showAddress = widget.preview == FailureStatePreview.reason ||
-        widget.preview == null;
+    final showAddress =
+        widget.preview == FailureStatePreview.reason || widget.preview == null;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -123,11 +125,16 @@ class _AddressCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(ctx.address, style: const TextStyle().setMainTextColor.s14.semiBold),
+          Text(
+            ctx.address,
+            style: const TextStyle().setMainTextColor.s14.semiBold,
+          ),
           8.szH,
           Text(
             ctx.addressDetail,
-            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(1.5),
+            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(
+              1.5,
+            ),
           ),
         ],
       ),

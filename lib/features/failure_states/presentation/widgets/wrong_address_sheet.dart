@@ -157,11 +157,9 @@ class _WrongAddressSheetState extends State<_WrongAddressSheet> {
               textDirection: TextDirection.rtl,
               textInputAction: TextInputAction.done,
               cursorColor: AppColors.brand,
-              style: const TextStyle()
-                  .setMainTextColor
-                  .s14
-                  .semiBold
-                  .withHeight(1.5),
+              style: const TextStyle().setMainTextColor.s14.semiBold.withHeight(
+                1.5,
+              ),
               decoration: const InputDecoration(
                 isDense: true,
                 border: InputBorder.none,

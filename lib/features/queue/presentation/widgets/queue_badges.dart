@@ -13,32 +13,33 @@ class _StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (status) {
       OrderStatus.transit => _pill(
-          bg: AppColors.transitBg,
-          fg: AppColors.transitText,
-          text: LocaleKeys.statusTransit.tr(),
-        ),
+        bg: AppColors.transitBg,
+        fg: AppColors.transitText,
+        text: LocaleKeys.statusTransit.tr(),
+      ),
       OrderStatus.postponed => _pill(
-          bg: AppColors.postponedBg,
-          fg: AppColors.postponedText,
-          border: AppColors.postponedBorder,
-          leading: AppAssets.svg.clock,
-          text: LocaleKeys.statusPostponedReturns
-              .tr(namedArgs: {'time': returns ?? ''}),
+        bg: AppColors.postponedBg,
+        fg: AppColors.postponedText,
+        border: AppColors.postponedBorder,
+        leading: AppAssets.svg.clock,
+        text: LocaleKeys.statusPostponedReturns.tr(
+          namedArgs: {'time': returns ?? ''},
         ),
+      ),
       OrderStatus.delivered => _pill(
-          bg: AppColors.deliveredBg,
-          fg: AppColors.deliveredText,
-          border: AppColors.deliveredBorder,
-          leading: AppAssets.svg.check,
-          text: LocaleKeys.statusDelivered.tr(),
-        ),
+        bg: AppColors.deliveredBg,
+        fg: AppColors.deliveredText,
+        border: AppColors.deliveredBorder,
+        leading: AppAssets.svg.check,
+        text: LocaleKeys.statusDelivered.tr(),
+      ),
       OrderStatus.failed => _pill(
-          bg: AppColors.failedBg,
-          fg: AppColors.failedText,
-          border: AppColors.failedBorder,
-          leading: AppAssets.svg.fail,
-          text: LocaleKeys.statusFailed.tr(),
-        ),
+        bg: AppColors.failedBg,
+        fg: AppColors.failedText,
+        border: AppColors.failedBorder,
+        leading: AppAssets.svg.fail,
+        text: LocaleKeys.statusFailed.tr(),
+      ),
     };
   }
 
@@ -52,7 +53,9 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(100), // full pill (radii 4px-exempt)
+        borderRadius: BorderRadius.circular(
+          100,
+        ), // full pill (radii 4px-exempt)
         border: border != null ? Border.all(color: border) : null,
       ),
       child: Row(

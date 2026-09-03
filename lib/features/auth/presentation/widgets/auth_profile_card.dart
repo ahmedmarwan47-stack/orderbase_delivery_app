@@ -35,22 +35,27 @@ class _AuthProfileCard extends StatelessWidget {
               color: AppColors.inkFill,
               borderRadius: BorderRadius.circular(AppCircular.r14),
             ),
-            child: Text(initials,
-                style: const TextStyle().setWhite.s14.semiBold),
+            child: Text(
+              initials,
+              style: const TextStyle().setWhite.s14.semiBold,
+            ),
           ),
           12.szW,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name,
-                    style: const TextStyle().setMainTextColor.s18.semiBold),
+                Text(
+                  name,
+                  style: const TextStyle().setMainTextColor.s18.semiBold,
+                ),
                 4.szH,
                 Text(
                   '$username · $merchant',
                   textDirection: TextDirection.ltr,
                   textAlign: TextAlign.start,
-                  style: const TextStyle().setSecondaryColor.s14.regular.tabular,
+                  style:
+                      const TextStyle().setSecondaryColor.s14.regular.tabular,
                 ),
               ],
             ),

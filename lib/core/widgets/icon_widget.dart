@@ -26,8 +26,9 @@ class IconWidget extends StatelessWidget {
       icon,
       height: height ?? AppSize.sH24,
       width: width ?? height ?? AppSize.sW24,
-      colorFilter:
-          color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
+      colorFilter: color != null
+          ? ColorFilter.mode(color!, BlendMode.srcIn)
+          : null,
     );
   }
 }

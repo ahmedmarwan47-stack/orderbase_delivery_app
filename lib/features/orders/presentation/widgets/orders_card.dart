@@ -11,7 +11,9 @@ class _OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Pay pill is derived purely from the COD flag, matching the mockup.
-    final payKey = order.cod ? LocaleKeys.ordersPayCod : LocaleKeys.ordersPayPaid;
+    final payKey = order.cod
+        ? LocaleKeys.ordersPayCod
+        : LocaleKeys.ordersPayPaid;
     final payFg = order.cod ? AppColors.postponedText : AppColors.deliveredText;
     final payBg = order.cod ? AppColors.heroCodPillBg : AppColors.deliveredBg;
 
@@ -47,20 +49,21 @@ class _OrderCard extends StatelessWidget {
                       ],
                     ),
                     4.szH,
-                    Text(order.name,
-                        style: const TextStyle().setMainTextColor.s18.semiBold),
+                    Text(
+                      order.name,
+                      style: const TextStyle().setMainTextColor.s18.semiBold,
+                    ),
                     4.szH,
-                    Text(order.meta,
-                        style: const TextStyle().setHintColor.s14.regular),
+                    Text(
+                      order.meta,
+                      style: const TextStyle().setHintColor.s14.regular,
+                    ),
                   ],
                 ),
               ),
             ],
           ).onClick(onTap: onTap),
-          if (order.cod) ...[
-            12.szH,
-            _CodRow(amount: order.amount ?? ''),
-          ],
+          if (order.cod) ...[12.szH, _CodRow(amount: order.amount ?? '')],
         ],
       ).paddingAll(AppPadding.pH16),
     );
@@ -80,10 +83,14 @@ class _PayPill extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(AppCircular.r7), // 7px pill (radii exempt from 4px rule)
+        borderRadius: BorderRadius.circular(
+          AppCircular.r7,
+        ), // 7px pill (radii exempt from 4px rule)
       ),
-      child: Text(labelKey.tr(), style: const TextStyle().setColor(fg).s12.semiBold)
-          .paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
+      child: Text(
+        labelKey.tr(),
+        style: const TextStyle().setColor(fg).s12.semiBold,
+      ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );
   }
 }
@@ -102,8 +109,10 @@ class _CodRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(LocaleKeys.codRequired.tr(),
-              style: const TextStyle().setSecondaryColor.s12.regular),
+          Text(
+            LocaleKeys.codRequired.tr(),
+            style: const TextStyle().setSecondaryColor.s12.regular,
+          ),
           Text(
             LocaleKeys.amountEgp.tr(namedArgs: {'amount': amount}),
             style: const TextStyle().setMainTextColor.s16.bold.tabular,

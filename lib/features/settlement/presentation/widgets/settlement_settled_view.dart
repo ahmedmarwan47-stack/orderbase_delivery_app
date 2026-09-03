@@ -1,22 +1,38 @@
 part of '../imports/settlement_imports.dart';
 
-/// State B — SETTLED ("تمت التسوية"): a full white confirmation screen. Slate
-/// badge, headline, a plain-language summary, the delivered/wallet summary card,
-/// the now-zero balance card, and an ink "back home" button that reopens (reset).
+/// State B — SETTLED ("تمت التسوية"): the branch has taken the cash. A slate
+/// badge, headline, a plain-language summary, the delivered/wallet summary
+/// card with cashier and time, the now-zero balance card, the day's batches
+/// for the record, and the week before it. The ink button goes home — there
+/// is nothing to reset, since the branch did the settling.
 class _SettlementSettledView extends StatelessWidget {
-  const _SettlementSettledView({required this.vc, this.onSelectTab});
+  const _SettlementSettledView({
+    required this.vc,
+    required this.data,
+    this.onSelectTab,
+    this.onOpenNotifications,
+    this.onOpenSearch,
+  });
   final SettlementController vc;
+  final SettlementData data;
   final ValueChanged<NavTab>? onSelectTab;
+  final VoidCallback? onOpenNotifications;
+  final VoidCallback? onOpenSearch;
 
   @override
   Widget build(BuildContext context) {
-    final data = vc.data;
+    final onSelectTab = this.onSelectTab;
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
         bottom: onSelectTab == null,
         child: Column(
           children: [
+            if (onSelectTab != null)
+              AppHeader(
+                onSearch: onOpenSearch,
+                onOpenNotifications: onOpenNotifications,
+              ),
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
@@ -26,7 +42,7 @@ class _SettlementSettledView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    32.szH,
+                    16.szH,
                     const _SettledBadge(),
                     20.szH,
                     Text(
@@ -39,7 +55,7 @@ class _SettlementSettledView extends StatelessWidget {
                       LocaleKeys.settlementSettledBody.tr(
                         namedArgs: {
                           'cash': formatThousands(data.cashTotal),
-                          'count': formatThousands(data.rowCount),
+                          'count': arabicDigits(data.rowCount),
                         },
                       ),
                       textAlign: TextAlign.center,
@@ -49,7 +65,13 @@ class _SettlementSettledView extends StatelessWidget {
                     24.szH,
                     _SummaryCard(data: data),
                     12.szH,
+                    _DayTotals(data: data),
+                    12.szH,
                     const _BalanceCard(),
+                    24.szH,
+                    _BatchesSection(data: data),
+                    24.szH,
+                    const _HistorySection(),
                   ],
                 ),
               ),
@@ -59,7 +81,11 @@ class _SettlementSettledView extends StatelessWidget {
                 horizontal: AppPadding.pW20,
                 vertical: AppPadding.pH12,
               ),
-              child: _BackHomeButton(onTap: vc.reset),
+              child: _BackHomeButton(
+                onTap: onSelectTab == null
+                    ? vc.reset
+                    : () => onSelectTab(NavTab.home),
+              ),
             ),
             if (onSelectTab != null)
               BottomNav(active: NavTab.settlement, onTap: onSelectTab)
@@ -111,6 +137,7 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final at = data.settledAt;
     return Container(
       decoration: BoxDecoration(
         color: AppColors.background,
@@ -146,7 +173,9 @@ class _SummaryCard extends StatelessWidget {
           _SummaryRow(
             icon: AppAssets.svg.clock,
             label: LocaleKeys.settlementSummaryTime.tr(),
-            value: LocaleKeys.settlementSummaryTimeValue.tr(),
+            value: at == null
+                ? LocaleKeys.settlementSummaryTimeValue.tr()
+                : formatClockArabic(at),
           ),
         ],
       ).paddingAll(AppPadding.pW16),
@@ -231,11 +260,7 @@ class _BalanceCard extends StatelessWidget {
                   Text(
                     '0',
                     textDirection: TextDirection.ltr,
-                    style: const TextStyle()
-                        .setMainTextColor
-                        .s20
-                        .bold
-                        .tabular,
+                    style: const TextStyle().setMainTextColor.s20.bold.tabular,
                   ),
                   6.szW,
                   Text(
@@ -253,8 +278,8 @@ class _BalanceCard extends StatelessWidget {
   }
 }
 
-/// Neutral "مُغلقة" (closed) pill — grey, not green, so it doesn't echo the
-/// delivered-success status.
+/// Neutral «مُغلقة» (closed) pill on the balance card — grey, not green, so it
+/// doesn't echo the delivered-success status.
 class _ClosedPill extends StatelessWidget {
   const _ClosedPill();
 
@@ -274,7 +299,7 @@ class _ClosedPill extends StatelessWidget {
   }
 }
 
-/// Ink "back to home" button — reopens the settlement (SETTLED reset → OPEN).
+/// Ink "back to home" button.
 class _BackHomeButton extends StatelessWidget {
   const _BackHomeButton({required this.onTap});
   final VoidCallback onTap;

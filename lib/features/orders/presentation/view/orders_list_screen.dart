@@ -17,8 +17,9 @@ class OrdersListScreen extends StatefulWidget {
 }
 
 class _OrdersListScreenState extends State<OrdersListScreen> {
-  late final OrdersViewController _vc =
-      OrdersViewController(orders: sampleFlowOrders);
+  late final OrdersViewController _vc = OrdersViewController(
+    orders: sampleFlowOrders,
+  );
 
   @override
   void dispose() {

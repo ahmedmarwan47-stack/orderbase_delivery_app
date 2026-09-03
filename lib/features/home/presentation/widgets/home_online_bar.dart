@@ -8,7 +8,10 @@ class _HomeOnlineBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 50.h, // mockup 50px (off the 4px grid)
-      padding: EdgeInsetsDirectional.only(start: AppPadding.pW16, end: AppPadding.pW8),
+      padding: EdgeInsetsDirectional.only(
+        start: AppPadding.pW16,
+        end: AppPadding.pW8,
+      ),
       decoration: BoxDecoration(
         color: AppColors.deliveredBg,
         borderRadius: BorderRadius.circular(AppCircular.r16),
@@ -28,15 +31,19 @@ class _HomeOnlineBar extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: const [
                     BoxShadow(
-                        color: AppColors.onlineDotGlow,
-                        blurRadius: 0,
-                        spreadRadius: 3),
+                      color: AppColors.onlineDotGlow,
+                      blurRadius: 0,
+                      spreadRadius: 3,
+                    ),
                   ],
                 ),
               ),
               Text(
                 LocaleKeys.homeOnlineNow.tr(),
-                style: const TextStyle().setColor(AppColors.deliveredText).s14.semiBold,
+                style: const TextStyle()
+                    .setColor(AppColors.deliveredText)
+                    .s14
+                    .semiBold,
               ),
             ],
           ),

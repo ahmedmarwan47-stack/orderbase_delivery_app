@@ -27,7 +27,9 @@ class _HomeProgressBar extends StatelessWidget {
               height: segHeight,
               decoration: BoxDecoration(
                 color: c,
-                borderRadius: BorderRadius.circular(AppCircular.r3), // radii exempt
+                borderRadius: BorderRadius.circular(
+                  AppCircular.r3,
+                ), // radii exempt
               ),
             ),
           ),

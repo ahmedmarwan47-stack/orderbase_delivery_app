@@ -1,0 +1,204 @@
+part of '../imports/home_imports.dart';
+
+/// The day's four numbers as one strip under the hero: in progress, delivered,
+/// failed, and the cash the courier is carrying. It replaced a 2×2 grid of tiles so the hero *and*
+/// the numbers fit on screen without a scroll — the courier asked for both
+/// upfront, with the hero still the biggest thing on the page.
+///
+/// Each cell taps through to what it summarises (an Orders filter, or the
+/// settlement). The cash cell is slate, like every money surface, and turns
+/// red when the cash in hand is over the branch's limit — the strip is the
+/// only place on Home that alarm shows, because the figure itself going red
+/// says it without a banner repeating it.
+class _HomeStatRow extends StatelessWidget {
+  const _HomeStatRow({this.onOpenOrdersFilter, this.onOpenSettlement});
+
+  final void Function(QueueFilter)? onOpenOrdersFilter;
+  final VoidCallback? onOpenSettlement;
+
+  static String _pad(int n) => n.toString().padLeft(2, '0');
+
+  @override
+  Widget build(BuildContext context) {
+    final shift = ShiftController.instance;
+    final over = shift.overCashLimit;
+    final road = RoadMode.instance.on;
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppCircular.r18), // radii exempt
+        border: road
+            ? Border.all(color: AppColors.borderDefault, width: 2)
+            : Border.all(color: AppColors.borderCardFaint),
+        boxShadow: AppShadows.card,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 3,
+              child: _StatCell(
+                value: _pad(shift.inProgress),
+                label: LocaleKeys.filterTransit.tr(),
+                road: road,
+                onTap: () => onOpenOrdersFilter?.call(QueueFilter.transit),
+              ),
+            ),
+            const _CellRule(),
+            Expanded(
+              flex: 3,
+              child: _StatCell(
+                value: _pad(shift.deliveredCount),
+                label: LocaleKeys.filterDelivered.tr(),
+                road: road,
+                onTap: () => onOpenOrdersFilter?.call(QueueFilter.delivered),
+              ),
+            ),
+            const _CellRule(),
+            Expanded(
+              flex: 3,
+              child: _StatCell(
+                value: _pad(shift.failedCount),
+                label: LocaleKeys.homeStatFailedShort.tr(),
+                road: road,
+                onTap: () => onOpenOrdersFilter?.call(QueueFilter.failed),
+              ),
+            ),
+            Expanded(
+              flex: 4,
+              child: _StatCell(
+                // Cash IN HAND, the same figure the header states — not the
+                // day's gross. They diverge the moment the branch settles a
+                // batch, and two different money totals on one screen read as
+                // a bug whichever one you trust.
+                value: formatThousands(shift.cashInHand),
+                suffix: LocaleKeys.homeEgp.tr(),
+                label: over
+                    ? LocaleKeys.homeStatOverLimit.tr()
+                    : LocaleKeys.homeStatCashOnYou.tr(),
+                // Slate for money; the one non-failure red in the app when
+                // the courier is carrying more than the branch allows.
+                background: over
+                    ? AppColors.failedText
+                    : AppColors.paymentCardBg,
+                valueColor: AppColors.surface,
+                labelColor: over
+                    ? AppColors.overLimitLabel
+                    : AppColors.paymentLabel,
+                road: road,
+                onTap: onOpenSettlement,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// One cell: the number, its unit when it is money, the label under it.
+class _StatCell extends StatelessWidget {
+  const _StatCell({
+    required this.value,
+    required this.label,
+    this.suffix,
+    this.background,
+    this.valueColor = AppColors.textPrimary,
+    this.labelColor,
+    this.road = false,
+    this.onTap,
+  });
+
+  final String value;
+  final String label;
+  final String? suffix;
+  final Color? background;
+  final Color valueColor;
+
+  /// Null picks the default label colour: secondary, or tertiary (darker,
+  /// 7.6:1) on the road.
+  final Color? labelColor;
+
+  /// Road mode: number and label one step up.
+  final bool road;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final labelColor =
+        this.labelColor ??
+        (road ? AppColors.textTertiary : AppColors.textSecondary);
+    return Semantics(
+      button: onTap != null,
+      label: '$value ${suffix ?? ''} $label'.trim(),
+      child: AnimatedContainer(
+        duration: AppMotion.fill,
+        curve: AppMotion.ease,
+        color: background,
+        padding: EdgeInsets.symmetric(
+          horizontal: AppPadding.pW4,
+          vertical: AppPadding.pH12,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text.rich(
+              TextSpan(
+                text: value,
+                style: const TextStyle()
+                    .setColor(valueColor)
+                    .s20
+                    .bold
+                    .tabular
+                    .road(road)
+                    .withHeight(1),
+                children: suffix == null
+                    ? null
+                    : [
+                        TextSpan(
+                          text: ' $suffix',
+                          style: const TextStyle()
+                              .setColor(valueColor)
+                              .s12
+                              .semiBold
+                              .road(road),
+                        ),
+                      ],
+              ),
+              textDirection: TextDirection.ltr,
+              maxLines: 1,
+            ),
+            6.szH,
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle()
+                  .setColor(labelColor)
+                  // Stays 12 on the road: four cells across 328pt leave no
+                  // room for «في الطريق» at 14. The darker colour does the work.
+                  .s12
+                  .regular,
+            ),
+          ],
+        ),
+      ).onClick(onTap: onTap),
+    );
+  }
+}
+
+/// Hairline between the count cells.
+class _CellRule extends StatelessWidget {
+  const _CellRule();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1.w,
+      margin: EdgeInsets.symmetric(vertical: AppMargin.mH12),
+      color: AppColors.borderHeader,
+    );
+  }
+}

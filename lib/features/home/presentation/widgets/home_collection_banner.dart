@@ -28,7 +28,10 @@ class _HomeCollectionBanner extends StatelessWidget {
             children: [
               Text(
                 LocaleKeys.homeTotalCollectedToday.tr(),
-                style: const TextStyle().setColor(AppColors.paymentLabel).s12.regular,
+                style: const TextStyle()
+                    .setColor(AppColors.paymentLabel)
+                    .s12
+                    .regular,
               ),
               8.szH,
               Text.rich(
@@ -43,8 +46,10 @@ class _HomeCollectionBanner extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: ' ${LocaleKeys.homeEgp.tr()}',
-                      style:
-                          const TextStyle().setColor(AppColors.cashSuffixGreen).s16.semiBold,
+                      style: const TextStyle()
+                          .setColor(AppColors.cashSuffixGreen)
+                          .s16
+                          .semiBold,
                     ),
                   ],
                 ),

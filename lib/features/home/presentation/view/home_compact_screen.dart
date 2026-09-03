@@ -22,19 +22,20 @@ class HomeCompactScreen extends StatelessWidget {
               const _HomeCompactHeader(),
               Expanded(
                 child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const _HomeCompactStatRow(),
-                      16.szH,
-                      _HomeRouteCard(onViewOrder: onOpenOrder),
-                    ],
-                  ).paddingOnly(
-                    left: AppPadding.pW20,
-                    top: AppPadding.pH4,
-                    right: AppPadding.pW20,
-                    bottom: AppPadding.pH16,
-                  ),
+                  child:
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const _HomeCompactStatRow(),
+                          16.szH,
+                          _HomeRouteCard(onViewOrder: onOpenOrder),
+                        ],
+                      ).paddingOnly(
+                        left: AppPadding.pW20,
+                        top: AppPadding.pH4,
+                        right: AppPadding.pW20,
+                        bottom: AppPadding.pH16,
+                      ),
                 ),
               ),
               BottomNav(

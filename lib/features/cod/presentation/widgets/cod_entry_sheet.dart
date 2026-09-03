@@ -38,8 +38,9 @@ class _CodEntrySheet extends StatefulWidget {
 }
 
 class _CodEntrySheetState extends State<_CodEntrySheet> {
-  late final TextEditingController _text =
-      TextEditingController(text: widget.initial);
+  late final TextEditingController _text = TextEditingController(
+    text: widget.initial,
+  );
   final FocusNode _focus = FocusNode();
 
   CodAmount get _amount => CodAmount(raw: _text.text, due: widget.due);
@@ -59,21 +60,20 @@ class _CodEntrySheetState extends State<_CodEntrySheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            LocaleKeys.codOrderLine.tr(namedArgs: {
-              'num': widget.orderNum,
-              'name': widget.customerName,
-              'due': formatThousands(widget.due),
-            }),
+            LocaleKeys.codOrderLine.tr(
+              namedArgs: {
+                'num': widget.orderNum,
+                'name': widget.customerName,
+                'due': formatThousands(widget.due),
+              },
+            ),
             style: const TextStyle().setSecondaryColor.s14.regular,
           ),
           20.szH,
           ListenableBuilder(
             listenable: _text,
-            builder: (_, _) => _AmountField(
-              a: _amount,
-              controller: _text,
-              focusNode: _focus,
-            ),
+            builder: (_, _) =>
+                _AmountField(a: _amount, controller: _text, focusNode: _focus),
           ),
           20.szH,
           ListenableBuilder(
@@ -108,18 +108,21 @@ class _AmountField extends StatelessWidget {
     final Color borderColor = a.isShort
         ? AppColors.failedBorder
         : (a.hasExtra ? AppColors.codExcessAmber : AppColors.borderHeader);
-    final Color amountColor =
-        a.isEmpty ? AppColors.timelineDotMuted : AppColors.textPrimary;
+    final Color amountColor = a.isEmpty
+        ? AppColors.timelineDotMuted
+        : AppColors.textPrimary;
 
     final String hint;
     final Color hintColor;
     if (a.isShort) {
-      hint = LocaleKeys.codHintShort
-          .tr(namedArgs: {'amount': formatThousands(a.short)});
+      hint = LocaleKeys.codHintShort.tr(
+        namedArgs: {'amount': formatThousands(a.short)},
+      );
       hintColor = AppColors.failedText;
     } else if (a.hasExtra) {
-      hint = LocaleKeys.codHintExtra
-          .tr(namedArgs: {'amount': formatThousands(a.extra)});
+      hint = LocaleKeys.codHintExtra.tr(
+        namedArgs: {'amount': formatThousands(a.extra)},
+      );
       hintColor = AppColors.postponedText;
     } else {
       hint = LocaleKeys.codHintMatch.tr();
@@ -143,52 +146,59 @@ class _AmountField extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppCircular.r16),
           border: Border.all(color: borderColor, width: 1.5),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
+        child:
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IntrinsicWidth(
-                  child: TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    autofocus: true,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: false),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      _ThousandsInputFormatter(),
-                    ],
-                    textDirection: TextDirection.ltr,
-                    cursorColor: AppColors.brand,
-                    style: amountStyle,
-                    decoration: InputDecoration(
-                      isCollapsed: true,
-                      border: InputBorder.none,
-                      hintText: '0',
-                      hintStyle: amountStyle.copyWith(
-                          color: AppColors.timelineDotMuted),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    IntrinsicWidth(
+                      child: TextField(
+                        controller: controller,
+                        focusNode: focusNode,
+                        autofocus: true,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: false,
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          _ThousandsInputFormatter(),
+                        ],
+                        textDirection: TextDirection.ltr,
+                        cursorColor: AppColors.brand,
+                        style: amountStyle,
+                        decoration: InputDecoration(
+                          isCollapsed: true,
+                          border: InputBorder.none,
+                          hintText: '0',
+                          hintStyle: amountStyle.copyWith(
+                            color: AppColors.timelineDotMuted,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    8.szW,
+                    Text(
+                      LocaleKeys.codUnit.tr(),
+                      style: const TextStyle()
+                          .setColor(AppColors.chipCountMuted)
+                          .s16
+                          .semiBold,
+                    ),
+                  ],
                 ),
-                8.szW,
+                8.szH,
                 Text(
-                  LocaleKeys.codUnit.tr(),
-                  style: const TextStyle()
-                      .setColor(AppColors.chipCountMuted)
-                      .s16
-                      .semiBold,
+                  hint,
+                  style: const TextStyle().setColor(hintColor).s12.semiBold,
                 ),
               ],
+            ).paddingSymmetric(
+              horizontal: AppPadding.pW20,
+              vertical: AppPadding.pH16,
             ),
-            8.szH,
-            Text(hint,
-                style: const TextStyle().setColor(hintColor).s12.semiBold),
-          ],
-        ).paddingSymmetric(
-            horizontal: AppPadding.pW20, vertical: AppPadding.pH16),
       ),
     );
   }
@@ -207,8 +217,8 @@ class _ConfirmButton extends StatelessWidget {
     final String label = (a.isEmpty || a.amount == 0)
         ? LocaleKeys.codConfirmWrite.tr()
         : (a.short > 0
-            ? LocaleKeys.codConfirmIncomplete.tr()
-            : LocaleKeys.codConfirm.tr());
+              ? LocaleKeys.codConfirmIncomplete.tr()
+              : LocaleKeys.codConfirm.tr());
     final Color fg = enabled ? AppColors.surface : AppColors.chipCountMuted;
 
     return Semantics(

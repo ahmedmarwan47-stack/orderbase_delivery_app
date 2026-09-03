@@ -40,6 +40,7 @@ class _AddressSection extends StatelessWidget {
           pinDiameter: 34.w,
           pinIconSize: 18.w,
           pinVerticalAlignment: -0.04,
+          destinationLabel: address,
         ),
       ],
     );

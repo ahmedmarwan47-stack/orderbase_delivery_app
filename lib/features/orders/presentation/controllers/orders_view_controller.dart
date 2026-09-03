@@ -9,7 +9,7 @@ enum OrdersFilter { all, active, done }
 /// derived here so the widgets stay declarative.
 class OrdersViewController {
   OrdersViewController({required this.orders})
-      : filter = ValueNotifier(OrdersFilter.all);
+    : filter = ValueNotifier(OrdersFilter.all);
 
   final List<FlowOrder> orders;
   final ValueNotifier<OrdersFilter> filter;
@@ -20,30 +20,36 @@ class OrdersViewController {
       OrdersFilter.all => orders,
       OrdersFilter.active =>
         orders.where((o) => o.state == FlowOrderState.active).toList(),
-      OrdersFilter.done => orders
-          .where((o) =>
-              o.state == FlowOrderState.done ||
-              o.state == FlowOrderState.failed)
-          .toList(),
+      OrdersFilter.done =>
+        orders
+            .where(
+              (o) =>
+                  o.state == FlowOrderState.done ||
+                  o.state == FlowOrderState.failed,
+            )
+            .toList(),
     };
   }
 
   int countFor(OrdersFilter f) => switch (f) {
-        OrdersFilter.all => orders.length,
-        OrdersFilter.active =>
-          orders.where((o) => o.state == FlowOrderState.active).length,
-        OrdersFilter.done => orders
-            .where((o) =>
+    OrdersFilter.all => orders.length,
+    OrdersFilter.active =>
+      orders.where((o) => o.state == FlowOrderState.active).length,
+    OrdersFilter.done =>
+      orders
+          .where(
+            (o) =>
                 o.state == FlowOrderState.done ||
-                o.state == FlowOrderState.failed)
-            .length,
-      };
+                o.state == FlowOrderState.failed,
+          )
+          .length,
+  };
 
   String filterLabelKey(OrdersFilter f) => switch (f) {
-        OrdersFilter.all => LocaleKeys.filterAll,
-        OrdersFilter.active => LocaleKeys.ordersFilterActive,
-        OrdersFilter.done => LocaleKeys.ordersFilterDone,
-      };
+    OrdersFilter.all => LocaleKeys.filterAll,
+    OrdersFilter.active => LocaleKeys.ordersFilterActive,
+    OrdersFilter.done => LocaleKeys.ordersFilterDone,
+  };
 
   void selectFilter(OrdersFilter f) => filter.value = f;
 

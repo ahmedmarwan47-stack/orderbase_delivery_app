@@ -64,7 +64,8 @@ class FlowOrder {
 
   /// The COD amount as an int (e.g. "1,200" → 1200) for the collection flow.
   /// Falls back to 0 when there is no amount (prepaid rows).
-  int get codDue => int.tryParse((amount ?? '').replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+  int get codDue =>
+      int.tryParse((amount ?? '').replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
 }
 
 /// Sample data identical to the mockup's `orderList`, so the ported screen is
@@ -106,7 +107,8 @@ const List<FlowOrder> sampleFlowOrders = [
     state: FlowOrderState.active,
     cod: true,
     amount: '450',
-    address: 'برج النيل - شارع الميرغني، الدور الـ3 شقة رقم 14 - مصر الجديدة، القاهرة',
+    address:
+        'برج النيل - شارع الميرغني، الدور الـ3 شقة رقم 14 - مصر الجديدة، القاهرة',
     items: [
       FlowOrderItem(
         name: 'تشيز كيك بالفراولة',
@@ -114,7 +116,8 @@ const List<FlowOrder> sampleFlowOrders = [
         weight: '450 جم',
       ),
     ],
-    note: 'الرجاء الاتصال قبل الوصول بـ 10 دقائق. البواب يستلم الطلب لو العميل غير موجود.',
+    note:
+        'الرجاء الاتصال قبل الوصول بـ 10 دقائق. البواب يستلم الطلب لو العميل غير موجود.',
     dateLabel: '13 سبتمبر 2024',
     assignedTime: '13 سبتمبر 2024 · 12:45pm',
     pickedTime: '13 سبتمبر 2024 · 01:40pm',
@@ -126,7 +129,8 @@ const List<FlowOrder> sampleFlowOrders = [
     state: FlowOrderState.active,
     cod: false,
     pay: 'مدفوع',
-    address: 'عمارات النصر - شارع مصطفى النحاس، الدور الـ2 شقة رقم 7 - مدينة نصر، القاهرة',
+    address:
+        'عمارات النصر - شارع مصطفى النحاس، الدور الـ2 شقة رقم 7 - مدينة نصر، القاهرة',
     items: [
       FlowOrderItem(
         name: 'كيك ريد فيلفيت',
@@ -199,7 +203,8 @@ const List<FlowOrder> sampleFlowOrders = [
     state: FlowOrderState.failed,
     cod: false,
     pay: 'تعذّر التسليم',
-    address: 'شارع التسعين الشمالي، بجوار كارفور - التجمع الخامس، القاهرة الجديدة',
+    address:
+        'شارع التسعين الشمالي، بجوار كارفور - التجمع الخامس، القاهرة الجديدة',
     items: [
       FlowOrderItem(
         name: 'تورتة عيد ميلاد',

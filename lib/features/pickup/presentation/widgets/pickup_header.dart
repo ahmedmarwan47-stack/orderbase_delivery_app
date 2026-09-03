@@ -36,87 +36,47 @@ class _PickupHeader extends StatelessWidget {
           ),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
+      child:
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (showBack) ...[
-                const HeaderBackButton(),
-                12.szW,
-              ],
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppCircular.r12),
-                child: IconWidget(
-                  icon: AppAssets.img.saleSucre,
-                  height: AppSize.sH40,
-                  width: AppSize.sW40,
-                ),
-              ),
-              12.szW,
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
                 children: [
-                  if (showBack) ...[
-                    Text(
-                      LocaleKeys.pickupTitle.tr(),
-                      style: const TextStyle().setSecondaryColor.s12.medium,
+                  if (showBack) ...[const HeaderBackButton(), 12.szW],
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(AppCircular.r12),
+                    child: IconWidget(
+                      icon: AppAssets.img.saleSucre,
+                      height: AppSize.sH40,
+                      width: AppSize.sW40,
                     ),
-                    4.szH,
-                  ],
-                  Text(
-                    LocaleKeys.pickupMerchant.tr(),
-                    style: const TextStyle().setMainTextColor.s14.semiBold,
+                  ),
+                  12.szW,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (showBack) ...[
+                        Text(
+                          LocaleKeys.pickupTitle.tr(),
+                          style: const TextStyle().setSecondaryColor.s12.medium,
+                        ),
+                        4.szH,
+                      ],
+                      Text(
+                        '${Courier.merchantName} · ${ShiftController.instance.branchName}',
+                        style: const TextStyle().setMainTextColor.s14.semiBold,
+                      ),
+                    ],
                   ),
                 ],
               ),
             ],
+          ).paddingOnlyDirectional(
+            start: AppPadding.pW20,
+            end: AppPadding.pW20,
+            top: AppPadding.pH12,
+            bottom: AppPadding.pH16,
           ),
-        ],
-      ).paddingOnlyDirectional(
-        start: AppPadding.pW20,
-        end: AppPadding.pW20,
-        top: AppPadding.pH12,
-        bottom: AppPadding.pH16,
-      ),
-    );
-  }
-}
-
-/// The amber "N orders ready to collect" callout under the branch identity.
-class _PickupBanner extends StatelessWidget {
-  const _PickupBanner({required this.count});
-  final int count;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.heroCodPillBg,
-        borderRadius: BorderRadius.circular(AppCircular.r12),
-        border: Border.all(color: AppColors.pickupBannerBorder),
-      ),
-      child: Row(
-        children: [
-          IconWidget(
-            icon: AppAssets.svg.bag,
-            color: AppColors.postponedText,
-            height: AppSize.sH18,
-            width: AppSize.sW18,
-          ),
-          8.szW,
-          Expanded(
-            child: Text(
-              LocaleKeys.pickupBanner.tr(namedArgs: {'count': '$count'}),
-              style: const TextStyle()
-                  .setColor(AppColors.pickupBannerText)
-                  .s12
-                  .semiBold
-                  .withHeight(1.5),
-            ),
-          ),
-        ],
-      ).paddingAll(AppPadding.pH12),
     );
   }
 }

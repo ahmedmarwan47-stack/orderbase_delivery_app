@@ -34,7 +34,10 @@ class StatusBar extends StatelessWidget {
               'assets/icons/status_bar.svg',
               width: 66,
               height: 13,
-              colorFilter: const ColorFilter.mode(AppColors.textPrimary, BlendMode.srcIn),
+              colorFilter: const ColorFilter.mode(
+                AppColors.textPrimary,
+                BlendMode.srcIn,
+              ),
             ),
           ],
         ),
