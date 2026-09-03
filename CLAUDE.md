@@ -552,6 +552,11 @@ shell. **Add a gallery entry for each new screen.**
     `/var/db/xcode_select_link` is missing — re-run the `sudo xcode-select -s …` above (needs the
     user's password; the MCP server runs outside the shell so a shell-only `DEVELOPER_DIR` won't
     help it).
+- **Real iPhone (Ahmed's, UDID `00008120-000E14913CF00032`, signing is automatic, team set).**
+  `flutter build ios --release` **then** `flutter install --release -d <udid>`. **`flutter install`
+  does NOT rebuild** — it installs whatever `build/ios/iphoneos/Runner.app` already holds, so an
+  install without a fresh build ships the previous binary silently (this bit us once: two "fixes"
+  went to the phone as the same stale build). Check the binary's mtime against the last commit.
 - **Browser fallback (no Xcode needed):**
   `flutter run -d web-server --web-port 8080 --web-hostname 127.0.0.1`, then open
   `http://127.0.0.1:8080` in the Browser pane at a phone viewport (~390×844). First compile is slow
