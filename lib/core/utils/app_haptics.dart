@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 
 /// Semantic haptic vocabulary for the courier's one-handed, eyes-off flow — the
@@ -22,4 +24,17 @@ class AppHaptics {
 
   /// A negative-but-sanctioned outcome — a failed / returned delivery.
   static void warning() => HapticFeedback.heavyImpact();
+
+  /// Something happened *to* the courier rather than by them — the branch
+  /// dispatched a batch. A phone in a jacket pocket on a bike needs more than
+  /// a sheet sliding up: two heavy knocks a beat apart, plus the system alert
+  /// sound so the ear catches what the hand misses. The sound is a real
+  /// system sound (no plugin, so the iOS build stays CocoaPods-free), it obeys
+  /// the ring/silent switch, and is a no-op on Android, where the haptics
+  /// still fire.
+  static void attention() {
+    HapticFeedback.heavyImpact();
+    SystemSound.play(SystemSoundType.alert);
+    Timer(const Duration(milliseconds: 160), HapticFeedback.heavyImpact);
+  }
 }

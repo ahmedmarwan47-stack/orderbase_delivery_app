@@ -11,6 +11,9 @@ Future<bool?> showPickupDispatchSheet(
   required OrderBatch batch,
   required String branch,
 }) {
+  // The knock lands with the sheet: this is the one event in the day the
+  // courier did not cause, so it must be felt and heard, not only seen.
+  AppHaptics.attention();
   return showAppSheet<bool>(
     context,
     child: _PickupDispatchSheet(batch: batch, branch: branch),
