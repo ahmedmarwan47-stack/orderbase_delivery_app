@@ -19,7 +19,7 @@ import 'shift_controller.dart';
 ///
 /// A [ChangeNotifier] singleton like [ShiftController]; in-memory only (there
 /// is no preferences plugin, and adding one would put native code back into
-/// the iOS build). Defaults: off, auto on.
+/// the iOS build). Both switches default to off: the courier opts in.
 class RoadMode extends ChangeNotifier {
   RoadMode._() {
     _wasOnRoute = _onRoute;
@@ -29,7 +29,7 @@ class RoadMode extends ChangeNotifier {
   static final RoadMode instance = RoadMode._();
 
   bool _on = false;
-  bool _auto = true;
+  bool _auto = false;
   bool _wasOnRoute = false;
 
   /// The mode is active right now — the one value the widgets read.

@@ -437,7 +437,8 @@ across 328pt cannot fit «في الطريق» at 14), and the hero/strip
 outline becomes a 2px `borderDefault`. No new colours.
 
 Two switches on the Account tab (`_RoadModeGroup`): the mode itself, and «تشغيل تلقائي على
-الطريق» (default on) — phones give apps no ambient-light reading, so the mode follows the day: it
+الطريق» (**both off by default** — the courier opts in) — phones give apps no ambient-light reading,
+so when auto is on the mode follows the day: it
 flips on when `CourierStatus` *transitions* to `onRoute` and off when it leaves. Only transitions
 move it, so a manual flip mid-route holds until the next route event, and the switch always shows
 `on` itself so the hero and the switch never disagree. In-memory only (no preferences plugin — it
