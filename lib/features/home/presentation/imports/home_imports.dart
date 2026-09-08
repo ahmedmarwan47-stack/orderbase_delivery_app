@@ -25,8 +25,10 @@ part '../view/home_compact_screen.dart';
 part '../view/home_flat_screen.dart';
 
 // Widgets (private to the feature)
+part '../widgets/home_branch_line.dart';
 part '../widgets/home_square_icon_button.dart';
 part '../widgets/home_next_stop_card.dart';
+part '../widgets/home_stop_actions.dart';
 part '../widgets/home_progress_seg.dart';
 part '../widgets/home_route_leg.dart';
 part '../widgets/home_stop_progress.dart';

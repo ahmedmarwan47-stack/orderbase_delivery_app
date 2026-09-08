@@ -23,6 +23,23 @@ abstract final class AppShadows {
     ),
   ];
 
+  /// The floating tab bar — it has to read as detached from the page without
+  /// casting a hard edge under a translucent material: `0 6px 20px -6px
+  /// rgba(0,0,0,.20)` plus a tight contact shadow.
+  static const floatingBar = [
+    BoxShadow(
+      color: Color(0x33000000), // .20
+      offset: Offset(0, 6),
+      blurRadius: 20,
+      spreadRadius: -6,
+    ),
+    BoxShadow(
+      color: Color(0x14000000), // .08
+      offset: Offset(0, 1),
+      blurRadius: 2,
+    ),
+  ];
+
   /// Map pin marker: `0 4px 10px rgba(231,43,41,.4)`
   static const pin = [
     BoxShadow(

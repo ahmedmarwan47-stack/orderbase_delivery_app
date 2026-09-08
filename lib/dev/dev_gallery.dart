@@ -22,7 +22,7 @@ class DevGallery extends StatelessWidget {
 
   static final _screens = <String, WidgetBuilder>{
     'الرئيسية · Home (1a)': (_) => const HomeScreen(),
-    'الرئيسية · Home — لا دفعة بعد': (_) =>
+    'الرئيسية · Home — لا جولة بعد': (_) =>
         const HomeScreen(preview: HomePreview.idle),
     'الرئيسية · Home — متوقَّع في الفرع': (_) =>
         const HomeScreen(preview: HomePreview.returning),

@@ -487,5 +487,9 @@
   "settlement_totals_title": "The day's tally",
   "settlement_totals_orders": "Orders",
   "settlement_totals_delivered": "Delivered",
-  "settlement_totals_returns": "Returns"
+  "settlement_totals_returns": "Returns",
+  "queue_exceptions_returns": "{count} returns",
+  "queue_exceptions_postponed": "{count} postponed",
+  "queue_exceptions_view": "View",
+  "queue_filter_exceptions": "Not completed"
 }

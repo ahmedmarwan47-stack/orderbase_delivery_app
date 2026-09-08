@@ -13,11 +13,20 @@ class NotificationsScreen extends StatefulWidget {
     super.key,
     this.onSelectTab,
     this.onOpenOrder,
+    this.onOpenSearch,
+    this.onClose,
     this.embedded = false,
   });
 
   /// Forwarded to the bottom nav so the app shell can switch tabs.
   final ValueChanged<NavTab>? onSelectTab;
+
+  /// The header's search tile (embedded mode) — routed to the Orders tab.
+  final VoidCallback? onOpenSearch;
+
+  /// The header's bell, inverted here: it closes this page and returns to the
+  /// tab the courier came from.
+  final VoidCallback? onClose;
 
   /// Opens the order a notification refers to (by number, without '#'). The
   /// app shell resolves it against the shift and pushes the order flow.
@@ -65,6 +74,51 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       builder: (context, _) {
         final items = NotificationsStore.instance.items;
         final unread = items.where((n) => n.unread).length;
+        Widget tile(int i) => _NotificationTile(
+          notification: items[i],
+          onTap: widget.onOpenOrder == null || items[i].orderNum.isEmpty
+              ? null
+              : () => widget.onOpenOrder!(items[i].orderNum),
+        );
+
+        if (widget.embedded) {
+          // Inside the shell the page owns its own scroll view, so the title
+          // collapses on the feed exactly like every tab's does.
+          return CustomScrollView(
+            slivers: [
+              AppHeaderSliver(
+                title: LocaleKeys.navNotifications.tr(),
+                onSearch: widget.onOpenSearch,
+                onOpenNotifications: widget.onClose,
+                notificationsActive: true,
+              ),
+              if (unread > 0)
+                SliverToBoxAdapter(
+                  child: _NotificationsUnreadPill(unread: unread),
+                ),
+              if (items.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: _NotificationsEmpty(),
+                )
+              else
+                SliverPadding(
+                  padding: EdgeInsetsDirectional.only(
+                    start: AppPadding.pW20,
+                    end: AppPadding.pW20,
+                    top: AppPadding.pH4,
+                    bottom: BottomNav.reservedHeight(context),
+                  ),
+                  sliver: SliverList.separated(
+                    itemCount: items.length,
+                    separatorBuilder: (_, _) => 12.szH,
+                    itemBuilder: (_, i) => tile(i),
+                  ),
+                ),
+            ],
+          );
+        }
+
         final feed = items.isEmpty
             ? const _NotificationsEmpty()
             : ListView.separated(
@@ -77,22 +131,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ),
                 itemCount: items.length,
                 separatorBuilder: (_, _) => 12.szH,
-                itemBuilder: (_, i) => _NotificationTile(
-                  notification: items[i],
-                  onTap: widget.onOpenOrder == null || items[i].orderNum.isEmpty
-                      ? null
-                      : () => widget.onOpenOrder!(items[i].orderNum),
-                ),
+                itemBuilder: (_, i) => tile(i),
               );
-
-        if (widget.embedded) {
-          return Column(
-            children: [
-              _NotificationsTitleRow(unread: unread),
-              Expanded(child: feed),
-            ],
-          );
-        }
 
         return Directionality(
           textDirection: TextDirection.rtl,
@@ -121,42 +161,31 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 }
 
-/// The in-shell title row: page name on the right, unread pill on the left.
-/// No back button — the header's bell is the way out.
-class _NotificationsTitleRow extends StatelessWidget {
-  const _NotificationsTitleRow({required this.unread});
+/// The unread count, on the left of the row under the large title. The page
+/// name that used to lead this row is the title itself now, so all that is
+/// left is the one fact the title cannot carry.
+class _NotificationsUnreadPill extends StatelessWidget {
+  const _NotificationsUnreadPill({required this.unread});
   final int unread;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          LocaleKeys.navNotifications.tr(),
-          style: const TextStyle().setMainTextColor.s14.bold,
+    return Align(
+      alignment: AlignmentDirectional.centerEnd,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.failedBg,
+          borderRadius: BorderRadius.circular(AppCircular.r20),
         ),
-        const Spacer(),
-        if (unread > 0)
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.failedBg,
-              borderRadius: BorderRadius.circular(AppCircular.r20),
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: AppPadding.pW12,
-              vertical: AppPadding.pH4,
-            ),
-            child: Text(
-              LocaleKeys.notifNewCount.tr(
-                namedArgs: {'n': arabicDigits(unread)},
-              ),
-              style: const TextStyle()
-                  .setColor(AppColors.failedText)
-                  .s12
-                  .semiBold,
-            ),
-          ),
-      ],
+        padding: EdgeInsets.symmetric(
+          horizontal: AppPadding.pW12,
+          vertical: AppPadding.pH4,
+        ),
+        child: Text(
+          LocaleKeys.notifNewCount.tr(namedArgs: {'n': arabicDigits(unread)}),
+          style: const TextStyle().setColor(AppColors.failedText).s12.semiBold,
+        ),
+      ),
     ).paddingOnly(
       left: AppPadding.pW20,
       top: AppPadding.pH8,

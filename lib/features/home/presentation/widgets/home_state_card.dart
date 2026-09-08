@@ -12,7 +12,7 @@ part of '../imports/home_imports.dart';
 ///  * **settled** — the branch closed the day. Who took the cash and when, and
 ///    (dev only) a way to start the simulated day again.
 ///
-/// A batch waiting at the branch adds the amber «ارجع للفرع لاستلام دفعة»
+/// A batch waiting at the branch adds the amber «ارجع للفرع لاستلام جولة»
 /// row to any of the three, since collecting it is then the next thing to do.
 /// That row also rides under the hero while the courier is still on route —
 /// see [HomeScreen].
@@ -403,7 +403,7 @@ class _HandChip extends StatelessWidget {
   }
 }
 
-/// «ارجع للفرع لاستلام دفعة جديدة» — shown wherever Home is, on route or not.
+/// «ارجع للفرع لاستلام جولة جديدة» — shown wherever Home is, on route or not.
 ///
 /// A batch dispatched mid-route is a reason to turn around *now*: the orders
 /// are not in the bag, and nothing else on Home would say so while the hero is
@@ -422,31 +422,16 @@ class _PendingBatchRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final pending = ShiftController.instance.pendingBatches;
     if (pending.isEmpty) return const SizedBox.shrink();
-    final orders = pending.fold<int>(0, (sum, b) => sum + b.count);
-    final cash = pending.fold<int>(0, (sum, b) => sum + b.codTotal);
-    final meta = LocaleKeys.homeCollectBatchMeta.tr(
-      namedArgs: {
-        // One waiting batch is named; several are counted, since a list of
-        // IDs would say less than "two batches" at this size.
-        'what': pending.length == 1
-            ? pending.single.id
-            : LocaleKeys.homeCollectBatchCount.tr(
-                namedArgs: {'n': arabicDigits(pending.length)},
-              ),
-        'orders': arabicDigits(orders),
-        'cash': formatThousands(cash),
-      },
-    );
     return Semantics(
       button: onTap != null,
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.postponedBannerBg,
-          borderRadius: BorderRadius.circular(AppCircular.r16),
+          borderRadius: BorderRadius.circular(AppCircular.r13),
           border: Border.all(color: AppColors.postponedBorder),
         ),
         padding: EdgeInsets.symmetric(
-          horizontal: AppPadding.pW16,
+          horizontal: AppPadding.pW12,
           vertical: AppPadding.pH12,
         ),
         child: Row(
@@ -459,31 +444,15 @@ class _PendingBatchRow extends StatelessWidget {
             ),
             12.szW,
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    (returning
-                            ? LocaleKeys.homeCollectBatchReady
-                            : LocaleKeys.homeCollectBatchTitle)
-                        .tr(),
-                    style: const TextStyle()
-                        .setColor(AppColors.postponedText)
-                        .s14
-                        .semiBold,
-                  ),
-                  2.szH,
-                  Text(
-                    meta,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle()
-                        .setColor(AppColors.postponedTextStrong)
-                        .s12
-                        .regular
-                        .tabular,
-                  ),
-                ],
+              child: Text(
+                (returning
+                        ? LocaleKeys.homeCollectBatchReady
+                        : LocaleKeys.homeCollectBatchTitle)
+                    .tr(),
+                style: const TextStyle()
+                    .setColor(AppColors.postponedText)
+                    .s14
+                    .bold,
               ),
             ),
             8.szW,

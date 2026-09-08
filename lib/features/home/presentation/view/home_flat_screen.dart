@@ -15,6 +15,12 @@ class HomeFlatScreen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: AppColors.background,
+        extendBody: true,
+        bottomNavigationBar: BottomNav(
+          active: NavTab.home,
+          notificationsBadge: true,
+          onTap: onSelectTab,
+        ),
         body: SafeArea(
           bottom: false,
           child: Column(
@@ -35,14 +41,9 @@ class HomeFlatScreen extends StatelessWidget {
                       ).paddingOnly(
                         left: AppPadding.pW20,
                         right: AppPadding.pW20,
-                        bottom: AppPadding.pH20,
+                        bottom: BottomNav.reservedHeight(context),
                       ),
                 ),
-              ),
-              BottomNav(
-                active: NavTab.home,
-                notificationsBadge: true,
-                onTap: onSelectTab,
               ),
             ],
           ),

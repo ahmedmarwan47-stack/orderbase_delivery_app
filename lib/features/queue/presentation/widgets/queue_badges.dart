@@ -70,7 +70,7 @@ class _StatusBadge extends StatelessWidget {
             ),
             4.szW,
           ],
-          Text(text, style: const TextStyle().setColor(fg).s10.semiBold),
+          Text(text, style: const TextStyle().setColor(fg).s12.semiBold),
         ],
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),
     );

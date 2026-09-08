@@ -3,8 +3,9 @@ part of '../imports/queue_imports.dart';
 /// One order inside a batch section — the batch row, one step richer than the
 /// pickup version: number and cash pill (or the outcome badge once closed),
 /// name · area · pieces, and the promised time while the order is still out.
-/// Flat, like every list in the app: a hairline between rows, indented under
-/// the batch header so the rows read as its children. Tapping opens the order.
+/// Flat inside its batch card: no fill of its own, a [AppColors.surfaceSubtle]
+/// hairline between rows, indented under the batch header so the rows read as
+/// its children. Tapping opens the order.
 class _QueueBatchRow extends StatelessWidget {
   const _QueueBatchRow({
     required this.order,
@@ -38,11 +39,11 @@ class _QueueBatchRow extends StatelessWidget {
       decoration: BoxDecoration(
         border: last
             ? null
-            : const Border(bottom: BorderSide(color: AppColors.borderDefault)),
+            : const Border(bottom: BorderSide(color: AppColors.surfaceSubtle)),
       ),
       padding: EdgeInsetsDirectional.only(
-        start: AppPadding.pW32,
-        end: AppPadding.pW20,
+        start: AppPadding.pW24,
+        end: AppPadding.pW16,
         top: AppPadding.pH12,
         bottom: AppPadding.pH12,
       ),

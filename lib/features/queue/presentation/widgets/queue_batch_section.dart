@@ -7,69 +7,68 @@ part of '../imports/queue_imports.dart';
 /// into a flat list — and the queue's filters as its head. Batches waiting at
 /// the branch come first, since they need an action; the ones in hand follow,
 /// newest first; a completed batch folds itself away.
-class _QueueBatchList extends StatefulWidget {
+class _QueueBatchList extends StatelessWidget {
   const _QueueBatchList({required this.groups, required this.vc});
   final List<QueueBatchGroup> groups;
   final QueueViewController vc;
 
   @override
-  State<_QueueBatchList> createState() => _QueueBatchListState();
-}
-
-class _QueueBatchListState extends State<_QueueBatchList> {
-  /// Pull-to-refresh re-checks today's orders. The tab reads live, in-memory
-  /// shift state, so there is nothing to fetch yet — the gesture re-reads and
-  /// settles; it becomes a real sync when the data layer goes async.
-  Future<void> _refresh() async {
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-    if (mounted) setState(() {});
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final groups = widget.groups;
-    return RefreshIndicator(
-      onRefresh: _refresh,
-      color: AppColors.brand,
-      backgroundColor: AppColors.surface,
-      child: ListView(
-        controller: widget.vc.scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsetsDirectional.only(bottom: AppPadding.pH20),
-        children: [
-          for (final (i, g) in groups.indexed)
-            _QueueBatchSection(
-              key: ValueKey(g.batch.id),
-              group: g,
-              vc: widget.vc,
-              // The batch the courier is working through opens; a completed
-              // one stays folded until wanted.
-              initiallyExpanded: !g.complete,
-              last: i == groups.length - 1,
-            ),
+    // A filter is narrowing the list: the courier has already said what they
+    // want to see, so the rows should not be a tap away.
+    final filtering = vc.filter.value != QueueFilter.all;
+    // One card per batch, 12 apart. A batch carries its own state and its own
+    // confirm button, so a shared sheet blurred where one ended and the next
+    // began.
+    //
+    // Plain content, not a scrollable: the page is one CustomScrollView now,
+    // and a day is three batches deep, so there is nothing here to lazily
+    // build — only a nested scroll to avoid.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final (i, group) in groups.indexed) ...[
+          if (i > 0) 12.szH,
+          _QueueBatchSection(
+            // The filter is part of the key: changing it rebuilds the section
+            // so the expansion below is re-evaluated instead of keeping the
+            // state the courier had before they filtered.
+            key: ValueKey('${group.batch.id}-$filtering'),
+            group: group,
+            vc: vc,
+            // Closed by default: the unfiltered list answers "what rounds do I
+            // have" first, and the courier opens the one they want. Under a
+            // filter that question is already answered — they asked for these
+            // specific orders — so the batch opens on what is left.
+            initiallyExpanded: filtering,
+          ),
         ],
-      ),
+      ],
+    ).paddingOnlyDirectional(
+      start: AppPadding.pW20,
+      end: AppPadding.pW20,
+      top: AppPadding.pH4,
+      bottom: AppPadding.pH20,
     );
   }
 }
 
-/// One batch as a collapsible section: its ID and state, a line sizing it up
+/// One batch as a collapsible **card**: its ID and state, a line sizing it up
 /// (orders · remaining · cash · km · return time), then its orders as flat
 /// rows. A batch still at the branch closes with its own carry button, so
-/// carrying happens where the batch is.
+/// carrying happens where the batch is. Each batch is its own card, and every
+/// one arrives closed.
 class _QueueBatchSection extends StatefulWidget {
   const _QueueBatchSection({
     super.key,
     required this.group,
     required this.vc,
     this.initiallyExpanded = true,
-    this.last = false,
   });
 
   final QueueBatchGroup group;
   final QueueViewController vc;
   final bool initiallyExpanded;
-  final bool last;
 
   @override
   State<_QueueBatchSection> createState() => _QueueBatchSectionState();
@@ -95,12 +94,15 @@ class _QueueBatchSectionState extends State<_QueueBatchSection> {
     final g = widget.group;
     final rows = [...g.rows]..sort((a, b) => a.num.compareTo(b.num));
     final reduced = AppMotion.reduced(context);
-    return DecoratedBox(
+    return Container(
       decoration: BoxDecoration(
-        border: widget.last
-            ? null
-            : const Border(bottom: BorderSide(color: AppColors.borderDefault)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppCircular.r16),
+        border: Border.all(color: AppColors.borderCard),
+        boxShadow: AppShadows.card,
       ),
+      // Clips the collapsing body to the rounded corners.
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
@@ -232,7 +234,7 @@ class _QueueBatchHeader extends StatelessWidget {
               ),
             ],
           ).paddingSymmetric(
-            horizontal: AppPadding.pW20,
+            horizontal: AppPadding.pW16,
             vertical: AppPadding.pH12,
           ),
     ).onClick(onTap: onTap);
@@ -272,12 +274,12 @@ class _BatchStatePill extends StatelessWidget {
         horizontal: AppPadding.pW8,
         vertical: AppPadding.pH2,
       ),
-      child: Text(text, style: const TextStyle().setColor(fg).s10.semiBold),
+      child: Text(text, style: const TextStyle().setColor(fg).s12.semiBold),
     );
   }
 }
 
-/// The ink confirm inside a waiting batch — «تأكيد استلام الدفعة (٣)».
+/// The ink confirm inside a waiting batch — «تأكيد استلام الجولة (٣)».
 class _CarryBatchButton extends StatelessWidget {
   const _CarryBatchButton({required this.count, required this.onTap});
   final int count;
@@ -314,8 +316,8 @@ class _CarryBatchButton extends StatelessWidget {
               ],
             ),
           ).paddingOnlyDirectional(
-            start: AppPadding.pW32,
-            end: AppPadding.pW20,
+            start: AppPadding.pW16,
+            end: AppPadding.pW16,
             top: AppPadding.pH12,
             bottom: AppPadding.pH16,
           ),

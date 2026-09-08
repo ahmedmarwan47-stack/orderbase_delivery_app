@@ -1,8 +1,10 @@
 part of '../imports/queue_imports.dart';
 
 /// Which slice of the queue is shown. `postponed` is filtered inline like the
-/// others (it renders the postponed cards in place, not a separate screen).
-enum QueueFilter { all, transit, delivered, failed, postponed }
+/// others (it renders the postponed cards in place, not a separate screen);
+/// `exceptions` is the two failure kinds together — what the exception row
+/// above the list summarises, so «عرض» lands on exactly what it counted.
+enum QueueFilter { all, transit, delivered, failed, postponed, exceptions }
 
 /// Ephemeral UI state for the Queue screen — search field, search/browse mode,
 /// active filter, and the debounced query. No `setState`, no logic in the View.
@@ -73,6 +75,8 @@ class QueueViewController {
       QueueFilter.delivered => o.status == OrderStatus.delivered,
       QueueFilter.failed => o.status == OrderStatus.failed,
       QueueFilter.postponed => o.status == OrderStatus.postponed,
+      QueueFilter.exceptions =>
+        o.status == OrderStatus.failed || o.status == OrderStatus.postponed,
     };
     final groups = <QueueBatchGroup>[
       for (final b in shift.pendingBatches)
@@ -166,7 +170,18 @@ class QueueViewController {
     QueueFilter.failed =>
       active.where((o) => o.status == OrderStatus.failed).length,
     QueueFilter.postponed => postponed.length,
+    QueueFilter.exceptions => returnedCount + postponedCount,
   };
+
+  /// The two exception counts, kept on the controller so the exception row is
+  /// pure layout: orders that came back, and orders pushed to later.
+  int get returnedCount =>
+      active.where((o) => o.status == OrderStatus.failed).length;
+
+  int get postponedCount => postponed.length;
+
+  /// Anything at all went wrong today — the row only exists when it did.
+  bool get hasExceptions => returnedCount > 0 || postponedCount > 0;
 
   List<Order> get filtered => switch (filter.value) {
     QueueFilter.all => active,
@@ -177,6 +192,10 @@ class QueueViewController {
     QueueFilter.failed =>
       active.where((o) => o.status == OrderStatus.failed).toList(),
     QueueFilter.postponed => postponed,
+    QueueFilter.exceptions => [
+      ...active.where((o) => o.status == OrderStatus.failed),
+      ...postponed,
+    ],
   };
 
   List<Order> get searchMatches =>
@@ -202,6 +221,7 @@ class QueueViewController {
     QueueFilter.delivered => LocaleKeys.filterDelivered,
     QueueFilter.failed => LocaleKeys.filterFailed,
     QueueFilter.postponed => LocaleKeys.filterPostponed,
+    QueueFilter.exceptions => LocaleKeys.queueFilterExceptions,
   };
 
   // ── handlers ──
@@ -226,6 +246,13 @@ class QueueViewController {
 
   /// Show the postponed orders inline (they used to live on a separate route).
   void openPostponed() => selectFilter(QueueFilter.postponed);
+
+  /// Narrow the list to what did not go to plan — returns and postponed
+  /// together. The exception row's «عرض»; [clearFilter] is the way back.
+  void showExceptions() {
+    AppHaptics.tick();
+    selectFilter(QueueFilter.exceptions);
+  }
 
   /// Send a postponed order back into the active queue (rejoins "في الطريق").
   void returnOrderToQueue(Order order) =>

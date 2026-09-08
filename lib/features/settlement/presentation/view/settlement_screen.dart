@@ -95,21 +95,22 @@ class SettlementDayScreen extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              _SettlementHeader(data: day, showBack: true, scrolled: true),
+              // Only the way out is pinned; the day's identity scrolls with
+              // the rest of the page.
+              const _SettlementBackBar(),
               Expanded(
                 child: SingleChildScrollView(
                   padding: EdgeInsetsDirectional.only(
                     start: AppPadding.pW20,
                     end: AppPadding.pW20,
-                    top: AppPadding.pH8,
+                    top: AppPadding.pH12,
                     bottom: AppPadding.pH24,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      _SettlementHeader(data: day),
                       _CashInHandCard(data: day, showBreakdown: true),
-                      12.szH,
-                      _DayTotals(data: day),
                       if (day.settledAt != null) ...[
                         12.szH,
                         _ReceiptCard(data: day),

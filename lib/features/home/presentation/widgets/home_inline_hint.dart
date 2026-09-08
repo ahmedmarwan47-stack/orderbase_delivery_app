@@ -285,7 +285,7 @@ class _HintDot extends StatelessWidget {
             child: Center(
               child: Text(
                 'i',
-                style: const TextStyle().setMainTextColor.s10.bold
+                style: const TextStyle().setMainTextColor.s12.bold
                     .withHeight(1)
                     .copyWith(fontFamily: 'sans-serif'),
               ),

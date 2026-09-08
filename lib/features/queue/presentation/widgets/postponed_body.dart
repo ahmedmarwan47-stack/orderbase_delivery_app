@@ -49,14 +49,22 @@ class _PostponedBodyState extends State<_PostponedBody> {
                 _PostponedHeader(count: list.length, scrolled: scrolled),
           ),
           Expanded(
-            child: _AnimatedPostponedList(
-              orders: list,
-              onReturn: widget.onReturn,
-              reduced: AppMotion.reduced(context),
-              scrollController: _scroll,
+            child: CustomScrollView(
+              controller: _scroll,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: _AnimatedPostponedList(
+                    orders: list,
+                    onReturn: widget.onReturn,
+                    reduced: AppMotion.reduced(context),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: SizedBox(height: BottomNav.reservedHeight(context)),
+                ),
+              ],
             ),
           ),
-          const BottomNav(active: NavTab.orders, notificationsBadge: true),
         ],
       ),
     );
@@ -74,17 +82,11 @@ class _AnimatedPostponedList extends StatefulWidget {
     required this.orders,
     required this.onReturn,
     required this.reduced,
-    this.scrollController,
   });
 
   final List<Order> orders;
   final void Function(Order) onReturn;
   final bool reduced;
-
-  /// Optional external controller (the standalone [PostponedScreen] passes one
-  /// to drive its scroll-reactive header). Null for the inline postponed filter,
-  /// which keeps its own default scrollable.
-  final ScrollController? scrollController;
 
   @override
   State<_AnimatedPostponedList> createState() => _AnimatedPostponedListState();
@@ -135,9 +137,8 @@ class _AnimatedPostponedListState extends State<_AnimatedPostponedList> {
     // Same flat-list treatment as the main queue: rows edge to edge on the page,
     // hairlines instead of card outlines. The advisory banner keeps its own
     // shape — it is a note, not an order.
-    return ListView(
-      controller: widget.scrollController,
-      padding: EdgeInsetsDirectional.only(bottom: AppPadding.pH20),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const _PostponedInfoBanner().paddingSymmetric(
           horizontal: AppPadding.pW20,
@@ -160,7 +161,7 @@ class _AnimatedPostponedListState extends State<_AnimatedPostponedList> {
             ),
           ),
       ],
-    );
+    ).paddingOnlyDirectional(bottom: AppPadding.pH20);
   }
 }
 

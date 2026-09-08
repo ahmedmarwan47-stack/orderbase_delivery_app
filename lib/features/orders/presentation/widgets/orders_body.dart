@@ -2,15 +2,10 @@ part of '../imports/orders_imports.dart';
 
 /// Layout only — header, the filtered card list, and the bottom nav.
 class _OrdersBody extends StatelessWidget {
-  const _OrdersBody({
-    required this.vc,
-    required this.onOpenOrder,
-    required this.onSelectTab,
-  });
+  const _OrdersBody({required this.vc, required this.onOpenOrder});
 
   final OrdersViewController vc;
   final ValueChanged<FlowOrder>? onOpenOrder;
-  final ValueChanged<NavTab>? onSelectTab;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +31,8 @@ class _OrdersBody extends StatelessWidget {
                   start: AppPadding.pW20,
                   end: AppPadding.pW20,
                   top: AppPadding.pH16,
-                  bottom: AppPadding.pH20,
+                  // Clears the floating tab bar the list runs under.
+                  bottom: BottomNav.reservedHeight(context),
                 ),
                 itemCount: items.length,
                 separatorBuilder: (_, _) => 12.szH,
@@ -47,11 +43,6 @@ class _OrdersBody extends StatelessWidget {
               );
             },
           ),
-        ),
-        BottomNav(
-          active: NavTab.orders,
-          notificationsBadge: true,
-          onTap: onSelectTab,
         ),
       ],
     );

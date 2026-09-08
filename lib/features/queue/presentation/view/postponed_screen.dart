@@ -49,6 +49,11 @@ class _PostponedScreenState extends State<PostponedScreen> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: AppColors.background,
+        extendBody: true,
+        bottomNavigationBar: const BottomNav(
+          active: NavTab.orders,
+          notificationsBadge: true,
+        ),
         body: SafeArea(
           bottom: false,
           child: _PostponedBody(orders: _orders, onReturn: _returnToQueue),

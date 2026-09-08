@@ -24,23 +24,16 @@ const bool kShowRouteLeg = false;
 ///  5. **Two actions** — «تم تسليم الطلب» and call. WhatsApp lives on the
 ///     detail, which the whole card opens.
 class _HomeNextStopCard extends StatelessWidget {
-  const _HomeNextStopCard({this.onViewOrder, this.onDeliver, this.onCall});
+  const _HomeNextStopCard({this.onViewOrder});
 
   /// Opens the current order's detail — the whole card taps through to it.
   final VoidCallback? onViewOrder;
-
-  /// Marks the order handed over (handoff sheet → COD collection → result).
-  final VoidCallback? onDeliver;
-
-  /// Dials the customer.
-  final VoidCallback? onCall;
 
   @override
   Widget build(BuildContext context) {
     final shift = ShiftController.instance;
     final order = shift.nextStop;
     if (order == null) return const SizedBox.shrink();
-    final batch = shift.currentBatch;
     final isCod = order.cod != null && !order.prepaid;
     // Road mode: one type step up, taller controls, a shorter map to pay for
     // it, and a firmer outline. See [RoadMode].
@@ -62,7 +55,7 @@ class _HomeNextStopCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppCircular.r22),
+        borderRadius: BorderRadius.circular(AppCircular.r16),
         border: road
             ? Border.all(color: AppColors.borderDefault, width: 2)
             : Border.all(color: AppColors.borderCardFaint),
@@ -75,17 +68,10 @@ class _HomeNextStopCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── 1. the batch line ──
-              if (batch != null)
-                _HomeBatchLine(
-                  batch: batch,
-                  current: shift.currentStopNumber,
-                  total: shift.totalStops,
-                  returnEta: formatClockArabic(shift.returnEtaOf(batch)),
-                  routeKm: batch.routeKm,
-                ),
-              12.szH,
-              // ── 2. the destination ──
+              // ── 1. the destination ──
+              // The batch line and the trip facts now sit above this card,
+              // and the actions below it: what is left inside is only the
+              // place the courier is going.
               // Area and street sit on ONE line at ONE weight and size: they
               // are a single fact ("where am I going"), and setting the area
               // three steps louder than its own street invented a hierarchy
@@ -94,7 +80,7 @@ class _HomeNextStopCard extends StatelessWidget {
                 '${order.area} · ${order.addr}',
                 // 16 — the hero slot's one headline size, shared with the
                 // idle / returning / settled titles that take its place.
-                style: const TextStyle().setMainTextColor.s16.bold
+                style: const TextStyle().setMainTextColor.s16.semiBold
                     .road(road)
                     .withHeight(1.4),
               ),
@@ -103,17 +89,13 @@ class _HomeNextStopCard extends StatelessWidget {
               // door, and the only part that isn't on the map.
               Text(
                 order.addrDetail ?? '',
-                style: const TextStyle().setTertiaryColor.s14.regular
+                style: const TextStyle().setTertiaryColor.s14.medium
                     .road(road)
                     .withHeight(1.5),
               ),
             ],
-          ).paddingOnly(
-            left: AppPadding.pW20,
-            top: AppPadding.pH16,
-            right: AppPadding.pW20,
-            bottom: AppPadding.pH12,
           ),
+          12.szH,
           if (kShowStopSegments)
             _HomeStopProgress(stops: orderedStops, current: order)
           else if (kShowRouteLeg)
@@ -123,9 +105,10 @@ class _HomeNextStopCard extends StatelessWidget {
           // job, the strip only confirms the pin.
           MapView(
             height: road ? AppSize.sH96 : AppSize.sH120,
-            showHairlines: true,
+            borderRadius: AppCircular.r12,
             destinationLabel: order.fullAddress,
           ),
+          12.szH,
           // ── 4. meta ──
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,8 +132,8 @@ class _HomeNextStopCard extends StatelessWidget {
                             text: order.num,
                             style: const TextStyle()
                                 .setSecondaryColor
-                                .s12
-                                .regular
+                                .s14
+                                .semiBold
                                 .tabular
                                 .road(road),
                           ),
@@ -184,86 +167,10 @@ class _HomeNextStopCard extends StatelessWidget {
                   ),
                 ],
               ),
-              if (order.due != null) ...[
-                4.szH,
-                Text(
-                  LocaleKeys.promisedAt.tr(namedArgs: {'time': order.due!}),
-                  style: const TextStyle().setSecondaryColor.s12.regular.road(
-                    road,
-                  ),
-                ),
-              ],
             ],
-          ).paddingOnly(
-            left: AppPadding.pW20,
-            top: AppPadding.pH12,
-            right: AppPadding.pW20,
-            bottom: AppPadding.pH4,
-          ),
-          // ── 5. actions ──
-          Row(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: road ? AppSize.sH64 : AppSize.sH52,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppColors.inkFill,
-                      borderRadius: BorderRadius.circular(
-                        AppCircular.r15,
-                      ), // radii exempt
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconWidget(
-                          icon: AppAssets.svg.check,
-                          color: AppColors.surface,
-                          height: AppSize.sH18,
-                          width: AppSize.sW18,
-                        ),
-                        8.szW,
-                        Flexible(
-                          child: Text(
-                            LocaleKeys.homeDeliver.tr(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle().setWhite.s14.semiBold.road(
-                              road,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ).onClick(onTap: onDeliver),
-              ),
-              12.szW,
-              // Neutral tile (ink glyph, white fill, hairline) matching the
-              // header actions — kept off the status hues so call never
-              // reads as the failed-red / delivered-green states.
-              Semantics(
-                button: true,
-                label: LocaleKeys.orderDetailCall.tr(),
-                child: _HomeSquareIconButton(
-                  icon: AppAssets.svg.phone,
-                  iconColor: AppColors.textPrimary,
-                  size: road ? AppSize.sH64 : AppSize.sH52,
-                  iconSize: road ? AppSize.sH24 : 21.h, // mockup glyph 21px
-                  radius: AppCircular.r15,
-                  background: AppColors.surface,
-                  border: AppColors.iconButtonBorder,
-                ).onClick(onTap: onCall),
-              ),
-            ],
-          ).paddingOnly(
-            left: AppPadding.pW20,
-            top: AppPadding.pH12,
-            right: AppPadding.pW20,
-            bottom: AppPadding.pH16,
           ),
         ],
-      ),
+      ).paddingAll(AppPadding.pW16),
       // The whole card opens the order. Everything inside that handles its own
       // tap — the deliver button, call, the open-in-Maps badge, the tooltip —
       // still wins the gesture arena, so only the "dead" areas fall through.
@@ -302,8 +209,8 @@ class _PayPill extends StatelessWidget {
         text,
         style: const TextStyle()
             .setColor(isCod ? AppColors.postponedText : AppColors.deliveredText)
-            .s12
-            .semiBold
+            .s14
+            .bold
             .tabular
             .road(road),
       ).paddingSymmetric(horizontal: AppPadding.pW8, vertical: AppPadding.pH4),

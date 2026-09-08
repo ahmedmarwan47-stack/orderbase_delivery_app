@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 /// Seeded from: Queue States.dc.html
 abstract final class AppColors {
   // Surfaces
+  static const transparent = Color(0x00000000);
   static const background = Color(0xFFF6F5F3);
   static const surface = Color(0xFFFFFFFF);
   static const surfaceMuted = Color(
@@ -96,6 +97,21 @@ abstract final class AppColors {
 
   // Selected / high-emphasis fill (chips, primary buttons)
   static const inkFill = Color(0xFF1A1919);
+
+  // Floating tab bar — the hand-rolled liquid glass. [navGlassFill] is the
+  // 70%-opaque white the blurred page shows through; [navGlassSheen*] is the
+  // top-to-bottom highlight that gives the pill its curvature; [navGlassEdge]
+  // is the 1px light rim. [navOpaqueEdge] replaces that rim on the opaque
+  // variant (high contrast / road mode), where a white-on-white rim would
+  // vanish. All four are marks, not text.
+  static const navGlassFill = Color(0xB3FFFFFF); // white @ .70
+  static const navGlassSheenTop = Color(0x59FFFFFF); // white @ .35
+  static const navGlassSheenBottom = Color(0x00FFFFFF); // white @ 0
+  static const navGlassEdge = Color(0x8CFFFFFF); // white @ .55
+  static const navOpaqueEdge = Color(0xFFE6E5E2); // = borderDefault
+  // The chip behind the active tab: the brand red at 10%, so it belongs to the
+  // red glyph sitting on it and stays visible on glass and on white alike.
+  static const navActiveChip = Color(0x1AE72B29);
 
   // Muted (70%) white for secondary text on a dark surface (e.g. the progress
   // tooltip's order-number line over the ink bubble).

@@ -57,7 +57,7 @@ class HomeScreen extends StatefulWidget {
   /// The cash cell → settlement.
   final VoidCallback? onOpenSettlement;
 
-  /// The status card's «دفعة جديدة في انتظارك» row → the Orders tab.
+  /// The status card's «جولة جديدة في انتظارك» row → the Orders tab.
   final VoidCallback? onOpenPendingBatch;
 
   /// Dev-only: reset the simulated day from the settled card.
@@ -84,15 +84,24 @@ class _HomeScreenState extends State<HomeScreen> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: AppColors.background,
+        // The page runs under the floating tab bar — that is what gives the
+        // glass something to blur.
+        extendBody: true,
+        bottomNavigationBar: BottomNav(
+          active: NavTab.home,
+          notificationsBadge: true,
+          onTap: widget.onSelectTab,
+        ),
         body: SafeArea(
           bottom: false,
-          child: Column(
-            children: [
-              AppHeader(
+          child: CustomScrollView(
+            slivers: [
+              AppHeaderSliver(
+                title: LocaleKeys.navHome.tr(),
                 onSearch: widget.onOpenSearch,
                 onOpenNotifications: widget.onOpenNotifications,
               ),
-              Expanded(
+              SliverToBoxAdapter(
                 child: AnimatedBuilder(
                   animation: Listenable.merge([
                     ShiftController.instance,
@@ -101,58 +110,91 @@ class _HomeScreenState extends State<HomeScreen> {
                   builder: (_, _) {
                     final shift = ShiftController.instance;
                     final status = _status(shift);
-                    return SingleChildScrollView(
-                      child:
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              if (status == CourierStatus.onRoute &&
-                                  shift.nextStop != null) ...[
-                                _HomeNextStopCard(
-                                  onViewOrder: widget.onOpenOrder,
-                                  onDeliver: widget.onDeliverOrder,
-                                  onCall: widget.onCallCustomer,
-                                ),
-                                // A batch dispatched mid-route is a reason to
-                                // turn around now — those orders are not in
-                                // the bag. The status card carries this row
-                                // when the hero is gone; on route it sits
-                                // under the hero instead of going unsaid.
-                                if (shift.hasPendingBatch) ...[
-                                  12.szH,
-                                  _PendingBatchRow(
-                                    onTap: widget.onOpenPendingBatch,
-                                  ),
-                                ],
-                              ] else
-                                _HomeStateCard(
-                                  status: status,
-                                  onCallBranch: widget.onCallBranch,
-                                  onOpenPendingBatch: widget.onOpenPendingBatch,
-                                  onStartNewDay: widget.onStartNewDay,
-                                ),
-                              16.szH,
-                              // The day's numbers, right under the hero so
-                              // both are on screen without a scroll.
-                              _HomeStatRow(
-                                onOpenOrdersFilter: widget.onOpenOrdersFilter,
-                                onOpenSettlement: widget.onOpenSettlement,
-                              ),
-                            ],
-                          ).paddingOnly(
-                            left: AppPadding.pW20,
-                            top: AppPadding.pH4,
-                            right: AppPadding.pW20,
-                            bottom: AppPadding.pH20,
+                    // There is an order to deliver: the hero, not a status
+                    // card, occupies the top of the page.
+                    final hasStop =
+                        status == CourierStatus.onRoute &&
+                        shift.nextStop != null;
+                    // Built once, placed once — above the hero slot or below
+                    // it, never both. Absent entirely until a number moves.
+                    final stats = _HomeStatRow.hasAnyMetric(shift)
+                        ? _HomeStatRow(
+                            onOpenOrdersFilter: widget.onOpenOrdersFilter,
+                            onOpenSettlement: widget.onOpenSettlement,
+                          )
+                        : null;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Which branch the courier is on today — it left the
+                        // header when the header became a page title, and it
+                        // belongs above the numbers it produced.
+                        _HomeBranchLine(branch: shift.branchName),
+                        12.szH,
+                        // The day's numbers lead the page, always —
+                        // the designer's call. They are still absent
+                        // until one of them moves off zero.
+                        if (stats != null) ...[stats, 20.szH],
+                        if (hasStop) ...[
+                          // The stop, in three parts. The batch and the
+                          // distance it runs sit above the card; the
+                          // card is the destination alone; the actions
+                          // sit below it, on the page.
+                          if (shift.currentBatch case final batch?) ...[
+                            _HomeStopTripRow(
+                              batch: batch,
+                              current: shift.currentStopNumber,
+                              total: shift.totalStops,
+                              routeKm: batch.routeKm,
+                            ),
+                            8.szH,
+                          ],
+                          _HomeNextStopCard(onViewOrder: widget.onOpenOrder),
+                          12.szH,
+                          _HomeStopActions(
+                            onDeliver: widget.onDeliverOrder,
+                            onCall: widget.onCallCustomer,
                           ),
+                          // A batch dispatched mid-route is a reason to
+                          // turn around now — those orders are not in the
+                          // bag. The status card carries this row when the
+                          // hero is gone; on route it sits under the hero
+                          // instead of going unsaid.
+                          //
+                          // The return time rides WITH it. On its own it is
+                          // an orphan — a figure answering a question nobody
+                          // asked. Beside a batch waiting at the branch it
+                          // becomes the useful half: when the courier is
+                          // expected there to collect it.
+                          if (shift.hasPendingBatch) ...[
+                            20.szH,
+                            if (shift.currentBatch case final batch?) ...[
+                              _HomeReturnEta(
+                                returnEta: formatClockArabic(
+                                  shift.returnEtaOf(batch),
+                                ),
+                              ),
+                              12.szH,
+                            ],
+                            _PendingBatchRow(onTap: widget.onOpenPendingBatch),
+                          ],
+                        ] else
+                          _HomeStateCard(
+                            status: status,
+                            onCallBranch: widget.onCallBranch,
+                            onOpenPendingBatch: widget.onOpenPendingBatch,
+                            onStartNewDay: widget.onStartNewDay,
+                          ),
+                      ],
+                    ).paddingOnly(
+                      left: AppPadding.pW16,
+                      top: AppPadding.pH12,
+                      right: AppPadding.pW16,
+                      // Clears the floating tab bar the page runs under.
+                      bottom: BottomNav.reservedHeight(context),
                     );
                   },
                 ),
-              ),
-              BottomNav(
-                active: NavTab.home,
-                notificationsBadge: true,
-                onTap: widget.onSelectTab,
               ),
             ],
           ),

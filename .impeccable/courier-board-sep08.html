@@ -1,0 +1,1242 @@
+<title>Eight Asks, Answered</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap">
+
+<style>
+/* ─── Board tokens: graphite workbench, ledger-green accent ───
+   The app's own hues appear ONLY inside .scr (phone screens).   */
+:root{
+  --ground:#E8EAEE; --ground-2:#DEE1E7; --panel:#FFFFFF;
+  --ink:#14171C; --ink-2:#39404A; --muted:#5B616C; --faint:#868D99;
+  --line:#D4D8E0; --line-soft:#E3E6EB;
+  --accent:#2B5B4C; --accent-soft:#DCEBE5; --accent-line:#A6CCBE;
+  --ok:#1F6B45; --ok-bg:#E4F2EA; --ok-line:#B4D9C6;
+  --live:#8A5B10; --live-bg:#FBF1DE; --live-line:#EBD5A8;
+  --bad:#A3231F; --bad-bg:#FBE7E6; --bad-line:#EFC2C0;
+  --shadow:0 1px 2px rgba(15,20,30,.05),0 8px 24px rgba(15,20,30,.07);
+  --shadow-phone:0 2px 4px rgba(15,20,30,.06),0 18px 44px rgba(15,20,30,.14);
+  --f-display:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-ar:"Noto Kufi Arabic","Segoe UI",Tahoma,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0F1216; --ground-2:#161A20; --panel:#181C22;
+  --ink:#E6E9ED; --ink-2:#C0C6CF; --muted:#97A0AB; --faint:#77808C;
+  --line:#292F37; --line-soft:#222830;
+  --accent:#5FBFA2; --accent-soft:#12332A; --accent-line:#1E5546;
+  --ok:#66C795; --ok-bg:#12301F; --ok-line:#1F5237;
+  --live:#D9A64A; --live-bg:#332713; --live-line:#5C4620;
+  --bad:#E4736E; --bad-bg:#361A19; --bad-line:#5E2A28;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.36);
+  --shadow-phone:0 2px 6px rgba(0,0,0,.5),0 20px 50px rgba(0,0,0,.55);
+}}
+:root[data-theme="dark"]{
+  --ground:#0F1216; --ground-2:#161A20; --panel:#181C22;
+  --ink:#E6E9ED; --ink-2:#C0C6CF; --muted:#97A0AB; --faint:#77808C;
+  --line:#292F37; --line-soft:#222830;
+  --accent:#5FBFA2; --accent-soft:#12332A; --accent-line:#1E5546;
+  --ok:#66C795; --ok-bg:#12301F; --ok-line:#1F5237;
+  --live:#D9A64A; --live-bg:#332713; --live-line:#5C4620;
+  --bad:#E4736E; --bad-bg:#361A19; --bad-line:#5E2A28;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.36);
+  --shadow-phone:0 2px 6px rgba(0,0,0,.5),0 20px 50px rgba(0,0,0,.55);
+}
+
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--f-body);
+     font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px 96px}
+
+.mast{padding:58px 0 34px;border-bottom:1px solid var(--line)}
+.kicker{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.14em;
+        text-transform:uppercase;color:var(--accent);margin:0 0 18px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(36px,5.6vw,62px);
+   line-height:1.02;letter-spacing:-.025em;margin:0 0 20px;text-wrap:balance}
+.standfirst{font-size:17px;color:var(--muted);max-width:66ch;margin:0 0 24px}
+.standfirst strong{color:var(--ink);font-weight:600}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px 26px;font-family:var(--f-mono);
+          font-size:11.5px;color:var(--faint);letter-spacing:.04em;text-transform:uppercase}
+
+/* evidence chip */
+.ev{display:inline-flex;align-items:center;gap:7px;font-family:var(--f-mono);
+    font-size:11px;line-height:1.45;color:var(--muted);background:var(--ground-2);
+    border:1px solid var(--line);border-radius:4px;padding:4px 8px;margin:0 6px 6px 0;
+    max-width:100%;overflow-x:auto;white-space:nowrap}
+.ev::before{content:"▸";color:var(--accent);font-size:9px;flex:0 0 auto}
+.ev b{color:var(--ink);font-weight:600}
+.evrow{display:flex;flex-wrap:wrap;margin:14px 0 0}
+
+/* the ask — the user's own words open every section */
+.ask{background:var(--panel);border:1px solid var(--line);border-inline-start:3px solid var(--accent);
+     border-radius:4px;padding:14px 18px;margin:0 0 20px;max-width:74ch}
+.ask p{margin:0;font-size:14.5px;color:var(--ink-2);font-style:italic;line-height:1.65}
+.ask p + p{margin-top:8px}
+.ask .who{display:block;font-family:var(--f-mono);font-size:10px;font-style:normal;
+          letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-bottom:7px}
+.ask .ar{font-family:var(--f-ar);font-style:normal;direction:rtl;unicode-bidi:isolate}
+
+section{padding:52px 0 8px;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+.sec-head{display:flex;gap:13px;align-items:baseline;margin-bottom:14px;flex-wrap:wrap}
+.num{font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--accent);
+     letter-spacing:.06em;position:relative;top:-2px}
+.tagline{font-family:var(--f-mono);font-size:9.5px;font-weight:600;letter-spacing:.09em;
+         text-transform:uppercase;padding:3px 8px;border-radius:3px;position:relative;top:-2px}
+.tagline.live{background:var(--live-bg);color:var(--live);border:1px solid var(--live-line)}
+.tagline.new{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-line)}
+.tagline.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.sec-title{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,2.9vw,30px);
+           letter-spacing:-.02em;line-height:1.15;margin:0}
+.sec-body{max-width:70ch;margin:0 0 24px;color:var(--muted);font-size:15px}
+.sec-body strong{color:var(--ink);font-weight:600}
+.sec-body code{font-family:var(--f-mono);font-size:12.5px;background:var(--ground-2);
+               padding:1px 5px;border-radius:3px;color:var(--ink-2)}
+.sec-body p{margin:0 0 12px}
+.sec-body .ar{font-family:var(--f-ar);direction:rtl;unicode-bidi:isolate}
+.cost{font-family:var(--f-mono);font-size:11px;color:var(--faint);letter-spacing:.05em;
+      text-transform:uppercase;margin-inline-start:auto;white-space:nowrap}
+
+.rail{display:flex;align-items:stretch;gap:24px;overflow-x:auto;padding:4px 4px 24px;
+      scroll-snap-type:x proximity}
+.rail::-webkit-scrollbar{height:8px}
+.rail::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.opt{flex:0 0 auto;width:300px;scroll-snap-align:start;display:flex;flex-direction:column}
+.opt-head{display:flex;align-items:center;gap:9px;margin-bottom:6px;flex-wrap:wrap}
+.code{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.07em;
+      color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:2px 6px;
+      background:var(--panel)}
+.opt-name{font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:-.01em}
+.tag{font-family:var(--f-mono);font-size:9.5px;font-weight:600;letter-spacing:.07em;
+     text-transform:uppercase;padding:2px 7px;border-radius:3px}
+.tag.now{background:var(--ground-2);color:var(--muted);border:1px solid var(--line)}
+.tag.rec{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line)}
+.tag.ref{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.opt-note{font-size:13.5px;color:var(--muted);margin:0 0 13px;line-height:1.5;min-height:58px}
+.opt-note b{color:var(--ink);font-weight:600}
+.opt-note .ar{font-family:var(--f-ar);direction:rtl;unicode-bidi:isolate}
+.caption{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+         color:var(--faint);margin:8px 0 0}
+
+/* ─── phone screens: the app's fixed light palette ─── */
+.scr{
+  --bg:#F6F5F3; --sf:#FFFFFF; --ink-a:#1A1919; --sec-a:#6B6B73;
+  --bd:#E6E5E2; --subtle:#F1F0ED; --muted-a:#F4F3F0;
+  --brand:#E72B29; --danger:#C81E1C;
+  --green-bg:#E9F6EE; --green-tx:#15803D;
+  --amber-bg:#FBF0DE; --amber-tx:#9A5A00; --amber-bd:#F3E6C8;
+  --blue-bg:#E7F0FB; --blue-tx:#1F6FD6;
+  --slate:#4C535D; --slate-lbl:#B8BDC6;
+  direction:rtl;font-family:var(--f-ar);background:var(--bg);color:var(--ink-a);
+  width:300px;overflow:hidden;position:relative;font-size:12px
+}
+.slice{border-radius:26px 26px 5px 5px;border:1px solid rgba(15,20,30,.14);
+       box-shadow:var(--shadow-phone);background:#F6F5F3}
+.full{border-radius:26px;border:1px solid rgba(15,20,30,.14);
+      box-shadow:var(--shadow-phone);background:#F6F5F3}
+.h200{height:200px}.h300{height:300px}.h240{height:240px}.h280{height:280px}.h330{height:330px}
+.h380{height:380px}.h430{height:430px}.h470{height:470px}
+
+.notch{height:22px;display:flex;align-items:center;justify-content:center;background:var(--sf)}
+.notch.on-bg{background:var(--bg)}
+.notch i{display:block;width:74px;height:5px;border-radius:3px;background:#DCDBD7}
+
+.hdr{background:var(--sf);padding:9px 15px 11px;display:flex;align-items:center;
+     justify-content:space-between;gap:10px;border-bottom:1px solid #EEEDEA}
+.hdr .l1{font-size:12.5px;font-weight:700}
+.hdr .l2{font-size:10.5px;font-weight:500;color:var(--sec-a);margin-top:3px}
+.acts{display:flex;gap:7px}
+.act{width:29px;height:29px;border-radius:9px;background:var(--sf);border:1px solid rgba(0,0,0,.08);
+     display:flex;align-items:center;justify-content:center;position:relative}
+.act svg{width:14px;height:14px;stroke:var(--ink-a);fill:none;stroke-width:1.7;
+         stroke-linecap:round;stroke-linejoin:round}
+.dotb{position:absolute;top:0;left:0;width:7px;height:7px;border-radius:50%;
+      background:var(--brand);border:1.5px solid var(--sf)}
+
+.pad{padding:0 15px}
+.bigt{padding:14px 15px 4px;font-size:23px;font-weight:800;line-height:1.25}
+.bigt.sm{font-size:14px;font-weight:700;padding:10px 15px}
+.eyebrow{padding:0 15px;font-size:10px;font-weight:600;color:var(--sec-a);letter-spacing:.02em}
+.ptitle{padding:12px 15px 8px;font-size:16px;font-weight:700}
+
+.card{background:var(--sf);border-radius:14px;border:1px solid rgba(0,0,0,.05);
+      box-shadow:0 1px 3px rgba(0,0,0,.05);padding:11px}
+.pill{display:inline-flex;align-items:center;gap:4px;border-radius:7px;padding:3px 7px;
+      font-size:9.5px;font-weight:700}
+.pill.cod{background:var(--amber-bg);color:var(--amber-tx)}
+.pill.grn{background:var(--green-bg);color:var(--green-tx)}
+.pill.blu{background:var(--blue-bg);color:var(--blue-tx)}
+.pill.amb{background:var(--amber-bg);color:var(--amber-tx);border:1px solid var(--amber-bd)}
+.pill.gry{background:var(--muted-a);color:var(--sec-a)}
+
+/* flat rows (shipped queue doctrine) */
+.lrow-f{padding:9px 15px;border-bottom:1px solid var(--bd)}
+.lrow-f.last{border-bottom:0}
+.lrow-f .t{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lrow-f .n{font-size:11.5px;font-weight:700;direction:ltr}
+.lrow-f .a{font-size:9.5px;color:var(--sec-a);margin-top:2px}
+.bhead{padding:10px 15px;border-bottom:1px solid var(--bd);display:flex;
+       align-items:center;justify-content:space-between;gap:8px}
+.bhead .id{font-size:12.5px;font-weight:700;direction:ltr}
+.bhead .m{font-size:9.5px;color:var(--sec-a);margin-top:2px}
+
+/* contained rows (settlement doctrine — the fix) */
+.ccard{background:var(--sf);border-radius:16px;border:1px solid rgba(0,0,0,.05);
+       box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden;margin:0 15px}
+.chead{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.chead .id{font-size:12.5px;font-weight:700;direction:ltr}
+.chead .m{font-size:9.5px;color:var(--sec-a);margin-top:2px}
+.crow{padding:9px 20px 9px 14px;border-top:1px solid var(--subtle)}
+.crow .t{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.crow .n{font-size:11.5px;font-weight:700;direction:ltr}
+.crow .a{font-size:9.5px;color:var(--sec-a);margin-top:2px}
+.cdiv{height:1px;background:var(--subtle)}
+
+.chev{width:13px;height:13px;stroke:var(--sec-a);fill:none;stroke-width:2;
+      stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+
+.chips{display:flex;gap:5px;padding:9px 15px 5px;overflow:hidden}
+.chip{border-radius:100px;border:1px solid var(--bd);background:var(--sf);padding:5px 9px;
+      font-size:10px;font-weight:600;color:#52525B;display:flex;align-items:center;
+      gap:5px;white-space:nowrap;flex:0 0 auto}
+.chip.on{background:var(--ink-a);border-color:var(--ink-a);color:#fff}
+.chip.amb{background:var(--amber-bg);border-color:var(--amber-bd);color:var(--amber-tx)}
+.chip .c{font-size:9px;opacity:.7}
+
+.strip{display:flex;background:var(--sf);border-radius:13px;overflow:hidden;
+       border:1px solid rgba(0,0,0,.05);box-shadow:0 1px 2px rgba(0,0,0,.04);margin:0 15px}
+.strip .cell{flex:1;padding:8px 5px;text-align:center;border-inline-start:1px solid #F0EFEC}
+.strip .cell:first-child{border-inline-start:0}
+.strip .cell.dark{background:var(--slate);flex:1.25}
+.strip .v{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+.strip .k{font-size:8.5px;color:var(--sec-a);margin-top:1px}
+.strip .cell.dark .v{color:#fff}
+.strip .cell.dark .k{color:var(--slate-lbl)}
+.strip.zero .v{color:#C9C7C1}
+
+.tabs{background:var(--sf);border-top:1px solid #EEEDEA;padding:7px 8px 4px;
+      display:flex;justify-content:space-around}
+.tabs.glass{background:rgba(255,255,255,.62);backdrop-filter:blur(11px) saturate(1.6);
+            -webkit-backdrop-filter:blur(11px) saturate(1.6);
+            border:1px solid rgba(255,255,255,.55);border-radius:24px;margin:0 12px 8px;
+            box-shadow:0 6px 20px rgba(15,20,30,.13)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;position:relative}
+.tab svg{width:16px;height:16px;fill:none;stroke:var(--sec-a);stroke-width:1.7;
+         stroke-linecap:round;stroke-linejoin:round}
+.tab span{font-size:8px;color:var(--sec-a);font-weight:500}
+.tab.on svg{stroke:var(--danger)}
+.tab.on span{color:var(--danger);font-weight:700}
+.tab .bdg{position:absolute;top:-1px;left:3px;width:5px;height:5px;border-radius:50%;background:var(--brand)}
+.hbar{background:var(--sf);padding:5px 0 6px;display:flex;justify-content:center}
+.hbar.clear{background:transparent}
+.hbar i{width:92px;height:4px;border-radius:3px;background:#1A1919;opacity:.85;display:block}
+
+/* glass demo: content visibly passing behind */
+.behind{position:absolute;inset-inline:0;bottom:52px;padding:0 15px;opacity:.95}
+
+.cash{background:#3E444C;border-radius:15px;padding:12px;color:#fff;margin:0 15px}
+.cash .cl{font-size:9.5px;color:var(--slate-lbl);font-weight:500}
+.cash .cv{font-size:23px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums}
+.cash .cv span{font-size:11px;font-weight:600;color:var(--slate-lbl);margin-inline-start:4px}
+.cash .brk{border-top:1px solid rgba(255,255,255,.13);margin-top:9px;padding-top:8px;
+           display:flex;justify-content:space-between;text-align:center}
+.cash .brk > div{flex:1}
+.cash .bk{font-size:8.5px;color:var(--slate-lbl)}
+.cash .bv{font-size:11px;font-weight:700;margin-top:2px}
+.cash .bv.warn{color:#F0B45C}
+.cash .bv.flag{color:#FF9B95}
+
+.mark{position:absolute;z-index:3;background:var(--bad);color:#fff;font-family:var(--f-mono);
+      font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:.04em;
+      box-shadow:0 2px 8px rgba(0,0,0,.3);direction:ltr}
+.mark.good{background:var(--accent)}
+.ring{position:absolute;z-index:2;border:2px solid var(--bad);border-radius:8px;
+      box-shadow:0 0 0 3px rgba(163,35,31,.14)}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;margin:0 0 22px}
+table{border-collapse:collapse;width:100%;min-width:540px;font-size:14px}
+th,td{text-align:start;padding:10px 14px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+th{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+   color:var(--faint);font-weight:600;border-bottom:1px solid var(--line)}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink)}
+td.ar{font-family:var(--f-ar);direction:rtl;font-size:13px;unicode-bidi:isolate}
+td code{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-2)}
+tr:last-child td{border-bottom:0}
+.no{color:var(--bad);font-weight:700}
+.yes{color:var(--ok);font-weight:700}
+
+/* hierarchy ladders */
+.ladders{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px;margin-bottom:8px}
+.ladder{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:18px}
+.ladder h4{font-family:var(--f-display);font-size:17px;font-weight:700;margin:0 0 3px;letter-spacing:-.01em}
+.ladder .sub{font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+             color:var(--faint);margin:0 0 14px}
+.rung{display:grid;grid-template-columns:20px 1fr;gap:10px;padding:7px 0;border-top:1px solid var(--line-soft)}
+.rung:first-of-type{border-top:0}
+.rung .r{font-family:var(--f-mono);font-size:11px;font-weight:600;color:var(--accent)}
+.rung .t{font-size:13.5px;color:var(--ink);font-weight:600}
+.rung .t .ar{font-family:var(--f-ar);direction:rtl;unicode-bidi:isolate;font-weight:700}
+.rung .w{font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.verdict{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);
+         font-size:13px;color:var(--muted)}
+.verdict b{color:var(--ink)}
+
+.words{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:22px}
+.wcard{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:16px}
+.wcard.flagged{border-color:var(--bad-line);background:var(--bad-bg)}
+.wcard.rec{border-color:var(--accent-line)}
+.warab{font-family:var(--f-ar);font-size:27px;font-weight:700;direction:rtl;line-height:1.35}
+.wlat{font-family:var(--f-mono);font-size:10px;color:var(--faint);letter-spacing:.06em;
+      text-transform:uppercase;margin-top:2px}
+.wuse{font-family:var(--f-ar);direction:rtl;background:var(--ground-2);border-radius:5px;
+      padding:8px 10px;font-size:12px;margin:10px 0;color:var(--ink-2);line-height:1.8}
+.wcard.flagged .wuse{background:rgba(163,35,31,.09)}
+.wnote{font-size:12.5px;color:var(--muted);margin:0}
+.wnote b{color:var(--ink);font-weight:600}
+
+.foot{margin-top:42px;padding-top:22px;border-top:1px solid var(--line);
+      font-family:var(--f-mono);font-size:11px;color:var(--faint);letter-spacing:.04em;
+      display:flex;flex-wrap:wrap;gap:8px 28px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:620px){.wrap{padding:0 18px 72px}}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="kicker">Orderbase courier · your brief, answered against the running build · 08 Sep</p>
+  <h1>Eight asks, and what the code says back</h1>
+  <p class="standfirst">
+Your brief, read line by line against <strong>5acb1d5</strong> — the build running on the
+    simulator — with <strong>Glovo as the reference throughout</strong>.
+    <strong>Six of the eight are now decided</strong> and written here as spec: the container, the
+    chips, the sticky header, the word, the summary strip and the glass bar. <strong>01 is still
+    open</strong> — the large title is the one call worth arguing about, and the argument is in that
+    section. Nothing here has been applied to the app.
+  </p>
+  <div class="meta-row">
+    <span>402 × 874 pt</span><span>Noto Kufi Arabic</span><span>RTL</span>
+    <span>iPhone 17 Pro · iOS 26.5</span><span>Reference: Glovo (iOS)</span>
+  </div>
+</header>
+
+<!-- ══ 01 HEADER ══ -->
+<section>
+  <div class="sec-head">
+    <span class="num">01</span>
+    <h2 class="sec-title">The status is the title</h2>
+    <span class="tagline live">Open — under discussion</span>
+    <span class="cost">Needs slivers · see 07</span>
+  </div>
+  <div class="ask">
+    <span class="who">Your brief</span>
+    <p>"first I want the header to have that modern big title on the right and when I scroll the title
+    become smaller and it becomes like the current header size … and the information in the right
+    corner can be in the homepage, so the header returns to be dynamic"</p>
+  </div>
+  <div class="sec-body">
+    <p>My first board proposed "a header per page" — a title on each screen. That was too small an
+    idea, and it missed the second half of your sentence. You are asking for two things: a
+    <strong>large title that collapses on scroll</strong>, and the shift facts <strong>moved out of the
+    chrome and into the page</strong>.</p>
+    <p>Glovo answers this better than I did. Their tracking screen has an almost empty top bar and makes
+    <strong>the live status itself the big title</strong> — "Get ready", "4 minutes left",
+    "13:30 – 13:40" — with a small state chip above it. The title is not a page name. It is the one
+    fact the courier opened the app to read.</p>
+    <p>Applied here, the big title is <span class="ar">«الطلب ٥ من ٨»</span> — position in the round —
+    with the branch demoted to an eyebrow. On scroll it shrinks to today's 53pt bar. The cash and
+    remaining count stop being chrome and become the first row of the page, which is also what makes
+    them free to disappear on a fresh day (section 06).</p>
+    <p><strong>The Glovo checkout screen you sent shows the second half of this pattern</strong>, and
+    it is worth taking as well. There, the nav bar title is small and centred — just "Checkout" — while
+    the <em>body</em> carries a stack of big bold headings: "Your order", "Delivery address",
+    "Delivery options". So "big title" is not only a collapsing nav bar; it is also
+    <strong>section headings inside the scroll, sized like titles</strong>. That is what gives a long
+    page its rhythm, and it is exactly what the settlement page lacks — see the ladder in section 08,
+    where <span class="ar">«جولات اليوم»</span> and the returns block currently read at the same weight
+    as body copy.</p>
+    <div class="evrow">
+      <span class="ev">AppHeader is on <b>all four tabs</b> — home, glance, profile, shell</span>
+      <span class="ev">large-title collapse needs <b>CustomScrollView</b> · 0 in lib/</span>
+    </div>
+  </div>
+
+  <div class="rail">
+    <div class="opt">
+      <div class="opt-head"><span class="code">01·A</span><span class="opt-name">As built</span><span class="tag now">Now</span></div>
+      <p class="opt-note">Fixed 53pt bar on every tab. Branch name is the loudest thing; the courier's
+      actual position in the round is <b>the smallest text on the card</b>, greyed.</p>
+      <div class="slice"><div class="scr h280">
+        <div class="notch"><i></i></div>
+        <div class="hdr">
+          <div><div class="l1">فرع مدينة نصر</div><div class="l2">٤ طلبات متبقية · معك 350 جم</div></div>
+          <div class="acts">
+            <div class="act"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+            <div class="act"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><i class="dotb"></i></div>
+          </div>
+        </div>
+        <div class="pad" style="padding-top:12px">
+          <div class="card">
+            <div style="font-size:10px;color:var(--sec-a);font-weight:600">B #7877 · الطلب ٥ من ٨</div>
+            <div style="font-size:16px;font-weight:800;margin-top:8px;line-height:1.4">زهراء مدينة نصر · شارع بن عبدالعزيز</div>
+            <div style="font-size:10.5px;color:var(--sec-a);margin-top:4px">عمارة ٤٢٩٠ · الدور ٥ · شقة ٥٢</div>
+          </div>
+        </div>
+        <div class="mark" style="top:64px;left:10px">smallest, greyed</div>
+        <div class="ring" style="top:88px;right:20px;width:150px;height:18px"></div>
+      </div></div>
+      <p class="caption">Branch louder than position</p>
+    </div>
+
+    <div class="opt">
+      <div class="opt-head"><span class="code">01·B</span><span class="opt-name">Large title</span><span class="tag rec">My call</span></div>
+      <p class="opt-note">Position becomes the title. Branch drops to an eyebrow, shift facts move into
+      the page as a first row. <b>Top bar carries actions only.</b></p>
+      <div class="slice"><div class="scr h280">
+        <div class="notch on-bg"><i></i></div>
+        <div style="display:flex;justify-content:flex-start;padding:6px 15px 0">
+          <div class="acts">
+            <div class="act"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+            <div class="act"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><i class="dotb"></i></div>
+          </div>
+        </div>
+        <div class="eyebrow" style="margin-top:6px">فرع مدينة نصر · B #7877</div>
+        <div class="bigt">الطلب ٥ من ٨</div>
+        <div class="pad" style="padding-top:8px">
+          <div style="display:flex;gap:7px">
+            <span class="pill gry" style="font-size:10px;padding:5px 9px">٤ متبقية</span>
+            <span class="pill cod" style="font-size:10px;padding:5px 9px">معك 350 جم</span>
+          </div>
+        </div>
+        <div class="pad" style="padding-top:10px">
+          <div class="card">
+            <div style="font-size:16px;font-weight:800;line-height:1.4">زهراء مدينة نصر · شارع بن عبدالعزيز</div>
+          </div>
+        </div>
+        <div class="mark good" style="top:52px;right:12px">the one fact</div>
+      </div></div>
+      <p class="caption">Facts are page content, not chrome</p>
+    </div>
+
+    <div class="opt">
+      <div class="opt-head"><span class="code">01·C</span><span class="opt-name">Scrolled</span><span class="tag ref">Collapsed</span></div>
+      <p class="opt-note">After scroll the title shrinks into the bar — <b>the same 53pt header you have
+      today</b>, so nothing below it has to move or be redesigned.</p>
+      <div class="slice"><div class="scr h280">
+        <div class="notch"><i></i></div>
+        <div class="hdr" style="padding-top:7px;padding-bottom:9px">
+          <div><div class="l1">الطلب ٥ من ٨</div><div class="l2">فرع مدينة نصر · معك 350 جم</div></div>
+          <div class="acts">
+            <div class="act"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+          </div>
+        </div>
+        <div class="pad" style="padding-top:10px">
+          <div class="card"><div style="font-size:14px;font-weight:700">تفاصيل الطلب</div>
+          <div style="font-size:10.5px;color:var(--sec-a);margin-top:5px">محمد حمدي · ٤ قطعة · الموعد ٢:٤٥ م</div></div>
+        </div>
+        <div class="pad" style="padding-top:8px"><div class="card" style="height:70px"></div></div>
+      </div></div>
+      <p class="caption">Collapsed = today's header</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 02 + 03 · DECIDED ══ -->
+<section>
+  <div class="sec-head">
+    <span class="num">02</span>
+    <h2 class="sec-title">The batches float because a migration finished halfway</h2>
+    <span class="tagline ok">Decided</span>
+    <span class="cost">~40 lines, one file</span>
+  </div>
+
+  <div class="ask">
+    <span class="who">Your brief</span>
+    <p>"right now in the settlement page there is a layout of the batches in a container and expandable and collapsable so I want the same in the orders list — because the orders list have the batches floating right now"</p>
+  </div>
+
+  <div class="sec-body">
+    <p><strong>Decision: the Orders tab adopts the settlement container.</strong> Batch sections get the white card — fill <code>#FFFFFF</code>, radius <code>r16</code>, 1px <code>rgba(0,0,0,.05)</code> border, <code>0 1px 3px rgba(0,0,0,.05)</code> shadow, <code>Clip.antiAlias</code>, and <code>surfaceSubtle</code> dividers between batches inside one card. Rows keep their flat treatment <em>inside</em> the container; nothing else on the tab gains a card.</p>
+
+    <p>The behaviour is already built and already identical. Both places hand-roll the same collapse: <code>ClipRect</code> › <code>AnimatedAlign(heightFactor)</code>, an <code>AnimatedRotation</code> chevron, an <code>AppHaptics.tick()</code> on tap. There is no interaction to design and no animation to write — the two screens differ by a decoration and nothing else.</p>
+
+    <div class="evrow">
+      <span class="ev"><b>Same</b> collapse mechanics in both files</span>
+      <span class="ev"><b>Only</b> the surface differs</span>
+      <span class="ev">Cause: <b>2026-08-25</b>, three flattening commits</span>
+      <span class="ev">Batch sections shipped <b>2026-09-02</b> · <code>22aca9e</code></span>
+    </div>
+
+    <p>The cause is archaeological, not aesthetic. Three commits on <strong>2026-08-25</strong> flattened the app's lists — <em>"Lists sit on the page, not on a white sheet"</em> — and settlement's card happened to survive that pass while the queue's did not. When batch sections were built on <strong>2026-09-02</strong> (<code>22aca9e</code>) they were built on whatever foundation the queue had, which by then was the flat one. So the two screens do not disagree about anything; one of them simply missed a migration, and the fix is to finish it.</p>
+
+    <p>This does not reopen the flat-lists rule. Glovo's checkout is the same shape: "Delivery options" is a bordered card holding a collapsible row, while the loose rows around it — address, gift, phone — carry no card at all. <strong>Contain what groups; leave loose rows loose.</strong> A batch is a group with a header, a count and a fold. A search result is not.</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Property</th><th>Settlement <span class="ar">جولات</span></th><th>Orders <span class="ar">جولات</span> (now)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Wrapper</td><td><code>Container</code> + <code>BoxDecoration</code></td><td><code>DecoratedBox</code></td></tr>
+          <tr><td>Fill</td><td class="yes">#FFFFFF</td><td class="no">none</td></tr>
+          <tr><td>Radius</td><td class="yes">r16</td><td class="no">0</td></tr>
+          <tr><td>Border</td><td class="yes">1px rgba(0,0,0,.05)</td><td class="no">bottom hairline only (#E6E5E2)</td></tr>
+          <tr><td>Shadow</td><td class="yes">0 1px 3px rgba(0,0,0,.05)</td><td class="no">none</td></tr>
+          <tr><td>Clip</td><td class="yes">Clip.antiAlias</td><td class="no">none</td></tr>
+          <tr><td>Between batches</td><td>divider <code>surfaceSubtle</code> #F1F0ED</td><td>hairline <code>borderDefault</code> #E6E5E2</td></tr>
+          <tr><td>Header padding</td><td class="num">card inset</td><td class="num">pW20</td></tr>
+          <tr><td>Row padding</td><td class="num">card inset</td><td class="num">pW32</td></tr>
+          <tr><td>Collapse</td><td class="yes">ClipRect › AnimatedAlign</td><td class="yes">ClipRect › AnimatedAlign</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rail">
+    <div class="opt">
+      <div class="opt-head"><span class="code">A</span><span class="opt-name">Orders today</span><span class="tag now">Now</span></div>
+      <p class="opt-note">Headers and rows sit straight on <code>#F6F5F3</code>. The fold works, but nothing draws the edge of a batch, so a header reads as one more row in a stack of rows.</p>
+      <div class="full">
+        <div class="scr h380">
+          <div class="notch on-bg"><i></i></div>
+          <div class="ptitle">الطلبات</div>
+          <div class="pad">
+            <div class="bhead"><span class="id">B #7877</span><span class="m">٥ طلبات · ٤ متبقية</span><span class="chev"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+            <div class="lrow-f"><span class="n">#1042 · منى عبد الله</span><span class="a">زهراء مدينة نصر</span><span class="pill cod">١٨٥ جم</span></div>
+            <div class="lrow-f"><span class="n">#1043 · طارق سليم</span><span class="a">الحي السابع</span><span class="pill gry">مدفوع مقدمًا</span></div>
+            <div class="lrow-f last"><span class="n">#1044 · هدى فؤاد</span><span class="a">مكرم عبيد</span><span class="pill cod">٢٤٠ جم</span></div>
+            <div class="bhead"><span class="id">B #7878</span><span class="m">٣ طلبات · في الفرع</span><span class="chev"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+            <div class="lrow-f last"><span class="n">#1051 · سارة منير</span><span class="a">عباس العقاد</span><span class="pill cod">٩٠ جم</span></div>
+          </div>
+          <div class="mark" style="top:120px;left:16px">no edge — where does a <span class="ar">جولة</span> end?</div>
+          <div class="ring" style="top:106px;left:12px;width:322px;height:150px"></div>
+        </div>
+      </div>
+      <p class="caption">Two batches, one continuous stripe of rows.</p>
+    </div>
+
+    <div class="opt">
+      <div class="opt-head"><span class="code">B</span><span class="opt-name">Orders decided</span><span class="tag rec">Decided</span></div>
+      <p class="opt-note">The settlement decoration, copied exactly. Each <span class="ar">جولة</span> is a white card with its own rounded edge; rows inside stay flat and gain the card's inset instead of <code>pW32</code>.</p>
+      <div class="full">
+        <div class="scr h380">
+          <div class="notch on-bg"><i></i></div>
+          <div class="ptitle">الطلبات</div>
+          <div class="pad">
+            <div class="ccard">
+              <div class="chead"><span class="id">B #7877</span><span class="m">٥ طلبات · ٤ متبقية</span><span class="chev"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+              <div class="crow"><span class="n">#1042 · منى عبد الله</span><span class="a">زهراء مدينة نصر</span><span class="pill cod">١٨٥ جم</span></div>
+              <div class="crow"><span class="n">#1043 · طارق سليم</span><span class="a">الحي السابع</span><span class="pill gry">مدفوع مقدمًا</span></div>
+              <div class="crow"><span class="n">#1044 · هدى فؤاد</span><span class="a">مكرم عبيد</span><span class="pill cod">٢٤٠ جم</span></div>
+            </div>
+            <div class="ccard">
+              <div class="chead"><span class="id">B #7878</span><span class="m">٣ طلبات · في الفرع</span><span class="chev"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+              <div class="crow"><span class="n">#1051 · سارة منير</span><span class="a">عباس العقاد</span><span class="pill cod">٩٠ جم</span></div>
+            </div>
+          </div>
+          <div class="mark good" style="top:118px;left:16px">same card as settlement</div>
+        </div>
+      </div>
+      <p class="caption">One card per <span class="ar">جولة</span>; the fold code is untouched.</p>
+    </div>
+
+    <div class="opt">
+      <div class="opt-head"><span class="code">R</span><span class="opt-name">Settlement</span><span class="tag ref">Reference</span></div>
+      <p class="opt-note">The surface being copied. It has looked like this since before the flattening pass and is the only place in the app where a batch already has an edge.</p>
+      <div class="slice">
+        <div class="scr h330">
+          <div class="notch on-bg"><i></i></div>
+          <div class="ptitle">التسوية</div>
+          <div class="pad">
+            <div class="card">إجمالي المحصَّل · ٢,٤٧٠ جم</div>
+            <div class="ccard">
+              <div class="chead"><span class="id">B #7877</span><span class="m">٥ طلبات · ٩٤٠ جم</span><span class="chev"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+              <div class="crow"><span class="n">#1042 · منى عبد الله</span><span class="a">نقدًا</span><span class="pill cod">١٨٥ جم</span></div>
+              <div class="crow"><span class="n">#1044 · هدى فؤاد</span><span class="a">نقدًا</span><span class="pill cod">٢٤٠ جم</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="caption">Fill, radius, border, shadow — lifted as-is.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="num">03</span>
+    <h2 class="sec-title">The chips restate the batch headers one row above them</h2>
+    <span class="tagline ok">Decided</span>
+    <span class="cost">~25 lines removed, ~30 added</span>
+  </div>
+
+  <div class="ask">
+    <span class="who">Your brief</span>
+    <p>"I think the filters are now making a traffic in the app as all of the orders are stacked below batches so we need to find a way or either remove them at all and just list the batches with their orders"</p>
+  </div>
+
+  <div class="sec-body">
+    <p><strong>Decision: the filter chips come out entirely.</strong> The Orders tab is search plus grouped <span class="ar">جولات</span>, nothing between them. In their place goes <em>one</em> exception row, and only on days that have exceptions.</p>
+
+    <p>The chips today read <span class="ar">الكل ١١</span> · <span class="ar">في الطريق ٧</span> · <span class="ar">مؤجلة ٢</span> · <span class="ar">تم التسليم</span> — and the fourth is <strong>clipped at the trailing screen edge</strong>. A filter whose count cannot be read is not a filter; it is a hint that a row is one item too long. Directly beneath, the batch headers already print <span class="ar">٤ متبقية</span> and <span class="ar">٣ طلبات</span>. The same facts, twice, eight pixels apart — and the lower copy is attached to the thing it describes.</p>
+
+    <div class="evrow">
+      <span class="ev">4th chip <b>clipped</b> at the edge</span>
+      <span class="ev">Counts <b>duplicated</b> in headers below</span>
+      <span class="ev">Grouping <b>cannot</b> gather across <span class="ar">جولات</span></span>
+      <span class="ev">One row, <b>conditional</b></span>
+    </div>
+
+    <p>Grouping does the chips' work for everything except one case, and that case is the reason a row survives. Folding gathers orders <em>within</em> a <span class="ar">جولة</span>; it can never gather the day's failures <em>across</em> them. A courier with two returns in <span class="ar">B #7877</span> and one in <span class="ar">B #7879</span> would have to open both to find out. So the exceptions get a dedicated line — <span class="ar">٣ مرتجعات · ٢ مؤجلة</span> with a <span class="ar">عرض</span> action, on <code>background:#FDECEC</code> with a <code>1px solid #F0C4C3</code> border at <code>border-radius:11px</code>.</p>
+
+    <p>It is conditional by design. A clean day shows nothing there and the <span class="ar">جولات</span> start immediately under the search field. The row is not a filter bar with one item left in it — it is a statement that something needs handling, which is why it is red and why it disappears when nothing does.</p>
+  </div>
+
+  <div class="rail">
+    <div class="opt">
+      <div class="opt-head"><span class="code">A</span><span class="opt-name">Chips today</span><span class="tag now">Now</span></div>
+      <p class="opt-note">Four chips, the last one cut off, above headers carrying the same counts.</p>
+      <div class="full">
+        <div class="scr h330">
+          <div class="notch on-bg"><i></i></div>
+          <div class="ptitle">الطلبات</div>
+          <div class="pad">
+            <div class="chips">
+              <span class="chip on">الكل <span class="c">١١</span></span>
+              <span class="chip">في الطريق <span class="c">٧</span></span>
+              <span class="chip">مؤجلة <span class="c">٢</span></span>
+              <span class="chip">تم التسليم</span>
+            </div>
+            <div class="bhead"><span class="id">B #7877</span><span class="m">٥ طلبات · ٤ متبقية</span><span class="chev"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+            <div class="lrow-f"><span class="n">#1042 · منى عبد الله</span><span class="a">زهراء مدينة نصر</span><span class="pill cod">١٨٥ جم</span></div>
+            <div class="lrow-f last"><span class="n">#1043 · طارق سليم</span><span class="a">الحي السابع</span><span class="pill gry">مدفوع مقدمًا</span></div>
+          </div>
+          <div class="mark" style="top:96px;left:14px">clipped</div>
+          <div class="mark" style="top:150px;left:120px">same counts, again</div>
+          <div class="ring" style="top:84px;left:8px;width:44px;height:30px"></div>
+        </div>
+      </div>
+      <p class="caption">The row costs a full band of height to repeat what follows it.</p>
+    </div>
+
+    <div class="opt">
+      <div class="opt-head"><span class="code">B</span><span class="opt-name">Exception row</span><span class="tag rec">Decided</span></div>
+      <p class="opt-note">Chips gone. One red row gathers the day's failures across every <span class="ar">جولة</span> — the single job grouping cannot do.</p>
+      <div class="full">
+        <div class="scr h380">
+          <div class="notch on-bg"><i></i></div>
+          <div class="ptitle">الطلبات</div>
+          <div class="pad">
+            <div class="lrow-f" style="background:#FDECEC;border:1px solid #F0C4C3;border-radius:11px"><span class="t">٣ مرتجعات · ٢ مؤجلة</span><span class="pill amb">عرض</span></div>
+            <div class="ccard">
+              <div class="chead"><span class="id">B #7877</span><span class="m">٥ طلبات · ٤ متبقية</span><span class="chev"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+              <div class="crow"><span class="n">#1042 · منى عبد الله</span><span class="a">زهراء مدينة نصر</span><span class="pill cod">١٨٥ جم</span></div>
+              <div class="crow"><span class="n">#1043 · طارق سليم</span><span class="a">الحي السابع</span><span class="pill gry">مدفوع مقدمًا</span></div>
+            </div>
+            <div class="ccard">
+              <div class="chead"><span class="id">B #7879</span><span class="m">٣ طلبات · في الفرع</span><span class="chev"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+              <div class="crow"><span class="n">#1061 · أمير حسن</span><span class="a">النزهة الجديدة</span><span class="pill cod">١٣٠ جم</span></div>
+            </div>
+          </div>
+          <div class="mark good" style="top:88px;left:14px">across both <span class="ar">جولات</span></div>
+        </div>
+      </div>
+      <p class="caption"><code>#FDECEC</code> fill, <code>#F0C4C3</code> border, <code>11px</code> radius.</p>
+    </div>
+
+    <div class="opt">
+      <div class="opt-head"><span class="code">C</span><span class="opt-name">A clean day</span><span class="tag rec">Decided</span></div>
+      <p class="opt-note">No failures, no row. Search sits directly on the first <span class="ar">جولة</span> — the tab's normal state.</p>
+      <div class="slice">
+        <div class="scr h330">
+          <div class="notch on-bg"><i></i></div>
+          <div class="ptitle">الطلبات</div>
+          <div class="pad">
+            <div class="ccard">
+              <div class="chead"><span class="id">B #7877</span><span class="m">٥ طلبات · ٤ متبقية</span><span class="chev"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+              <div class="crow"><span class="n">#1042 · منى عبد الله</span><span class="a">زهراء مدينة نصر</span><span class="pill cod">١٨٥ جم</span></div>
+              <div class="crow"><span class="n">#1043 · طارق سليم</span><span class="a">الحي السابع</span><span class="pill gry">مدفوع مقدمًا</span></div>
+              <div class="crow"><span class="n">#1044 · هدى فؤاد</span><span class="a">مكرم عبيد</span><span class="pill cod">٢٤٠ جم</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="caption">Nothing above the first <span class="ar">جولة</span>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 04 · DECIDED ══ -->
+<section>
+  <div class="sec-head">
+    <span class="num">04</span>
+    <h2 class="sec-title">Unstick the settlement sub-header</h2>
+    <span class="tagline ok">Decided — it scrolls</span>
+    <span class="cost">One line</span>
+  </div>
+
+  <div class="ask">
+    <span class="who">Your brief</span>
+    <p>&ldquo;there is like a second header sticky in the settlement so we want to make that non sticky&rdquo;</p>
+  </div>
+
+  <div class="sec-body">
+    <p>
+      Nobody wrote a sticky behaviour here. <code>_SettlementHeader</code> is pinned by
+      <em>where it sits in the tree</em>: at <code>settlement_screen.dart:98</code> it is a sibling of the
+      <code>Expanded</code> that holds the <code>SingleChildScrollView</code>, not a child of it. A widget
+      outside that <code>Expanded</code> is physically incapable of scrolling — the scroll view starts
+      below it. So the row is not sticky by intent; it is sticky by position, and the fix is the same
+      one line either way.
+    </p>
+    <p>
+      The cost is paid on the worst possible page. Settlement is the app's one long reconciliation
+      list — cash lines, per-<span class="ar">جولة</span> sections, returns, then seven days of history —
+      and it opens with two stacked fixed bars: the shell's <code>AppHeader</code> and this one. Together
+      they hold roughly a fifth of the viewport for the entire scroll, repeating a branch name and a date
+      the courier read once on arrival.
+    </p>
+    <p>
+      <strong>Settled direction:</strong> move <code>_SettlementHeader</code> inside the
+      <code>SingleChildScrollView</code>, as the first child of its <code>Column</code>. It scrolls away
+      with the content and the cash card gains that fifth back. This also composes with the collapsing-title
+      work rather than competing with it: once the title collapses on scroll, this row is exactly what
+      collapses — it cannot be both the thing that collapses and the thing that never moves.
+    </p>
+
+    <div class="evrow">
+      <div class="ev"><b>settlement_screen.dart:98</b> — sibling of the <code>Expanded</code>, so it is outside the scrollable subtree entirely.</div>
+      <div class="ev"><b>scrolled: true</b> — passed as a hardcoded constant, never derived from a scroll offset. Nothing is listening.</div>
+      <div class="ev"><b>~20% of the viewport</b> — two permanent bars on the longest list in the app.</div>
+      <div class="ev"><b>One line</b> — the widget moves into the <code>Column</code>; no new state, no controller, no scroll listener.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 05 THE WORD ══ -->
+<section>
+  <div class="sec-head">
+    <span class="num">05</span>
+    <h2 class="sec-title">«دفعة» also means «payment», and it sits in a cash breakdown</h2>
+    <span class="tagline ok">Decided — «جولة»</span>
+    <span class="cost">Strings only · 22 keys</span>
+  </div>
+  <div class="ask">
+    <span class="who">Your brief</span>
+    <p>"can we choose different wording than <span class="ar">«دفعه»</span>? suggest another please"</p>
+  </div>
+  <div class="sec-body">
+    <p>Yes — and the argument is stronger than ambiguity. Three cells share one row inside the
+    settlement cash card. Two are money. The third is a count, labelled with the word that also means
+    <em>payments</em>. Reading left to right, <span class="ar">«الدفعات ١»</span> in that company does
+    not say "one batch".</p>
+    <p>The same root already carries the other meaning elsewhere in the file:
+    <code>pay_cod</code> is <span class="ar">«الدفع عند الاستلام»</span>. One root, two meanings, in a
+    cash-handling app.</p>
+  </div>
+
+  <div class="words">
+    <div class="wcard flagged">
+      <div class="warab">دفعة</div>
+      <div class="wlat">daf‘a — batch / payment</div>
+      <div class="wuse">قيمة الطلبات · فكة للمحفظة · <b>الدفعات ١</b></div>
+      <p class="wnote">Collides with money in the one place money is counted. <b>22 keys</b> use it.</p>
+    </div>
+    <div class="wcard rec">
+      <div class="warab">جولة</div>
+      <div class="wlat">gawla — round / tour</div>
+      <div class="wuse">قيمة الطلبات · فكة للمحفظة · <b>الجولات ١</b></div>
+      <p class="wnote"><b>Chosen.</b> Native to delivery work, carries no money sense, and it names the
+      thing correctly: a circuit out and back. Note the ending — <b>«جولة» with teh marbuta</b>, matching
+      «التسوية» and «الرئيسية»; «جوله» is the informal spelling and should not ship.</p>
+    </div>
+    <div class="wcard">
+      <div class="warab">شحنة</div>
+      <div class="wlat">shaḥna — consignment</div>
+      <div class="wuse">الشحنات ١</div>
+      <p class="wnote">Clean and unambiguous, but it names <b>the parcels</b>, not the trip. Weaker for
+      «عودة للفرع».</p>
+    </div>
+    <div class="wcard">
+      <div class="warab">تشغيلة</div>
+      <div class="wlat">tashghila — a run</div>
+      <div class="wuse">التشغيلات ١</div>
+      <p class="wnote">Closest to Egyptian operations vernacular, but reads industrial and is the
+      longest of the four in a tight header.</p>
+    </div>
+  </div>
+  <div class="sec-body" style="margin-bottom:4px">
+    <div class="evrow">
+      <span class="ev"><b>settlement_breakdown_batches</b> → «الدفعات» sits beside two money labels</span>
+      <span class="ev"><b>pay_cod</b> → «الدفع عند الاستلام» — same root, other meaning</span>
+      <span class="ev">Dart identifiers stay <code>batch</code> — no model rename</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 06 · DECIDED ══ -->
+<section>
+  <div class="sec-head">
+    <span class="num">06</span>
+    <h2 class="sec-title">Summary strip: placement and zero state</h2>
+    <span class="tagline new">Decided — withheld until it moves</span>
+    <span class="cost">One condition + one branch</span>
+  </div>
+
+  <div class="ask">
+    <span class="who">Your brief</span>
+    <p>&ldquo;the summary cards in the homepage we need them to be the first in the homepage and removed in the beginning of a new day &hellip; they will only appear once there is a change in any of the metrics to be above zero &hellip; whether it is a success or a failure, the metrics change so they will appear&rdquo;</p>
+  </div>
+
+  <div class="sec-body">
+    <p>
+      Neither half of this exists today. <code>_HomeStatRow</code> renders at
+      <code>home_screen.dart:137</code> — after the hero at <code>:111</code> and the pending-<span class="ar">جولة</span>
+      row at <code>:123</code> — and it renders unconditionally. Searching <code>features/home</code> for any
+      <code>showStats</code>, <code>hasActivity</code>, or zero-state guard returns nothing. On a fresh day the
+      courier's first screen therefore opens with <span class="ar">٠٠ · ٠٠ · ٠٠</span> and an empty cash cell.
+    </p>
+    <p>
+      <strong>Settled on the zero state:</strong> the strip is withheld until any metric moves above zero —
+      first delivery, first failure, first cash collected. Failure counts as movement, so a courier whose
+      day opens badly still gets the strip. A counter reading zero is furniture: it occupies the eye,
+      teaches nothing, and trains the courier to skip the row on the days it does carry a number.
+    </p>
+    <p>
+      <strong>Settled on placement, with one caveat worth seeing:</strong> first on the page when there is no
+      hero — idle, new day, returning — and under the hero once there is an active stop. Above the hero on a
+      working day the strip pushes the destination down the screen, and the destination is the reason the
+      screen exists. Measured in your own Figma edit: moving the strip above the hero shifted the destination
+      from about 20% to about 31% down an 874pt screen. On the hero-less states there is nothing to push, so
+      the strip takes the top slot exactly as asked.
+    </p>
+
+    <div class="evrow">
+      <div class="ev"><b>home_screen.dart:137</b> — <code>_HomeStatRow</code> sits after both the hero and the pending row, with no guard of any kind.</div>
+      <div class="ev"><b>No zero-state condition</b> anywhere in <code>features/home</code> — the strip has never been conditional.</div>
+      <div class="ev"><b>20% &rarr; 31%</b> — how far down an 874pt screen the destination falls when the strip goes above the hero.</div>
+      <div class="ev"><b>Failure counts</b> — <span class="ar">تعذّر</span> moving off zero reveals the strip just as a delivery does.</div>
+    </div>
+
+    <div class="rail">
+
+      <div class="opt">
+        <div class="opt-head">
+          <span class="code">06&middot;A</span>
+          <span class="opt-name">New day, as built</span>
+          <span class="tag now">now</span>
+        </div>
+        <div class="opt-note">Four cells of nothing, above the fold, before the courier has done anything.</div>
+        <div class="slice">
+          <div class="scr h380">
+            <div class="notch on-bg"><i></i></div>
+            <div class="pad">
+              <div class="eyebrow">فرع مدينة نصر</div>
+              <div class="bigt">لم تُسند لك جولة بعد</div>
+              <div class="card">هنبلّغك أول ما الفرع يجهّز جولة. استلامها من تبويب الطلبات.</div>
+              <div class="strip zero">
+                <div class="cell dark"><div class="v">0 جم</div><div class="k">معك نقدًا</div></div>
+                <div class="cell"><div class="v">00</div><div class="k">تعذّر</div></div>
+                <div class="cell"><div class="v">00</div><div class="k">تم التسليم</div></div>
+                <div class="cell"><div class="v">00</div><div class="k">في الطريق</div></div>
+              </div>
+            </div>
+            <div class="ring" style="top:212px;left:8px;width:184px;height:64px"></div>
+            <div class="mark" style="top:286px;left:52px">furniture</div>
+          </div>
+        </div>
+        <div class="caption">Three zeros and a blank cash cell are the first numbers of the day.</div>
+      </div>
+
+      <div class="opt">
+        <div class="opt-head">
+          <span class="code">06&middot;B</span>
+          <span class="opt-name">New day, decided</span>
+          <span class="tag rec">decided</span>
+        </div>
+        <div class="opt-note">Strip absent entirely. What replaces it is the one fact a waiting courier wants: when they last worked.</div>
+        <div class="slice">
+          <div class="scr h380">
+            <div class="notch on-bg"><i></i></div>
+            <div class="pad">
+              <div class="eyebrow">فرع مدينة نصر</div>
+              <div class="bigt">لسه مفيش جولة</div>
+              <div class="card">هنبلّغك أول ما الفرع يجهّز جولة. استلامها من تبويب الطلبات.</div>
+              <div class="pill gry">آخر جولة أمس ٦:٤٠ م</div>
+            </div>
+            <div class="mark good" style="top:250px;left:46px">no zeros</div>
+          </div>
+        </div>
+        <div class="caption">Nothing has happened yet, so the page says so once and stops.</div>
+      </div>
+
+      <div class="opt">
+        <div class="opt-head">
+          <span class="code">06&middot;C</span>
+          <span class="opt-name">After first close</span>
+          <span class="tag ref">reference</span>
+        </div>
+        <div class="opt-note">One delivery lands and the strip appears — under the hero, so the destination keeps the top of the screen.</div>
+        <div class="slice">
+          <div class="scr h380">
+            <div class="notch on-bg"><i></i></div>
+            <div class="pad">
+              <div class="eyebrow">فرع مدينة نصر · B #7877</div>
+              <div class="bigt sm">الطلب ٢ من ٨</div>
+              <div class="card">
+                <div class="ptitle">مصر الجديدة · شارع الحجاز</div>
+                <div>عمارة ١٢ · الدور ٣</div>
+              </div>
+              <div class="strip">
+                <div class="cell dark"><div class="v">350 جم</div><div class="k">معك نقدًا</div></div>
+                <div class="cell"><div class="v">00</div><div class="k">تعذّر</div></div>
+                <div class="cell"><div class="v">01</div><div class="k">تم التسليم</div></div>
+                <div class="cell"><div class="v">07</div><div class="k">في الطريق</div></div>
+              </div>
+            </div>
+            <div class="mark good" style="top:300px;left:26px">now it means something</div>
+          </div>
+        </div>
+        <div class="caption">Same strip, same order of cells — it just waited until it had something to report.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ 07 · DECIDED ══ -->
+<section>
+  <div class="sec-head">
+    <span class="num">07</span>
+    <h2 class="sec-title">Liquid-glass tab bar</h2>
+    <span class="tagline new">Decided</span>
+    <span class="cost">No native code</span>
+  </div>
+
+  <div class="ask">
+    <span class="who">Your brief</span>
+    "I want to include another version of the tab bar to have the same liquid glass as new iphones so can we do that? like downloading it or something and giving you the engineering directions"
+  </div>
+
+  <div class="sec-body">
+    <p>Yes — and there is nothing to download. The effect itself is about <strong>eighty lines</strong> of Flutter. The real project is the <strong>layout</strong>, because a blur samples whatever is painted beneath it, and right now nothing is.</p>
+
+    <p><code>BottomNav</code> has <strong>12 call sites</strong>, and every one of them is the last child of a <code>Column</code> with <code>Expanded(child: list)</code> above it — <code>app_shell.dart:311</code>, <code>queue_body.dart:30</code>, <code>orders_body.dart:51</code>, <code>home_screen.dart:152</code>. The list ends at exactly the pixel where the bar begins. A grep of <code>lib/</code> for <code>extendBody|BackdropFilter|ImageFilter|CustomScrollView|SliverList</code> returns <strong>zero hits</strong>. So a <code>BackdropFilter</code> dropped in today would blur a flat page fill and render indistinguishable from the opaque bar we already ship.</p>
+
+    <p>The layout work is therefore the spec, not a footnote: content must pass <em>behind</em> the bar via <code>Scaffold(extendBody: true)</code> or a <code>Stack</code> with the bar <code>Positioned</code>, and <strong>every scrollable gains a bottom inset</strong> of bar height + <code>MediaQuery.viewPaddingOf(context).bottom</code>. Skip that and the last row hides under the bar forever.</p>
+
+    <p>One trap to clear first: <code>HomeIndicator</code> paints an opaque <code>AppColors.surface</code> strip, and <code>BottomNav</code> wraps everything in a second <code>Container(color: AppColors.surface)</code>. Both go transparent, or you get a crisp white band sitting under a blurred bar.</p>
+  </div>
+
+  <div class="evrow">
+    <div class="ev">Road mode <span class="ar">«وضع الطريق»</span> <strong>forces glass off</strong>. It exists for sun on the screen and gloves on the grips; translucency is the direct enemy of legibility. This is an interlock, not a preference.</div>
+    <div class="ev">Flutter exposes <strong>no <code>reduceTransparency</code> flag</strong> — verified against the installed SDK: <code>AccessibilityFeatures</code> carries only <code>accessibleNavigation</code>, <code>invertColors</code>, <code>disableAnimations</code>, <code>boldText</code>, <code>reduceMotion</code>, <code>highContrast</code>, <code>onOffSwitchLabels</code>. Use <code>MediaQuery.highContrastOf(context)</code> as the honest proxy; the real iOS flag can later ride the app's existing <code>LiveActivityChannel</code> MethodChannel — no plugin, no Podfile.</div>
+    <div class="ev">When gated, follow <code>cupertino_ui</code>'s own <code>opaque()</code> pattern: <strong>skip the <code>BackdropFilter</code> entirely</strong> rather than blurring behind an opaque fill. Paying for a save layer nobody can see is the worst of both.</div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Route</th><th>Native code?</th><th>State</th><th>Verdict</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Official Flutter <code>cupertino_ui</code> 1.0.2</td>
+          <td class="yes">No native code</td>
+          <td>Shipped by the verified flutter.dev publisher, but contains <strong>zero glass code</strong>; tracking issue flutter/flutter#170310 is P3 with no milestone.</td>
+          <td>Nothing to adopt yet</td>
+        </tr>
+        <tr>
+          <td>Hand-rolled <code>BackdropFilter</code></td>
+          <td class="yes">No native code</td>
+          <td>~80 lines. Apple's own numbers are already encoded in <code>cupertino_ui</code>'s tab bar — sigma 10, fill <code>0xF0F9F9F9</code> light / <code>0xF01D1D1D</code> dark, hairline <code>0x4D000000</code>.</td>
+          <td class="yes"><strong>CHOSEN</strong></td>
+        </tr>
+        <tr>
+          <td><code>liquid_glass_widgets</code> 1.4.1</td>
+          <td class="yes">No native code — GLSL shaders only (no <code>plugin:</code> block, no <code>ios/</code> dir)</td>
+          <td>261 likes, maintained. The only no-native route to <em>true refraction</em> rather than blur.</td>
+          <td>Fallback</td>
+        </tr>
+        <tr>
+          <td><code>cupertino_native</code> 0.1.1</td>
+          <td class="no">YES — UIKit platform views + method channels</td>
+          <td>Genuine Apple fidelity, because it <em>is</em> UIKit.</td>
+          <td class="no">Refused — ends the no-Podfile property</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rail">
+
+    <div class="opt">
+      <div class="opt-head">
+        <span class="code">07·A</span>
+        <span class="opt-name">As built</span>
+        <span class="tag now">Now</span>
+      </div>
+      <div class="opt-note">The list ends where the bar starts. There is nothing under the bar to blur.</div>
+      <div class="slice">
+        <div class="scr h300">
+          <div class="notch on-bg"><i></i></div>
+
+          <div class="lrow-f">
+            <div class="t"><span class="n">#89289</span><span class="pill cod">1,200 جم</span></div>
+            <div class="a">محمد حمدي · زهراء مدينة نصر</div>
+          </div>
+          <div class="lrow-f">
+            <div class="t"><span class="n">#89293</span><span class="pill grn">مدفوع</span></div>
+            <div class="a">يوسف كمال · مصر الجديدة</div>
+          </div>
+          <div class="lrow-f last">
+            <div class="t"><span class="n">#89298</span><span class="pill cod">640 جم</span></div>
+            <div class="a">هناء مصطفى · المعادي</div>
+          </div>
+
+          <div class="mark" style="top:186px;left:14px">list stops here</div>
+
+          <div style="position:absolute;inset-inline:0;bottom:0">
+            <div class="tabs">
+              <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>الحساب</span></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><circle cx="17" cy="12.5" r="1.5"/></svg><span>التسوية</span></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 8h6M9 12h4"/></svg><span>الطلبات</span><i class="bdg"></i></div>
+              <div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg><span>الرئيسية</span></div>
+            </div>
+            <div class="hbar"></div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Opaque surface, twice — the bar's own fill and the home-indicator strip.</div>
+    </div>
+
+    <div class="opt">
+      <div class="opt-head">
+        <span class="code">07·B</span>
+        <span class="opt-name">Glass</span>
+        <span class="tag rec">Decided</span>
+      </div>
+      <div class="opt-note">Content runs under the bar; the scrollable carries the inset so the last row still clears it.</div>
+      <div class="slice">
+        <div class="scr h300">
+          <div class="notch on-bg"><i></i></div>
+
+          <div class="lrow-f">
+            <div class="t"><span class="n">#89289</span><span class="pill cod">1,200 جم</span></div>
+            <div class="a">محمد حمدي · زهراء مدينة نصر</div>
+          </div>
+          <div class="lrow-f">
+            <div class="t"><span class="n">#89293</span><span class="pill grn">مدفوع</span></div>
+            <div class="a">يوسف كمال · مصر الجديدة</div>
+          </div>
+          <div class="lrow-f">
+            <div class="t"><span class="n">#89298</span><span class="pill cod">640 جم</span></div>
+            <div class="a">هناء مصطفى · المعادي</div>
+          </div>
+          <div class="lrow-f">
+            <div class="t"><span class="n">#89322</span><span class="pill grn">تم التسليم</span></div>
+            <div class="a">نور عادل · زهراء مدينة نصر</div>
+          </div>
+          <div class="lrow-f last">
+            <div class="t"><span class="n">#89340</span><span class="pill cod">450 جم</span></div>
+            <div class="a">سارة إبراهيم · المعادي</div>
+          </div>
+
+          <div class="mark good" style="bottom:96px;left:14px">row passes behind</div>
+
+          <div style="position:absolute;inset-inline:0;bottom:0">
+            <div class="tabs glass">
+              <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>الحساب</span></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><circle cx="17" cy="12.5" r="1.5"/></svg><span>التسوية</span></div>
+              <div class="tab"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 8h6M9 12h4"/></svg><span>الطلبات</span><i class="bdg"></i></div>
+              <div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg><span>الرئيسية</span></div>
+            </div>
+            <div class="hbar clear"></div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">sigma 10 · saturate 1.6 · r28</div>
+    </div>
+
+    <div class="opt" style="width:326px">
+      <div class="opt-head">
+        <span class="code">07·R</span>
+        <span class="opt-name">The recipe</span>
+        <span class="tag rec">Spec</span>
+      </div>
+      <div class="opt-note">Eighty lines, in order. Everything else on this card is the layout tax around them.</div>
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:14px;font-family:var(--f-mono);font-size:10.5px;line-height:1.85;color:var(--muted);max-height:330px;overflow:auto">
+ClipRRect(radius: 28)
+&nbsp;&nbsp;› BackdropFilter(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ImageFilter.compose(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;outer: ColorFilter.matrix(_sat16),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inner: ImageFilter.blur(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sigmaX: 10, sigmaY: 10,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tileMode: TileMode.clamp)))
+&nbsp;&nbsp;› fill at 70%
+&nbsp;&nbsp;&nbsp;&nbsp;+ top sheen gradient
+&nbsp;&nbsp;&nbsp;&nbsp;+ 1px edge highlight
+<br>
+// TileMode.clamp — without it the blur
+// samples transparent black past the
+// clip and you get a dark bleed on
+// every rounded edge.
+<br>
+// gates — skip the filter entirely:
+if (MediaQuery.highContrastOf(context)
+&nbsp;&nbsp;&nbsp;&nbsp;|| RoadMode.instance.on) return opaque();
+<br>
+// perf: BackdropFilter forces a save
+// layer and re-reads the framebuffer
+// EVERY frame while the list scrolls.
+// - keep sigma at 10
+// - keep the filter a SIBLING of the
+//   scrollable inside a Stack, never
+//   a child of it
+// - BackdropGroup + BackdropFilter
+//   .grouped (Flutter 3.32+) share one
+//   backdrop read if the header is
+//   glassed too
+<br>
+// delivery shape:
+class GlassBottomNav // sibling of BottomNav
+&nbsp;&nbsp;// same public API:
+&nbsp;&nbsp;// active, onTap, notificationsBadge
+&nbsp;&nbsp;// → all 12 call sites swap by
+&nbsp;&nbsp;//   changing one identifier
+      </div>
+      <div class="caption">Same API as <code>BottomNav</code>, so the rollback is a find-and-replace.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ 08 HIERARCHY ══ -->
+<section>
+  <div class="sec-head">
+    <span class="num">08</span>
+    <h2 class="sec-title">What each page is for, in order</h2>
+    <span class="tagline live">Your ask</span>
+  </div>
+  <div class="ask">
+    <span class="who">Your brief</span>
+    <p>"overall I want to discuss the heirarchy of the information found in three pages (homepage,
+    settlement and brand new day in the homepage) — we want to discuss that much information and set up
+    hierarchy"</p>
+  </div>
+  <div class="sec-body">
+    <p>One test decides every ranking below: <strong>what is the courier holding the phone about to
+    do?</strong> Facts that answer that come first; facts that merely reassure come last or go. Each
+    ladder is what the page should say in order, with what currently gets in the way.</p>
+  </div>
+
+  <div class="ladders">
+    <div class="ladder">
+      <h4>Homepage · mid-round</h4>
+      <p class="sub">Standing at a door, engine running</p>
+      <div class="rung"><span class="r">1</span><div><div class="t">Where am I going</div>
+        <div class="w">The destination. Bold, one line, area and street together.</div></div></div>
+      <div class="rung"><span class="r">2</span><div><div class="t">What happens here</div>
+        <div class="w">Deliver, and how much cash to take. The black button and the pill.</div></div></div>
+      <div class="rung"><span class="r">3</span><div><div class="t">How far through am I</div>
+        <div class="w"><span class="ar">«الطلب ٥ من ٨»</span> — which section 01 promotes to the title.</div></div></div>
+      <div class="rung"><span class="r">4</span><div><div class="t">Is anything waiting</div>
+        <div class="w">The amber row. A reason to turn around now.</div></div></div>
+      <div class="rung"><span class="r">5</span><div><div class="t">The day's totals</div>
+        <div class="w">Real, but read at a red light — never above the destination.</div></div></div>
+      <div class="verdict"><b>In the way today:</b> the branch name is the loudest text on the screen,
+      and the trip line, address detail and batch id all outrank the door the courier is standing at.</div>
+    </div>
+
+    <div class="ladder">
+      <h4>Homepage · brand new day</h4>
+      <p class="sub">Nothing assigned yet</p>
+      <div class="rung"><span class="r">1</span><div><div class="t">Is work coming</div>
+        <div class="w">Yes / not yet. The whole answer, as the title.</div></div></div>
+      <div class="rung"><span class="r">2</span><div><div class="t">When, and what do I do</div>
+        <div class="w">You'll be told; collect from Orders. One sentence.</div></div></div>
+      <div class="rung"><span class="r">3</span><div><div class="t">Anything left from yesterday</div>
+        <div class="w">Unsettled cash or returns still in custody — the only number worth showing.</div></div></div>
+      <div class="rung"><span class="r">—</span><div><div class="t">Everything else</div>
+        <div class="w">Absent. No zeroed counters, no empty cash cell, no strip.</div></div></div>
+      <div class="verdict"><b>In the way today:</b> the strip renders <span class="ar">٠٠ · ٠٠ · ٠٠</span>
+      and an empty cash cell — four facts that all say "nothing has happened", on a screen whose only
+      message is already "nothing has happened".</div>
+    </div>
+
+    <div class="ladder">
+      <h4>Settlement</h4>
+      <p class="sub">At the counter, handing over</p>
+      <div class="rung"><span class="r">1</span><div><div class="t">How much do I owe</div>
+        <div class="w">One figure, the slate card. Red when over the limit.</div></div></div>
+      <div class="rung"><span class="r">2</span><div><div class="t">What is it made of</div>
+        <div class="w">Order value, wallet change, round count — what a cashier reconciles.</div></div></div>
+      <div class="rung"><span class="r">3</span><div><div class="t">What else am I handing over</div>
+        <div class="w">Returns. A physical act, so it keeps its button.</div></div></div>
+      <div class="rung"><span class="r">4</span><div><div class="t">Show me the working</div>
+        <div class="w">Per-round breakdown, collapsed until asked.</div></div></div>
+      <div class="rung"><span class="r">5</span><div><div class="t">Previous days</div>
+        <div class="w">Reference. Bottom, always.</div></div></div>
+      <div class="verdict"><b>In the way today:</b> two fixed headers eat a fifth of the page before the
+      cash figure appears. The breakdown label reading as a payment is settled — it becomes
+      <span class="ar">«الجولات»</span> under 05.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FLAG ══ -->
+<section>
+  <div class="sec-head">
+    <span class="num">▲</span>
+    <h2 class="sec-title">One thing you didn't ask about</h2>
+    <span class="tagline new">Flag</span>
+  </div>
+  <div class="sec-body">
+    <p>Captured seconds apart in one session, on one simulated day: the header says
+    <span class="ar">٤ طلبات متبقية</span>, the Orders title says <span class="ar">١١ طلبًا</span>, its
+    own two batch rows sum to <strong>13</strong>, and settlement says
+    <span class="ar">١٣ الطلبات</span>.</p>
+    <p>Three of those can be defended as different questions — left to do, inside the filter, dispatched
+    today. <strong>The fourth cannot:</strong> Orders prints 11 in its title and 13 in the rows directly
+    beneath it, on one screen. Worth settling before the hierarchy work above is built on those numbers.</p>
+    <div class="evrow">
+      <span class="ev">B #7877 → <b>١٠ طلبات</b> · B #7878 → <b>٣ طلبات</b> · title → <b>١١</b></span>
+      <span class="ev">screenshots 14:33–14:34 · no refresh between</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ ORDER ══ -->
+<section style="border-bottom:0">
+  <div class="sec-head"><h2 class="sec-title">Sequence</h2></div>
+  <div class="sec-body">
+    <p><strong>04 first.</strong> Moving one widget inside a scroll view. Smallest change on the board,
+    and it gives the settlement page back a fifth of its height immediately.</p>
+    <p><strong>Then 05 and 02 together.</strong> The word is 22 string keys; the container is a widget
+    you have already written and shipped on another page. Both are low risk and both change how every
+    later screenshot reads, so doing them first makes the rest easier to judge.</p>
+    <p><strong>Then 03, then 06.</strong> Drop the chips once batches are contained — that ordering lets
+    you see whether the exception row is still needed. Then the strip's placement and its zero-state
+    rule, which is the first change that touches logic rather than layout.</p>
+    <p><strong>01 and 07 last, and together.</strong> Both need the same migration: the body becomes the
+    scroll owner and the chrome floats over it. Done separately you pay for it twice — a collapsing
+    header built on a <code>Column</code> would need rebuilding to let content pass under a translucent
+    bar anyway. <strong>One migration, then both are configuration.</strong> 07 is settled; 01 is not,
+    but it does not block the migration — <em>what</em> the title says can be decided while the
+    scroll architecture is being built.</p>
+    <p><strong>The flag is not in this queue.</strong> It needs an answer, not a design.</p>
+  </div>
+</section>
+
+<div class="foot">
+  <span>Read against 5acb1d5 · 3 Sep</span>
+  <span>Verified iPhone 17 Pro · iOS 26.5 · 8 Sep</span>
+  <span>Reference: Glovo (iOS)</span>
+  <span>Nothing applied to the app</span>
+</div>
+
+</div>

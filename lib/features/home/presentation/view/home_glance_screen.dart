@@ -15,37 +15,36 @@ class HomeGlanceScreen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: AppColors.background,
+        extendBody: true,
+        bottomNavigationBar: BottomNav(
+          active: NavTab.home,
+          notificationsBadge: true,
+          onTap: onSelectTab,
+        ),
         body: SafeArea(
           bottom: false,
-          child: Column(
-            children: [
-              const AppHeader(),
-              Expanded(
-                child: SingleChildScrollView(
-                  child:
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const _HomeOnlineBar(),
-                          16.szH,
-                          const _HomeCollectionBanner(),
-                          16.szH,
-                          const _HomeStatStrip(),
-                          16.szH,
-                          _HomeNextStopCompactCard(onViewOrder: onOpenOrder),
-                        ],
-                      ).paddingOnly(
-                        left: AppPadding.pW20,
-                        top: AppPadding.pH4,
-                        right: AppPadding.pW20,
-                        bottom: AppPadding.pH20,
-                      ),
-                ),
-              ),
-              BottomNav(
-                active: NavTab.home,
-                notificationsBadge: true,
-                onTap: onSelectTab,
+          child: CustomScrollView(
+            slivers: [
+              AppHeaderSliver(title: LocaleKeys.navHome.tr()),
+              SliverToBoxAdapter(
+                child:
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const _HomeOnlineBar(),
+                        16.szH,
+                        const _HomeCollectionBanner(),
+                        16.szH,
+                        const _HomeStatStrip(),
+                        16.szH,
+                        _HomeNextStopCompactCard(onViewOrder: onOpenOrder),
+                      ],
+                    ).paddingOnly(
+                      left: AppPadding.pW20,
+                      top: AppPadding.pH4,
+                      right: AppPadding.pW20,
+                      bottom: BottomNav.reservedHeight(context),
+                    ),
               ),
             ],
           ),

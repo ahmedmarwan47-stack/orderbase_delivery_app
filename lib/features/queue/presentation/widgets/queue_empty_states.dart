@@ -9,44 +9,40 @@ class _QueueClearState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final postponed = vc.postponed;
-    return SingleChildScrollView(
-      child:
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: _EmptyBadge(
-                  bg: AppColors.deliveredBg,
-                  icon: AppAssets.svg.check,
-                  iconColor: AppColors.deliveredText,
-                ),
-              ),
-              24.szH,
-              Text(
-                LocaleKeys.queueClearTitle.tr(),
-                textAlign: TextAlign.center,
-                style: const TextStyle().setMainTextColor.s20.bold,
-              ),
-              8.szH,
-              Text(
-                LocaleKeys.queueClearDesc.tr(),
-                textAlign: TextAlign.center,
-                style: const TextStyle().setSecondaryColor.s14.regular
-                    .withHeight(1.5),
-              ),
-              24.szH,
-              if (postponed.isNotEmpty)
-                _PostponedHandoffCard(
-                  postponed: postponed,
-                  onView: vc.openPostponed,
-                ),
-            ],
-          ).paddingOnlyDirectional(
-            start: AppPadding.pW24,
-            end: AppPadding.pW24,
-            top: AppPadding.pH56,
-            bottom: AppPadding.pH24,
+    // Plain content: the page's one CustomScrollView owns the scrolling.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Center(
+          child: _EmptyBadge(
+            bg: AppColors.deliveredBg,
+            icon: AppAssets.svg.check,
+            iconColor: AppColors.deliveredText,
           ),
+        ),
+        24.szH,
+        Text(
+          LocaleKeys.queueClearTitle.tr(),
+          textAlign: TextAlign.center,
+          style: const TextStyle().setMainTextColor.s20.bold,
+        ),
+        8.szH,
+        Text(
+          LocaleKeys.queueClearDesc.tr(),
+          textAlign: TextAlign.center,
+          style: const TextStyle().setSecondaryColor.s14.regular.withHeight(
+            1.5,
+          ),
+        ),
+        24.szH,
+        if (postponed.isNotEmpty)
+          _PostponedHandoffCard(postponed: postponed, onView: vc.openPostponed),
+      ],
+    ).paddingOnlyDirectional(
+      start: AppPadding.pW24,
+      end: AppPadding.pW24,
+      top: AppPadding.pH56,
+      bottom: AppPadding.pH24,
     );
   }
 }
@@ -153,7 +149,6 @@ class _QueueSearchPrompt extends StatelessWidget {
                 style: const TextStyle().setMainTextColor.s20.bold,
               ),
               24.szH,
-              _ScopeCard(),
             ],
           ).paddingOnlyDirectional(
             start: AppPadding.pW32,
@@ -204,7 +199,6 @@ class _QueueNoResults extends StatelessWidget {
               24.szH,
               Center(child: _ClearSearchButton(onTap: vc.clearSearch)),
               24.szH,
-              _ScopeCard(),
             ],
           ).paddingOnlyDirectional(
             start: AppPadding.pW32,
@@ -249,37 +243,6 @@ class _ClearSearchButton extends StatelessWidget {
   }
 }
 
-/// White card explaining what the search covers.
-class _ScopeCard extends StatelessWidget {
-  const _ScopeCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppCircular.r16),
-        border: Border.all(color: AppColors.borderHeader),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            LocaleKeys.searchScopeTitle.tr(),
-            style: const TextStyle().setMainTextColor.s12.semiBold,
-          ),
-          8.szH,
-          Text(
-            LocaleKeys.searchScopeDesc.tr(),
-            style: const TextStyle().setSecondaryColor.s12.regular.withHeight(
-              1.5,
-            ),
-          ),
-        ],
-      ).paddingAll(AppPadding.pH16),
-    );
-  }
-}
 
 /// 72×72 rounded badge behind an empty-state icon.
 class _EmptyBadge extends StatelessWidget {

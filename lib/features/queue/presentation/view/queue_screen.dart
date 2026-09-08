@@ -67,15 +67,30 @@ class _QueueScreenState extends State<QueueScreen> {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: SafeArea(
-          bottom: false,
-          // Rebuild when the shift mutates (a delivered/failed order leaves the
-          // active list) so the queue always reflects reality.
-          child: AnimatedBuilder(
-            animation: ShiftController.instance,
-            builder: (_, _) => _QueueBody(vc: _vc),
+      child: ValueListenableBuilder<bool>(
+        valueListenable: _vc.isSearching,
+        // The bottom bar belongs to the Scaffold, not the body: `extendBody`
+        // is what lets the browse list pass under the floating pill and give
+        // its blur something to work on. Search has no tab bar — the field
+        // takes the page over — so it only reserves the indicator strip.
+        builder: (context, searching, _) => Scaffold(
+          backgroundColor: AppColors.background,
+          extendBody: !searching,
+          bottomNavigationBar: searching
+              ? const HomeIndicator()
+              : BottomNav(
+                  active: NavTab.orders,
+                  notificationsBadge: true,
+                  onTap: _vc.onSelectTab,
+                ),
+          body: SafeArea(
+            bottom: false,
+            // Rebuild when the shift mutates (a delivered/failed order leaves
+            // the active list) so the queue always reflects reality.
+            child: AnimatedBuilder(
+              animation: ShiftController.instance,
+              builder: (_, _) => _QueueBody(vc: _vc, searching: searching),
+            ),
           ),
         ),
       ),

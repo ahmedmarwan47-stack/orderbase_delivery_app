@@ -15,6 +15,12 @@ class HomeCompactScreen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: AppColors.background,
+        extendBody: true,
+        bottomNavigationBar: BottomNav(
+          active: NavTab.home,
+          notificationsBadge: true,
+          onTap: onSelectTab,
+        ),
         body: SafeArea(
           bottom: false,
           child: Column(
@@ -34,14 +40,9 @@ class HomeCompactScreen extends StatelessWidget {
                         left: AppPadding.pW20,
                         top: AppPadding.pH4,
                         right: AppPadding.pW20,
-                        bottom: AppPadding.pH16,
+                        bottom: BottomNav.reservedHeight(context),
                       ),
                 ),
-              ),
-              BottomNav(
-                active: NavTab.home,
-                notificationsBadge: true,
-                onTap: onSelectTab,
               ),
             ],
           ),

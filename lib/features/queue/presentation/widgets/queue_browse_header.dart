@@ -1,32 +1,56 @@
 part of '../imports/queue_imports.dart';
 
-/// Browse sub-head (1b/1d): the "date · N orders" heading, then the filter
-/// chips — placed in the page body, directly beneath the unified [AppHeader]
-/// (search now lives in that header). Sits on the page ground (no bar/border).
+/// Browse sub-head (1b/1d): the "date · N orders" heading, and — only on a day
+/// that actually went wrong — the exception row. Placed in the page body,
+/// directly beneath the unified [AppHeader] (search lives in that header).
+/// Sits on the page ground (no bar/border).
+///
+/// The filter chips that used to sit here are gone: they restated counts the
+/// batch headers already carry one row below, and the fourth chip was clipped
+/// off the screen edge. Filters themselves live on (Home's KPI cells still
+/// drive them, and [_FilterResultsBar] clears them) — only the row went.
 class _QueueBrowseHeader extends StatelessWidget {
   const _QueueBrowseHeader({required this.vc});
   final QueueViewController vc;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          LocaleKeys.queueSubtitle.tr(
-            namedArgs: {
-              'count': arabicDigits(vc.active.length),
-              'batches': arabicDigits(vc.batchCount),
-            },
-          ),
-          style: const TextStyle().setMainTextColor.s14.bold,
-        ).paddingOnlyDirectional(start: AppPadding.pW20, end: AppPadding.pW20),
-        12.szH,
-        // Chips run edge-to-edge (their own internal padding) so an off-screen
-        // chip bleeds past the edge, signalling there's more to scroll.
-        _QueueFilterChips(vc: vc),
-      ],
-    ).paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH8);
+    return ValueListenableBuilder<QueueFilter>(
+      valueListenable: vc.filter,
+      // Hidden once the courier is already looking at the exceptions — the
+      // filter bar says so, and the row would offer a trip to where they are.
+      builder: (_, filter, _) {
+        final show = vc.hasExceptions && filter != QueueFilter.exceptions;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              LocaleKeys.queueSubtitle.tr(
+                namedArgs: {
+                  'count': arabicDigits(vc.active.length),
+                  'batches': arabicDigits(vc.batchCount),
+                },
+              ),
+              style: const TextStyle().setMainTextColor.s14.bold,
+            ).paddingOnlyDirectional(
+              start: AppPadding.pW20,
+              end: AppPadding.pW20,
+            ),
+            if (show) ...[
+              12.szH,
+              _QueueExceptionsRow(
+                returns: vc.returnedCount,
+                postponed: vc.postponedCount,
+                onView: vc.showExceptions,
+              ).paddingOnlyDirectional(
+                start: AppPadding.pW20,
+                end: AppPadding.pW20,
+              ),
+            ],
+          ],
+        ).paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH8);
+      },
+    );
   }
 }
 

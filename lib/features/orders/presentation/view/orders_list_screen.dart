@@ -33,13 +33,15 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: AppColors.background,
+        extendBody: true,
+        bottomNavigationBar: BottomNav(
+          active: NavTab.orders,
+          notificationsBadge: true,
+          onTap: widget.onSelectTab,
+        ),
         body: SafeArea(
           bottom: false,
-          child: _OrdersBody(
-            vc: _vc,
-            onOpenOrder: widget.onOpenOrder,
-            onSelectTab: widget.onSelectTab,
-          ),
+          child: _OrdersBody(vc: _vc, onOpenOrder: widget.onOpenOrder),
         ),
       ),
     );

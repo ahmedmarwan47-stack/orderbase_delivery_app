@@ -1,6 +1,6 @@
 part of '../imports/settlement_imports.dart';
 
-/// «دفعات اليوم» — the day batch by batch. Each batch is a collapsible
+/// «جولات اليوم» — the day batch by batch. Each batch is a collapsible
 /// section headed by its ID and what it produced (cash · cash orders ·
 /// returns); open it for the cash lines (collected vs order value, wallet
 /// change) and the parcels it sends back. A batch still at the branch is one
@@ -157,7 +157,7 @@ class _SettlementBatchSectionState extends State<_SettlementBatchSection> {
                         LocaleKeys.queueBatchAtBranch.tr(),
                         style: const TextStyle()
                             .setColor(AppColors.postponedText)
-                            .s10
+                            .s12
                             .semiBold,
                       ),
                     ),
@@ -348,7 +348,7 @@ class _ReturnRow extends StatelessWidget {
                         LocaleKeys.settlementReturnPill.tr(),
                         style: const TextStyle()
                             .setColor(AppColors.failedText)
-                            .s10
+                            .s12
                             .semiBold,
                       ),
                     ),

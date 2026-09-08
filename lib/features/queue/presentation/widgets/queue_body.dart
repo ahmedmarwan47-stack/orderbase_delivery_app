@@ -1,37 +1,59 @@
 part of '../imports/queue_imports.dart';
 
-/// Layout only — adaptive header + body + footer, switching on search vs browse.
-class _QueueBody extends StatelessWidget {
-  const _QueueBody({required this.vc});
+/// Layout only — two shapes, one per mode.
+///
+/// **Browse** is one [CustomScrollView]: the collapsing page title, the day's
+/// sub-head, then the list. There is a single scrollable on the page, so the
+/// title's size, pull-to-refresh and the content all ride the same offset.
+/// **Search** keeps its pinned field above a plain list — a search field that
+/// scrolls away is a search field you have to scroll back for.
+class _QueueBody extends StatefulWidget {
+  const _QueueBody({required this.vc, required this.searching});
   final QueueViewController vc;
+  final bool searching;
+
+  @override
+  State<_QueueBody> createState() => _QueueBodyState();
+}
+
+class _QueueBodyState extends State<_QueueBody> {
+  /// Pull-to-refresh re-checks today's orders. The tab reads live, in-memory
+  /// shift state, so there is nothing to fetch yet — the gesture re-reads and
+  /// settles; it becomes a real sync when the data layer goes async.
+  Future<void> _refresh() async {
+    await Future<void>.delayed(const Duration(milliseconds: 700));
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: vc.isSearching,
-      builder: (_, searching, _) => Column(
+    final vc = widget.vc;
+    if (widget.searching) {
+      return Column(
         children: [
-          // The unified app header (shift status + search + bell) tops every
-          // page. In search mode the search bar takes over, so it's hidden then.
-          if (!searching)
-            AppHeader(
-              onSearch: vc.openSearch,
-              onOpenNotifications: vc.onOpenNotifications,
-            ),
-          searching ? _QueueSearchHeader(vc: vc) : _QueueBrowseHeader(vc: vc),
-          Expanded(
-            child: searching
-                ? _QueueSearchResults(vc: vc)
-                : _QueueBrowseList(vc: vc),
+          _QueueSearchHeader(vc: vc),
+          Expanded(child: _QueueSearchResults(vc: vc)),
+        ],
+      );
+    }
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      color: AppColors.brand,
+      backgroundColor: AppColors.surface,
+      child: CustomScrollView(
+        controller: vc.scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          AppHeaderSliver(
+            title: LocaleKeys.navOrders.tr(),
+            onSearch: vc.openSearch,
+            onOpenNotifications: vc.onOpenNotifications,
           ),
-          if (searching)
-            const HomeIndicator()
-          else
-            BottomNav(
-              active: NavTab.orders,
-              notificationsBadge: true,
-              onTap: vc.onSelectTab,
-            ),
+          SliverToBoxAdapter(child: _QueueBrowseHeader(vc: vc)),
+          SliverToBoxAdapter(child: _QueueBrowseList(vc: vc)),
+          SliverToBoxAdapter(
+            child: SizedBox(height: BottomNav.reservedHeight(context)),
+          ),
         ],
       ),
     );
@@ -100,11 +122,8 @@ class _QueueBrowseList extends StatelessWidget {
                         top: AppPadding.pH16,
                         bottom: AppPadding.pH12,
                       ),
-                    Expanded(
-                      // The day as batch sections. Rows carry their own side
-                      // padding, so the list itself is edge to edge.
-                      child: _QueueBatchList(groups: groups, vc: vc),
-                    ),
+                    // The day as batch cards; the list owns the side inset.
+                    _QueueBatchList(groups: groups, vc: vc),
                   ],
                 );
         }
@@ -296,44 +315,42 @@ class _FilterResultsBar extends StatelessWidget {
 }
 
 /// Empty state for the postponed filter — no orders currently postponed.
+/// Plain content: the page's one [CustomScrollView] owns the scrolling.
 class _QueuePostponedEmpty extends StatelessWidget {
   const _QueuePostponedEmpty();
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child:
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: _EmptyBadge(
-                  bg: AppColors.postponedBg,
-                  icon: AppAssets.svg.clock,
-                  iconColor: AppColors.postponedText,
-                ),
-              ),
-              24.szH,
-              Text(
-                LocaleKeys.postponedEmptyTitle.tr(),
-                textAlign: TextAlign.center,
-                style: const TextStyle().setMainTextColor.s20.bold,
-              ),
-              8.szH,
-              Text(
-                LocaleKeys.postponedEmptyDesc.tr(),
-                textAlign: TextAlign.center,
-                style: const TextStyle().setSecondaryColor.s14.regular
-                    .withHeight(1.5),
-              ),
-            ],
-          ).paddingOnlyDirectional(
-            start: AppPadding.pW32,
-            end: AppPadding.pW32,
-            top: AppPadding.pH64,
-            bottom: AppPadding.pH24,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Center(
+          child: _EmptyBadge(
+            bg: AppColors.postponedBg,
+            icon: AppAssets.svg.clock,
+            iconColor: AppColors.postponedText,
           ),
+        ),
+        24.szH,
+        Text(
+          LocaleKeys.postponedEmptyTitle.tr(),
+          textAlign: TextAlign.center,
+          style: const TextStyle().setMainTextColor.s20.bold,
+        ),
+        8.szH,
+        Text(
+          LocaleKeys.postponedEmptyDesc.tr(),
+          textAlign: TextAlign.center,
+          style: const TextStyle().setSecondaryColor.s14.regular.withHeight(
+            1.5,
+          ),
+        ),
+      ],
+    ).paddingOnlyDirectional(
+      start: AppPadding.pW32,
+      end: AppPadding.pW32,
+      top: AppPadding.pH64,
+      bottom: AppPadding.pH24,
     );
   }
 }

@@ -16,6 +16,19 @@ class _HomeStatRow extends StatelessWidget {
   final void Function(QueueFilter)? onOpenOrdersFilter;
   final VoidCallback? onOpenSettlement;
 
+  /// Whether the strip has anything to report yet — one of its own four
+  /// numbers off zero.
+  ///
+  /// On a brand-new day it would read «٠٠ · ٠٠ · ٠٠» with an empty cash cell:
+  /// four cells all saying "nothing has happened" on a screen whose only
+  /// message is already "nothing has happened". So it does not render at all
+  /// until the day has actually started moving.
+  static bool hasAnyMetric(ShiftController shift) =>
+      shift.inProgress > 0 ||
+      shift.deliveredCount > 0 ||
+      shift.failedCount > 0 ||
+      shift.cashInHand > 0;
+
   static String _pad(int n) => n.toString().padLeft(2, '0');
 
   @override
@@ -26,7 +39,7 @@ class _HomeStatRow extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppCircular.r18), // radii exempt
+        borderRadius: BorderRadius.circular(AppCircular.r12), // from the design frame
         border: road
             ? Border.all(color: AppColors.borderDefault, width: 2)
             : Border.all(color: AppColors.borderCardFaint),
@@ -149,7 +162,7 @@ class _StatCell extends StatelessWidget {
                 text: value,
                 style: const TextStyle()
                     .setColor(valueColor)
-                    .s20
+                    .s18
                     .bold
                     .tabular
                     .road(road)
@@ -180,7 +193,7 @@ class _StatCell extends StatelessWidget {
                   // Stays 12 on the road: four cells across 328pt leave no
                   // room for «في الطريق» at 14. The darker colour does the work.
                   .s12
-                  .regular,
+                  .medium,
             ),
           ],
         ),

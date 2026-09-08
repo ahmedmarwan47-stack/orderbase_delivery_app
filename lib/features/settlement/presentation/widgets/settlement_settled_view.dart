@@ -22,77 +22,85 @@ class _SettlementSettledView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final onSelectTab = this.onSelectTab;
+    final isTab = onSelectTab != null;
+    final Widget body =
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            16.szH,
+            const _SettledBadge(),
+            20.szH,
+            Text(
+              LocaleKeys.settlementSettledTitle.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle().setMainTextColor.s20.bold,
+            ),
+            12.szH,
+            Text(
+              LocaleKeys.settlementSettledBody.tr(
+                namedArgs: {
+                  'cash': formatThousands(data.cashTotal),
+                  'count': arabicDigits(data.rowCount),
+                },
+              ),
+              textAlign: TextAlign.center,
+              style: const TextStyle().setSecondaryColor.s14.regular.withHeight(
+                1.5,
+              ),
+            ),
+            24.szH,
+            _SummaryCard(data: data),
+            12.szH,
+            const _BalanceCard(),
+            24.szH,
+            _BatchesSection(data: data),
+            24.szH,
+            const _HistorySection(),
+          ],
+        ).paddingOnlyDirectional(
+          start: AppPadding.pW20,
+          end: AppPadding.pW20,
+          top: AppPadding.pH24,
+          bottom: isTab ? BottomNav.reservedHeight(context) : AppPadding.pH24,
+        );
+
+    final Widget scroll = CustomScrollView(
+      slivers: [
+        if (isTab)
+          AppHeaderSliver(
+            title: LocaleKeys.navSettlement.tr(),
+            background: AppColors.surface,
+            onSearch: onOpenSearch,
+            onOpenNotifications: onOpenNotifications,
+          ),
+        SliverToBoxAdapter(child: body),
+      ],
+    );
+
     return Scaffold(
       backgroundColor: AppColors.surface,
+      extendBody: isTab,
+      bottomNavigationBar: isTab
+          ? BottomNav(active: NavTab.settlement, onTap: onSelectTab)
+          : null,
       body: SafeArea(
-        bottom: onSelectTab == null,
-        child: Column(
-          children: [
-            if (onSelectTab != null)
-              AppHeader(
-                onSearch: onOpenSearch,
-                onOpenNotifications: onOpenNotifications,
+        bottom: !isTab,
+        // As a tab there is no «العودة للرئيسية» button: the Home tab in the
+        // bar below IS that button, and a floating bar leaves no room for a
+        // sticky footer saying the same thing twice. The pushed preview keeps
+        // it — there it is the only way back.
+        child: isTab
+            ? scroll
+            : Column(
+                children: [
+                  Expanded(child: scroll),
+                  _BackHomeButton(onTap: vc.reset).paddingSymmetric(
+                    horizontal: AppPadding.pW20,
+                    vertical: AppPadding.pH12,
+                  ),
+                  const HomeIndicator(),
+                ],
               ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppPadding.pW20,
-                  vertical: AppPadding.pH24,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    16.szH,
-                    const _SettledBadge(),
-                    20.szH,
-                    Text(
-                      LocaleKeys.settlementSettledTitle.tr(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle().setMainTextColor.s20.bold,
-                    ),
-                    12.szH,
-                    Text(
-                      LocaleKeys.settlementSettledBody.tr(
-                        namedArgs: {
-                          'cash': formatThousands(data.cashTotal),
-                          'count': arabicDigits(data.rowCount),
-                        },
-                      ),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle().setSecondaryColor.s14.regular
-                          .withHeight(1.5),
-                    ),
-                    24.szH,
-                    _SummaryCard(data: data),
-                    12.szH,
-                    _DayTotals(data: data),
-                    12.szH,
-                    const _BalanceCard(),
-                    24.szH,
-                    _BatchesSection(data: data),
-                    24.szH,
-                    const _HistorySection(),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppPadding.pW20,
-                vertical: AppPadding.pH12,
-              ),
-              child: _BackHomeButton(
-                onTap: onSelectTab == null
-                    ? vc.reset
-                    : () => onSelectTab(NavTab.home),
-              ),
-            ),
-            if (onSelectTab != null)
-              BottomNav(active: NavTab.settlement, onTap: onSelectTab)
-            else
-              const HomeIndicator(),
-          ],
-        ),
       ),
     );
   }

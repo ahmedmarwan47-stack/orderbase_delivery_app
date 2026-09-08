@@ -611,4 +611,8 @@ abstract final class LocaleKeys {
   static const String settlementTotalsOrders = 'settlement_totals_orders';
   static const String settlementTotalsDelivered = 'settlement_totals_delivered';
   static const String settlementTotalsReturns = 'settlement_totals_returns';
+  static const String queueExceptionsReturns = 'queue_exceptions_returns';
+  static const String queueExceptionsPostponed = 'queue_exceptions_postponed';
+  static const String queueExceptionsView = 'queue_exceptions_view';
+  static const String queueFilterExceptions = 'queue_filter_exceptions';
 }

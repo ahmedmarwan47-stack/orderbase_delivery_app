@@ -35,17 +35,26 @@ class ProfileScreen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: AppColors.background,
+        extendBody: true,
+        bottomNavigationBar: BottomNav(
+          active: NavTab.profile,
+          notificationsBadge: true,
+          onTap: onSelectTab,
+        ),
         body: SafeArea(
           bottom: false,
-          child: Column(
-            children: [
-              AppHeader(
+          child: CustomScrollView(
+            slivers: [
+              AppHeaderSliver(
+                title: LocaleKeys.navProfile.tr(),
                 onSearch: onOpenSearch,
                 onOpenNotifications: onOpenNotifications,
               ),
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsetsDirectional.only(bottom: AppPadding.pH20),
+              SliverPadding(
+                padding: EdgeInsetsDirectional.only(
+                  bottom: BottomNav.reservedHeight(context),
+                ),
+                sliver: SliverList.list(
                   children: [
                     const _ProfileIdentity(),
                     16.szH,
@@ -89,11 +98,6 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-              BottomNav(
-                active: NavTab.profile,
-                notificationsBadge: true,
-                onTap: onSelectTab,
               ),
             ],
           ),

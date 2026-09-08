@@ -33,6 +33,5 @@ part '../widgets/settlement_open_view.dart';
 part '../widgets/settlement_cash_card.dart';
 part '../widgets/settlement_collections_section.dart';
 part '../widgets/settlement_returns_section.dart';
-part '../widgets/settlement_locked_note.dart';
 part '../widgets/settlement_settled_view.dart';
 part '../widgets/settlement_history_section.dart';

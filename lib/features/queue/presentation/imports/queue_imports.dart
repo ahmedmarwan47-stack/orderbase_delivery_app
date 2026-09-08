@@ -11,6 +11,7 @@ import '../../../../app/shift_controller.dart';
 import '../../../../config/res/config_imports.dart';
 import '../../../../data/order.dart';
 import '../../../../data/flow_order.dart';
+import '../../../../theme/shadows.dart';
 import '../../../order_flow/presentation/imports/order_flow_imports.dart'
     show OrderDetailScreen;
 import '../../../pickup/presentation/imports/pickup_imports.dart'
@@ -31,7 +32,7 @@ part '../view/postponed_screen.dart';
 part '../widgets/queue_body.dart';
 part '../widgets/queue_browse_header.dart';
 part '../widgets/queue_search_header.dart';
-part '../widgets/queue_filter_chips.dart';
+part '../widgets/queue_exceptions_row.dart';
 part '../widgets/queue_cards.dart';
 part '../widgets/queue_batch_section.dart';
 part '../widgets/queue_batch_row.dart';

@@ -27,6 +27,7 @@ abstract final class AppSize {
   static double get sH44 => 44.h;
   static double get sH48 => 48.h;
   static double get sH52 => 52.h;
+  static double get sH66 => 66.h;
   static double get sH56 => 56.h;
   static double get sH60 => 60.h;
   static double get sH64 => 64.h;
@@ -115,6 +116,7 @@ abstract final class AppCircular {
   static double get r22 => 22.r;
   static double get r24 => 24.r;
   static double get r26 => 26.r; // bottom-sheet top corners
+  static double get r28 => 28.r; // the floating tab bar's pill
   static double get infinity => 999.r;
 }
 
