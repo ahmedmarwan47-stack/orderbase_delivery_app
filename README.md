@@ -1,17 +1,20 @@
 # orderbase_delivery_app
 
-A new Flutter project.
+Flutter port of the Orderbase courier app — Arabic-first (RTL), built from the `.dc.html`
+mockups in the Claude Design project. Architecture, design tokens, and screen inventory are
+documented in [`CLAUDE.md`](CLAUDE.md).
 
-## Getting Started
+## Getting started
 
-This project is a starting point for a Flutter application.
+New machine? Follow **[`docs/LOCAL_SETUP.md`](docs/LOCAL_SETUP.md)** — it lists everything to
+install (Flutter SDK, Xcode housekeeping, SSH access, editor) and the optional extras.
 
-A few resources to get you started if this is your first Flutter project:
+Already set up:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+flutter pub get
+open -a Simulator
+flutter run
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Verify the toolchain at any time with `./scripts/doctor.sh`.
