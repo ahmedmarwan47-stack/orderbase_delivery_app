@@ -37,7 +37,7 @@ if [ "$(uname -s)" = "Darwin" ]; then
     if xcrun simctl list devices available 2>/dev/null | grep -qi iphone; then
       ok "iPhone simulator runtime available"
     else
-      bad "no iPhone simulator runtime — install one from Xcode > Settings > Components"
+      bad "no iPhone simulator runtime — install one: xcodebuild -downloadPlatform iOS"
     fi
   else
     bad "Command Line Tools missing — run: xcode-select --install"

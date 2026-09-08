@@ -33,10 +33,24 @@ sudo softwareupdate --install-rosetta --agree-to-license   # Apple silicon only
 Confirm a simulator runtime is present:
 
 ```bash
-xcrun simctl list devices available | grep -i iphone
+xcrun simctl list devices available | grep -i iPhone
 ```
 
-If that prints nothing, open Xcode → Settings → Components and install an iOS runtime.
+Installing Xcode does **not** install an iOS runtime, so this often prints nothing on a fresh
+machine — `flutter run` then has no device to target. Install one (~7 GB):
+
+```bash
+xcodebuild -downloadPlatform iOS
+```
+
+(Same thing as Xcode → Settings → Components → iOS, just easier to leave running.) Re-run the
+`simctl` line afterwards; you should get a list of iPhones.
+
+> **If the App Store refuses to install Xcode** — *"This version of Xcode isn't supported in this
+> version of macOS"* — check whether you already have a working copy before chasing it:
+> `xcodebuild -version`. On a macOS beta/seed the App Store can refuse an Xcode that is already
+> installed and perfectly usable. If you genuinely don't have one, grab a build matching your macOS
+> from <https://developer.apple.com/download/all/>; **Xcode 16 or newer is enough for this project**.
 
 ## 2. Flutter SDK — the one real download
 
