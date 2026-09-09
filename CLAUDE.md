@@ -647,7 +647,11 @@ shell (and the *Tab bar lab*). **Add a gallery entry for each new screen.**
   one by a `FittedBox`, with `ScreenUtil.configure` fed that frame. Without it screenutil scales
   widths by the window's width and heights by its height — on a 1280×720 laptop window that is
   3.5× wide and 0.9× tall, which squashed every 44×44 tile into a slab and clipped the large title
-  on GitHub Pages. Phone-sized viewports keep the normal `ScreenUtilInit` path.
+  on GitHub Pages. A phone-sized viewport is scaled **from its width alone** (both axes at
+  `width / 368`): Safari's chrome takes an iPhone 15 down to ~660pt, and height-scaling from that
+  squashed every 44×44 tile by ~15%. Native builds keep the normal `ScreenUtilInit` path — note
+  the same squash exists natively on short phones (an SE's 667pt gives an 0.82 height scale),
+  so if the fleet's older iPhones show it, move native onto the width-only scale too.
 - **Browser fallback (no Xcode needed):**
   `flutter run -d web-server --web-port 8080 --web-hostname 127.0.0.1`, then open
   `http://127.0.0.1:8080` in the Browser pane at a phone viewport (~390×844). First compile is slow

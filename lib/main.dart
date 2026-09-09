@@ -52,7 +52,24 @@ class OrderbaseCourierApp extends StatelessWidget {
       child: Builder(
         builder: (context) {
           final mq = MediaQuery.of(context);
-          if (mq.size.width <= _phoneMaxWidth) return const _ScaledApp();
+          if (mq.size.width <= _phoneMaxWidth) {
+            // A phone's browser. Safari's chrome takes the viewport down to
+            // ~660pt on an iPhone 15, so screenutil's height scale lands
+            // ~15% under its width scale and every 44×44 tile squashes into
+            // a slab. Scale both axes from the width: the page simply runs a
+            // little longer under the browser bar instead of shrinking.
+            final w = mq.size.width;
+            ScreenUtil.configure(
+              data: mq.copyWith(
+                size: Size(w, w * _design.height / _design.width),
+              ),
+              designSize: _design,
+              minTextAdapt: true,
+              splitScreenMode: false,
+              fontSizeResolver: FontSizeResolvers.width,
+            );
+            return const _CourierMaterialApp();
+          }
           // A desktop browser (GitHub Pages on a laptop): screenutil would
           // scale widths by the window's width and heights by its height —
           // 3.5× wide and 0.9× tall on a 1280×720 window, which squashes
@@ -95,8 +112,9 @@ class OrderbaseCourierApp extends StatelessWidget {
   }
 }
 
-/// The app scaled by screenutil from the real screen — every phone, and a
-/// phone-sized browser viewport.
+/// The app scaled by screenutil from the real screen — every native phone.
+/// (The web takes the manual [ScreenUtil.configure] paths above: a browser's
+/// viewport is never the phone's own aspect.)
 class _ScaledApp extends StatelessWidget {
   const _ScaledApp();
 
