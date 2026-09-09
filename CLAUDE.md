@@ -446,7 +446,12 @@ bar (Files on the iOS 26.5 iPhone 17 Pro simulator, pixel-scanned) and the user'
   top-left light with a hairline highlight on the lit edge, dispersion, a 3-ring jittered frost,
   its own drop shadow; `GlassStyle.bar` / `.lens` hold the numbers); *blur* = backdrop blur σ5 +
   saturation under the same `navGlassTint`, for devices without Impeller or that the frame
-  governor stepped down; *opaque* = solid pill, forced by high-contrast and Road mode. The
+  governor stepped down — **the web is always this tier** (`ImageFilter.shader` does not exist in
+  the browser engines, so GitHub Pages can never refract), which is why `GlassLightPainter`
+  (`nav_glass.dart`) paints the shader's *lighting* onto it: the hairline along the lit edge, the
+  soft rim band, the shade on the far side, on both the bar and the lens, from the same
+  `GlassStyle` numbers. What the blur tier still cannot do is bend the page at the rim; *opaque* =
+  solid pill, forced by high-contrast and Road mode. The
   Account tab's dev row «مادة شريط التبويب (Dev)» pins a tier. Outside debug builds a frame
   governor (`SchedulerBinding.addTimingsCallback`) degrades glass → blur for the session after
   12 slow raster frames in 60 (90 warm-up frames ignored).
@@ -457,8 +462,12 @@ bar (Files on the iOS 26.5 iPhone 17 Pro simulator, pixel-scanned) and the user'
   `active: null` never folds.
 - **Lens**: neutral 7% shade (`navLensTint` — iOS's lens has no colour of its own; the tint comes
   from the glyph), slides between tabs on `AppMotion.spring` (ratio .84), stretches with its own
-  speed, swells under a press; **press-and-scrub** along the bar follows the finger on
-  `AppMotion.follow` with `AppHaptics.tick()` at every slot, release chooses. Reduce Motion jumps.
+  speed, swells under a press; **press-and-scrub** along the bar is **glued to the finger** — no
+  spring, however stiff: one restarted on every pointer event trails the finger by its own settle
+  time, and Ahmed read that trail as lag. The liquid feel is the stretch, driven by the finger's
+  measured speed (`_fingerVelocity`, relaxed over `AppMotion.tick` once it stops) and carried into
+  the release spring so a flick lands like a flick; `AppHaptics.tick()` at every slot, release
+  chooses. Reduce Motion jumps.
 - **The shader contract, as it actually is** (the docs say otherwise): `ImageFilter.shader` hands
   the shader the **whole screen** as `uTex`, and `FlutterFragCoord()` is in screen pixels — the
   widget's clip only limits which pixels are asked for. So `GlassSurface` describes the capsule by

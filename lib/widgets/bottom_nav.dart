@@ -131,6 +131,18 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
   bool _pressed = false;
   bool _scrubbing = false;
 
+  /// The finger's speed along the bar while scrubbing, in slots per second,
+  /// and the short relaxation that lets the stretch it drives ease off once
+  /// the finger stops — a lens that stays stretched under a still finger
+  /// reads as stuck.
+  double _fingerVelocity = 0;
+  int? _fingerAt;
+  late final AnimationController _relax = AnimationController(
+    vsync: this,
+    duration: AppMotion.tick,
+    value: 1,
+  );
+
   /// The visual slot under the finger while scrubbing — a tick every time it
   /// changes.
   int? _hover;
@@ -155,6 +167,7 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
     _nav.removeListener(_onNav);
     _fold.dispose();
     _lens.dispose();
+    _relax.dispose();
     super.dispose();
   }
 
@@ -165,15 +178,18 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
   void _spring(
     AnimationController c,
     double target,
-    SpringDescription spring,
-  ) {
+    SpringDescription spring, {
+    double? velocity,
+  }) {
     if (!mounted) return;
     if (AppMotion.reduced(context)) {
       c.value = target;
       return;
     }
     if (!c.isAnimating && (c.value - target).abs() < 0.0005) return;
-    c.animateWith(SpringSimulation(spring, c.value, target, c.velocity));
+    c.animateWith(
+      SpringSimulation(spring, c.value, target, velocity ?? c.velocity),
+    );
   }
 
   bool get _rtl => Directionality.of(context) == TextDirection.rtl;
@@ -223,6 +239,7 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
         _nav,
         _fold,
         _lens,
+        _relax,
       ]),
       builder: (context, _) => _bar(context),
     );
@@ -305,7 +322,15 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
                     borderRadius: r,
                     border: Border.all(color: AppColors.navGlassEdge),
                   ),
-                  child: const SizedBox.expand(),
+                  // The shader's rim light, painted: without it the blur
+                  // tier is a frosted slab next to the glass tier's capsule.
+                  child: CustomPaint(
+                    painter: GlassLightPainter(
+                      style: GlassStyle.bar,
+                      radius: radius,
+                    ),
+                    child: const SizedBox.expand(),
+                  ),
                 ),
               ),
             ),
@@ -411,9 +436,7 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
         style:
-            (selected
-                    ? const TextStyle().semiBold
-                    : const TextStyle().regular)
+            (selected ? const TextStyle().semiBold : const TextStyle().regular)
                 .s12
                 .setColor(color),
       );
@@ -467,7 +490,7 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
     // finger; the fold dissolves it into the pill.
     if (activeV != null && fade > 0) {
       final v = _lens.value;
-      final stretch = (_lens.velocity.abs() * 0.055).clamp(0.0, 0.45);
+      final stretch = (_lensVelocity.abs() * 0.055).clamp(0.0, 0.45);
       final press = _pressed ? 1.06 : 1.0;
       final lw = (g.slotW + BottomNav._lensOverhang) * (1 + stretch) * press;
       final lh =
@@ -508,7 +531,13 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
         color: AppColors.navLensTint,
         borderRadius: BorderRadius.circular(size.height / 2),
       ),
-      child: const SizedBox.expand(),
+      child: CustomPaint(
+        painter: GlassLightPainter(
+          style: GlassStyle.lens,
+          radius: size.height / 2,
+        ),
+        child: const SizedBox.expand(),
+      ),
     );
   }
 
@@ -534,6 +563,8 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
           : (d) {
               _scrubbing = true;
               _pressed = true;
+              _fingerVelocity = 0;
+              _fingerAt = null;
               _follow(g, rect, d.localPosition.dx);
             },
       onHorizontalDragUpdate: folded
@@ -543,8 +574,9 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
           ? null
           : (_) {
               final v = _hover ?? _visualSlot(widget.active) ?? 0;
+              final carried = _lensVelocity;
               _scrubbing = false;
-              _choose(v);
+              _choose(v, velocity: carried);
               _release();
             },
       onHorizontalDragCancel: () {
@@ -557,28 +589,51 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
   }
 
   double _slotsFrom(_Geometry g, Rect rect, double localX) =>
-      (localX + rect.left - g.expanded.left - BottomNav._barPadding) /
-      g.slotW;
+      (localX + rect.left - g.expanded.left - BottomNav._barPadding) / g.slotW;
 
   int _visualAt(_Geometry g, Rect rect, double localX) =>
       _slotsFrom(g, rect, localX).floor().clamp(0, _n - 1);
 
+  /// The lens under a scrubbing finger is glued to it — no spring, however
+  /// stiff: a spring restarted on every pointer event trails the finger by
+  /// its own settle time, and that trail is read as lag. The liquid feel
+  /// comes from the stretch instead, driven by the finger's measured speed
+  /// and relaxed over [AppMotion.tick] once it stops; the release carries
+  /// that speed into the settling spring so a flick lands like a flick.
   void _follow(_Geometry g, Rect rect, double localX) {
     final v = _visualAt(g, rect, localX);
     if (v != _hover) {
       _hover = v;
       AppHaptics.tick();
     }
-    final target = (_slotsFrom(g, rect, localX) - 0.5).clamp(
-      -0.15,
-      _n - 0.85,
-    );
-    _spring(_lens, target, AppMotion.follow);
+    final target = (_slotsFrom(g, rect, localX) - 0.5).clamp(-0.15, _n - 0.85);
+    final now = DateTime.now().microsecondsSinceEpoch;
+    final at = _fingerAt;
+    if (at != null && now > at) {
+      final dt = (now - at) / 1e6;
+      final sample = (target - _lens.value) / dt;
+      // Two-sample smoothing: pointer timestamps are jittery, the stretch
+      // must not be.
+      _fingerVelocity = _fingerVelocity * 0.4 + sample * 0.6;
+    }
+    _fingerAt = now;
+    _lens.stop();
+    _lens.value = target;
+    if (AppMotion.reduced(context)) {
+      _relax.value = 1;
+    } else {
+      _relax.forward(from: 0);
+    }
     setState(() {});
   }
 
-  void _choose(int v) {
-    _spring(_lens, v.toDouble(), AppMotion.spring);
+  /// What the stretch and the release spring read: the finger's speed while
+  /// scrubbing (fading as [_relax] runs), the lens's own otherwise.
+  double get _lensVelocity =>
+      _scrubbing ? _fingerVelocity * (1 - _relax.value) : _lens.velocity;
+
+  void _choose(int v, {double? velocity}) {
+    _spring(_lens, v.toDouble(), AppMotion.spring, velocity: velocity);
     widget.onTap?.call(_tabAtVisual(v));
   }
 

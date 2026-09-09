@@ -195,7 +195,13 @@ class _GlassFilter extends SingleChildRenderObjectWidget {
 /// [RenderBackdropFilter]'s shape, with the filter rebuilt every paint so the
 /// capsule's screen rect and the style's numbers are the current ones.
 class _RenderGlassFilter extends RenderProxyBox {
-  _RenderGlassFilter(this._shader, this._style, this._radius, this._pad, this._dpr);
+  _RenderGlassFilter(
+    this._shader,
+    this._style,
+    this._radius,
+    this._pad,
+    this._dpr,
+  );
 
   final ui.FragmentShader _shader;
 
@@ -267,4 +273,75 @@ class _RenderGlassFilter extends RenderProxyBox {
     this.layer = layer;
     context.pushLayer(layer, super.paint, offset);
   }
+}
+
+/// The shader's lighting, painted — for the blur tier, which has the frost
+/// and the tint but no shader to light the rim. Nothing here refracts (that
+/// needs the backdrop, which only Impeller hands a shader); what it gives back
+/// is the rest of what makes the capsule read as glass: the hairline of light
+/// along the lit edge, the soft band of rim light inside it, the whisper of
+/// shade on the far side. Numbers come from the same [GlassStyle] the shader
+/// uses, so the two tiers agree on where the light is and how strong.
+///
+/// Paint it INSIDE the capsule's clip, over the frost and the sheen.
+class GlassLightPainter extends CustomPainter {
+  const GlassLightPainter({required this.style, required this.radius});
+
+  final GlassStyle style;
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final r = Radius.circular(radius);
+    // The gradient runs from the lit edge to the far one, along the light.
+    final l = style.light;
+    final len = l.distance == 0 ? 1.0 : l.distance;
+    final begin = Alignment(l.dx / len, l.dy / len);
+    final end = Alignment(-l.dx / len, -l.dy / len);
+    final lit = (style.specular * 1.4).clamp(0.0, 1.0);
+    final dark = (style.edgeDark * 1.5).clamp(0.0, 1.0);
+
+    // The rim band: as wide as the shader's rim, softened, strongest where
+    // the edge faces the light and gone before the middle.
+    final band = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = style.rim
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, style.rim * 0.5)
+      ..shader = LinearGradient(
+        begin: begin,
+        end: end,
+        colors: [
+          const Color(0xFFFFFFFF).withValues(alpha: lit * 0.35),
+          const Color(0x00FFFFFF),
+        ],
+        stops: const [0.0, 0.55],
+      ).createShader(rect);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(rect.deflate(style.rim / 2), r),
+      band,
+    );
+
+    // The hairline: one pixel of light along the lit edge, a hint of shade
+    // along the far one.
+    final line = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..shader = LinearGradient(
+        begin: begin,
+        end: end,
+        colors: [
+          const Color(0xFFFFFFFF).withValues(alpha: lit),
+          const Color(0xFFFFFFFF).withValues(alpha: lit * 0.5),
+          const Color(0x00FFFFFF),
+          const Color(0xFF000000).withValues(alpha: dark),
+        ],
+        stops: const [0.0, 0.3, 0.6, 1.0],
+      ).createShader(rect);
+    canvas.drawRRect(RRect.fromRectAndRadius(rect.deflate(0.5), r), line);
+  }
+
+  @override
+  bool shouldRepaint(GlassLightPainter old) =>
+      old.style != style || old.radius != radius;
 }
