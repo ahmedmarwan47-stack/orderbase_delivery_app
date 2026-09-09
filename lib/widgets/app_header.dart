@@ -48,8 +48,11 @@ class AppHeaderSliver extends StatelessWidget {
   /// from the content passing beneath it.
   final Color background;
 
-  /// Collapsed height — the bar the title shrinks into.
-  static double get barHeight => AppSize.sH52;
+  /// Collapsed height — the bar the title shrinks into. The 44pt action tiles
+  /// sit centred in it, so this is what sets their breathing room: at 52 they
+  /// had 4pt above and below and looked jammed against the hairline; 60 gives
+  /// them 8, on the grid.
+  static double get barHeight => AppSize.sH60;
 
   /// Expanded height. The title and the actions share ONE row: the design has
   /// no separate large-title band, so the header collapses by shrinking its
