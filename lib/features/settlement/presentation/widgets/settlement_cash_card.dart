@@ -33,79 +33,76 @@ class _CashInHandCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppCircular.r20),
         boxShadow: AppShadows.moneyCard,
       ),
-      child:
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                (data.isSettled
-                        ? LocaleKeys.settlementSummaryDelivered
-                        : LocaleKeys.settlementCashInHand)
-                    .tr(),
-                style: const TextStyle().setColor(labelColor).s12.medium,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            (data.isSettled
+                    ? LocaleKeys.settlementSummaryDelivered
+                    : LocaleKeys.settlementCashInHand)
+                .tr(),
+            style: const TextStyle().setColor(labelColor).s12.medium,
+          ),
+          8.szH,
+          Text(
+            '${formatThousands(data.cashTotal)} '
+            '${LocaleKeys.settlementCurrency.tr()}',
+            // LTR so the digits lead the unit; end-aligned so the figure
+            // hangs off the same right edge as its label.
+            textDirection: TextDirection.ltr,
+            textAlign: TextAlign.end,
+            style: const TextStyle().setWhite.s28.bold.tabular,
+          ),
+          if (over) ...[
+            6.szH,
+            Text(
+              LocaleKeys.settlementOverLimit.tr(
+                namedArgs: {
+                  'limit': formatThousands(ShiftController.cashThresholdEgp),
+                },
               ),
-              8.szH,
-              Text(
-                '${formatThousands(data.cashTotal)} '
-                '${LocaleKeys.settlementCurrency.tr()}',
-                // LTR so the digits lead the unit; end-aligned so the figure
-                // hangs off the same right edge as its label.
-                textDirection: TextDirection.ltr,
-                textAlign: TextAlign.end,
-                style: const TextStyle().setWhite.s28.bold.tabular,
-              ),
-              if (over) ...[
-                6.szH,
-                Text(
-                  LocaleKeys.settlementOverLimit.tr(
-                    namedArgs: {
-                      'limit': formatThousands(
-                        ShiftController.cashThresholdEgp,
-                      ),
-                    },
+              style: const TextStyle()
+                  .setColor(AppColors.overLimitLabel)
+                  .s12
+                  .semiBold,
+            ),
+          ],
+          if (showBreakdown) ...[
+            16.szH,
+            const Divider(
+              height: 1,
+              thickness: 1,
+              color: AppColors.cashCardHairline,
+            ),
+            12.szH,
+            Row(
+              children: [
+                Expanded(
+                  child: _BreakdownCol(
+                    label: LocaleKeys.settlementBreakdownOrders.tr(),
+                    value: '${formatThousands(data.ordersTotal)} جم',
+                    labelColor: labelColor,
                   ),
-                  style: const TextStyle()
-                      .setColor(AppColors.overLimitLabel)
-                      .s12
-                      .semiBold,
+                ),
+                Expanded(
+                  child: _BreakdownCol(
+                    label: LocaleKeys.settlementBreakdownWallet.tr(),
+                    value: '${formatThousands(data.walletTotal)} جم',
+                    labelColor: labelColor,
+                  ),
+                ),
+                Expanded(
+                  child: _BreakdownCol(
+                    label: LocaleKeys.settlementBreakdownBatches.tr(),
+                    value: arabicDigits(data.carriedBatchCount),
+                    labelColor: labelColor,
+                  ),
                 ),
               ],
-              if (showBreakdown) ...[
-                16.szH,
-                const Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: AppColors.cashCardHairline,
-                ),
-                12.szH,
-                Row(
-                  children: [
-                    Expanded(
-                      child: _BreakdownCol(
-                        label: LocaleKeys.settlementBreakdownOrders.tr(),
-                        value: '${formatThousands(data.ordersTotal)} جم',
-                        labelColor: labelColor,
-                      ),
-                    ),
-                    Expanded(
-                      child: _BreakdownCol(
-                        label: LocaleKeys.settlementBreakdownWallet.tr(),
-                        value: '${formatThousands(data.walletTotal)} جم',
-                        labelColor: labelColor,
-                      ),
-                    ),
-                    Expanded(
-                      child: _BreakdownCol(
-                        label: LocaleKeys.settlementBreakdownBatches.tr(),
-                        value: arabicDigits(data.carriedBatchCount),
-                        labelColor: labelColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ],
-          ).paddingAll(AppPadding.pH24),
+            ),
+          ],
+        ],
+      ).paddingAll(AppPadding.pH24),
     );
   }
 }

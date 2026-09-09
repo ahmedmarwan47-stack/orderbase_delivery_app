@@ -208,49 +208,77 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      // Every page's scroll bubbles up through here to the tab bar, which
-      // folds on the way down and opens on the way up. The switch itself is
-      // immediate — the way a tab bar's is: the old page dissolved in from
-      // nothing over 200 ms, which read as a lag between the tab lighting up
-      // and the page arriving, and a blank first frame under a backdrop
-      // filter is a frame the bar had to be re-rendered for.
-      child: NotificationListener<ScrollNotification>(
-        onNotification: NavBarController.instance.handleScroll,
-        child: IndexedStack(
-          index: _notifications ? NavTab.values.length : _tab.index,
-          children: [
-            HomeScreen(
-              onSelectTab: _select,
-              onOpenOrder: _openNextStop,
-              onDeliverOrder: _deliverNextStop,
-              onCallCustomer: _callNextStop,
-              onCallBranch: _callBranch,
-              onOpenOrdersFilter: _openOrdersFilter,
-              onOpenSettlement: _openSettlement,
-              onOpenPendingBatch: _openPendingBatch,
-              onOpenNotifications: _toggleNotifications,
-              onOpenSearch: _openOrdersSearch,
-              onStartNewDay: _simulator.restart,
-            ),
-            QueueScreen(controller: _ordersVc),
-            SettlementScreen(
-              onSelectTab: _select,
-              onOpenNotifications: _toggleNotifications,
-              onOpenSearch: _openOrdersSearch,
-            ),
-            ProfileScreen(
-              onSelectTab: _select,
-              onOpenNotifications: _toggleNotifications,
-              onOpenSearch: _openOrdersSearch,
-              onStartNewDay: _simulator.restart,
-            ),
-            _NotificationsPage(
-              onSelectTab: _select,
-              onClose: _toggleNotifications,
-              onOpenOrder: _openOrderByNum,
-              onOpenSearch: _openOrdersSearch,
-            ),
-          ],
+      // ONE tab bar, owned here, over every page. Each page used to carry its
+      // own copy in its Scaffold; a tap then sprang *that* page's lens away
+      // and the newly shown page arrived with a lens parked wherever its last
+      // tap had left it, drifting into place a beat later — which read as the
+      // page switch lagging. With a single bar the lens slides from the old
+      // tab to the new one while the page changes underneath, immediately.
+      // The pages still reserve the bar's height themselves
+      // (`BottomNav.reservedHeight` reads the padding this Scaffold hands
+      // down), and Orders drops the bar while its search takes the page over.
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        extendBody: true,
+        bottomNavigationBar: ValueListenableBuilder<bool>(
+          valueListenable: _ordersVc.isSearching,
+          builder: (_, searching, _) {
+            if (searching && _tab == NavTab.orders && !_notifications) {
+              return const SizedBox.shrink();
+            }
+            return BottomNav(
+              active: _notifications ? null : _tab,
+              notificationsBadge: true,
+              onTap: _select,
+            );
+          },
+        ),
+        // Every page's scroll bubbles up through here to the tab bar, which
+        // folds on the way down and opens on the way up. The switch itself is
+        // immediate — the way a tab bar's is: the old page dissolved in from
+        // nothing over 200 ms, which read as a lag between the tab lighting
+        // up and the page arriving.
+        body: NotificationListener<ScrollNotification>(
+          onNotification: NavBarController.instance.handleScroll,
+          child: IndexedStack(
+            index: _notifications ? NavTab.values.length : _tab.index,
+            children: [
+              HomeScreen(
+                hostsTabBar: false,
+                onSelectTab: _select,
+                onOpenOrder: _openNextStop,
+                onDeliverOrder: _deliverNextStop,
+                onCallCustomer: _callNextStop,
+                onCallBranch: _callBranch,
+                onOpenOrdersFilter: _openOrdersFilter,
+                onOpenSettlement: _openSettlement,
+                onOpenPendingBatch: _openPendingBatch,
+                onOpenNotifications: _toggleNotifications,
+                onOpenSearch: _openOrdersSearch,
+                onStartNewDay: _simulator.restart,
+              ),
+              QueueScreen(controller: _ordersVc, hostsTabBar: false),
+              SettlementScreen(
+                hostsTabBar: false,
+                onSelectTab: _select,
+                onOpenNotifications: _toggleNotifications,
+                onOpenSearch: _openOrdersSearch,
+              ),
+              ProfileScreen(
+                hostsTabBar: false,
+                onSelectTab: _select,
+                onOpenNotifications: _toggleNotifications,
+                onOpenSearch: _openOrdersSearch,
+                onStartNewDay: _simulator.restart,
+              ),
+              _NotificationsPage(
+                onSelectTab: _select,
+                onClose: _toggleNotifications,
+                onOpenOrder: _openOrderByNum,
+                onOpenSearch: _openOrdersSearch,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -277,7 +305,7 @@ class _NotificationsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       extendBody: true,
-      bottomNavigationBar: BottomNav(active: null, onTap: onSelectTab),
+      // The shell's bar sits over this page with no tab lit.
       body: SafeArea(
         bottom: false,
         child: NotificationsScreen(

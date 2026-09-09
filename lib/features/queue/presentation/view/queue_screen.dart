@@ -20,6 +20,7 @@ class QueueScreen extends StatefulWidget {
     this.initialFilter = QueueFilter.all,
     this.onSelectTab,
     this.onOpenOrder,
+    this.hostsTabBar = true,
   });
 
   /// Shell-owned controller. When null the screen creates (and disposes) its own.
@@ -33,6 +34,10 @@ class QueueScreen extends StatefulWidget {
   final QueueFilter initialFilter;
   final ValueChanged<NavTab>? onSelectTab;
   final void Function(FlowOrder)? onOpenOrder;
+
+  /// Standalone the page carries its own tab bar; inside the app shell the
+  /// shell owns the one bar (and drops it while search takes the page over).
+  final bool hostsTabBar;
 
   @override
   State<QueueScreen> createState() => _QueueScreenState();
@@ -78,11 +83,13 @@ class _QueueScreenState extends State<QueueScreen> {
           extendBody: !searching,
           bottomNavigationBar: searching
               ? const HomeIndicator()
-              : BottomNav(
+              : widget.hostsTabBar
+              ? BottomNav(
                   active: NavTab.orders,
                   notificationsBadge: true,
                   onTap: _vc.onSelectTab,
-                ),
+                )
+              : null,
           body: SafeArea(
             bottom: false,
             // Rebuild when the shift mutates (a delivered/failed order leaves

@@ -12,12 +12,14 @@ class _SettlementOpenView extends StatelessWidget {
     this.onSelectTab,
     this.onOpenNotifications,
     this.onOpenSearch,
+    this.hostsTabBar = true,
   });
   final SettlementController vc;
   final SettlementData data;
   final ValueChanged<NavTab>? onSelectTab;
   final VoidCallback? onOpenNotifications;
   final VoidCallback? onOpenSearch;
+  final bool hostsTabBar;
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +69,7 @@ class _SettlementOpenView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       extendBody: isTab,
-      bottomNavigationBar: isTab
+      bottomNavigationBar: isTab && hostsTabBar
           ? BottomNav(active: NavTab.settlement, onTap: onSelectTab)
           : null,
       body: SafeArea(

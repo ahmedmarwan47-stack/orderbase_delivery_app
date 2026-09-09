@@ -15,6 +15,7 @@ class SettlementScreen extends StatefulWidget {
     this.onSelectTab,
     this.onOpenNotifications,
     this.onOpenSearch,
+    this.hostsTabBar = true,
   });
 
   /// Defaults to [shiftSettlement] (built live from today's shift) when null.
@@ -29,6 +30,10 @@ class SettlementScreen extends StatefulWidget {
   /// Unified-header actions (shell-tab mode).
   final VoidCallback? onOpenNotifications;
   final VoidCallback? onOpenSearch;
+
+  /// Standalone the tab page carries its own tab bar; inside the app shell
+  /// the shell owns the one bar, so this is false there.
+  final bool hostsTabBar;
 
   @override
   State<SettlementScreen> createState() => _SettlementScreenState();
@@ -65,6 +70,7 @@ class _SettlementScreenState extends State<SettlementScreen> {
                     onSelectTab: widget.onSelectTab,
                     onOpenNotifications: widget.onOpenNotifications,
                     onOpenSearch: widget.onOpenSearch,
+                    hostsTabBar: widget.hostsTabBar,
                   )
                 : _SettlementOpenView(
                     vc: _vc,
@@ -72,6 +78,7 @@ class _SettlementScreenState extends State<SettlementScreen> {
                     onSelectTab: widget.onSelectTab,
                     onOpenNotifications: widget.onOpenNotifications,
                     onOpenSearch: widget.onOpenSearch,
+                    hostsTabBar: widget.hostsTabBar,
                   );
           },
         ),

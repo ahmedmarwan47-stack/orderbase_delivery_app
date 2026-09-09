@@ -9,6 +9,7 @@ class ProfileScreen extends StatelessWidget {
     this.onOpenNotifications,
     this.onOpenSearch,
     this.onStartNewDay,
+    this.hostsTabBar = true,
   });
 
   final ValueChanged<NavTab> onSelectTab;
@@ -17,6 +18,10 @@ class ProfileScreen extends StatelessWidget {
 
   /// Dev-only: reset the simulated day so the whole flow can be run again.
   final VoidCallback? onStartNewDay;
+
+  /// Standalone the page carries its own tab bar; inside the app shell the
+  /// shell owns the one bar, so this is false there.
+  final bool hostsTabBar;
 
   void _push(BuildContext context, Widget screen) => Navigator.of(
     context,
@@ -36,11 +41,13 @@ class ProfileScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.background,
         extendBody: true,
-        bottomNavigationBar: BottomNav(
-          active: NavTab.profile,
-          notificationsBadge: true,
-          onTap: onSelectTab,
-        ),
+        bottomNavigationBar: hostsTabBar
+            ? BottomNav(
+                active: NavTab.profile,
+                notificationsBadge: true,
+                onTap: onSelectTab,
+              )
+            : null,
         body: SafeArea(
           bottom: false,
           child: CustomScrollView(

@@ -481,6 +481,18 @@ bar (Files on the iOS 26.5 iPhone 17 Pro simulator, pixel-scanned) and the user'
   evaluated a sin and a cos per tap. Same taps, same picture.
 - **The page switch is immediate.** The shell's 200 ms fade-in of the newly selected tab is gone:
   a page dissolving in from nothing read as a lag between the tab lighting up and the page arriving.
+- **The shell owns ONE bar** (`AppShell`'s own `Scaffold(extendBody: true)`), not one per page.
+  Each tab page used to carry its own copy: a tap on Home's bar sprang *Home's* lens away, and the
+  page that appeared brought a bar whose lens was parked wherever its last tap had left it, drifting
+  into place a beat later — that drift was the "lag" in Ahmed's screen recording. Now `active`
+  changes on the one `BottomNav`, `didUpdateWidget` springs the lens from the old tab to the new one
+  while the page switches underneath (verified frame by frame on the simulator: lens in flight on
+  the switch frame, landed within ~300 ms). The tab pages take `hostsTabBar` (default true, for
+  DevGallery / standalone routes); the shell passes false. `BottomNav.reservedHeight` still works
+  inside them because the shell's Scaffold hands the bar's height down as bottom padding. Orders'
+  search still takes the page over: the shell drops the bar (`SizedBox.shrink`) while
+  `QueueViewController.isSearching`, and the page shows its `HomeIndicator`. `OrderDetailScreen`
+  is a pushed route and keeps its own bar.
 - **`NavBarLab`** (`lib/dev/nav_bar_lab.dart`, DevGallery «شريط التبويب · Tab bar lab») puts the
   bar over dark cards, colour bands and rows; autoplay scrolls and walks the tabs on a 1.5s timer
   and steps the tier once per 12s loop — the way to watch (and screenshot) it without a finger.

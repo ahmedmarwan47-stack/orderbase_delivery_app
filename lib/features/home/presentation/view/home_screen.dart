@@ -25,6 +25,7 @@ class HomeScreen extends StatefulWidget {
     this.onOpenSearch,
     this.onStartNewDay,
     this.preview,
+    this.hostsTabBar = true,
   });
 
   /// Forwarded to the bottom nav so the app shell can switch tabs.
@@ -66,6 +67,10 @@ class HomeScreen extends StatefulWidget {
   /// Force a state for previews; null follows the live shift.
   final HomePreview? preview;
 
+  /// Standalone (DevGallery, a route) the page carries its own tab bar; inside
+  /// the app shell the shell owns the one bar, so this is false there.
+  final bool hostsTabBar;
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -87,11 +92,13 @@ class _HomeScreenState extends State<HomeScreen> {
         // The page runs under the floating tab bar — that is what gives the
         // glass something to blur.
         extendBody: true,
-        bottomNavigationBar: BottomNav(
-          active: NavTab.home,
-          notificationsBadge: true,
-          onTap: widget.onSelectTab,
-        ),
+        bottomNavigationBar: widget.hostsTabBar
+            ? BottomNav(
+                active: NavTab.home,
+                notificationsBadge: true,
+                onTap: widget.onSelectTab,
+              )
+            : null,
         body: SafeArea(
           bottom: false,
           child: CustomScrollView(

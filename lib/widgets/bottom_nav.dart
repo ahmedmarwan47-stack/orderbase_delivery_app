@@ -41,9 +41,12 @@ enum NavTab { home, orders, settlement, profile }
 /// to choose. All of it on [AppMotion.spring]; all of it jumping straight to
 /// the end state under Reduce Motion.
 ///
-/// **It only works because the page passes underneath it.** Every host puts it
+/// **It only works because the page passes underneath it.** The host puts it
 /// in `Scaffold(extendBody: true)`'s `bottomNavigationBar` slot and gives its
-/// scrollable [reservedHeight] of bottom padding.
+/// scrollable [reservedHeight] of bottom padding. In the app that host is the
+/// shell — ONE bar over every tab page, so [active] changes on this widget and
+/// the lens slides from the old tab to the new one; a page carries its own
+/// copy only standalone (a route, the DevGallery, the pushed order detail).
 ///
 /// [active] is null on pages that are not a tab — notifications, opened from
 /// the header, sits inside the shell with no tab highlighted (and nothing to

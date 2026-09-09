@@ -117,5 +117,3 @@ class _HistoryRow extends StatelessWidget {
 /// The cash card answers "how much"; this answers "out of what". Everything
 /// dispatched, how much of it was handed over, and how much came back —
 /// the three counts a cashier reconciles against the cash before signing it
-
-
