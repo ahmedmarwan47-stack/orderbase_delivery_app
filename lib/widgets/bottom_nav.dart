@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 import '../app/road_mode.dart';
 import '../app/shift_controller.dart';
@@ -47,6 +48,29 @@ class BottomNav extends StatelessWidget {
   final NavTab? active;
   final bool notificationsBadge;
   final ValueChanged<NavTab>? onTap;
+
+  /// PROTOTYPE — render the pill through `liquid_glass_renderer`'s refraction
+  /// shader instead of the hand-rolled blur+sheen. Fully reversible: flip to
+  /// `false` to get the previous bar back verbatim (then `flutter pub remove
+  /// liquid_glass_renderer` if the experiment is abandoned). The package is
+  /// pure Dart + fragment shaders (Impeller-only), so the iOS build stays
+  /// CocoaPods-free either way. The high-contrast / road-mode gates still win:
+  /// they render the opaque twin with no shader at all.
+  static const bool kLiquidGlassBar = true;
+
+  /// The prototype's material. Tuned against the iOS 26 tab bar: shallow
+  /// refraction (the bar is thin glass, not a lens ball), a whisper of frost,
+  /// a faint white tint so text behind it can't collide with the labels, and
+  /// mild dispersion on the rim.
+  static const LiquidGlassSettings _liquidSettings = LiquidGlassSettings(
+    thickness: 14,
+    blur: 6,
+    glassColor: Color(0x30FFFFFF),
+    refractiveIndex: 1.15,
+    lightIntensity: .35,
+    saturation: 1.4,
+    chromaticAberration: .015,
+  );
 
   /// The pill's own height, before its margins.
   static double get barHeight => AppSize.sH64;
@@ -135,22 +159,34 @@ class BottomNav extends StatelessWidget {
     // of being re-guessed whenever that changes.
     final radius = BorderRadius.circular(AppCircular.infinity);
 
-    Widget pill = DecoratedBox(
-      decoration: BoxDecoration(
-        color: opaque ? AppColors.surface : AppColors.navGlassFill,
-        borderRadius: radius,
-        border: Border.all(
-          color: opaque ? AppColors.navOpaqueEdge : AppColors.navGlassEdge,
-        ),
-      ),
-      child: SizedBox(height: barHeight, child: _items()),
-    );
-    if (!opaque) {
-      pill = DecoratedBox(
-        decoration: const BoxDecoration(gradient: _sheen),
-        child: pill,
+    Widget pill;
+    if (!opaque && kLiquidGlassBar) {
+      // The shader draws its own rim lighting and fill — no border, sheen or
+      // BackdropFilter of ours on top of it.
+      pill = LiquidGlass.withOwnLayer(
+        settings: _liquidSettings,
+        // A capsule as a squircle: corner radius = half the pill's height.
+        shape: LiquidRoundedSuperellipse(borderRadius: barHeight / 2),
+        child: SizedBox(height: barHeight, child: _items()),
       );
-      pill = BackdropFilter(filter: _glass, child: pill);
+    } else {
+      pill = DecoratedBox(
+        decoration: BoxDecoration(
+          color: opaque ? AppColors.surface : AppColors.navGlassFill,
+          borderRadius: radius,
+          border: Border.all(
+            color: opaque ? AppColors.navOpaqueEdge : AppColors.navGlassEdge,
+          ),
+        ),
+        child: SizedBox(height: barHeight, child: _items()),
+      );
+      if (!opaque) {
+        pill = DecoratedBox(
+          decoration: const BoxDecoration(gradient: _sheen),
+          child: pill,
+        );
+        pill = BackdropFilter(filter: _glass, child: pill);
+      }
     }
 
     final bar = Container(
