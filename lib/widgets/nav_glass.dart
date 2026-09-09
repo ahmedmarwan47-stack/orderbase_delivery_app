@@ -65,7 +65,7 @@ class GlassStyle {
     blur: 14,
     saturation: 1.25,
     tint: Color(0x94FFFFFF),
-    specular: 0.55,
+    specular: 0.42,
     light: Offset(-0.55, -0.85),
     edgeDark: 0.035,
     shadow: 0.07,
@@ -85,9 +85,9 @@ class GlassStyle {
     blur: 0,
     saturation: 1,
     tint: Color(0x12000000),
-    specular: 0.35,
+    specular: 0.14,
     light: Offset(-0.55, -0.85),
-    edgeDark: 0.05,
+    edgeDark: 0.03,
   );
 
   final double rim;
