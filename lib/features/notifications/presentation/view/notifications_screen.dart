@@ -70,12 +70,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     // Rebuild as the feed grows — the simulator files batch / cash / settled
     // events while this page may be on screen.
     return AnimatedBuilder(
-      animation: NotificationsStore.instance,
+      animation: Listenable.merge([
+        NotificationsStore.instance,
+        ShiftController.instance,
+      ]),
       builder: (context, _) {
         final items = NotificationsStore.instance.items;
         final unread = items.where((n) => n.unread).length;
         Widget tile(int i) => _NotificationTile(
           notification: items[i],
+          last: i == items.length - 1,
           onTap: widget.onOpenOrder == null || items[i].orderNum.isEmpty
               ? null
               : () => widget.onOpenOrder!(items[i].orderNum),
@@ -92,10 +96,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 onOpenNotifications: widget.onClose,
                 notificationsActive: true,
               ),
-              if (unread > 0)
+              if (ShiftController.instance.hasPendingBatch)
                 SliverToBoxAdapter(
-                  child: _NotificationsUnreadPill(unread: unread),
+                  child: _NotificationsHeroBanner(
+                    batch: ShiftController.instance.pendingBatches.first,
+                    branch: ShiftController.instance.branchName,
+                    onView: () => widget.onSelectTab?.call(NavTab.orders),
+                  ).paddingOnly(
+                    left: AppPadding.pW20,
+                    right: AppPadding.pW20,
+                    top: AppPadding.pH8,
+                    bottom: AppPadding.pH12,
+                  ),
                 ),
+              SliverToBoxAdapter(
+                child: _NotificationsListTitle(
+                  onMarkAllRead: unread > 0
+                      ? NotificationsStore.instance.markAllRead
+                      : null,
+                ),
+              ),
               if (items.isEmpty)
                 const SliverFillRemaining(
                   hasScrollBody: false,
@@ -109,9 +129,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     top: AppPadding.pH4,
                     bottom: BottomNav.reservedHeight(context),
                   ),
-                  sliver: SliverList.separated(
+                  sliver: SliverList.builder(
                     itemCount: items.length,
-                    separatorBuilder: (_, _) => 12.szH,
                     itemBuilder: (_, i) => tile(i),
                   ),
                 ),
@@ -121,7 +140,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
         final feed = items.isEmpty
             ? const _NotificationsEmpty()
-            : ListView.separated(
+            : ListView.builder(
                 controller: _scroll,
                 padding: EdgeInsetsDirectional.only(
                   start: AppPadding.pW20,
@@ -130,7 +149,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   bottom: AppPadding.pH20,
                 ),
                 itemCount: items.length,
-                separatorBuilder: (_, _) => 12.szH,
                 itemBuilder: (_, i) => tile(i),
               );
 
@@ -161,31 +179,107 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 }
 
-/// The unread count, on the left of the row under the large title. The page
-/// name that used to lead this row is the title itself now, so all that is
-/// left is the one fact the title cannot carry.
-class _NotificationsUnreadPill extends StatelessWidget {
-  const _NotificationsUnreadPill({required this.unread});
-  final int unread;
+/// The batch-dispatched hero, pinned atop the feed while a batch waits at the
+/// branch: a dark slate gradient card with a red CTA into the Orders tab. It
+/// mirrors the dispatch sheet, but as a standing reminder rather than an
+/// interruption.
+class _NotificationsHeroBanner extends StatelessWidget {
+  const _NotificationsHeroBanner({
+    required this.batch,
+    required this.branch,
+    this.onView,
+  });
+  final OrderBatch batch;
+  final String branch;
+  final VoidCallback? onView;
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: AlignmentDirectional.centerEnd,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.failedBg,
-          borderRadius: BorderRadius.circular(AppCircular.r20),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.heroBannerTop, AppColors.heroBannerBottom],
         ),
-        padding: EdgeInsets.symmetric(
-          horizontal: AppPadding.pW12,
-          vertical: AppPadding.pH4,
-        ),
-        child: Text(
-          LocaleKeys.notifNewCount.tr(namedArgs: {'n': arabicDigits(unread)}),
-          style: const TextStyle().setColor(AppColors.failedText).s12.semiBold,
-        ),
+        borderRadius: BorderRadius.circular(AppCircular.r24),
+        boxShadow: AppShadows.heroBanner,
       ),
+      padding: EdgeInsets.all(AppPadding.pH20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            LocaleKeys.notifHeroTitle.tr(namedArgs: {'id': batch.id}),
+            style: const TextStyle().setWhite.s18.semiBold.withHeight(1.4),
+          ),
+          8.szH,
+          Text(
+            LocaleKeys.notifHeroBody.tr(
+              namedArgs: {
+                'count': arabicDigits(batch.count),
+                'branch': branch,
+                'cash': formatThousands(batch.codTotal),
+              },
+            ),
+            style: const TextStyle()
+                .setColor(AppColors.heroBannerBody)
+                .s12
+                .regular
+                .withHeight(1.4),
+          ),
+          16.szH,
+          Container(
+            height: AppSize.sH40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.brand,
+              borderRadius: BorderRadius.circular(AppCircular.r12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  LocaleKeys.notifHeroCta.tr(),
+                  style: const TextStyle().setWhite.s14.bold,
+                ),
+                8.szW,
+                IconWidget(
+                  icon: AppAssets.svg.chevronLeft,
+                  color: AppColors.surface,
+                  height: 14.h,
+                  width: 14.w,
+                ),
+              ],
+            ),
+          ).onClick(onTap: onView),
+        ],
+      ),
+    );
+  }
+}
+
+/// The «التنبيهات السابقة» heading over the feed, with a «تحديد الكل كمقروء»
+/// action (shown only while something is unread) at the far end.
+class _NotificationsListTitle extends StatelessWidget {
+  const _NotificationsListTitle({this.onMarkAllRead});
+  final VoidCallback? onMarkAllRead;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          LocaleKeys.notifPrevious.tr(),
+          style: const TextStyle().setMainTextColor.s12.bold,
+        ),
+        const Spacer(),
+        if (onMarkAllRead != null)
+          Text(
+            LocaleKeys.notifMarkAllRead.tr(),
+            style: const TextStyle().setSecondaryColor.s12.regular,
+          ).onClick(onTap: onMarkAllRead),
+      ],
     ).paddingOnly(
       left: AppPadding.pW20,
       top: AppPadding.pH8,

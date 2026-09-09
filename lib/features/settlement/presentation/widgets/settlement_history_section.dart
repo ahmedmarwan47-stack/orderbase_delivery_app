@@ -96,14 +96,9 @@ class _HistoryRow extends StatelessWidget {
                   ),
                 ),
                 8.szW,
+                // No chevron — the row is quiet (the Figma frame); the pill is
+                // the row's end.
                 const _StatusPill(status: SettlementStatus.settled),
-                8.szW,
-                IconWidget(
-                  icon: AppAssets.svg.chevronLeft,
-                  color: AppColors.textSecondary,
-                  height: AppSize.sH16,
-                  width: AppSize.sW16,
-                ),
               ],
             ).paddingSymmetric(vertical: AppPadding.pH12),
           ).onClick(

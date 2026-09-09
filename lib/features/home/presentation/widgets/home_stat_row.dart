@@ -39,11 +39,11 @@ class _HomeStatRow extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppCircular.r12), // from the design frame
+        borderRadius: BorderRadius.circular(AppCircular.r16), // from the design frame
         border: road
             ? Border.all(color: AppColors.borderDefault, width: 2)
             : Border.all(color: AppColors.borderCardFaint),
-        boxShadow: AppShadows.card,
+        boxShadow: AppShadows.statStrip,
       ),
       clipBehavior: Clip.antiAlias,
       child: IntrinsicHeight(

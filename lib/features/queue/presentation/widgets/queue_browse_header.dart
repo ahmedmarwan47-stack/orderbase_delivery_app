@@ -21,33 +21,14 @@ class _QueueBrowseHeader extends StatelessWidget {
       // filter bar says so, and the row would offer a trip to where they are.
       builder: (_, filter, _) {
         final show = vc.hasExceptions && filter != QueueFilter.exceptions;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              LocaleKeys.queueSubtitle.tr(
-                namedArgs: {
-                  'count': arabicDigits(vc.active.length),
-                  'batches': arabicDigits(vc.batchCount),
-                },
-              ),
-              style: const TextStyle().setMainTextColor.s14.bold,
-            ).paddingOnlyDirectional(
-              start: AppPadding.pW20,
-              end: AppPadding.pW20,
-            ),
-            if (show) ...[
-              12.szH,
-              _QueueExceptionsRow(
-                returns: vc.returnedCount,
-                postponed: vc.postponedCount,
-                onView: vc.showExceptions,
-              ).paddingOnlyDirectional(
-                start: AppPadding.pW20,
-                end: AppPadding.pW20,
-              ),
-            ],
-          ],
+        if (!show) return 8.szH;
+        return _QueueExceptionsRow(
+          returns: vc.returnedCount,
+          postponed: vc.postponedCount,
+          onView: vc.showExceptions,
+        ).paddingOnlyDirectional(
+          start: AppPadding.pW20,
+          end: AppPadding.pW20,
         ).paddingOnly(top: AppPadding.pH16, bottom: AppPadding.pH8);
       },
     );

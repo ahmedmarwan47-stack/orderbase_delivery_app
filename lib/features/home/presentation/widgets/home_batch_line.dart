@@ -51,14 +51,16 @@ class _HomeStopTripRow extends StatelessWidget {
                 road,
               ),
               children: [
-                // The ID is Latin + digits: isolate it so the RTL line does
-                // not re-order «B #7877» around the hash.
+                // The count leads, the batch ID trails (the Figma frame):
+                // «الطلب ٥ من ٨ · B #7877». The ID is Latin + digits — its own
+                // span keeps the RTL line from re-ordering «B #7877» around
+                // the hash.
+                TextSpan(text: '$count · '),
                 TextSpan(
                   text: batch.id,
                   style: const TextStyle().setMainTextColor.s14.medium.tabular
                       .road(road),
                 ),
-                TextSpan(text: ' · $count'),
               ],
             ),
             textDirection: TextDirection.rtl,

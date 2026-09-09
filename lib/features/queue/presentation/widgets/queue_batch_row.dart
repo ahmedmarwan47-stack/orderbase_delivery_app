@@ -42,7 +42,7 @@ class _QueueBatchRow extends StatelessWidget {
             : const Border(bottom: BorderSide(color: AppColors.surfaceSubtle)),
       ),
       padding: EdgeInsetsDirectional.only(
-        start: AppPadding.pW24,
+        start: AppPadding.pW16,
         end: AppPadding.pW16,
         top: AppPadding.pH12,
         bottom: AppPadding.pH12,
@@ -58,9 +58,10 @@ class _QueueBatchRow extends StatelessWidget {
                 textDirection: TextDirection.ltr,
                 style: const TextStyle().setMainTextColor.s14.bold.tabular,
               ),
-              8.szW,
+              const Spacer(),
               // Payment while the order is out; its outcome once it is closed,
-              // so a dimmed row says *why* it is dimmed.
+              // so a dimmed row says *why* it is dimmed. At the far end of the
+              // line, opposite the number (the design frame's row).
               if (isTransit)
                 _PayPillSmall(prepaid: order.prepaid, amount: order.cod)
               else
@@ -76,21 +77,9 @@ class _QueueBatchRow extends StatelessWidget {
           ),
           if (isTransit && !pending && order.due != null) ...[
             4.szH,
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconWidget(
-                  icon: AppAssets.svg.clock,
-                  color: AppColors.textSecondary,
-                  height: AppSize.sH14,
-                  width: AppSize.sW14,
-                ),
-                4.szW,
-                Text(
-                  LocaleKeys.promisedAt.tr(namedArgs: {'time': order.due!}),
-                  style: const TextStyle().setTertiaryColor.s12.regular,
-                ),
-              ],
+            Text(
+              LocaleKeys.promisedAt.tr(namedArgs: {'time': order.due!}),
+              style: const TextStyle().setTertiaryColor.s12.regular,
             ),
           ],
         ],

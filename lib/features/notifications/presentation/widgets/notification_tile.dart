@@ -5,29 +5,39 @@ part of '../imports/notifications_imports.dart';
 /// items stand out on a plain white card with a brand dot; already-read items
 /// recede onto a muted background. Tapping opens the referenced order.
 class _NotificationTile extends StatelessWidget {
-  const _NotificationTile({required this.notification, this.onTap});
+  const _NotificationTile({
+    required this.notification,
+    this.onTap,
+    this.last = false,
+  });
   final AppNotification notification;
   final VoidCallback? onTap;
+
+  /// Last row of the feed — drops the trailing hairline.
+  final bool last;
 
   @override
   Widget build(BuildContext context) {
     final n = notification;
     return Container(
-      decoration: BoxDecoration(
-        color: n.unread ? AppColors.surface : AppColors.surfaceMuted,
-        borderRadius: BorderRadius.circular(AppCircular.r16),
-        border: Border.all(color: AppColors.borderCardFaint),
-      ),
-      padding: EdgeInsets.all(AppPadding.pH16),
+      decoration: last
+          ? null
+          : const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: AppColors.borderDefault),
+              ),
+            ),
+      padding: EdgeInsets.symmetric(vertical: AppPadding.pH12),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Kind-tinted circle at the reading-start (right in RTL).
           Container(
-            width: AppSize.sW40,
-            height: AppSize.sH40,
+            width: AppSize.sW44,
+            height: AppSize.sH44,
             decoration: BoxDecoration(
               color: n.kind.tileBg,
-              borderRadius: BorderRadius.circular(AppCircular.r12),
+              shape: BoxShape.circle,
             ),
             child: Center(
               child: IconWidget(
@@ -39,47 +49,39 @@ class _NotificationTile extends StatelessWidget {
             ),
           ),
           12.szW,
+          // The message, with the relative time directly beneath it.
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        n.title,
-                        style: const TextStyle().setMainTextColor.s14.semiBold,
-                      ),
-                    ),
-                    8.szW,
-                    Text(
-                      n.time,
-                      style: const TextStyle().setHintColor.s12.regular,
-                    ),
-                    if (n.unread) ...[
-                      8.szW,
-                      Container(
-                        width: AppSize.sW8,
-                        height: AppSize.sH8,
-                        margin: EdgeInsets.only(top: AppMargin.mH4),
-                        decoration: const BoxDecoration(
-                          color: AppColors.brand,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                6.szH,
                 Text(
-                  n.body,
-                  style: const TextStyle().setSecondaryColor.s12.regular
-                      .withHeight(1.5),
+                  n.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle().setMainTextColor.s14.semiBold
+                      .withHeight(1.35),
+                ),
+                4.szH,
+                Text(
+                  n.time,
+                  style: const TextStyle().setHintColor.s12.regular,
                 ),
               ],
             ),
           ),
+          // Unread marker at the far reading-end, vertically centered.
+          if (n.unread) ...[
+            12.szW,
+            Container(
+              width: AppSize.sW8,
+              height: AppSize.sH8,
+              decoration: const BoxDecoration(
+                color: AppColors.brand,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ],
         ],
       ),
     ).onClick(onTap: onTap);

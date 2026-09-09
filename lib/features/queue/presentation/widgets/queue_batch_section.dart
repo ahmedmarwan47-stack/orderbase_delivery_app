@@ -152,7 +152,6 @@ class _QueueBatchHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final shift = ShiftController.instance;
     final b = group.batch;
     final String meta;
     if (group.pending) {
@@ -160,7 +159,6 @@ class _QueueBatchHeader extends StatelessWidget {
         namedArgs: {
           'count': arabicDigits(b.count),
           'cash': formatThousands(b.codTotal),
-          'km': formatKmArabic(b.routeKm),
         },
       );
     } else if (group.complete) {
@@ -171,9 +169,7 @@ class _QueueBatchHeader extends StatelessWidget {
       meta = LocaleKeys.queueBatchMetaCarried.tr(
         namedArgs: {
           'count': arabicDigits(b.count),
-          'left': arabicDigits(group.remaining),
-          'km': formatKmArabic(b.routeKm),
-          'time': formatClockArabic(shift.returnEtaOf(b)),
+          'cash': formatThousands(b.codTotal),
         },
       );
     }
@@ -181,40 +177,31 @@ class _QueueBatchHeader extends StatelessWidget {
       button: true,
       expanded: open,
       label: b.id,
+      // One line, justified — the ID and its state at the reading start, the
+      // sizing meta at the far end beside the disclosure chevron (the design
+      // frame's header).
       child:
           Row(
             children: [
+              Text(
+                b.id,
+                textDirection: TextDirection.ltr,
+                style: const TextStyle().setMainTextColor.s14.bold.tabular,
+              ),
+              8.szW,
+              _BatchStatePill(group: group),
+              8.szW,
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          b.id,
-                          textDirection: TextDirection.ltr,
-                          style: const TextStyle()
-                              .setMainTextColor
-                              .s14
-                              .bold
-                              .tabular,
-                        ),
-                        8.szW,
-                        _BatchStatePill(group: group),
-                      ],
-                    ),
-                    4.szH,
-                    Text(
-                      meta,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle()
-                          .setSecondaryColor
-                          .s12
-                          .regular
-                          .tabular,
-                    ),
-                  ],
+                child: Text(
+                  meta,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: const TextStyle()
+                      .setSecondaryColor
+                      .s12
+                      .regular
+                      .tabular,
                 ),
               ),
               8.szW,
@@ -235,7 +222,7 @@ class _QueueBatchHeader extends StatelessWidget {
             ],
           ).paddingSymmetric(
             horizontal: AppPadding.pW16,
-            vertical: AppPadding.pH12,
+            vertical: AppPadding.pH16,
           ),
     ).onClick(onTap: onTap);
   }

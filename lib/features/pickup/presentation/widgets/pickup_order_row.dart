@@ -61,7 +61,9 @@ class _PickupOrderRow extends StatelessWidget {
                 textDirection: TextDirection.ltr,
                 style: const TextStyle().setMainTextColor.s14.bold,
               ),
-              8.szW,
+              // The pill rides the far end of the line, opposite the number —
+              // the same justified row the Orders tab uses (the design frame).
+              const Spacer(),
               Container(
                 decoration: BoxDecoration(
                   color: payBg,

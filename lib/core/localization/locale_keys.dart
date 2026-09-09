@@ -19,6 +19,11 @@ abstract final class LocaleKeys {
 
   // Notifications feed
   static const String notifNewCount = 'notif_new_count';
+  static const String notifMarkAllRead = 'notif_mark_all_read';
+  static const String notifPrevious = 'notif_previous';
+  static const String notifHeroTitle = 'notif_hero_title';
+  static const String notifHeroBody = 'notif_hero_body';
+  static const String notifHeroCta = 'notif_hero_cta';
   static const String notifMinutesAgo = 'notif_minutes_ago';
   static const String notifEmptyTitle = 'notif_empty_title';
   static const String notifEmptySub = 'notif_empty_sub';
@@ -185,6 +190,7 @@ abstract final class LocaleKeys {
   static const String pickupBatchLabel = 'pickup_batch_label';
   static const String pickupBatchMeta = 'pickup_batch_meta';
   static const String pickupDispatchTitle = 'pickup_dispatch_title';
+  static const String pickupDispatchCount = 'pickup_dispatch_count';
   static const String pickupDispatchBanner = 'pickup_dispatch_banner';
   static const String pickupDispatchBody = 'pickup_dispatch_body';
   static const String pickupDispatchCarry = 'pickup_dispatch_carry';

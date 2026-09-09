@@ -33,16 +33,38 @@ class _PickupDispatchSheet extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            LocaleKeys.pickupDispatchMeta.tr(
-              namedArgs: {
-                'count': arabicDigits(batch.count),
-                'cash': formatThousands(batch.codTotal),
-                'km': formatKmArabic(batch.routeKm),
-                'branch': branch,
-              },
-            ),
-            style: const TextStyle().setSecondaryColor.s12.regular,
+          Row(
+            children: [
+              Text(
+                LocaleKeys.pickupDispatchCount.tr(
+                  namedArgs: {'count': arabicDigits(batch.count)},
+                ),
+                style: const TextStyle()
+                    .setColor(AppColors.textBody)
+                    .s16
+                    .semiBold,
+              ),
+              const Spacer(),
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.heroCodPillBg,
+                  borderRadius: BorderRadius.circular(AppCircular.r7),
+                ),
+                padding: EdgeInsetsDirectional.symmetric(
+                  horizontal: AppPadding.pW8,
+                  vertical: AppPadding.pH4,
+                ),
+                child: Text(
+                  LocaleKeys.amountEgp.tr(
+                    namedArgs: {'amount': formatThousands(batch.codTotal)},
+                  ),
+                  style: const TextStyle()
+                      .setColor(AppColors.postponedText)
+                      .s14
+                      .bold,
+                ),
+              ),
+            ],
           ),
           12.szH,
           // The waiting orders as compact rows — the batch list in miniature.
@@ -55,13 +77,6 @@ class _PickupDispatchSheet extends StatelessWidget {
             ],
           ),
           16.szH,
-          Text(
-            LocaleKeys.pickupDispatchBody.tr(),
-            style: const TextStyle().setTertiaryColor.s12.regular.withHeight(
-              1.5,
-            ),
-          ),
-          16.szH,
           Container(
             height: AppSize.sH56,
             alignment: Alignment.center,
@@ -69,21 +84,10 @@ class _PickupDispatchSheet extends StatelessWidget {
               color: AppColors.inkFill,
               borderRadius: BorderRadius.circular(AppCircular.r15),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconWidget(
-                  icon: AppAssets.svg.orders,
-                  color: AppColors.surface,
-                  height: AppSize.sH18,
-                  width: AppSize.sW18,
-                ),
-                8.szW,
-                Text(
-                  LocaleKeys.pickupDispatchView.tr(),
-                  style: const TextStyle().setWhite.s14.semiBold,
-                ),
-              ],
+            // The label alone — the design frame's button carries no glyph.
+            child: Text(
+              LocaleKeys.pickupDispatchView.tr(),
+              style: const TextStyle().setWhite.s14.semiBold,
             ),
           ).onClick(onTap: () => Navigator.of(context).pop(true)),
           8.szH,

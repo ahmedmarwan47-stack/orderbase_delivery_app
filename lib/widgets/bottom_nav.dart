@@ -93,6 +93,17 @@ class BottomNav extends StatelessWidget {
     0, 0, 0, 1, 0, //
   ];
 
+  /// Bottom scroll edge effect — page colour rising from nothing at the top of
+  /// the bar's strip to solid at the screen edge. The stops are weighted late
+  /// so the dissolve happens close to the edge rather than washing the whole
+  /// strip out.
+  static const LinearGradient _edgeFade = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [AppColors.navEdgeFadeClear, AppColors.navEdgeFadeSolid],
+    stops: [0.15, 0.85],
+  );
+
   static const LinearGradient _sheen = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
@@ -119,7 +130,10 @@ class BottomNav extends StatelessWidget {
     // No BackdropFilter at all when gated — mirroring cupertino_ui's own
     // `opaque()` pattern rather than blurring into an invisible result.
     final opaque = MediaQuery.highContrastOf(context) || RoadMode.instance.on;
-    final radius = BorderRadius.circular(AppCircular.r28);
+    // A capsule, not a fixed radius: at phone scale a floating control's
+    // corner is half its own height, so the shape follows [barHeight] instead
+    // of being re-guessed whenever that changes.
+    final radius = BorderRadius.circular(AppCircular.infinity);
 
     Widget pill = DecoratedBox(
       decoration: BoxDecoration(
@@ -139,10 +153,13 @@ class BottomNav extends StatelessWidget {
       pill = BackdropFilter(filter: _glass, child: pill);
     }
 
-    return Container(
+    final bar = Container(
+      // A capsule needs more clearance from the screen edge than a rounded
+      // rectangle does — its widest point is its middle, so at 12 the curve
+      // reads as if it were about to touch the bezel.
       margin: EdgeInsetsDirectional.only(
-        start: AppMargin.mW12,
-        end: AppMargin.mW12,
+        start: AppMargin.mW16,
+        end: AppMargin.mW16,
         bottom: _bottomGap(context),
       ),
       decoration: BoxDecoration(
@@ -150,6 +167,25 @@ class BottomNav extends StatelessWidget {
         boxShadow: AppShadows.floatingBar,
       ),
       child: ClipRRect(borderRadius: radius, child: pill),
+    );
+
+    // The scroll edge effect. Content passing *behind* the pill is blurred by
+    // it, but content in the gutters beside it and in the gap below it reaches
+    // the screen edge with nothing between it and the bezel — a row sliced in
+    // half by the end of the screen. The fade dissolves it into the page
+    // first. Painted before the pill, so the blur samples it too.
+    //
+    // It fades to [AppColors.background] because every screen that hosts this
+    // bar is on that fill; a white-page host would need its own colour.
+    return Stack(
+      children: [
+        const Positioned.fill(
+          child: IgnorePointer(
+            child: DecoratedBox(decoration: BoxDecoration(gradient: _edgeFade)),
+          ),
+        ),
+        bar,
+      ],
     );
   }
 
@@ -245,7 +281,11 @@ class _NavItem extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: active ? AppColors.navActiveChip : AppColors.transparent,
-                borderRadius: BorderRadius.circular(AppCircular.r16),
+                // Concentric with the pill: inner radius = parent radius minus
+                // the inset between them. The parent is a capsule, so that
+                // arithmetic lands on half this chip's own height — a capsule
+                // too, at whatever height the icon and label add up to.
+                borderRadius: BorderRadius.circular(AppCircular.infinity),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,

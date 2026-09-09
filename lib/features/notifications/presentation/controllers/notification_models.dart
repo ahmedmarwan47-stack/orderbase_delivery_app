@@ -59,6 +59,15 @@ class AppNotification {
   final String body;
   final String time; // relative label, e.g. "١٠ دقائق"
   final bool unread;
+
+  AppNotification copyWith({bool? unread}) => AppNotification(
+    kind: kind,
+    orderNum: orderNum,
+    title: title,
+    body: body,
+    time: time,
+    unread: unread ?? this.unread,
+  );
 }
 
 /// Sample feed mirroring the reference (order assigned / cancelled / notes /
@@ -168,6 +177,13 @@ class NotificationsStore extends ChangeNotifier {
   /// File a notification at the top of the feed, newest first.
   void add(AppNotification n) {
     _items = [n, ...items];
+    notifyListeners();
+  }
+
+  /// Mark every notification read — the feed's «تحديد الكل كمقروء» action.
+  void markAllRead() {
+    if (items.every((n) => !n.unread)) return;
+    _items = items.map((n) => n.copyWith(unread: false)).toList();
     notifyListeners();
   }
 

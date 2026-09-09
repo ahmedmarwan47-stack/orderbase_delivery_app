@@ -55,26 +55,12 @@ class _HandReturnsButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppCircular.r15),
         border: Border.all(color: AppColors.borderDefault),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconWidget(
-            icon: AppAssets.svg.box,
-            color: AppColors.textPrimary,
-            height: AppSize.sH18,
-            width: AppSize.sW18,
-          ),
-          8.szW,
-          Text(
-            LocaleKeys.settlementHandReturns.tr(
-              namedArgs: {
-                'count': arabicDigits(count),
-                'pieces': _piecesLabel(pieces),
-              },
-            ),
-            style: const TextStyle().setMainTextColor.s14.semiBold,
-          ),
-        ],
+      // The label alone, centered — the Figma frame dropped the glyph and the
+      // counts: the batches above already enumerate the returns, and the
+      // confirmation sheet restates them before anything is handed over.
+      child: Text(
+        LocaleKeys.settlementHandReturns.tr(),
+        style: const TextStyle().setMainTextColor.s14.semiBold,
       ),
     ).onClick(
       onTap: () => showReturnsHandoverSheet(

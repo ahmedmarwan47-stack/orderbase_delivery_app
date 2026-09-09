@@ -112,6 +112,11 @@ abstract final class AppColors {
   // The chip behind the active tab: the brand red at 10%, so it belongs to the
   // red glyph sitting on it and stays visible on glass and on white alike.
   static const navActiveChip = Color(0x1AE72B29);
+  // The bottom scroll edge effect under the floating bar: [background] rising
+  // from nothing to solid, so a row scrolling off the page dissolves into it
+  // instead of being cut in half by the screen edge.
+  static const navEdgeFadeClear = Color(0x00F6F5F3); // = background @ 0
+  static const navEdgeFadeSolid = Color(0xFFF6F5F3); // = background
 
   // Muted (70%) white for secondary text on a dark surface (e.g. the progress
   // tooltip's order-number line over the ink bubble).
@@ -147,6 +152,12 @@ abstract final class AppColors {
     0x26FFFFFF,
   ); // rgba(255,255,255,.15) icon tile
   static const cashBright = Color(0xFFEDEFF3); // near-white cash glyph on slate
+
+  // Notifications batch hero banner — a dark slate gradient with a light-slate
+  // body line (Notifications frame).
+  static const heroBannerTop = Color(0xFF0F172A);
+  static const heroBannerBottom = Color(0xFF1E293B);
+  static const heroBannerBody = Color(0xFFAAB1BC);
   // Label on the cash cell once it has turned red (over the cash limit) —
   // the pale twin of failedBg, readable on failedText (8.9:1).
   static const overLimitLabel = Color(0xFFFBD5D4);
@@ -204,6 +215,14 @@ abstract final class AppColors {
   static const darkCardHairline = Color(
     0x1FFFFFFF,
   ); // rgba(255,255,255,.12) breakdown divider on the dark card
+  // The card's fill per the Figma settlement frame: a warm near-black falling
+  // into deep maroon, so the money surface reads as its own material — neither
+  // the button black nor the notifications hero's cool slate.
+  static const cashCardTop = Color(0xFF170A0A);
+  static const cashCardBottom = Color(0xFF291414);
+  static const cashCardHairline = Color(
+    0x21FFFFFF,
+  ); // rgba(255,255,255,.13) — the Figma frame's divider
   static const walletAmberOnDark = Color(
     0xFFF0B75A,
   ); // softer amber for the wallet figure on ink (brighter than codExcessAmber)

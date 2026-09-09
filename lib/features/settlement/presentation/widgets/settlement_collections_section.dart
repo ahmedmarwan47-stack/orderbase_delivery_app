@@ -15,20 +15,12 @@ class _BatchesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              LocaleKeys.settlementBatchesTitle.tr(),
-              style: const TextStyle().setMainTextColor.s16.semiBold,
-            ),
-            Text(
-              data.isSettled
-                  ? LocaleKeys.settlementClosed.tr()
-                  : LocaleKeys.settlementCollectionsHint.tr(),
-              style: const TextStyle().setHintColor.s12.regular,
-            ),
-          ],
+        // The title alone — the Figma frame dropped the «تُغلق بعد التسوية»
+        // hint: the status pill and the locked note already say where the day
+        // stands.
+        Text(
+          LocaleKeys.settlementBatchesTitle.tr(),
+          style: const TextStyle().setMainTextColor.s16.semiBold,
         ),
         12.szH,
         Container(
@@ -52,8 +44,9 @@ class _BatchesSection extends StatelessWidget {
                 _SettlementBatchSection(
                   key: ValueKey(data.batches[i].id),
                   batch: data.batches[i],
-                  // The first batch with something in it opens; the rest fold.
-                  initiallyExpanded: i == 0,
+                  // Every batch arrives folded — the day reads as one-line
+                  // summaries first (the Figma frame), and the cashier opens
+                  // the one being reconciled.
                 ),
               ],
             ],
@@ -67,13 +60,8 @@ class _BatchesSection extends StatelessWidget {
 /// One batch: header row (ID · summary · chevron), then its cash lines and
 /// returns when open.
 class _SettlementBatchSection extends StatefulWidget {
-  const _SettlementBatchSection({
-    super.key,
-    required this.batch,
-    this.initiallyExpanded = false,
-  });
+  const _SettlementBatchSection({super.key, required this.batch});
   final SettlementBatch batch;
-  final bool initiallyExpanded;
 
   @override
   State<_SettlementBatchSection> createState() =>
@@ -81,7 +69,7 @@ class _SettlementBatchSection extends StatefulWidget {
 }
 
 class _SettlementBatchSectionState extends State<_SettlementBatchSection> {
-  late bool _open = widget.initiallyExpanded;
+  bool _open = false;
 
   bool get _hasBody =>
       widget.batch.lines.isNotEmpty || widget.batch.returns.isNotEmpty;

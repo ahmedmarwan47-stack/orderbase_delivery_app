@@ -401,11 +401,13 @@ branch dashboard exists.
 One tab, grouped by batch, the queue's search + filters on top. `QueueViewController.batchGroups`
 returns `QueueBatchGroup`s — batches **waiting at the branch first** (they need an action), then the
 ones in hand newest first — each holding only the rows that survive the active filter; an empty
-group is dropped. `_QueueBatchSection` is the collapsible section (ID · state pill «في الفرع» /
-«معك» / «مكتملة» · «٨ طلبات · ٤ متبقية · ٣٤ كم · عودة ~٥:٤٠ م»); a waiting batch closes with its own
-«تأكيد استلام الدفعة» button → `showCarryBatchSheet` (pickup feature, public) → `carryBatch`.
-`_QueueBatchRow` is the row (number · cash pill / outcome badge · name · area · pieces · promised
-time). The postponed filter keeps its rich cards. The old order card with the merchant thumbnail is
+group is dropped. `_QueueBatchSection` is the collapsible card; its header is ONE justified line
+(Figma board): ID + state pill «في الفرع» / «معك» / «مكتملة» at the reading start, the sizing meta
+(«٣ طلبات · 1,620 جم») + chevron at the far end. A waiting batch closes with its own
+«تأكيد استلام الجولة» button → `showCarryBatchSheet` (pickup feature, public) → `carryBatch`.
+`_QueueBatchRow` is the row — number at the reading start, the cash pill / outcome badge pushed to
+the far end of the same line (Figma board), then name · area · pieces, then a plain «الموعد …» line
+(no clock glyph). The postponed filter keeps its rich cards. The old order card with the merchant thumbnail is
 gone; `_MerchantThumb` survives only on the postponed card.
 
 `PickupScreen` (`/pickup`, DevGallery) is the standalone "carry everything waiting" page; the
@@ -419,10 +421,12 @@ returns, or `pending`), `status` (`open` → `awaiting` once the courier is expe
 `settled`), `cashierName`, `settledAt`. `shiftSettlement` builds today's live; `sampleSettlementHistory`
 seeds the last seven days. `_DayTotals` sits under the cash card on every settlement view — the
 day in orders (dispatched · delivered · returned), because the cash card answers "how much" and a
-cashier reconciles that against "out of what". The page: status pill in the header (no button), the slate cash card
-(red over the limit, «الدفعات» in its breakdown), `_BatchesSection` (collapsible per batch), the
-returns handover button (physically handing parcels back is still the courier's act), the locked
-note, then `_HistorySection` — rows that push `SettlementDayScreen(day)` read-only. The settled
+cashier reconciles that against "out of what". The page: status pill in the header (no button), the cash card —
+a warm near-black gradient (`cashCardTop`→`cashCardBottom`, Figma board), no icon tile, one 28-bold
+right-aligned figure, red over the limit — `_BatchesSection` (collapsible per batch, all folded by
+default, title with no hint text), the plain centered returns handover button (physically handing
+parcels back is still the courier's act), the locked note, then `_HistorySection` — chevron-less
+rows that push `SettlementDayScreen(day)` read-only. The settled
 view is the designed confirmation plus the batches and the history.
 
 ## Road mode (`lib/app/road_mode.dart`)
@@ -495,7 +499,7 @@ Rules worth keeping:
 - **`DeliveryActivityAttributes.swift` must be in both targets.** ActivityKit
   pairs an activity to its widget by that type; one-target membership is the
   classic "starts but renders nothing" bug.
-- **Keep Runner's deployment target at 13.0** and link ActivityKit as *Optional*.
+- **Keep Runner's deployment target at 15.0** and link ActivityKit as *Optional*.
   Raising it would drop the older iPhones this feature is explicitly optional for.
 - **Cash shows on the island, is masked on the Lock Screen** — the island only
   appears on an unlocked phone in the courier's hand; the Lock Screen is readable
