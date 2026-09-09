@@ -98,25 +98,19 @@ abstract final class AppColors {
   // Selected / high-emphasis fill (chips, primary buttons)
   static const inkFill = Color(0xFF1A1919);
 
-  // Floating tab bar — the hand-rolled liquid glass. [navGlassFill] is the
-  // 70%-opaque white the blurred page shows through; [navGlassSheen*] is the
-  // top-to-bottom highlight that gives the pill its curvature; [navGlassEdge]
-  // is the 1px light rim. [navOpaqueEdge] replaces that rim on the opaque
-  // variant (high contrast / road mode), where a white-on-white rim would
-  // vanish. All four are marks, not text.
-  static const navGlassFill = Color(0xB3FFFFFF); // white @ .70
-  static const navGlassSheenTop = Color(0x59FFFFFF); // white @ .35
+  // Floating tab bar — see BottomNav. [navGlassTint] is the milk of the glass
+  // over the frosted page; the shader and the blur fallback share it so the
+  // two tiers differ only in the lensing. [navGlassSheen*] is the fallback's
+  // top-to-bottom highlight, [navGlassEdge] its 1px light rim; [navOpaqueEdge]
+  // replaces that rim on the opaque twin. [navLensTint] is the selection lens:
+  // iOS 26's is a neutral 7% shade with no colour of its own — the tint comes
+  // from the glyph sitting on it.
+  static const navGlassTint = Color(0x85FFFFFF); // white @ .52
+  static const navGlassSheenTop = Color(0x40FFFFFF); // white @ .25
   static const navGlassSheenBottom = Color(0x00FFFFFF); // white @ 0
-  static const navGlassEdge = Color(0x8CFFFFFF); // white @ .55
+  static const navGlassEdge = Color(0x99FFFFFF); // white @ .60
   static const navOpaqueEdge = Color(0xFFE6E5E2); // = borderDefault
-  // The chip behind the active tab: the brand red at 10%, so it belongs to the
-  // red glyph sitting on it and stays visible on glass and on white alike.
-  static const navActiveChip = Color(0x1AE72B29);
-  // The bottom scroll edge effect under the floating bar: [background] rising
-  // from nothing to solid, so a row scrolling off the page dissolves into it
-  // instead of being cut in half by the screen edge.
-  static const navEdgeFadeClear = Color(0x00F6F5F3); // = background @ 0
-  static const navEdgeFadeSolid = Color(0xFFF6F5F3); // = background
+  static const navLensTint = Color(0x12000000); // black @ .07
 
   // Muted (70%) white for secondary text on a dark surface (e.g. the progress
   // tooltip's order-number line over the ink bubble).

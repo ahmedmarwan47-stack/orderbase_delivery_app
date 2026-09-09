@@ -199,10 +199,10 @@ no longer linked from the tab bar.
 - `StatusBar` — mock `9:41` + signal/wifi/battery glyph (LTR). **No longer used** — the OS status
   bar is shown instead; kept only for the browser fallback / mockup parity.
 - `BottomNav` — the 4-tab bar (`NavTab { home, orders, settlement, profile }`), `active`-tab driven
-  (**nullable** — the notifications page highlights nothing); includes the `HomeIndicator`. It
-  **watches `ShiftController` itself**: the Orders red dot is the standing "a batch is waiting"
-  signal now that the header chip is gone, and a batch can land while the courier sits on a tab
-  that would never otherwise rebuild.
+  (**nullable** — the notifications page highlights nothing). Built to iOS 26's own numbers and
+  manners — see *The tab bar* below. It **watches `ShiftController` itself**: the Orders red dot
+  is the standing "a batch is waiting" signal now that the header chip is gone, and a batch can
+  land while the courier sits on a tab that would never otherwise rebuild.
 - `HomeIndicator` — the home-indicator pill on a white strip (used directly by screens with no tab
   bar, e.g. Pickup).
 - `MapView` — real `FlutterMap` + OSM raster tiles + red pin (Home strip and Order-detail map both
@@ -429,6 +429,47 @@ parcels back is still the courier's act), the locked note, then `_HistorySection
 rows that push `SettlementDayScreen(day)` read-only. The settled
 view is the designed confirmation plus the batches and the history.
 
+## The tab bar (`lib/widgets/bottom_nav.dart` · `nav_glass.dart` · `nav_bar_controller.dart`)
+
+The floating bar is an **extreme approximation of iOS 26's tab bar**, so the courier's phone and
+the system apps beside it behave as one. Everything below was *measured*, not guessed, off the real
+bar (Files on the iOS 26.5 iPhone 17 Pro simulator, pixel-scanned) and the user's WhatsApp recording.
+
+- **Geometry, in absolute points** (iOS does not scale its bar with the screen, so this is the one
+  widget deliberately outside screenutil): 64 tall (iOS 62), 20 above the screen edge (iOS 21 —
+  *below* the safe area, not above it), `n × 86 + 16` wide capped at `screen − 2 × 20`, the
+  selection lens `slot + 8` wide × `bar − 8` tall inset 4. Inactive glyphs are `textPrimary` (iOS
+  uses the primary label colour, not a grey), the active one `dangerAccent`. **No scroll-edge
+  fade under the bar** — iOS 26 runs content crisp to the bezel; the old fade is gone.
+- **Three material tiers**, resolved by `NavBarController.effectiveMaterial`: *glass* = the
+  refraction shader `assets/shaders/nav_glass.frag` (rim lensing on a quarter-circle profile,
+  top-left light with a hairline highlight on the lit edge, dispersion, a 3-ring jittered frost,
+  its own drop shadow; `GlassStyle.bar` / `.lens` hold the numbers); *blur* = backdrop blur σ5 +
+  saturation under the same `navGlassTint`, for devices without Impeller or that the frame
+  governor stepped down; *opaque* = solid pill, forced by high-contrast and Road mode. The
+  Account tab's dev row «مادة شريط التبويب (Dev)» pins a tier. Outside debug builds a frame
+  governor (`SchedulerBinding.addTimingsCallback`) degrades glass → blur for the session after
+  12 slow raster frames in 60 (90 warm-up frames ignored).
+- **Fold on scroll**: `AppShell` wraps its `IndexedStack` in a `NotificationListener` feeding
+  `NavBarController.handleScroll` — 12pt of travel down folds the bar into a 76 × 56 pill holding
+  the selected glyph at the leading edge, 12pt up (or reaching the top, or switching tabs) opens
+  it; pages that can't scroll 120pt never fold; tapping the pill opens it. A page with
+  `active: null` never folds.
+- **Lens**: neutral 7% shade (`navLensTint` — iOS's lens has no colour of its own; the tint comes
+  from the glyph), slides between tabs on `AppMotion.spring` (ratio .84), stretches with its own
+  speed, swells under a press; **press-and-scrub** along the bar follows the finger on
+  `AppMotion.follow` with `AppHaptics.tick()` at every slot, release chooses. Reduce Motion jumps.
+- **The shader contract, as it actually is** (the docs say otherwise): `ImageFilter.shader` hands
+  the shader the **whole screen** as `uTex`, and `FlutterFragCoord()` is in screen pixels — the
+  widget's clip only limits which pixels are asked for. So `GlassSurface` describes the capsule by
+  its **global rect**, measured every paint in `_RenderGlassFilter.paint` via `localToGlobal`. That
+  breaks inside a saveLayer whose bounds aren't the screen (an `Opacity`/`ShaderMask` ancestor) —
+  never wrap the bar in one. Outside the capsule the shader outputs transparent (plus the shadow's
+  alpha), so the page is untouched by construction.
+- **`NavBarLab`** (`lib/dev/nav_bar_lab.dart`, DevGallery «شريط التبويب · Tab bar lab») puts the
+  bar over dark cards, colour bands and rows; autoplay scrolls and walks the tabs on a 1.5s timer
+  and steps the tier once per 12s loop — the way to watch (and screenshot) it without a finger.
+
 ## Road mode (`lib/app/road_mode.dart`)
 
 «وضع الطريق» — for sun on the screen and gloves on the grips. `RoadMode.instance.on` grows only the
@@ -535,7 +576,7 @@ batch rows all follow this; prepaid keeps its «مدفوع مقدمًا» label,
 
 Launcher listing every built screen, now reached from the **الحساب (Account)** tab's
 "كل الشاشات (Dev)" row (no longer the app's `home`). Still the place to preview screens not yet wired into the
-shell. **Add a gallery entry for each new screen.**
+shell (and the *Tab bar lab*). **Add a gallery entry for each new screen.**
 
 ---
 
@@ -581,6 +622,12 @@ shell. **Add a gallery entry for each new screen.**
   equal height).
 - **`Cannot provide both a color and a decoration`**: a `Container` can't set `color:` and
   `decoration:` together — put the color inside the `BoxDecoration`.
+- **The desktop app's simulator panel streamer crash-loops on this machine** («restarting after a
+  crash» → «stopped retrying»); taps die with it. The simulator itself is fine: build, `xcrun
+  simctl install/launch`, and screenshot with `xcrun simctl io booted screenshot`. To reach a state
+  that needs taps, swap the `/` route to the screen (or to `NavBarLab`, which drives itself) and
+  take timed screenshots; measure pixels with a pure-Python PNG reader (no PIL here) — `sips -c`
+  crops are unreliable.
 - **DesignSync `get_file` caps at 256 KiB.** Large binaries (e.g. `assets/merchant/fudge-cake.jpg`)
   come back **truncated** (no `ffd9` EOI). Salvage with PIL and truncation allowed:
   `ImageFile.LOAD_TRUNCATED_IMAGES = True`, then center-crop + resize to a small baseline JPEG.

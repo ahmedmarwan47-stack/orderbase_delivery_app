@@ -54,20 +54,14 @@ abstract final class AppShadows {
     ),
   ];
 
-  /// The floating tab bar — it has to read as detached from the page without
-  /// casting a hard edge under a translucent material: `0 6px 20px -6px
-  /// rgba(0,0,0,.20)` plus a tight contact shadow.
+  /// The floating tab bar (blur / opaque tiers; the glass tier draws its own
+  /// inside the shader). Measured off iOS 26's bar over white: 6% black at the
+  /// bottom edge, 3% at the top, gone within ~15pt — `0 3px 14px rgba(0,0,0,.10)`.
   static const floatingBar = [
     BoxShadow(
-      color: Color(0x33000000), // .20
-      offset: Offset(0, 6),
-      blurRadius: 20,
-      spreadRadius: -6,
-    ),
-    BoxShadow(
-      color: Color(0x14000000), // .08
-      offset: Offset(0, 1),
-      blurRadius: 2,
+      color: Color(0x1A000000), // .10
+      offset: Offset(0, 3),
+      blurRadius: 14,
     ),
   ];
 

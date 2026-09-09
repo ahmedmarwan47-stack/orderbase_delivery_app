@@ -12,6 +12,7 @@ import '../features/pickup/presentation/imports/pickup_imports.dart';
 import '../features/queue/presentation/imports/queue_imports.dart';
 import '../features/settlement/presentation/imports/settlement_imports.dart';
 import '../theme/colors.dart';
+import 'nav_bar_lab.dart';
 import 'sheet_preview_host.dart';
 
 /// Temporary launcher listing the screens built so far, so each can be opened
@@ -21,6 +22,7 @@ class DevGallery extends StatelessWidget {
   const DevGallery({super.key});
 
   static final _screens = <String, WidgetBuilder>{
+    'شريط التبويب · Tab bar lab': (_) => const NavBarLab(),
     'الرئيسية · Home (1a)': (_) => const HomeScreen(),
     'الرئيسية · Home — لا جولة بعد': (_) =>
         const HomeScreen(preview: HomePreview.idle),

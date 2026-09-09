@@ -78,6 +78,7 @@ class ProfileScreen extends StatelessWidget {
                           label: LocaleKeys.profileDevScreens.tr(),
                           onTap: () => _push(context, const DevGallery()),
                         ),
+                        const _NavMaterialRow(),
                         if (onStartNewDay != null)
                           _ProfileRow(
                             icon: AppAssets.svg.box,

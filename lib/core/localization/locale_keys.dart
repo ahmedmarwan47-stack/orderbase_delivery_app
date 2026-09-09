@@ -621,4 +621,11 @@ abstract final class LocaleKeys {
   static const String queueExceptionsPostponed = 'queue_exceptions_postponed';
   static const String queueExceptionsView = 'queue_exceptions_view';
   static const String queueFilterExceptions = 'queue_filter_exceptions';
+
+  // Tab bar material (Account tab dev row)
+  static const String profileNavMaterial = 'profile_nav_material';
+  static const String navMaterialAuto = 'nav_material_auto';
+  static const String navMaterialGlass = 'nav_material_glass';
+  static const String navMaterialBlur = 'nav_material_blur';
+  static const String navMaterialOpaque = 'nav_material_opaque';
 }

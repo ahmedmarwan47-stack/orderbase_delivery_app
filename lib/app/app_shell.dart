@@ -14,6 +14,7 @@ import '../features/queue/presentation/imports/queue_imports.dart';
 import '../features/settlement/presentation/imports/settlement_imports.dart';
 import '../theme/colors.dart';
 import '../widgets/bottom_nav.dart';
+import '../widgets/nav_bar_controller.dart';
 import 'shift_controller.dart';
 import 'shift_simulator.dart';
 
@@ -125,6 +126,8 @@ class _AppShellState extends State<AppShell>
       _tab = t;
       _notifications = false;
     });
+    // A new page starts at its top, so the bar opens with it.
+    NavBarController.instance.expand();
     _fadeIn();
   }
 
@@ -132,6 +135,7 @@ class _AppShellState extends State<AppShell>
   /// already open, go back to that tab.
   void _toggleNotifications() {
     setState(() => _notifications = !_notifications);
+    NavBarController.instance.expand();
     _fadeIn();
   }
 
@@ -232,7 +236,11 @@ class _AppShellState extends State<AppShell>
       textDirection: TextDirection.rtl,
       child: FadeTransition(
         opacity: _pageFadeCurve,
-        child: IndexedStack(
+        // Every page's scroll bubbles up through here to the tab bar, which
+        // folds on the way down and opens on the way up.
+        child: NotificationListener<ScrollNotification>(
+          onNotification: NavBarController.instance.handleScroll,
+          child: IndexedStack(
           index: _notifications ? NavTab.values.length : _tab.index,
           children: [
             HomeScreen(
@@ -267,6 +275,7 @@ class _AppShellState extends State<AppShell>
               onOpenSearch: _openOrdersSearch,
             ),
           ],
+          ),
         ),
       ),
     );

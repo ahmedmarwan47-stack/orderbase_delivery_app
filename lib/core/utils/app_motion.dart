@@ -28,6 +28,23 @@ class AppMotion {
   /// bounce/elastic by reflex.
   static const Curve ease = Curves.easeOutCubic;
 
+  /// The one physical spring — a settled landing with a hint of bounce
+  /// (damping ratio .84, about 400ms to rest). The tab bar's fold and its
+  /// selection lens run on it, so the two motions read as one material.
+  static const SpringDescription spring = SpringDescription(
+    mass: 1,
+    stiffness: 320,
+    damping: 30,
+  );
+
+  /// A stiffer spring for something that has to stay under a finger — the
+  /// lens while the courier scrubs along the bar.
+  static const SpringDescription follow = SpringDescription(
+    mass: 1,
+    stiffness: 900,
+    damping: 55,
+  );
+
   /// True when the platform asks to minimise motion; jump to the end state.
   static bool reduced(BuildContext context) =>
       MediaQuery.of(context).disableAnimations;

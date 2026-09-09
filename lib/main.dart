@@ -7,6 +7,8 @@ import 'app_module.dart';
 import 'core/live_activity/live_activity_bridge.dart';
 import 'theme/colors.dart';
 import 'theme/typography.dart';
+import 'widgets/nav_bar_controller.dart';
+import 'widgets/nav_glass.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +16,10 @@ Future<void> main() async {
   // Mirrors the shift onto the iOS Dynamic Island / Lock Screen where the
   // device supports it. A no-op everywhere else — see [LiveActivityService].
   LiveActivityBridge.instance.attach();
+  // The tab bar's glass shader — loaded before the first frame so the bar
+  // never flashes from its blur fallback to glass.
+  await NavGlass.load();
+  NavBarController.instance.armGovernor();
   runApp(
     ModularApp(
       module: AppModule(),
