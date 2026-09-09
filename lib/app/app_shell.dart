@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../core/live_activity/live_activity_bridge.dart';
 import '../core/live_activity/live_activity_service.dart';
-import '../core/utils/app_motion.dart';
 import '../data/flow_order.dart';
 import '../data/order.dart';
 import '../features/home/presentation/imports/home_imports.dart';
@@ -37,26 +36,12 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell>
-    with SingleTickerProviderStateMixin {
+class _AppShellState extends State<AppShell> {
   NavTab _tab = NavTab.home;
 
   /// Notifications is a page, not a tab — while it is up the tab bar shows no
   /// selection and the header's bell reads as "close".
   bool _notifications = false;
-
-  /// Drives a quick fade-in of the newly-selected page. The [IndexedStack]
-  /// stays in the tree (so every page keeps its state); only the visible child
-  /// is dissolved in on switch. Held at 1.0 while idle / under Reduce Motion.
-  late final AnimationController _pageFade = AnimationController(
-    vsync: this,
-    duration: AppMotion.stamp,
-    value: 1,
-  );
-  late final Animation<double> _pageFadeCurve = CurvedAnimation(
-    parent: _pageFade,
-    curve: AppMotion.ease,
-  );
 
   /// The Orders tab IS the day's batches (search + 5 filters + postponed).
   /// The shell owns its controller so a Home KPI tap can preselect a filter
@@ -90,7 +75,6 @@ class _AppShellState extends State<AppShell>
     LiveActivityBridge.instance.onOpenOrder = null;
     ShiftController.instance.removeListener(_onShiftChanged);
     _simulator.dispose();
-    _pageFade.dispose();
     _ordersVc.dispose();
     super.dispose();
   }
@@ -112,14 +96,6 @@ class _AppShellState extends State<AppShell>
     if (view == true && mounted) _openPendingBatch();
   }
 
-  void _fadeIn() {
-    if (AppMotion.reduced(context)) {
-      _pageFade.value = 1;
-    } else {
-      _pageFade.forward(from: 0);
-    }
-  }
-
   void _select(NavTab t) {
     if (t == _tab && !_notifications) return;
     setState(() {
@@ -128,7 +104,6 @@ class _AppShellState extends State<AppShell>
     });
     // A new page starts at its top, so the bar opens with it.
     NavBarController.instance.expand();
-    _fadeIn();
   }
 
   /// The header bell: open notifications over the current tab, or, when
@@ -136,7 +111,6 @@ class _AppShellState extends State<AppShell>
   void _toggleNotifications() {
     setState(() => _notifications = !_notifications);
     NavBarController.instance.expand();
-    _fadeIn();
   }
 
   /// Push the order-detail flow for [order], wiring its Result screen back to
@@ -234,13 +208,15 @@ class _AppShellState extends State<AppShell>
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: FadeTransition(
-        opacity: _pageFadeCurve,
-        // Every page's scroll bubbles up through here to the tab bar, which
-        // folds on the way down and opens on the way up.
-        child: NotificationListener<ScrollNotification>(
-          onNotification: NavBarController.instance.handleScroll,
-          child: IndexedStack(
+      // Every page's scroll bubbles up through here to the tab bar, which
+      // folds on the way down and opens on the way up. The switch itself is
+      // immediate — the way a tab bar's is: the old page dissolved in from
+      // nothing over 200 ms, which read as a lag between the tab lighting up
+      // and the page arriving, and a blank first frame under a backdrop
+      // filter is a frame the bar had to be re-rendered for.
+      child: NotificationListener<ScrollNotification>(
+        onNotification: NavBarController.instance.handleScroll,
+        child: IndexedStack(
           index: _notifications ? NavTab.values.length : _tab.index,
           children: [
             HomeScreen(
@@ -275,7 +251,6 @@ class _AppShellState extends State<AppShell>
               onOpenSearch: _openOrdersSearch,
             ),
           ],
-          ),
         ),
       ),
     );

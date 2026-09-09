@@ -63,26 +63,43 @@ vec3 tap(vec2 px) {
 
 // The frost: three rings of taps around the centre, rotated per pixel so the
 // ring pattern dissolves into fine grain instead of banding.
+//
+// Cost matters here — this runs for every pixel under the bar, every frame
+// the page beneath it changes. So the per-pixel jitter is ONE rotation
+// (a single sin/cos pair), and each tap steps around its ring by a constant
+// matrix: four multiply-adds instead of a sin and a cos per tap. Same taps,
+// same picture, a fraction of the ALU.
+const mat2 kStep8 = mat2(0.70710678, 0.70710678, -0.70710678, 0.70710678); // 45°
+const mat2 kStep12 = mat2(0.86602540, 0.5, -0.5, 0.86602540);              // 30°
+const mat2 kStep16 = mat2(0.92387953, 0.38268343, -0.38268343, 0.92387953); // 22.5°
+
 vec3 frost(vec2 c) {
   if (uBlur < 0.5) return tap(c);
   float a0 = fract(sin(dot(c, vec2(12.9898, 78.233))) * 43758.5453) * 6.2831853;
+  float ca = cos(a0);
+  float sa = sin(a0);
+  mat2 jitter = mat2(ca, sa, -sa, ca);
   vec3 acc = tap(c);
   float w = 1.0;
+  // Ring 1: 8 taps from a0, 45° apart.
+  vec2 d = jitter * vec2(uBlur * 0.35, 0.0);
   for (int i = 0; i < 8; i++) {
-    float a = a0 + float(i) * 0.7853982;
-    acc += tap(c + vec2(cos(a), sin(a)) * uBlur * 0.35) * 0.85;
-    w += 0.85;
+    acc += tap(c + d) * 0.85;
+    d = kStep8 * d;
   }
+  // Ring 2: 12 taps from a0 + 15°, 30° apart.
+  d = jitter * (vec2(0.96592583, 0.25881905) * (uBlur * 0.7));
   for (int i = 0; i < 12; i++) {
-    float a = a0 + 0.2617994 + float(i) * 0.5235988;
-    acc += tap(c + vec2(cos(a), sin(a)) * uBlur * 0.7) * 0.55;
-    w += 0.55;
+    acc += tap(c + d) * 0.55;
+    d = kStep12 * d;
   }
+  // Ring 3: 16 taps from a0 + 11.25°, 22.5° apart.
+  d = jitter * (vec2(0.98078528, 0.19509032) * uBlur);
   for (int i = 0; i < 16; i++) {
-    float a = a0 + 0.1963495 + float(i) * 0.3926991;
-    acc += tap(c + vec2(cos(a), sin(a)) * uBlur) * 0.3;
-    w += 0.3;
+    acc += tap(c + d) * 0.3;
+    d = kStep16 * d;
   }
+  w += 8.0 * 0.85 + 12.0 * 0.55 + 16.0 * 0.3;
   return acc / w;
 }
 

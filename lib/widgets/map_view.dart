@@ -75,13 +75,23 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
-  // A slow, continuous breath so the pin reads as a live GPS fix.
+  /// The pin's breath — a few slow rings when a destination lands, then rest.
+  ///
+  /// It used to loop forever, and that was the tab bar's whole performance
+  /// story: the bar is a backdrop filter, and a backdrop must be re-rendered
+  /// every frame anything beneath it changes. A ring breathing at 60 fps
+  /// under the glass meant the shader (and, on the web, the blur) ran
+  /// continuously while the courier just looked at Home. Three breaths still
+  /// say "live fix"; a frozen page afterwards costs nothing.
   late final AnimationController _pulse = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1800),
   );
 
+  static const int _breaths = 3;
+
   bool _reduced = false;
+  bool _started = false;
 
   @override
   void didChangeDependencies() {
@@ -89,14 +99,26 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
     // Reduce Motion is a display setting, so re-evaluate whenever it changes:
     // animate only when motion is allowed, otherwise sit on the static pin.
     final reduced = AppMotion.reduced(context);
-    if (reduced != _reduced || (!reduced && !_pulse.isAnimating)) {
-      _reduced = reduced;
-      if (reduced) {
-        _pulse.stop();
-      } else {
-        _pulse.repeat();
-      }
-    }
+    if (_started && reduced == _reduced) return;
+    _reduced = reduced;
+    _started = true;
+    _breathe();
+  }
+
+  @override
+  void didUpdateWidget(MapView old) {
+    super.didUpdateWidget(old);
+    // A new destination gets a fresh fix.
+    if (old.center != widget.center) _breathe();
+  }
+
+  void _breathe() {
+    _pulse.stop();
+    _pulse.value = 0;
+    if (_reduced) return;
+    // The ring is invisible at both ends of a breath (under the pin at 0,
+    // faded out at 1), so wherever the loop leaves it the pin reads clean.
+    _pulse.repeat(count: _breaths);
   }
 
   @override

@@ -466,6 +466,21 @@ bar (Files on the iOS 26.5 iPhone 17 Pro simulator, pixel-scanned) and the user'
   breaks inside a saveLayer whose bounds aren't the screen (an `Opacity`/`ShaderMask` ancestor) —
   never wrap the bar in one. Outside the capsule the shader outputs transparent (plus the shadow's
   alpha), so the page is untouched by construction.
+- **Nothing under the bar may animate forever.** The bar is a backdrop filter, and a backdrop is
+  re-rendered every frame anything beneath it changes — so one looping animation on a page turns the
+  whole app into a 60 fps render loop with the shader (or, on the web, the blur) in every frame,
+  and everything else (taps, tab switches, the desktop app's simulator streamer) queues behind it.
+  That was the Home map pin's pulse: measured on the simulator, Home never dropped below 60 fps
+  while idle. `MapView` now breathes **three times** when a destination lands and then rests
+  (`_breathe`, `repeat(count: 3)`); the idle page renders zero frames. Keep it that way: a
+  `repeat()` with no `count` on any page that hosts the bar is a bug. (`home_stop_progress`,
+  `home_route_leg` and the order-detail timeline still loop, but none of them is under the bar —
+  the first two are behind `kShow…` flags and the detail page has no backdrop.)
+- **The frost's per-pixel cost is one sin/cos pair.** The 36 taps step around their rings by
+  constant rotation matrices (`kStep8/12/16`) from a single per-pixel jitter rotation; the old loop
+  evaluated a sin and a cos per tap. Same taps, same picture.
+- **The page switch is immediate.** The shell's 200 ms fade-in of the newly selected tab is gone:
+  a page dissolving in from nothing read as a lag between the tab lighting up and the page arriving.
 - **`NavBarLab`** (`lib/dev/nav_bar_lab.dart`, DevGallery «شريط التبويب · Tab bar lab») puts the
   bar over dark cards, colour bands and rows; autoplay scrolls and walks the tabs on a 1.5s timer
   and steps the tier once per 12s loop — the way to watch (and screenshot) it without a finger.
@@ -603,6 +618,15 @@ shell (and the *Tab bar lab*). **Add a gallery entry for each new screen.**
   does NOT rebuild** — it installs whatever `build/ios/iphoneos/Runner.app` already holds, so an
   install without a fresh build ships the previous binary silently (this bit us once: two "fixes"
   went to the phone as the same stale build). Check the binary's mtime against the last commit.
+- **The phone must be unlocked, on a cable, with Developer Mode on** (Settings → Privacy &
+  Security) or `flutter run` refuses it ("enable Developer Mode"); it then shows up as *wireless*
+  only. Profile-mode numbers come from the phone — the simulator only runs debug.
+- **On the web, a wide viewport gets a phone frame** (`OrderbaseCourierApp` in `main.dart`): past
+  600 logical px the app renders at exactly the 368×812 design frame, centred on ink and scaled as
+  one by a `FittedBox`, with `ScreenUtil.configure` fed that frame. Without it screenutil scales
+  widths by the window's width and heights by its height — on a 1280×720 laptop window that is
+  3.5× wide and 0.9× tall, which squashed every 44×44 tile into a slab and clipped the large title
+  on GitHub Pages. Phone-sized viewports keep the normal `ScreenUtilInit` path.
 - **Browser fallback (no Xcode needed):**
   `flutter run -d web-server --web-port 8080 --web-hostname 127.0.0.1`, then open
   `http://127.0.0.1:8080` in the Browser pane at a phone viewport (~390×844). First compile is slow
@@ -628,6 +652,14 @@ shell (and the *Tab bar lab*). **Add a gallery entry for each new screen.**
   that needs taps, swap the `/` route to the screen (or to `NavBarLab`, which drives itself) and
   take timed screenshots; measure pixels with a pure-Python PNG reader (no PIL here) — `sips -c`
   crops are unreliable.
+- **To measure frames, print them.** A `SchedulerBinding.addTimingsCallback` that logs fps and
+  build/raster percentiles every 2 s (temporary, in `main.dart`) is the whole toolkit: idle frames
+  are never reported, so a page that is truly at rest prints nothing, and a page printing `fps=60`
+  while nobody touches it has a looping animation somewhere. `flutter run -d <simulator>` streams
+  the lines; the Browser pane cannot help on the web — it stops rendering the page while hidden.
+  `--dart-define=FLAG=true` (the literal `true`) is what `bool.fromEnvironment` reads; `=1` is false.
+- **`test/widget_test.dart` fails on `main`** (pumps the app without `EasyLocalization`); it is
+  not a signal about your change.
 - **DesignSync `get_file` caps at 256 KiB.** Large binaries (e.g. `assets/merchant/fudge-cake.jpg`)
   come back **truncated** (no `ffd9` EOI). Salvage with PIL and truncation allowed:
   `ImageFile.LOAD_TRUNCATED_IMAGES = True`, then center-crop + resize to a small baseline JPEG.

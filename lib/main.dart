@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -37,45 +38,115 @@ Future<void> main() async {
 class OrderbaseCourierApp extends StatelessWidget {
   const OrderbaseCourierApp({super.key});
 
+  /// The mockup phone frame; screenutil scales every token from it.
+  static const Size _design = Size(368, 812);
+
+  /// Wider than this and the viewport is a desktop browser, not a phone.
+  static const double _phoneMaxWidth = 600;
+
   @override
   Widget build(BuildContext context) {
-    // Design size = the mockup phone frame; screenutil scales tokens from it.
-    return ScreenUtilInit(
-      designSize: const Size(368, 812),
-      minTextAdapt: true,
-      builder: (context, _) => MaterialApp.router(
-        title: 'Orderbase Courier',
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-        theme: ThemeData(
-          useMaterial3: true,
-          scaffoldBackgroundColor: AppColors.background,
-          fontFamily: AppTypography.size16.fontFamily,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: AppColors.brand,
-            primary: AppColors.brand,
-            surface: AppColors.surface,
-          ),
-        ),
-        // Deliberately light-only: the "warm paper" identity has no dark variant.
-        // Pinning ThemeMode.light keeps the app consistent under system dark mode
-        // instead of a mechanically inverted look.
-        themeMode: ThemeMode.light,
-        // Honor the OS text-size setting, but cap it so large accessibility
-        // sizes don't clip the fixed-height chrome (pills, deliver bar, etc.).
-        builder: (context, child) {
+    if (!kIsWeb) return const _ScaledApp();
+    return MediaQuery.fromView(
+      view: View.of(context),
+      child: Builder(
+        builder: (context) {
           final mq = MediaQuery.of(context);
+          if (mq.size.width <= _phoneMaxWidth) return const _ScaledApp();
+          // A desktop browser (GitHub Pages on a laptop): screenutil would
+          // scale widths by the window's width and heights by its height —
+          // 3.5× wide and 0.9× tall on a 1280×720 window, which squashes
+          // every 44×44 tile into a slab and clips the large title. Instead
+          // the app renders at exactly the design frame and the frame is
+          // scaled as one, so a laptop shows the phone the mockups show.
+          final framed = mq.copyWith(
+            size: _design,
+            padding: EdgeInsets.zero,
+            viewPadding: EdgeInsets.zero,
+            viewInsets: EdgeInsets.zero,
+          );
+          ScreenUtil.configure(
+            data: framed,
+            designSize: _design,
+            minTextAdapt: true,
+            splitScreenMode: false,
+            fontSizeResolver: FontSizeResolvers.width,
+          );
           return MediaQuery(
-            data: mq.copyWith(
-              textScaler: mq.textScaler.clamp(maxScaleFactor: 1.3),
+            data: framed,
+            child: ColoredBox(
+              color: AppColors.inkFill,
+              child: Center(
+                child: FittedBox(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(32),
+                    child: SizedBox.fromSize(
+                      size: _design,
+                      child: const _CourierMaterialApp(),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            child: child!,
           );
         },
-        routerConfig: Modular.routerConfig,
       ),
+    );
+  }
+}
+
+/// The app scaled by screenutil from the real screen — every phone, and a
+/// phone-sized browser viewport.
+class _ScaledApp extends StatelessWidget {
+  const _ScaledApp();
+
+  @override
+  Widget build(BuildContext context) {
+    return ScreenUtilInit(
+      designSize: OrderbaseCourierApp._design,
+      minTextAdapt: true,
+      builder: (context, _) => const _CourierMaterialApp(),
+    );
+  }
+}
+
+class _CourierMaterialApp extends StatelessWidget {
+  const _CourierMaterialApp();
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'Orderbase Courier',
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
+      theme: ThemeData(
+        useMaterial3: true,
+        scaffoldBackgroundColor: AppColors.background,
+        fontFamily: AppTypography.size16.fontFamily,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.brand,
+          primary: AppColors.brand,
+          surface: AppColors.surface,
+        ),
+      ),
+      // Deliberately light-only: the "warm paper" identity has no dark variant.
+      // Pinning ThemeMode.light keeps the app consistent under system dark mode
+      // instead of a mechanically inverted look.
+      themeMode: ThemeMode.light,
+      // Honor the OS text-size setting, but cap it so large accessibility
+      // sizes don't clip the fixed-height chrome (pills, deliver bar, etc.).
+      builder: (context, child) {
+        final mq = MediaQuery.of(context);
+        return MediaQuery(
+          data: mq.copyWith(
+            textScaler: mq.textScaler.clamp(maxScaleFactor: 1.3),
+          ),
+          child: child!,
+        );
+      },
+      routerConfig: Modular.routerConfig,
     );
   }
 }
