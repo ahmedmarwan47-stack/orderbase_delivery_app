@@ -462,7 +462,7 @@ bar (Files on the iOS 26.5 iPhone 17 Pro simulator, pixel-scanned) and the user'
   `active: null` never folds.
 - **The lens is a soap bubble while it moves.** `GlassStyle.dispersion` is the shader's chromatic
   spread (red bent less than blue, `off·(1∓uDisp)`), a whisper at rest (0.12) and opened with the
-  lens's speed — `BottomNav._fringeMoving` (0.7) at `_fringeFullSpeed` (4 slots/s), 0.35 under a
+  lens's speed — `BottomNav._fringeMoving` (0.95) at `_fringeFullSpeed` (3 slots/s), 0.5 under a
   still pressed finger — through `GlassStyle.copyWith`, so the glyphs and labels the rim crosses
   split into a warm copy and a cool one, the rim's hairline splits the same way, and a **thin-film
   band** (warm → magenta → blue across the outer rim, multiplied in so it reads as a pastel on the

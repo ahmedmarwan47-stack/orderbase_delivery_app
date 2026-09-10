@@ -168,7 +168,7 @@ void main() {
   // lens's resting dispersion sits below the threshold, and so does the
   // bar's.
   float film = smoothstep(0.25, 0.8, uDisp) * smoothstep(0.0, 0.04, x) *
-      (1.0 - smoothstep(0.1, 0.4, x)) * (0.6 + 0.4 * toward) * 0.7;
+      (1.0 - smoothstep(0.12, 0.45, x)) * (0.6 + 0.4 * toward);
   if (film > 0.001) {
     float u = clamp(x / 0.3, 0.0, 1.0);
     vec3 warm = vec3(1.0, 0.72, 0.4);
@@ -176,7 +176,7 @@ void main() {
     vec3 blue = vec3(0.5, 0.75, 1.0);
     vec3 tone = u < 0.5 ? mix(warm, magenta, u * 2.0)
                         : mix(magenta, blue, u * 2.0 - 1.0);
-    col = mix(col, col * mix(vec3(1.0), tone, 0.6) + tone * 0.1, film);
+    col = mix(col, col * mix(vec3(1.0), tone, 0.75) + tone * 0.14, film);
   }
 
   // Lighting: a Blinn highlight where the rim faces the light, a whisper of

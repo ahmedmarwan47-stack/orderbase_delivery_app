@@ -87,10 +87,10 @@ class BottomNav extends StatefulWidget {
   /// the finger drags it: full at [_fringeFullSpeed] slots per second, the
   /// pace of a brisk scrub, with the rim light brightening to
   /// [_fringeSpecular] alongside so the fringe has something to ride on.
-  static const double _fringePressed = 0.35;
-  static const double _fringeMoving = 0.7;
-  static const double _fringeSpecular = 0.3;
-  static const double _fringeFullSpeed = 4;
+  static const double _fringePressed = 0.5;
+  static const double _fringeMoving = 0.95;
+  static const double _fringeSpecular = 0.36;
+  static const double _fringeFullSpeed = 3;
 
   /// Where the glyph's centre sits when the bar is open.
   static const double _iconCenterY =
