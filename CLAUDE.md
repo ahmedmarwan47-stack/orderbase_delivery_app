@@ -537,6 +537,24 @@ would put native code back into the iOS build).
 
 ## Unified header (`lib/widgets/app_header.dart`)
 
+**The bar has no fill and no hairline.** What separates it from the page is a **scroll-edge blur**
+(`HeaderBackdrop`, `lib/widgets/header_blur.dart`): the page blurred under the bar and clearing
+again 32pt below it (`reach`; the blur starts thinning 16pt above the bar's bottom, `rampIn`),
+with the page ground washed over it (`tintAlpha` .6) at the same rate, so a row scrolling up
+dissolves into the title instead of hitting an edge and text passing under the title stays
+readable — iOS 26's scroll edge, Instagram's header. It **fades in over the first 8–40pt of
+scroll** (`_AppHeaderDelegate.edgeFadeFrom/To`): at rest the content sits *below* the bar and a
+band reaching down would soften a page that has not moved. Two tiers, resolved off
+`NavBarController.effectiveMaterial` like the tab bar: *glass* = `assets/shaders/header_blur.frag`
+(one backdrop pass, the frost radius a function of the pixel's place in the fade — same
+whole-screen `uTex` contract as `nav_glass.frag`); *blur* (the web, degraded devices) = five
+stacked `BackdropFilter`s of growing sigma each clipped shorter than the last, under a gradient
+wash. High contrast and Road mode keep the **old solid bar with its hairline** (the opaque tier).
+The band is a `Positioned(bottom: -reach)` overflow inside the pinned sliver — a pinned header
+paints after the slivers below it, so the backdrop sees them — wrapped in `IgnorePointer`. One
+commit («Header: the scroll edge is a blur…») so it reverts in one step.
+
+
 Line 1: **the branch alone** — «فرع مدينة نصر» (`ShiftController.branchName`; assigned per day).
 The merchant logo and name were dropped: the merchant never changes, and this bar exists to carry
 live facts. Line 2 follows `CourierStatus`: «٤ طلبات متبقية» / «متوقَّع في الفرع ~٥:٤٠ م» / «تمت
@@ -682,11 +700,18 @@ shell (and the *Tab bar lab*). **Add a gallery entry for each new screen.**
 - **`Cannot provide both a color and a decoration`**: a `Container` can't set `color:` and
   `decoration:` together — put the color inside the `BoxDecoration`.
 - **The desktop app's simulator panel streamer crash-loops on this machine** («restarting after a
-  crash» → «stopped retrying»); taps die with it. The simulator itself is fine: build, `xcrun
-  simctl install/launch`, and screenshot with `xcrun simctl io booted screenshot`. To reach a state
-  that needs taps, swap the `/` route to the screen (or to `NavBarLab`, which drives itself) and
-  take timed screenshots; measure pixels with a pure-Python PNG reader (no PIL here) — `sips -c`
-  crops are unreliable.
+  crash» → «stopped retrying»), so its `screenshot` dies — but its `launch`, `swipe` and
+  `touch_path` still work (a `touch_path` with a dwell at the end scrolls a page and leaves it
+  there, no fling). Its `tap` x-coordinates did **not** land where claimed on the tab bar (a tap
+  at the Account slot lit Home), so don't trust it for anything narrower than a sheet button in
+  the centre. Screenshot with `xcrun simctl io booted screenshot`; to capture a gesture, start
+  `xcrun simctl io booted recordVideo --codec h264 --force out.mov` in the background, run the
+  gesture, `pkill -INT` it, and pull frames with an AVAssetImageGenerator script (no ffmpeg here —
+  the recorder only writes changed frames, so the timestamps are nominal). To reach a state that
+  needs taps, swap the `/` route (or the shell's initial tab / the pinned `NavMaterial`) for a
+  throwaway build and revert. **Never drive the Simulator window with Mac-level mouse events**
+  (CGEvent / osascript): they go to whatever window is in front, which was Brave once. Measure
+  pixels with a pure-Python PNG reader (no PIL here) — `sips -c` crops are unreliable.
 - **To measure frames, print them.** A `SchedulerBinding.addTimingsCallback` that logs fps and
   build/raster percentiles every 2 s (temporary, in `main.dart`) is the whole toolkit: idle frames
   are never reported, so a page that is truly at rest prints nothing, and a page printing `fps=60`

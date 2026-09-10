@@ -76,9 +76,11 @@ flutter:
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
-  # The tab bar's liquid-glass backdrop shader (see lib/widgets/nav_glass.dart).
+  # The tab bar's liquid-glass backdrop shader (see lib/widgets/nav_glass.dart)
+  # and the header's scroll-edge blur (lib/widgets/header_blur.dart).
   shaders:
     - assets/shaders/nav_glass.frag
+    - assets/shaders/header_blur.frag
 
   assets:
     - assets/brand/

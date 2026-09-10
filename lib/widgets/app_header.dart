@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../app/road_mode.dart';
 import '../config/res/config_imports.dart';
+import 'header_blur.dart';
+import 'nav_bar_controller.dart';
 
 /// The unified app header — an iOS-style large title that collapses on scroll.
 ///
@@ -8,8 +11,16 @@ import '../config/res/config_imports.dart';
 /// title's size is driven by the page's own scroll offset rather than by a
 /// controller wired up by hand. Expanded, the page name reads at 24/bold on the
 /// page ground with nothing above it; scrolled, it shrinks into a compact bar
-/// about the height of the old header, gains the surface fill and its hairline,
-/// and the actions stay exactly where they were the whole way down.
+/// about the height of the old header, and the actions stay exactly where
+/// they were the whole way down.
+///
+/// **The bar has no fill and no line.** What separates it from the page is the
+/// page itself, blurred under the bar and clearing again a little below it
+/// ([HeaderBackdrop]) — the way iOS 26's scroll edge and Instagram's header do
+/// it — so a row scrolling up dissolves into the title instead of hitting an
+/// edge, and a line of text passing under the title stays legible through
+/// the blur. Under high contrast and in Road mode (sun, gloves) the bar is the
+/// solid one it used to be: a surface fill with a hairline.
 ///
 /// The bar carries only the two actions — search and the bell — at the
 /// leading-left, 44pt each. The branch name and the shift line that used to
@@ -43,9 +54,9 @@ class AppHeaderSliver extends StatelessWidget {
   /// so the courier can see they are "in" it, and tapping it goes back.
   final bool notificationsActive;
 
-  /// The page ground the header sits on while expanded. It lerps to
-  /// [AppColors.surface] as the title collapses, so the bar separates itself
-  /// from the content passing beneath it.
+  /// The page ground the header sits on — the colour washed over the blur
+  /// once content passes beneath (and, on the opaque tier, the fill it lerps
+  /// to [AppColors.surface] from as the title collapses).
   final Color background;
 
   /// Collapsed height — the bar the title shrinks into. The 44pt action tiles
@@ -108,50 +119,97 @@ class _AppHeaderDelegate extends SliverPersistentHeaderDelegate {
   double _t(double shrinkOffset) =>
       (shrinkOffset / (large - bar)).clamp(0.0, 1.0);
 
+  /// The scroll-edge blur fades in over this stretch of scrolling. At rest
+  /// the page's content sits *below* the bar, and a blur band reaching down
+  /// from it would soften the top of a page that has not moved; by
+  /// [edgeFadeTo] the content has passed under the bar and the band is full.
+  static const double edgeFadeFrom = 8;
+  static const double edgeFadeTo = 40;
+
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlaps) {
     final t = _t(shrinkOffset);
-    final barColor = Color.lerp(background, AppColors.surface, t)!;
     // The title shrinks in place, 24 → 16, instead of a second row scrolling
     // away: the design puts the title and the actions on one line, so there is
     // no band to lose.
     final titleSize =
         FontSizeManager.s24 + (FontSizeManager.s16 - FontSizeManager.s24) * t;
+    final edge = AppMotion.ease.transform(
+      ((shrinkOffset - edgeFadeFrom) / (edgeFadeTo - edgeFadeFrom)).clamp(
+        0.0,
+        1.0,
+      ),
+    );
+    final Widget content = Row(
+      children: [
+        // First child is trailing-right in RTL: the title.
+        Expanded(
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle().setMainTextColor.bold.copyWith(
+              fontSize: titleSize,
+            ),
+          ),
+        ),
+        8.szW,
+        _HeaderActions(
+          onSearch: onSearch,
+          onOpenNotifications: onOpenNotifications,
+          notificationsBadge: notificationsBadge,
+          notificationsActive: notificationsActive,
+        ),
+      ],
+    ).paddingOnlyDirectional(start: AppPadding.pW20, end: AppPadding.pW20);
     // The child MUST fill the extent the delegate was given: a sliver's
     // paintExtent is its child's measured height, so a self-sizing child
     // reports less than maxExtent and trips the geometry assertion.
     return SizedBox.expand(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: barColor,
-          border: Border(
-            bottom: BorderSide(
-              color: AppColors.borderHeader.withValues(alpha: t),
-            ),
-          ),
-        ),
-        child: Row(
-          children: [
-            // First child is trailing-right in RTL: the title.
-            Expanded(
-              child: Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle().setMainTextColor.bold.copyWith(
-                  fontSize: titleSize,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([
+          NavBarController.instance,
+          RoadMode.instance,
+        ]),
+        builder: (context, _) {
+          // Sun and gloves, or high contrast: the solid bar — the tab bar
+          // goes opaque on the same two gates.
+          final opaque =
+              MediaQuery.highContrastOf(context) ||
+              RoadMode.instance.on ||
+              NavBarController.instance.effectiveMaterial == NavMaterial.opaque;
+          if (opaque) {
+            return DecoratedBox(
+              decoration: BoxDecoration(
+                color: Color.lerp(background, AppColors.surface, t),
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppColors.borderHeader.withValues(alpha: t),
+                  ),
                 ),
               ),
-            ),
-            8.szW,
-            _HeaderActions(
-              onSearch: onSearch,
-              onOpenNotifications: onOpenNotifications,
-              notificationsBadge: notificationsBadge,
-              notificationsActive: notificationsActive,
-            ),
-          ],
-        ).paddingOnlyDirectional(start: AppPadding.pW20, end: AppPadding.pW20),
+              child: content,
+            );
+          }
+          // The band paints past the header's extent, down over the page;
+          // it is a backdrop, so nothing about it takes a touch.
+          return Stack(
+            clipBehavior: Clip.none,
+            fit: StackFit.expand,
+            children: [
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: -HeaderBackdrop.reach,
+                child: IgnorePointer(
+                  child: HeaderBackdrop(strength: edge, tint: background),
+                ),
+              ),
+              content,
+            ],
+          );
+        },
       ),
     );
   }
