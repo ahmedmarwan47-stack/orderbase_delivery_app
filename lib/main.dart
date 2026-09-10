@@ -8,7 +8,6 @@ import 'app_module.dart';
 import 'core/live_activity/live_activity_bridge.dart';
 import 'theme/colors.dart';
 import 'theme/typography.dart';
-import 'widgets/header_blur.dart';
 import 'widgets/nav_bar_controller.dart';
 import 'widgets/nav_glass.dart';
 
@@ -21,8 +20,6 @@ Future<void> main() async {
   // The tab bar's glass shader — loaded before the first frame so the bar
   // never flashes from its blur fallback to glass.
   await NavGlass.load();
-  // The header's scroll-edge fade rides the same engine path as the bar.
-  await HeaderBlur.load();
   NavBarController.instance.armGovernor();
   runApp(
     ModularApp(
