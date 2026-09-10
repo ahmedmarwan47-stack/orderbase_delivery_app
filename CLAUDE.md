@@ -470,6 +470,11 @@ bar (Files on the iOS 26.5 iPhone 17 Pro simulator, pixel-scanned) and the user'
   (0.08) never shows it and the lens at rest never does. The blur tier paints the split hairline
   (`navFringeWarm` / `navFringeCool` in `GlassLightPainter`) since it cannot bend the page. Both
   land as one commit («Tab bar: the lens disperses…») so the whole thing reverts in one step.
+- **The scrub starts on the first pixel.** The bar's touch is a raw `Listener`, not a
+  `GestureDetector`: a drag recognizer waits out the 18pt touch slop before it calls a drag a drag,
+  and that wait was a small but visible beat before the lens moved under a finger already moving
+  (Ahmed felt it). Down swells the lens, the first move glues it, up chooses the tab under it; the
+  bar lives in the Scaffold's own slot, never inside a scrollable, so there is no arena to respect.
 - **Lens**: neutral 7% shade (`navLensTint` — iOS's lens has no colour of its own; the tint comes
   from the glyph), slides between tabs on `AppMotion.spring` (ratio .84), stretches with its own
   speed, swells under a press; **press-and-scrub** along the bar is **glued to the finger** — no

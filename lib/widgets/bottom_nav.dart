@@ -564,51 +564,63 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
     );
   }
 
-  /// Touch, over the whole capsule. Open: a tap chooses the tab under it, a
-  /// horizontal drag scrubs the lens along the bar and chooses on release.
-  /// Folded: any tap opens the bar again.
+  /// Touch, over the whole capsule — raw pointer events, not a gesture
+  /// recognizer: a recognizer waits out the touch slop (18pt of travel)
+  /// before it calls a drag a drag, and that wait was a beat where the lens
+  /// sat still under a finger already moving — small, and Ahmed felt it. The
+  /// bar sits in the Scaffold's own slot, never inside a scrollable, so there
+  /// is no arena to be polite in. Open: down swells the lens, the first move
+  /// glues it to the finger, up chooses the tab under it (a tap is a down and
+  /// an up with nothing between; a finger that wanders far off the bar is a
+  /// cancel). Folded: up opens the bar.
   Widget _touch(_Geometry g, Rect rect, double t) {
     final folded = t > 0.5;
-    return GestureDetector(
+    return Listener(
       behavior: HitTestBehavior.opaque,
-      onTapDown: folded ? null : (_) => setState(() => _pressed = true),
-      onTapUp: (d) {
+      onPointerDown: (e) {
+        if (folded) return;
+        _scrubbing = true;
+        _fingerVelocity = 0;
+        _fingerAt = DateTime.now().microsecondsSinceEpoch;
+        _hover = _visualAt(g, rect, e.localPosition.dx);
+        setState(() => _pressed = true);
+      },
+      onPointerMove: (e) {
+        if (folded || !_scrubbing) return;
+        _follow(g, rect, e.localPosition.dx);
+      },
+      onPointerUp: (e) {
         if (folded) {
           _nav.expand();
           return;
         }
-        _choose(_visualAt(g, rect, d.localPosition.dx));
+        if (!_scrubbing) return;
+        _scrubbing = false;
+        final dy = e.localPosition.dy;
+        if (dy < -rect.height || dy > 2 * rect.height) {
+          _cancel();
+          return;
+        }
+        final carried = _lensVelocity;
+        _choose(
+          _hover ?? _visualAt(g, rect, e.localPosition.dx),
+          velocity: carried,
+        );
         _release();
       },
-      onTapCancel: _release,
-      onHorizontalDragStart: folded
-          ? null
-          : (d) {
-              _scrubbing = true;
-              _pressed = true;
-              _fingerVelocity = 0;
-              _fingerAt = null;
-              _follow(g, rect, d.localPosition.dx);
-            },
-      onHorizontalDragUpdate: folded
-          ? null
-          : (d) => _follow(g, rect, d.localPosition.dx),
-      onHorizontalDragEnd: folded
-          ? null
-          : (_) {
-              final v = _hover ?? _visualSlot(widget.active) ?? 0;
-              final carried = _lensVelocity;
-              _scrubbing = false;
-              _choose(v, velocity: carried);
-              _release();
-            },
-      onHorizontalDragCancel: () {
+      onPointerCancel: (_) {
+        if (!_scrubbing) return;
         _scrubbing = false;
-        final v = _visualSlot(widget.active);
-        if (v != null) _spring(_lens, v.toDouble(), AppMotion.spring);
-        _release();
+        _cancel();
       },
     );
+  }
+
+  /// The finger left without choosing: the lens goes home.
+  void _cancel() {
+    final v = _visualSlot(widget.active);
+    if (v != null) _spring(_lens, v.toDouble(), AppMotion.spring);
+    _release();
   }
 
   double _slotsFrom(_Geometry g, Rect rect, double localX) =>
