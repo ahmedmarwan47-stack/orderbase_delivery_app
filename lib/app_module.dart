@@ -1,6 +1,7 @@
 import 'package:flutter_modular/flutter_modular.dart';
 
 import 'app/auth_gate.dart';
+import 'app/app_shell.dart'; // TEMP-VERIFY
 import 'core/session/auth_session.dart';
 import 'features/auth/presentation/imports/auth_imports.dart';
 import 'features/failure_states/presentation/imports/failure_states_imports.dart';
@@ -20,7 +21,7 @@ class AppModule extends Module {
 
   @override
   void routes(RouteManager r) {
-    r.child('/', child: (_) => const AuthGate());
+    r.child('/', child: (_) => const AppShell()); // TEMP-VERIFY
     r.child(
       '/auth',
       child: (_) => LoginScreen(

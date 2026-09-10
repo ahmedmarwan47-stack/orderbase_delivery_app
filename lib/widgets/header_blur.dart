@@ -1,7 +1,35 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+
+/// The header's scroll-edge fade shader — loaded once at startup, gated at
+/// runtime, exactly like [NavGlass]: `ImageFilter.shader` exists only on
+/// Impeller, and a shader that fails to load leaves [ready] false so the
+/// header falls back to hard-edged strips.
+class HeaderBlur {
+  HeaderBlur._();
+
+  static ui.FragmentProgram? _program;
+
+  static bool get ready => _program != null;
+
+  static bool get supported => ready && ui.ImageFilter.isShaderFilterSupported;
+
+  static Future<void> load() async {
+    if (_program != null) return;
+    try {
+      _program = await ui.FragmentProgram.fromAsset(
+        'assets/shaders/header_fade.frag',
+      );
+    } catch (_) {
+      // Hard strips it is.
+    }
+  }
+
+  static ui.FragmentShader shader() => _program!.fragmentShader();
+}
 
 /// The progressive blur under the unified header — the page dissolving into
 /// the bar instead of hitting an edge, the way iOS 26's scroll edge and
@@ -9,33 +37,35 @@ import 'package:flutter/widgets.dart';
 ///
 /// The box it is given is the header's own extent (status-bar inset
 /// included) plus [reach] below it. The blur is full down to [rampIn] above
-/// the header's bottom edge and gone at the box's bottom, so the whole ramp
-/// is one [rampIn] + [reach] run across the edge and nothing about it is a
-/// line. [strength] scales everything — the header fades the effect in over
-/// the first stretch of scrolling, since at rest the page's content sits
-/// *below* the bar and a blur band reaching down from it would soften the
-/// top of a page that has not moved.
+/// the header's bottom edge and gone at the box's bottom, so the ramp ends
+/// *with* the bar. [strength] scales everything — the header fades the
+/// effect in over the first stretch of scrolling, since at rest the page's
+/// content sits *below* the bar and a blur reaching into it would soften a
+/// page that has not moved.
 ///
-/// **The ramp is a stack of the engine's own Gaussians**, [steps] of them:
-/// the widest and softest first, each next one clipped a little shorter and
-/// adding a little more blur, so the blur a pixel receives grows in steps
-/// toward the top — each step small enough to pass for a slope — and the page
-/// near the edge is *softly blurred*, not sharp under a haze. The page ground
-/// is washed over it by a gradient that thins out down the same run. Nothing
-/// here is a shader, so every tier renders it the same way; the caller
-/// handles *opaque* — sun, gloves, high contrast — by not building this.
+/// **The ramp is a ladder of the engine's own Gaussians**: [steps] zones
+/// down the run, zone j blurred at `sigma · j / steps`, the block above the
+/// run at [sigma]. Each zone's blur is one `BackdropFilter` reading the page
+/// once — the engine downsamples a large blur and resamples it back, and a
+/// stack of overlapping bands that re-blurred the same pixels eight times
+/// over left a grid on dark banners. Hard-edged, the zones show as stairs
+/// wherever the page has a sharp horizontal edge (each zone smears it by a
+/// different amount), so on Impeller every strip reaches one zone further
+/// down and *fades out across it* — `header_fade.frag` composed over the
+/// blur — which crossfades neighbouring blur levels into one slope
+/// ([_Ladder]). Without shader filters (the web) the same zones keep their
+/// hard edges ([_Strips]). The page ground is washed over by a gradient that
+/// thins out down the same run. The caller handles *opaque* — sun, gloves,
+/// high contrast — by not building this.
 ///
-/// Three dead ends, so nobody walks them again. A hand-rolled ring-tap frost
-/// in one backdrop shader leaves ring-shaped ghosts of the text beneath at
-/// this radius. ONE engine Gaussian crossfaded into the sharp page down the
-/// ramp (a fade shader composed over the blur) reads as a translucent strip
-/// with sharp text showing through — the reference's edge is content getting
-/// softer, which only a radius that falls with the pixel gives. And the same
-/// stack with each band's edge feathered by that fade shader draws a ripple
-/// at every band edge on Impeller (measured: the fade weight is right, the
-/// band rect is right, and still the composed bands do not meet), where the
-/// plain bands meet cleanly. A backdrop under a `ShaderMask` blurs nothing at
-/// all, on Impeller as on Skia.
+/// Dead ends, so nobody walks them again: a hand-rolled ring-tap frost in
+/// one shader (ring-shaped ghosts of text at this radius); one Gaussian
+/// crossfaded into the *sharp* page (a translucent strip with sharp text
+/// showing through — the reference's edge is content getting softer); a stack
+/// of overlapping bands (the grid above, and feathered, ripples besides); a
+/// backdrop under a `ShaderMask` (blurs nothing, on Impeller as on Skia);
+/// `BackdropGroup` (shares one *filtered result*, so it only serves
+/// identical, non-overlapping filters).
 class HeaderBackdrop extends StatelessWidget {
   const HeaderBackdrop({super.key, required this.strength, required this.tint});
 
@@ -46,12 +76,13 @@ class HeaderBackdrop extends StatelessWidget {
   final Color tint;
 
   /// How far below the header the ramp reaches, and how far above the
-  /// header's bottom edge the blur starts thinning.
-  static const double reach = 56;
-  static const double rampIn = 16;
+  /// header's bottom edge the blur starts thinning: the blur ends with the
+  /// bar, the last few points only so the end is soft rather than a stop.
+  static const double reach = 8;
+  static const double rampIn = 40;
 
   /// The Gaussian's sigma at the top of the ramp (logical px), the wash's
-  /// alpha there, and in how many steps the ramp reaches them.
+  /// alpha there, and in how many zones the ramp climbs to them.
   static const double sigma = 14;
   static const double tintAlpha = 0.5;
   static const int steps = 8;
@@ -62,46 +93,16 @@ class HeaderBackdrop extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, c) {
         final h = c.maxHeight;
-        const n = steps;
         final run = reach + rampIn;
-        final full = sigma * strength;
-        final fadeFrom = h - run;
         final a = tintAlpha * strength;
-        // Blurs compose in quadrature: the sigma each step adds is what takes
-        // the running total one step further up a straight ramp.
-        var prev = 0.0;
-        final bands = <Widget>[];
-        for (var k = 1; k <= n; k++) {
-          final total = full * k / n;
-          final s = math.sqrt(total * total - prev * prev);
-          prev = total;
-          bands.add(
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 0,
-              height: h - run * (k - 1) / n,
-              // A BackdropFilter filters the whole ancestor clip, not just
-              // its child: the ClipRect is what confines each step.
-              child: ClipRect(
-                child: BackdropFilter(
-                  // Clamp, or the blur samples transparent past the clip and
-                  // the band's bottom edge bleeds dark.
-                  filter: ui.ImageFilter.blur(
-                    sigmaX: s,
-                    sigmaY: s,
-                    tileMode: ui.TileMode.clamp,
-                  ),
-                  child: const SizedBox.expand(),
-                ),
-              ),
-            ),
-          );
-        }
+        final fadeFrom = h - run;
         return Stack(
           clipBehavior: Clip.none,
           children: [
-            ...bands,
+            if (HeaderBlur.supported)
+              _Ladder(height: h, strength: strength)
+            else
+              _Strips(height: h, strength: strength),
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
@@ -127,6 +128,265 @@ class HeaderBackdrop extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// Zone j (1 = the lowest) of the ramp in a box [h] tall: its top, its bottom
+/// and its sigma. Zone [HeaderBackdrop.steps] is the block above the run.
+({double top, double bottom, double sigma}) _zone(int j, double h, double s) {
+  const n = HeaderBackdrop.steps;
+  const run = HeaderBackdrop.reach + HeaderBackdrop.rampIn;
+  return (
+    top: j == n ? 0.0 : h - run * j / n,
+    bottom: h - run * (j - 1) / n,
+    sigma: HeaderBackdrop.sigma * s * j / n,
+  );
+}
+
+/// Impeller: every zone's blur reaches one zone further down and fades out
+/// across it, painted lowest first, so zone j shows zone j's level crossfading
+/// up into zone j + 1's. Each strip's filter box is padded by three sigma
+/// above and below its window and the shader masks that padding to nothing:
+/// a blur composed this way pads a thin box with transparent black rather
+/// than clamping, and the rows within a few sigma of the box's edges come
+/// out dark.
+class _Ladder extends StatefulWidget {
+  const _Ladder({required this.height, required this.strength});
+
+  final double height;
+  final double strength;
+
+  @override
+  State<_Ladder> createState() => _LadderState();
+}
+
+class _LadderState extends State<_Ladder> {
+  late final List<ui.FragmentShader> _shaders = List.generate(
+    HeaderBackdrop.steps,
+    (_) => HeaderBlur.shader(),
+  );
+
+  @override
+  void dispose() {
+    for (final s in _shaders) {
+      s.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    final screen = MediaQuery.sizeOf(context);
+    final h = widget.height;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        for (var j = 1; j <= HeaderBackdrop.steps; j++)
+          () {
+            final z = _zone(j, h, widget.strength);
+            // The window: this zone opaque, then a fade across the zone
+            // below (the lowest fades across its own lower half, into the
+            // page).
+            final ownTop = z.top;
+            final fadeFrom = j == 1 ? (z.top + z.bottom) / 2 : z.bottom;
+            final fadeTo = j == 1 ? z.bottom : _zone(j - 1, h, 1).bottom;
+            final pad = 3 * z.sigma + 2;
+            final boxTop = math.max(0.0, ownTop - pad);
+            final boxBottom = fadeTo + pad;
+            final boxH = boxBottom - boxTop;
+            return Positioned(
+              left: 0,
+              right: 0,
+              top: boxTop,
+              height: boxH,
+              // A BackdropFilter filters the whole ancestor clip, not just
+              // its child: the ClipRect is what confines each strip.
+              child: ClipRect(
+                child: _FadeFilter(
+                  shader: _shaders[j - 1],
+                  sigma: z.sigma,
+                  start: (ownTop - boxTop) / boxH,
+                  fadeFrom: (fadeFrom - boxTop) / boxH,
+                  fadeTo: (fadeTo - boxTop) / boxH,
+                  dpr: dpr,
+                  screen: screen,
+                  child: const SizedBox.expand(),
+                ),
+              ),
+            );
+          }(),
+      ],
+    );
+  }
+}
+
+class _FadeFilter extends SingleChildRenderObjectWidget {
+  const _FadeFilter({
+    required this.shader,
+    required this.sigma,
+    required this.start,
+    required this.fadeFrom,
+    required this.fadeTo,
+    required this.dpr,
+    required this.screen,
+    super.child,
+  });
+
+  final ui.FragmentShader shader;
+  final double sigma;
+  final double start;
+  final double fadeFrom;
+  final double fadeTo;
+  final double dpr;
+  final Size screen;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderFadeFilter(shader, sigma, start, fadeFrom, fadeTo, dpr, screen);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderFadeFilter r) {
+    r
+      ..sigma = sigma
+      ..start = start
+      ..fadeFrom = fadeFrom
+      ..fadeTo = fadeTo
+      ..dpr = dpr
+      ..screen = screen;
+  }
+}
+
+/// The twin of nav_glass.dart's `_RenderGlassFilter`: the filter is rebuilt
+/// every paint so the strip's screen rect is the current one. The shader is
+/// told that rect and the screen's size so it can place itself in the padded
+/// texture the blur hands it (see the comment atop `header_fade.frag`).
+class _RenderFadeFilter extends RenderProxyBox {
+  _RenderFadeFilter(
+    this._shader,
+    this._sigma,
+    this._start,
+    this._fadeFrom,
+    this._fadeTo,
+    this._dpr,
+    this._screen,
+  );
+
+  final ui.FragmentShader _shader;
+
+  double _sigma;
+  set sigma(double v) {
+    if (v == _sigma) return;
+    _sigma = v;
+    markNeedsPaint();
+  }
+
+  double _start;
+  set start(double v) {
+    if (v == _start) return;
+    _start = v;
+    markNeedsPaint();
+  }
+
+  double _fadeFrom;
+  set fadeFrom(double v) {
+    if (v == _fadeFrom) return;
+    _fadeFrom = v;
+    markNeedsPaint();
+  }
+
+  double _fadeTo;
+  set fadeTo(double v) {
+    if (v == _fadeTo) return;
+    _fadeTo = v;
+    markNeedsPaint();
+  }
+
+  double _dpr;
+  set dpr(double v) {
+    if (v == _dpr) return;
+    _dpr = v;
+    markNeedsPaint();
+  }
+
+  Size _screen;
+  set screen(Size v) {
+    if (v == _screen) return;
+    _screen = v;
+    markNeedsPaint();
+  }
+
+  @override
+  bool get alwaysNeedsCompositing => true;
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final origin = localToGlobal(Offset.zero);
+    final d = _dpr;
+    // Indices 0-1 (the input texture size) are the engine's to set.
+    _shader
+      ..setFloat(2, _screen.width * d)
+      ..setFloat(3, _screen.height * d)
+      ..setFloat(4, origin.dx * d)
+      ..setFloat(5, origin.dy * d)
+      ..setFloat(6, size.width * d)
+      ..setFloat(7, size.height * d)
+      ..setFloat(8, _start)
+      ..setFloat(9, _fadeFrom)
+      ..setFloat(10, _fadeTo);
+    final layer = (this.layer as BackdropFilterLayer?) ?? BackdropFilterLayer();
+    layer
+      // The blur runs in the layer's own (logical) space; only the shader's
+      // numbers are in texture pixels.
+      ..filter = ui.ImageFilter.compose(
+        outer: ui.ImageFilter.shader(_shader),
+        inner: ui.ImageFilter.blur(
+          sigmaX: _sigma,
+          sigmaY: _sigma,
+          tileMode: ui.TileMode.clamp,
+        ),
+      )
+      ..blendMode = BlendMode.srcOver;
+    this.layer = layer;
+    context.pushLayer(layer, super.paint, offset);
+  }
+}
+
+/// No shader filters (the web): the same zones with hard edges.
+class _Strips extends StatelessWidget {
+  const _Strips({required this.height, required this.strength});
+
+  final double height;
+  final double strength;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        for (var j = 1; j <= HeaderBackdrop.steps; j++)
+          () {
+            final z = _zone(j, height, strength);
+            return Positioned(
+              left: 0,
+              right: 0,
+              top: z.top,
+              // A pixel of overlap, so rounding never opens a hairline.
+              height: z.bottom - z.top + (j == 1 ? 0 : 1),
+              child: ClipRect(
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(
+                    sigmaX: z.sigma,
+                    sigmaY: z.sigma,
+                    tileMode: ui.TileMode.clamp,
+                  ),
+                  child: const SizedBox.expand(),
+                ),
+              ),
+            );
+          }(),
+      ],
     );
   }
 }

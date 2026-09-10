@@ -1,5 +1,7 @@
 part of '../imports/settlement_imports.dart';
 
+final ScrollController _tmpVerify = ScrollController(); // TEMP-VERIFY
+
 /// State A — OPEN / AWAITING: one pinned bar + scrolling paper body (the day
 /// sub-head, the cash card, the day's batches, returns handover, the locked
 /// note, the last seven days) + bottom nav. There is no settle button: the
@@ -51,7 +53,12 @@ class _SettlementOpenView extends StatelessWidget {
           bottom: isTab ? BottomNav.reservedHeight(context) : AppPadding.pH24,
         );
 
+    Future.delayed(const Duration(seconds: 3), () {
+      // TEMP-VERIFY
+      if (_tmpVerify.hasClients) _tmpVerify.jumpTo(160);
+    });
     final Widget scroll = CustomScrollView(
+      controller: _tmpVerify, // TEMP-VERIFY
       slivers: [
         // Exactly ONE pinned bar per mode: the collapsing page title as a
         // shell tab, the back bar when pushed. Everything else — the day's

@@ -27,7 +27,7 @@ class ShiftSimulator {
   final NotificationsStore notifications;
 
   /// A fresh day is empty; the branch takes a moment to have anything ready.
-  static const Duration firstBatchAfter = Duration(seconds: 10);
+  static const Duration firstBatchAfter = Duration(seconds: 600) /* TEMP-VERIFY */;
 
   /// From the courier confirming they carried a batch to the next one being
   /// dispatched.
