@@ -37,7 +37,7 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> {
-  NavTab _tab = NavTab.settlement; // TEMP-VERIFY
+  NavTab _tab = NavTab.home;
 
   /// Notifications is a page, not a tab — while it is up the tab bar shows no
   /// selection and the header's bell reads as "close".

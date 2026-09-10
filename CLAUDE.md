@@ -544,36 +544,49 @@ would put native code back into the iOS build).
 
 **The bar has no fill and no hairline.** What separates it from the page is a **scroll-edge blur**
 (`HeaderBackdrop`, `lib/widgets/header_blur.dart`): the page blurred under the bar and clearing
-again 32pt below it (`reach`; the blur starts thinning 16pt above the bar's bottom, `rampIn`),
-with the page ground washed over it (`tintAlpha` .6) at the same rate, so a row scrolling up
-dissolves into the title instead of hitting an edge and text passing under the title stays
-readable — iOS 26's scroll edge, Instagram's header. It **fades in over the first 8–40pt of
-scroll** (`_AppHeaderDelegate.edgeFadeFrom/To`): at rest the content sits *below* the bar and a
-band reaching down would soften a page that has not moved. **The sliver carries the status-bar
+again *with* the bar's bottom edge (`rampIn` 40 of the ramp inside the bar, `reach` 8 below so the
+end is soft rather than a stop — Ahmed: it must not run on past the header), with the page ground
+washed over it (`tintAlpha` .5) thinning out over the same run, so a row scrolling up dissolves
+into the title instead of hitting an edge and text passing under the title stays readable — iOS
+26's scroll edge, Instagram's header. It **fades in over the first 8–40pt of scroll**
+(`_AppHeaderDelegate.edgeFadeFrom/To`): at rest the content sits *below* the bar and a blur
+reaching into it would soften a page that has not moved. **The sliver carries the status-bar
 inset itself** (`MediaQuery.paddingOf(context).top` → both extents, the row padded down) and the
 tab pages' `SafeArea`s drop `top`, so the page passes under the status bar and the blur runs to
 the top of the screen — with a top SafeArea the haze stopped on a hard line at the header's top.
 (Orders keeps `top: searching`; the pushed settlement pages keep theirs for the back bar;
-`RefreshIndicator` gets `edgeOffset` so its spinner stays below the status bar.)
+`RefreshIndicator` gets `edgeOffset` so its spinner stays below the status bar.) The band is a
+`Positioned(bottom: -reach)` overflow inside the pinned sliver — a pinned header paints after the
+slivers below it, so the backdrop sees them — in `IgnorePointer`. High contrast and Road mode keep
+the **old solid bar with its hairline**.
 
-Two tiers. **Impeller** (`_FadeBand`): ONE backdrop filter, `ImageFilter.compose(outer:
-shader(header_fade.frag), inner: blur(σ 12))` — the engine's own two-pass Gaussian does the
-blurring (as smooth as the references) and the shader only lets the blurred page thin out down
-the ramp, `vec4(col·f, f)` so the sharp page shows through where it ends. **Measured contract**
-(diagnostic builds, pixels read back): `FlutterFragCoord()` is in screen px exactly, the band
-rect from `localToGlobal` is exact, and `uTex` is the blurred screen padded by the blur's reach
-(~3σ per side) — sample at `(p + (uSize − uScreen)/2) / uSize`. *Blur tier* (the web, degraded
-devices; `_StackedBand`) = five stacked `BackdropFilter`s of growing sigma each clipped shorter
-than the last, under a gradient wash. High contrast and Road mode keep the **old solid bar with
-its hairline**. The band is a `Positioned(bottom: -reach)` overflow inside the pinned sliver — a
-pinned header paints after the slivers below it, so the backdrop sees them — in `IgnorePointer`.
+**The ramp is a ladder of the engine's own Gaussians**: `steps` (8) zones down the 48pt run, zone
+j blurred at `sigma · j / steps` (14 at the top block), every pixel blurred ONCE straight from the
+page — a stack of overlapping bands re-blurred the same pixels once per band and the engine's
+downsample-resample left a grid on dark banners (Ahmed: «pixelated»). Hard-edged zones show as
+stairs on any sharp horizontal edge (each smears it by a different amount), so on Impeller every
+strip reaches one zone further down and **fades out across it** (`_Ladder`: the engine blur
+composed with `header_fade.frag`, whose window is nothing / opaque / fade / nothing), which
+crossfades neighbouring levels into one slope; without shader filters (the web) the zones keep
+hard edges (`_Strips`).
 
-> Two dead ends, so nobody walks them again: a hand-rolled ring-tap frost in a shader
-> (the first version) leaves ring-shaped ghosts of text at a large radius — Ahmed spotted it
-> against Instagram at once; and `ShaderMask(dstIn) → BackdropFilter(blur)`, the obvious
-> masked-UIVisualEffectView shape, blurs **nothing** on Impeller as on Skia: a backdrop inside a
-> mask layer is handed that layer's own, empty, contents.
+**The composed-filter contract, all measured by pixel readback** (constant-colour probes and
+encoded uniforms — the only way; guessing cost a day): the engine composites a runtime-effect
+filter's output as **premultiplied source-over** (`vec4(col·f, f)`); `FlutterFragCoord()` is in
+screen px; `localToGlobal` rects are exact; the blur hands the shader the **screen padded past its
+far edges** — `uSize` ≈ screen + 2σ with the origin the screen's own, so sample at `p / uSize` (a
+symmetric-padding guess shifts every band and puts a dark wedge down the right edge); and a blur
+composed this way **pads a thin box with black instead of clamping**, so each strip's box is padded
+by 3σ above and below its window and the shader masks that padding to nothing — a 12pt strip
+blurred at σ 10 without it comes out as a dark band.
 
+> Dead ends, so nobody walks them again: a hand-rolled ring-tap frost in one shader (ring-shaped
+> ghosts of text at this radius); one Gaussian crossfaded into the *sharp* page (a translucent
+> strip with sharp text showing through — the reference's edge is content getting softer); a stack
+> of overlapping bands, plain (the grid) or feathered (black-padding bands, before that was
+> understood); a backdrop under a `ShaderMask` (blurs nothing, on Impeller as on Skia);
+> `BackdropGroup` (shares one *filtered result*, so it only serves identical, non-overlapping
+> filters).
 
 Line 1: **the branch alone** — «فرع مدينة نصر» (`ShiftController.branchName`; assigned per day).
 The merchant logo and name were dropped: the merchant never changes, and this bar exists to carry
