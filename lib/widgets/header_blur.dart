@@ -82,10 +82,15 @@ class HeaderBackdrop extends StatelessWidget {
   static const double rampIn = 40;
 
   /// The Gaussian's sigma at the top of the ramp (logical px), the wash's
-  /// alpha there, and in how many zones the ramp climbs to them.
+  /// alpha there, and in how many zones the ramp climbs to them. Four, not
+  /// eight: the ramp came out pixel-identical down the centre and within a
+  /// few levels at the margins, and each zone is a backdrop readback plus a
+  /// runtime-effect pass over the whole padded screen — the switch to a page
+  /// whose ladder is live cost 100–200 ms of raster with eight, 5–20 with four
+  /// (measured; a one-time 90 ms warm-up on the session's first ladder aside).
   static const double sigma = 14;
   static const double tintAlpha = 0.5;
-  static const int steps = 8;
+  static const int steps = 4;
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +197,7 @@ class _LadderState extends State<_Ladder> {
             final ownTop = z.top;
             final fadeFrom = j == 1 ? (z.top + z.bottom) / 2 : z.bottom;
             final fadeTo = j == 1 ? z.bottom : _zone(j - 1, h, 1).bottom;
-            final pad = 3 * z.sigma + 2;
+            final pad = 2 * z.sigma + 2;
             final boxTop = math.max(0.0, ownTop - pad);
             final boxBottom = fadeTo + pad;
             final boxH = boxBottom - boxTop;

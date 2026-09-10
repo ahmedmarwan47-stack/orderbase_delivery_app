@@ -58,6 +58,48 @@ class _AppShellState extends State<AppShell> {
     notifications: NotificationsStore.instance,
   );
 
+  /// The five pages, built ONCE. They used to be constructed inline in
+  /// [build], so every tab switch rebuilt all five trees before the new page
+  /// could paint — 30–60 ms of build in a debug frame, felt as a beat between
+  /// the tap and the lens moving. Same instances every build means the
+  /// framework skips them entirely; each page watches its own controllers.
+  late final List<Widget> _pages = [
+    HomeScreen(
+      hostsTabBar: false,
+      onSelectTab: _select,
+      onOpenOrder: _openNextStop,
+      onDeliverOrder: _deliverNextStop,
+      onCallCustomer: _callNextStop,
+      onCallBranch: _callBranch,
+      onOpenOrdersFilter: _openOrdersFilter,
+      onOpenSettlement: _openSettlement,
+      onOpenPendingBatch: _openPendingBatch,
+      onOpenNotifications: _toggleNotifications,
+      onOpenSearch: _openOrdersSearch,
+      onStartNewDay: _simulator.restart,
+    ),
+    QueueScreen(controller: _ordersVc, hostsTabBar: false),
+    SettlementScreen(
+      hostsTabBar: false,
+      onSelectTab: _select,
+      onOpenNotifications: _toggleNotifications,
+      onOpenSearch: _openOrdersSearch,
+    ),
+    ProfileScreen(
+      hostsTabBar: false,
+      onSelectTab: _select,
+      onOpenNotifications: _toggleNotifications,
+      onOpenSearch: _openOrdersSearch,
+      onStartNewDay: _simulator.restart,
+    ),
+    _NotificationsPage(
+      onSelectTab: _select,
+      onClose: _toggleNotifications,
+      onOpenOrder: _openOrderByNum,
+      onOpenSearch: _openOrdersSearch,
+    ),
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -242,42 +284,7 @@ class _AppShellState extends State<AppShell> {
           onNotification: NavBarController.instance.handleScroll,
           child: IndexedStack(
             index: _notifications ? NavTab.values.length : _tab.index,
-            children: [
-              HomeScreen(
-                hostsTabBar: false,
-                onSelectTab: _select,
-                onOpenOrder: _openNextStop,
-                onDeliverOrder: _deliverNextStop,
-                onCallCustomer: _callNextStop,
-                onCallBranch: _callBranch,
-                onOpenOrdersFilter: _openOrdersFilter,
-                onOpenSettlement: _openSettlement,
-                onOpenPendingBatch: _openPendingBatch,
-                onOpenNotifications: _toggleNotifications,
-                onOpenSearch: _openOrdersSearch,
-                onStartNewDay: _simulator.restart,
-              ),
-              QueueScreen(controller: _ordersVc, hostsTabBar: false),
-              SettlementScreen(
-                hostsTabBar: false,
-                onSelectTab: _select,
-                onOpenNotifications: _toggleNotifications,
-                onOpenSearch: _openOrdersSearch,
-              ),
-              ProfileScreen(
-                hostsTabBar: false,
-                onSelectTab: _select,
-                onOpenNotifications: _toggleNotifications,
-                onOpenSearch: _openOrdersSearch,
-                onStartNewDay: _simulator.restart,
-              ),
-              _NotificationsPage(
-                onSelectTab: _select,
-                onClose: _toggleNotifications,
-                onOpenOrder: _openOrderByNum,
-                onOpenSearch: _openOrdersSearch,
-              ),
-            ],
+            children: _pages,
           ),
         ),
       ),

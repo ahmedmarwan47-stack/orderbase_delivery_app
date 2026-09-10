@@ -560,7 +560,7 @@ the top of the screen — with a top SafeArea the haze stopped on a hard line at
 slivers below it, so the backdrop sees them — in `IgnorePointer`. High contrast and Road mode keep
 the **old solid bar with its hairline**.
 
-**The ramp is a ladder of the engine's own Gaussians**: `steps` (8) zones down the 48pt run, zone
+**The ramp is a ladder of the engine's own Gaussians**: `steps` (4) zones down the 48pt run, zone
 j blurred at `sigma · j / steps` (14 at the top block), every pixel blurred ONCE straight from the
 page — a stack of overlapping bands re-blurred the same pixels once per band and the engine's
 downsample-resample left a grid on dark banners (Ahmed: «pixelated»). Hard-edged zones show as
@@ -577,8 +577,22 @@ screen px; `localToGlobal` rects are exact; the blur hands the shader the **scre
 far edges** — `uSize` ≈ screen + 2σ with the origin the screen's own, so sample at `p / uSize` (a
 symmetric-padding guess shifts every band and puts a dark wedge down the right edge); and a blur
 composed this way **pads a thin box with black instead of clamping**, so each strip's box is padded
-by 3σ above and below its window and the shader masks that padding to nothing — a 12pt strip
+by 2σ above and below its window and the shader masks that padding to nothing — a 12pt strip
 blurred at σ 10 without it comes out as a dark band.
+
+**Performance, measured (simulator, debug, frame timings printed every 2 s while a timer cycled
+the tabs and swept the scroll):** the ladder's cost is per zone — each is a backdrop readback plus
+a runtime-effect pass over the *whole padded screen* (the coverage hint does not pass through
+`compose`), so 8 zones cost 100–200 ms of raster on the first frame after switching to a page
+whose ladder is live and 4 cost 5–20 (the ramp is pixel-identical; one 90 ms warm-up on the
+session's first ladder remains). Plain `BackdropFilter` blurs are cheap (coverage-limited), which
+is why the web tier is fine with hard strips. Shader-first (`compose(outer: blur, inner: shader)`)
+would be cheap but the engine drops the blur; `TileMode.decal` on plain strips feathers for free
+but darkens everything within σ of a clip edge. The other half of the tab-switch lag was the
+shell rebuilding all five page trees on every `setState` (30–60 ms of build) — the pages are built
+once now (`_AppShellState._pages`). To re-measure: a `SchedulerBinding.addTimingsCallback` bucket
+printed every 2 s (build/raster p50/p90/max, frames > 33 ms) plus a `Timer.periodic` in the shell
+calling `_select` — throwaway, `flutter run -d <sim>` streams the lines.
 
 > Dead ends, so nobody walks them again: a hand-rolled ring-tap frost in one shader (ring-shaped
 > ghosts of text at this radius); one Gaussian crossfaded into the *sharp* page (a translucent
