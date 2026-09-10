@@ -49,6 +49,10 @@ class ProfileScreen extends StatelessWidget {
               )
             : null,
         body: SafeArea(
+          // The header sliver carries the top inset (see AppHeaderSliver), so the
+          // page passes under the status bar and the scroll-edge blur runs to the
+          // top of the screen.
+          top: false,
           bottom: false,
           child: CustomScrollView(
             slivers: [

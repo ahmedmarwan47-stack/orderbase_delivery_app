@@ -544,15 +544,30 @@ with the page ground washed over it (`tintAlpha` .6) at the same rate, so a row 
 dissolves into the title instead of hitting an edge and text passing under the title stays
 readable — iOS 26's scroll edge, Instagram's header. It **fades in over the first 8–40pt of
 scroll** (`_AppHeaderDelegate.edgeFadeFrom/To`): at rest the content sits *below* the bar and a
-band reaching down would soften a page that has not moved. Two tiers, resolved off
-`NavBarController.effectiveMaterial` like the tab bar: *glass* = `assets/shaders/header_blur.frag`
-(one backdrop pass, the frost radius a function of the pixel's place in the fade — same
-whole-screen `uTex` contract as `nav_glass.frag`); *blur* (the web, degraded devices) = five
-stacked `BackdropFilter`s of growing sigma each clipped shorter than the last, under a gradient
-wash. High contrast and Road mode keep the **old solid bar with its hairline** (the opaque tier).
-The band is a `Positioned(bottom: -reach)` overflow inside the pinned sliver — a pinned header
-paints after the slivers below it, so the backdrop sees them — wrapped in `IgnorePointer`. One
-commit («Header: the scroll edge is a blur…») so it reverts in one step.
+band reaching down would soften a page that has not moved. **The sliver carries the status-bar
+inset itself** (`MediaQuery.paddingOf(context).top` → both extents, the row padded down) and the
+tab pages' `SafeArea`s drop `top`, so the page passes under the status bar and the blur runs to
+the top of the screen — with a top SafeArea the haze stopped on a hard line at the header's top.
+(Orders keeps `top: searching`; the pushed settlement pages keep theirs for the back bar;
+`RefreshIndicator` gets `edgeOffset` so its spinner stays below the status bar.)
+
+Two tiers. **Impeller** (`_FadeBand`): ONE backdrop filter, `ImageFilter.compose(outer:
+shader(header_fade.frag), inner: blur(σ 12))` — the engine's own two-pass Gaussian does the
+blurring (as smooth as the references) and the shader only lets the blurred page thin out down
+the ramp, `vec4(col·f, f)` so the sharp page shows through where it ends. **Measured contract**
+(diagnostic builds, pixels read back): `FlutterFragCoord()` is in screen px exactly, the band
+rect from `localToGlobal` is exact, and `uTex` is the blurred screen padded by the blur's reach
+(~3σ per side) — sample at `(p + (uSize − uScreen)/2) / uSize`. *Blur tier* (the web, degraded
+devices; `_StackedBand`) = five stacked `BackdropFilter`s of growing sigma each clipped shorter
+than the last, under a gradient wash. High contrast and Road mode keep the **old solid bar with
+its hairline**. The band is a `Positioned(bottom: -reach)` overflow inside the pinned sliver — a
+pinned header paints after the slivers below it, so the backdrop sees them — in `IgnorePointer`.
+
+> Two dead ends, so nobody walks them again: a hand-rolled ring-tap frost in a shader
+> (the first version) leaves ring-shaped ghosts of text at a large radius — Ahmed spotted it
+> against Instagram at once; and `ShaderMask(dstIn) → BackdropFilter(blur)`, the obvious
+> masked-UIVisualEffectView shape, blurs **nothing** on Impeller as on Skia: a backdrop inside a
+> mask layer is handed that layer's own, empty, contents.
 
 
 Line 1: **the branch alone** — «فرع مدينة نصر» (`ShiftController.branchName`; assigned per day).

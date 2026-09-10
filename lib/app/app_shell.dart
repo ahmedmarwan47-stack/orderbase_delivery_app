@@ -305,8 +305,10 @@ class _NotificationsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       extendBody: true,
-      // The shell's bar sits over this page with no tab lit.
+      // The shell's bar sits over this page with no tab lit. The header
+      // sliver carries the top inset, so the feed passes under the status bar.
       body: SafeArea(
+        top: false,
         bottom: false,
         child: NotificationsScreen(
           embedded: true,

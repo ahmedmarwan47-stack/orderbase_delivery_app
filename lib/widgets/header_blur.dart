@@ -4,9 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import 'nav_bar_controller.dart';
-
-/// The header's scroll-edge shader — loaded once at startup, gated at
+/// The header's scroll-edge fade shader — loaded once at startup, gated at
 /// runtime, exactly like [NavGlass]: `ImageFilter.shader` exists only on
 /// Impeller, and a shader that fails to load leaves [ready] false so the
 /// header falls back to its stacked-blur tier.
@@ -23,7 +21,7 @@ class HeaderBlur {
     if (_program != null) return;
     try {
       _program = await ui.FragmentProgram.fromAsset(
-        'assets/shaders/header_blur.frag',
+        'assets/shaders/header_fade.frag',
       );
     } catch (_) {
       // Stacked blur it is.
@@ -45,13 +43,19 @@ class HeaderBlur {
 /// at rest the page's content sits *below* the bar and a blur band reaching
 /// down from it would soften the top of a page that has not moved.
 ///
-/// Two tiers, resolved the way the tab bar resolves its material: *glass* —
-/// `header_blur.frag`, one backdrop pass with the radius a function of the
-/// pixel's place in the fade; *blur* — [steps] stacked backdrop blurs of
-/// growing sigma, each clipped a little shorter than the one beneath it,
-/// under a gradient wash. The web is always the second (no shader filters in
-/// the browser engines). The caller handles *opaque* — sun, gloves, high
-/// contrast — by not building this at all.
+/// Two tiers. On Impeller, ONE backdrop filter: the engine's own two-pass
+/// Gaussian, composed with `header_fade.frag`, which lets the blurred page thin
+/// out down the ramp so the sharp page shows through where it ends — as smooth
+/// as the references, since the blur is the engine's ([_FadeBand]). Elsewhere
+/// (the web, non-Impeller devices) [steps] stacked backdrop blurs of growing
+/// sigma, each clipped a little shorter than the one beneath it, under a
+/// gradient wash ([_StackedBand]). The caller handles *opaque* — sun, gloves,
+/// high contrast — by not building this at all.
+///
+/// (A Gaussian backdrop under a `ShaderMask` would be the obvious way and is
+/// how a masked `UIVisualEffectView` works, but a backdrop inside a mask layer
+/// is handed that layer's own, empty, contents — on Impeller as on Skia — so
+/// it blurs nothing.)
 class HeaderBackdrop extends StatelessWidget {
   const HeaderBackdrop({super.key, required this.strength, required this.tint});
 
@@ -66,50 +70,41 @@ class HeaderBackdrop extends StatelessWidget {
   static const double reach = 32;
   static const double rampIn = 16;
 
-  /// The frost radius at full strength (logical px) and the wash's alpha.
-  static const double blur = 16;
+  /// The Gaussian's sigma at full strength (logical px) and the wash's alpha.
+  static const double sigma = 12;
   static const double tintAlpha = 0.6;
 
-  /// The blur tier: its sigma at full strength, in how many steps.
-  static const double sigma = 7;
+  /// The stacked tier: how many steps the same sigma is reached in.
   static const int steps = 5;
 
   @override
   Widget build(BuildContext context) {
     if (strength <= 0) return const SizedBox.shrink();
-    final glass =
-        NavBarController.instance.effectiveMaterial == NavMaterial.glass &&
-        HeaderBlur.supported;
     // A BackdropFilter filters the whole ancestor clip, not just its child:
     // the ClipRect confines it to this band.
     return ClipRect(
-      child: glass
-          ? _ShaderBand(
-              strength: strength,
-              tint: tint,
-              dpr: MediaQuery.devicePixelRatioOf(context),
-            )
+      child: HeaderBlur.supported
+          ? _FadeBand(strength: strength, tint: tint)
           : _StackedBand(strength: strength, tint: tint),
     );
   }
 }
 
-class _ShaderBand extends StatefulWidget {
-  const _ShaderBand({
-    required this.strength,
-    required this.tint,
-    required this.dpr,
-  });
+/// Impeller: the engine's Gaussian blur of the backdrop, composed with the
+/// fade shader as its outer half. The shader is told the band's screen rect
+/// and the screen's size so it can work out which pixel space it was handed
+/// (see the comment atop `header_fade.frag`).
+class _FadeBand extends StatefulWidget {
+  const _FadeBand({required this.strength, required this.tint});
 
   final double strength;
   final Color tint;
-  final double dpr;
 
   @override
-  State<_ShaderBand> createState() => _ShaderBandState();
+  State<_FadeBand> createState() => _FadeBandState();
 }
 
-class _ShaderBandState extends State<_ShaderBand> {
+class _FadeBandState extends State<_FadeBand> {
   late final ui.FragmentShader _shader = HeaderBlur.shader();
 
   @override
@@ -119,21 +114,23 @@ class _ShaderBandState extends State<_ShaderBand> {
   }
 
   @override
-  Widget build(BuildContext context) => _HeaderFilter(
+  Widget build(BuildContext context) => _FadeFilter(
     shader: _shader,
     strength: widget.strength,
     tint: widget.tint,
-    dpr: widget.dpr,
+    dpr: MediaQuery.devicePixelRatioOf(context),
+    screen: MediaQuery.sizeOf(context),
     child: const SizedBox.expand(),
   );
 }
 
-class _HeaderFilter extends SingleChildRenderObjectWidget {
-  const _HeaderFilter({
+class _FadeFilter extends SingleChildRenderObjectWidget {
+  const _FadeFilter({
     required this.shader,
     required this.strength,
     required this.tint,
     required this.dpr,
+    required this.screen,
     super.child,
   });
 
@@ -141,25 +138,32 @@ class _HeaderFilter extends SingleChildRenderObjectWidget {
   final double strength;
   final Color tint;
   final double dpr;
+  final Size screen;
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
-      _RenderHeaderFilter(shader, strength, tint, dpr);
+      _RenderFadeFilter(shader, strength, tint, dpr, screen);
 
   @override
-  void updateRenderObject(BuildContext context, _RenderHeaderFilter r) {
+  void updateRenderObject(BuildContext context, _RenderFadeFilter r) {
     r
       ..strength = strength
       ..tint = tint
-      ..dpr = dpr;
+      ..dpr = dpr
+      ..screen = screen;
   }
 }
 
-/// The twin of nav_glass.dart's `_RenderGlassFilter`: a backdrop filter whose
-/// shader is told the band's *screen* rect at every paint, because the engine
-/// hands a backdrop shader the whole screen, not the widget's clip.
-class _RenderHeaderFilter extends RenderProxyBox {
-  _RenderHeaderFilter(this._shader, this._strength, this._tint, this._dpr);
+/// The twin of nav_glass.dart's `_RenderGlassFilter`: the filter is rebuilt
+/// every paint so the band's screen rect is the current one.
+class _RenderFadeFilter extends RenderProxyBox {
+  _RenderFadeFilter(
+    this._shader,
+    this._strength,
+    this._tint,
+    this._dpr,
+    this._screen,
+  );
 
   final ui.FragmentShader _shader;
 
@@ -184,6 +188,13 @@ class _RenderHeaderFilter extends RenderProxyBox {
     markNeedsPaint();
   }
 
+  Size _screen;
+  set screen(Size v) {
+    if (v == _screen) return;
+    _screen = v;
+    markNeedsPaint();
+  }
+
   @override
   bool get alwaysNeedsCompositing => true;
 
@@ -192,22 +203,35 @@ class _RenderHeaderFilter extends RenderProxyBox {
     final origin = localToGlobal(Offset.zero);
     final d = _dpr;
     final s = _strength;
-    final fadeFrom = size.height - HeaderBackdrop.reach - HeaderBackdrop.rampIn;
-    // Indices 0-1 (the texture size) are the engine's to set.
+    final fadeFrom =
+        (size.height - HeaderBackdrop.reach - HeaderBackdrop.rampIn) /
+        size.height;
+    // Indices 0-1 (the input texture size) are the engine's to set.
     _shader
-      ..setFloat(2, origin.dx * d)
-      ..setFloat(3, origin.dy * d)
-      ..setFloat(4, size.width * d)
-      ..setFloat(5, size.height * d)
-      ..setFloat(6, (origin.dy + fadeFrom) * d)
-      ..setFloat(7, HeaderBackdrop.blur * s * d)
-      ..setFloat(8, _tint.r)
-      ..setFloat(9, _tint.g)
-      ..setFloat(10, _tint.b)
-      ..setFloat(11, HeaderBackdrop.tintAlpha * s);
+      ..setFloat(2, _screen.width * d)
+      ..setFloat(3, _screen.height * d)
+      ..setFloat(4, origin.dx * d)
+      ..setFloat(5, origin.dy * d)
+      ..setFloat(6, size.width * d)
+      ..setFloat(7, size.height * d)
+      ..setFloat(8, fadeFrom.clamp(0.0, 1.0))
+      ..setFloat(9, _tint.r)
+      ..setFloat(10, _tint.g)
+      ..setFloat(11, _tint.b)
+      ..setFloat(12, HeaderBackdrop.tintAlpha * s);
+    // The blur runs in the layer's own (logical) space; only the shader's
+    // numbers are in texture pixels.
+    final sigma = HeaderBackdrop.sigma * s;
     final layer = (this.layer as BackdropFilterLayer?) ?? BackdropFilterLayer();
     layer
-      ..filter = ui.ImageFilter.shader(_shader)
+      ..filter = ui.ImageFilter.compose(
+        outer: ui.ImageFilter.shader(_shader),
+        inner: ui.ImageFilter.blur(
+          sigmaX: sigma,
+          sigmaY: sigma,
+          tileMode: ui.TileMode.clamp,
+        ),
+      )
       ..blendMode = BlendMode.srcOver;
     this.layer = layer;
     context.pushLayer(layer, super.paint, offset);

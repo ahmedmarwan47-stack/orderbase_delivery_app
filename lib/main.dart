@@ -21,7 +21,7 @@ Future<void> main() async {
   // The tab bar's glass shader — loaded before the first frame so the bar
   // never flashes from its blur fallback to glass.
   await NavGlass.load();
-  // The header's scroll-edge blur rides the same tier as the bar.
+  // The header's scroll-edge fade rides the same engine path as the bar.
   await HeaderBlur.load();
   NavBarController.instance.armGovernor();
   runApp(

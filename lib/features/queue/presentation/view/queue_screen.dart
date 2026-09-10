@@ -91,6 +91,10 @@ class _QueueScreenState extends State<QueueScreen> {
                 )
               : null,
           body: SafeArea(
+            // Browsing, the header sliver carries the top inset (the list
+            // passes under the status bar, so the scroll-edge blur runs to
+            // the top of the screen); the search header needs it here.
+            top: searching,
             bottom: false,
             // Rebuild when the shift mutates (a delivered/failed order leaves
             // the active list) so the queue always reflects reality.

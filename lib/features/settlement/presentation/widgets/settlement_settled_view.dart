@@ -86,6 +86,8 @@ class _SettlementSettledView extends StatelessWidget {
           ? BottomNav(active: NavTab.settlement, onTap: onSelectTab)
           : null,
       body: SafeArea(
+        // As a tab the header sliver carries the top inset — see the open view.
+        top: !isTab,
         bottom: !isTab,
         // As a tab there is no «العودة للرئيسية» button: the Home tab in the
         // bar below IS that button, and a floating bar leaves no room for a

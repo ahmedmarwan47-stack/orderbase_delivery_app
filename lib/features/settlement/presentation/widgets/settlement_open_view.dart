@@ -73,6 +73,10 @@ class _SettlementOpenView extends StatelessWidget {
           ? BottomNav(active: NavTab.settlement, onTap: onSelectTab)
           : null,
       body: SafeArea(
+        // As a tab the header sliver carries the top inset (the page passes
+        // under the status bar, so the scroll-edge blur runs to the top of
+        // the screen); pushed, the back bar needs it here.
+        top: !isTab,
         bottom: !isTab,
         child: isTab
             ? scroll

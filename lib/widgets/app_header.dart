@@ -72,6 +72,12 @@ class AppHeaderSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The bar carries the status-bar inset itself, so the page's scroll view
+    // can run under the status bar and the scroll-edge blur reaches the top
+    // of the screen instead of stopping on a line at the header's top — the
+    // page does not sit in a top SafeArea any more (a page that still does
+    // reads 0 here and loses nothing).
+    final inset = MediaQuery.paddingOf(context).top;
     return SliverPersistentHeader(
       pinned: true,
       delegate: _AppHeaderDelegate(
@@ -83,6 +89,7 @@ class AppHeaderSliver extends StatelessWidget {
         background: background,
         bar: barHeight,
         large: largeTitleHeight,
+        inset: inset,
       ),
     );
   }
@@ -98,6 +105,7 @@ class _AppHeaderDelegate extends SliverPersistentHeaderDelegate {
     required this.background,
     required this.bar,
     required this.large,
+    required this.inset,
   });
 
   final String title;
@@ -109,11 +117,14 @@ class _AppHeaderDelegate extends SliverPersistentHeaderDelegate {
   final double bar;
   final double large;
 
-  @override
-  double get minExtent => bar;
+  /// The status-bar inset the bar sits under; part of both extents.
+  final double inset;
 
   @override
-  double get maxExtent => large;
+  double get minExtent => bar + inset;
+
+  @override
+  double get maxExtent => large + inset;
 
   /// 0 at rest, 1 once the title has fully shrunk into the bar.
   double _t(double shrinkOffset) =>
@@ -140,7 +151,7 @@ class _AppHeaderDelegate extends SliverPersistentHeaderDelegate {
         1.0,
       ),
     );
-    final Widget content = Row(
+    Widget content = Row(
       children: [
         // First child is trailing-right in RTL: the title.
         Expanded(
@@ -162,6 +173,9 @@ class _AppHeaderDelegate extends SliverPersistentHeaderDelegate {
         ),
       ],
     ).paddingOnlyDirectional(start: AppPadding.pW20, end: AppPadding.pW20);
+    // The bar's row sits below the status bar; the fill and the blur behind
+    // it run all the way up.
+    if (inset > 0) content = content.paddingOnly(top: inset);
     // The child MUST fill the extent the delegate was given: a sliver's
     // paintExtent is its child's measured height, so a self-sizing child
     // reports less than maxExtent and trips the geometry assertion.
@@ -220,6 +234,7 @@ class _AppHeaderDelegate extends SliverPersistentHeaderDelegate {
       background != old.background ||
       bar != old.bar ||
       large != old.large ||
+      inset != old.inset ||
       notificationsBadge != old.notificationsBadge ||
       notificationsActive != old.notificationsActive ||
       (onSearch == null) != (old.onSearch == null) ||

@@ -40,6 +40,9 @@ class _QueueBodyState extends State<_QueueBody> {
       onRefresh: _refresh,
       color: AppColors.brand,
       backgroundColor: AppColors.surface,
+      // The scroll view now starts at the screen's top edge: keep the spinner
+      // below the status bar.
+      edgeOffset: MediaQuery.paddingOf(context).top,
       child: CustomScrollView(
         controller: vc.scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
