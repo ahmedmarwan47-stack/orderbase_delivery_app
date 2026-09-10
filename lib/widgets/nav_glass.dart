@@ -3,6 +3,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import '../theme/colors.dart';
+
 /// The tab bar's glass shader — loaded once at startup, gated at runtime.
 ///
 /// `ImageFilter.shader` only exists on Impeller (iOS, and Android where the
@@ -103,6 +105,30 @@ class GlassStyle {
   final double shadow;
   final double shadowBlur;
   final Offset shadowOffset;
+
+  /// The same glass with another [dispersion] and [specular] — what the lens
+  /// becomes under a dragging finger. Hands back this very instance when
+  /// nothing changes, so a repaint is only asked for when the glass differs.
+  GlassStyle copyWith({double? dispersion, double? specular}) {
+    final d = dispersion ?? this.dispersion;
+    final s = specular ?? this.specular;
+    if (d == this.dispersion && s == this.specular) return this;
+    return GlassStyle(
+      rim: rim,
+      curve: curve,
+      depth: depth,
+      dispersion: d,
+      blur: blur,
+      saturation: saturation,
+      tint: tint,
+      specular: s,
+      light: light,
+      edgeDark: edgeDark,
+      shadow: shadow,
+      shadowBlur: shadowBlur,
+      shadowOffset: shadowOffset,
+    );
+  }
 }
 
 /// A capsule of [style] glass, [size] big with [radius] corners, rendered as a
@@ -339,6 +365,39 @@ class GlassLightPainter extends CustomPainter {
         stops: const [0.0, 0.3, 0.6, 1.0],
       ).createShader(rect);
     canvas.drawRRect(RRect.fromRectAndRadius(rect.deflate(0.5), r), line);
+
+    // Dispersing — a finger dragging the lens — the hairline splits into a
+    // warm thread on the edge and a cool one just inside it: this tier's
+    // share of the fringe the shader shows, since it cannot bend the page.
+    // Nothing at rest; [GlassStyle.lens]'s resting dispersion is below the
+    // threshold.
+    final k = ((style.dispersion - 0.2) / 0.6).clamp(0.0, 1.0);
+    if (k > 0) {
+      Paint thread(Color c, double alpha) => Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..shader = LinearGradient(
+          begin: begin,
+          end: end,
+          colors: [
+            c.withValues(alpha: alpha),
+            c.withValues(alpha: 0),
+          ],
+          stops: const [0.0, 0.55],
+        ).createShader(rect);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(rect.deflate(0.5), r),
+        thread(AppColors.navFringeWarm, lit * k),
+      );
+      final inset = 0.5 + 1.5 * k;
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          rect.deflate(inset),
+          Radius.circular(radius - inset),
+        ),
+        thread(AppColors.navFringeCool, lit * 0.8 * k),
+      );
+    }
   }
 
   @override

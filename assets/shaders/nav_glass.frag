@@ -139,25 +139,63 @@ void main() {
 
   vec3 col = frost(p + off);
   float rimW = 1.0 - h;
+  // Dispersion: glass bends blue more than red, so the rim shows the page's
+  // red from a little nearer the edge and its blue from a little further in.
+  // uDisp is that spread as a fraction of the bend — a whisper at rest, and
+  // on the lens opened wide while a finger drags it, so the glyphs and labels
+  // it slides across split into a warm copy and a cool one at its edge: the
+  // fringe a soap bubble shows in the sun.
   if (uDisp > 0.0 && rimW > 0.01) {
-    col.r = mix(col.r, tap(p + off * (1.0 + uDisp)).r, rimW);
-    col.b = mix(col.b, tap(p + off * (1.0 - uDisp)).b, rimW);
+    col.r = mix(col.r, tap(p + off * (1.0 - uDisp)).r, rimW);
+    col.b = mix(col.b, tap(p + off * (1.0 + uDisp)).b, rimW);
   }
 
   float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
   col = mix(vec3(l), col, uSat);
   col = mix(col, uTint.rgb, uTint.a);
 
-  // Lighting: a Blinn highlight where the rim faces the light, a whisper of
-  // shade where it faces away, and a hairline of light along the lit edge.
   vec3 L = normalize(vec3(uLight, 0.75));
   vec3 H = normalize(L + vec3(0.0, 0.0, 1.0));
   float facing = dot(g, normalize(uLight));
   float toward = smoothstep(-0.25, 0.7, facing);
   float away = smoothstep(-0.25, 0.7, -facing);
+
+  // Thin film: while the lens disperses, a band of colour lies across the
+  // outer rim — warm at the very edge, magenta, then blue a little way in —
+  // the way a soap film bands where it thins, strongest where the light
+  // falls. Multiplied in so it reads as a pastel on a white page, with a
+  // touch added on top so it still shows over ink. Nothing at rest: the
+  // lens's resting dispersion sits below the threshold, and so does the
+  // bar's.
+  float film = smoothstep(0.25, 0.8, uDisp) * smoothstep(0.0, 0.04, x) *
+      (1.0 - smoothstep(0.1, 0.4, x)) * (0.6 + 0.4 * toward) * 0.7;
+  if (film > 0.001) {
+    float u = clamp(x / 0.3, 0.0, 1.0);
+    vec3 warm = vec3(1.0, 0.72, 0.4);
+    vec3 magenta = vec3(1.0, 0.55, 0.9);
+    vec3 blue = vec3(0.5, 0.75, 1.0);
+    vec3 tone = u < 0.5 ? mix(warm, magenta, u * 2.0)
+                        : mix(magenta, blue, u * 2.0 - 1.0);
+    col = mix(col, col * mix(vec3(1.0), tone, 0.6) + tone * 0.1, film);
+  }
+
+  // Lighting: a Blinn highlight where the rim faces the light, a whisper of
+  // shade where it faces away, and a hairline of light along the lit edge.
   float spec = pow(max(dot(n, H), 0.0), 20.0) * rimW * toward * uSpec;
-  float line = (1.0 - smoothstep(0.0, 2.5, -sd)) * toward * uSpec * 0.6;
-  col = col * (1.0 - uEdgeDark * rimW * away) + vec3(spec + line);
+  // The hairline of light along the lit edge. Dispersing, it splits the way
+  // the page does — red held to the very edge, blue trailing just inside it —
+  // so the rim carries a thread of colour even over a plain page.
+  float d = -sd;
+  float hairG = 1.0 - smoothstep(0.0, 2.5, d);
+  vec3 hair = vec3(hairG);
+  if (uDisp > 0.0) {
+    float s = max(uDisp * uDepth * 0.35, 0.01);
+    float hairR = 1.0 - smoothstep(0.0, 2.5, d + s * 0.5);
+    float hairB = smoothstep(0.0, s, d) * (1.0 - smoothstep(0.0, 2.5, d - s));
+    hair = vec3(hairR, hairG, hairB);
+  }
+  vec3 line = hair * (toward * uSpec * 0.6);
+  col = col * (1.0 - uEdgeDark * rimW * away) + vec3(spec) + line;
 
   // Anti-aliased edge: the glass fades to the shadow underneath it.
   float aa = 1.0 - smoothstep(-1.0, 1.0, sd);

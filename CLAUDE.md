@@ -460,6 +460,16 @@ bar (Files on the iOS 26.5 iPhone 17 Pro simulator, pixel-scanned) and the user'
   the selected glyph at the leading edge, 12pt up (or reaching the top, or switching tabs) opens
   it; pages that can't scroll 120pt never fold; tapping the pill opens it. A page with
   `active: null` never folds.
+- **The lens is a soap bubble while it moves.** `GlassStyle.dispersion` is the shader's chromatic
+  spread (red bent less than blue, `off·(1∓uDisp)`), a whisper at rest (0.12) and opened with the
+  lens's speed — `BottomNav._fringeMoving` (0.7) at `_fringeFullSpeed` (4 slots/s), 0.35 under a
+  still pressed finger — through `GlassStyle.copyWith`, so the glyphs and labels the rim crosses
+  split into a warm copy and a cool one, the rim's hairline splits the same way, and a **thin-film
+  band** (warm → magenta → blue across the outer rim, multiplied in so it reads as a pastel on the
+  white bar) lies along the edge even over plain page. All of it keyed off `uDisp`, so the bar
+  (0.08) never shows it and the lens at rest never does. The blur tier paints the split hairline
+  (`navFringeWarm` / `navFringeCool` in `GlassLightPainter`) since it cannot bend the page. Both
+  land as one commit («Tab bar: the lens disperses…») so the whole thing reverts in one step.
 - **Lens**: neutral 7% shade (`navLensTint` — iOS's lens has no colour of its own; the tint comes
   from the glyph), slides between tabs on `AppMotion.spring` (ratio .84), stretches with its own
   speed, swells under a press; **press-and-scrub** along the bar is **glued to the finger** — no

@@ -82,6 +82,16 @@ class BottomNav extends StatefulWidget {
   static const double _labelHeight = 17;
   static const double _iconLabelGap = 4;
 
+  /// The lens's dispersion — the soap-bubble fringe at its rim. A whisper at
+  /// rest ([GlassStyle.lens]), more under a pressed finger, and wide open as
+  /// the finger drags it: full at [_fringeFullSpeed] slots per second, the
+  /// pace of a brisk scrub, with the rim light brightening to
+  /// [_fringeSpecular] alongside so the fringe has something to ride on.
+  static const double _fringePressed = 0.35;
+  static const double _fringeMoving = 0.7;
+  static const double _fringeSpecular = 0.3;
+  static const double _fringeFullSpeed = 4;
+
   /// Where the glyph's centre sits when the bar is open.
   static const double _iconCenterY =
       (barHeight - (_iconSize + _iconLabelGap + _labelHeight)) / 2 +
@@ -490,8 +500,24 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
     // finger; the fold dissolves it into the pill.
     if (activeV != null && fade > 0) {
       final v = _lens.value;
-      final stretch = (_lensVelocity.abs() * 0.055).clamp(0.0, 0.45);
+      final speed = _lensVelocity.abs();
+      final stretch = (speed * 0.055).clamp(0.0, 0.45);
       final press = _pressed ? 1.06 : 1.0;
+      // The fringe comes and goes with the stretch, so the bubble's colour
+      // and its liquid shape read as one thing happening.
+      final motion = (speed / BottomNav._fringeFullSpeed).clamp(0.0, 1.0);
+      final style = GlassStyle.lens.copyWith(
+        dispersion: ui.lerpDouble(
+          _pressed ? BottomNav._fringePressed : GlassStyle.lens.dispersion,
+          BottomNav._fringeMoving,
+          motion,
+        ),
+        specular: ui.lerpDouble(
+          GlassStyle.lens.specular,
+          BottomNav._fringeSpecular,
+          motion,
+        ),
+      );
       final lw = (g.slotW + BottomNav._lensOverhang) * (1 + stretch) * press;
       final lh =
           (BottomNav.barHeight - 2 * BottomNav._lensInset) *
@@ -508,7 +534,7 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
           height: lh + 2 * lensPad,
           child: Opacity(
             opacity: fade,
-            child: _lensSurface(m, Size(lw, lh), lensPad),
+            child: _lensSurface(m, Size(lw, lh), lensPad, style),
           ),
         ),
       );
@@ -517,13 +543,13 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
     return Stack(clipBehavior: Clip.none, children: children);
   }
 
-  Widget _lensSurface(NavMaterial m, Size size, double pad) {
+  Widget _lensSurface(NavMaterial m, Size size, double pad, GlassStyle style) {
     if (m == NavMaterial.glass) {
       return GlassSurface(
         size: size,
         radius: size.height / 2,
         pad: pad,
-        style: GlassStyle.lens,
+        style: style,
       );
     }
     return DecoratedBox(
@@ -532,10 +558,7 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(size.height / 2),
       ),
       child: CustomPaint(
-        painter: GlassLightPainter(
-          style: GlassStyle.lens,
-          radius: size.height / 2,
-        ),
+        painter: GlassLightPainter(style: style, radius: size.height / 2),
         child: const SizedBox.expand(),
       ),
     );

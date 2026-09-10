@@ -111,6 +111,11 @@ abstract final class AppColors {
   static const navGlassEdge = Color(0x99FFFFFF); // white @ .60
   static const navOpaqueEdge = Color(0xFFE6E5E2); // = borderDefault
   static const navLensTint = Color(0x12000000); // black @ .07
+  // The lens's dispersion fringe on the blur tier — the warm and cool threads
+  // GlassLightPainter draws along the rim while a finger drags the lens (the
+  // glass tier gets the real thing from the shader). Marks, never text.
+  static const navFringeWarm = Color(0xFFFFB347);
+  static const navFringeCool = Color(0xFF4DA3FF);
 
   // Muted (70%) white for secondary text on a dark surface (e.g. the progress
   // tooltip's order-number line over the ink bubble).
