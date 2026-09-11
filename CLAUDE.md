@@ -429,7 +429,25 @@ parcels back is still the courier's act), the locked note, then `_HistorySection
 rows that push `SettlementDayScreen(day)` read-only. The settled
 view is the designed confirmation plus the batches and the history.
 
-## The tab bar (`lib/widgets/bottom_nav.dart` · `nav_glass.dart` · `nav_bar_controller.dart`)
+## The tab bar — now the `liquid_tab_bar` package (`packages/liquid_tab_bar/`)
+
+**The bar is a package.** Everything below — the glass shader, the lens, the scrub, the fold, the
+three tiers, the frame governor — lives in `packages/liquid_tab_bar/` (`lib/src/bar.dart` ·
+`glass.dart` · `controller.dart` · `theme.dart`, the shader at `assets/shaders/nav_glass.frag`,
+loaded as `packages/liquid_tab_bar/assets/shaders/nav_glass.frag`), pulled in as a path dependency
+and generic: `LiquidTabBar(items:, selectedIndex:, onSelected:, controller:, theme:, forceOpaque:,
+haptic:)`, `LiquidTabItem(label:, iconBuilder:, badge:)` / `.icon(...)`, `LiquidTabBarTheme` (every
+colour and number), `LiquidTabBarController` (`.shared`), `LiquidTabBarMaterial`, `LiquidGlass.load()`.
+The app's `lib/widgets/bottom_nav.dart` is a thin adapter — `NavTab`, `BottomNav(active:, onTap:)`,
+`reservedHeight` — that dresses the package in `AppColors` / `IconWidget` / `LocaleKeys`, feeds the
+Orders badge from `ShiftController` and `forceOpaque` from `RoadMode`; `nav_bar_controller.dart`
+keeps `NavBarController.instance` (= `LiquidTabBarController.shared`) and `typedef NavMaterial`.
+`nav_glass.dart` is gone (`main.dart` calls `LiquidGlass.load()`). **Change the bar in the package,
+not the adapter.** `packages/liquid_tab_bar/example/` is a runnable demo (colour bands, a dark card,
+rows, a material picker) for anyone trying the package; it is not published to pub.dev yet — that
+needs Ahmed's account (`flutter pub publish` from the package folder). Verified after the move: the
+courier app renders pixel-identically and `LiquidGlass.supported` is true on the simulator.
+
 
 The floating bar is an **extreme approximation of iOS 26's tab bar**, so the courier's phone and
 the system apps beside it behave as one. Everything below was *measured*, not guessed, off the real

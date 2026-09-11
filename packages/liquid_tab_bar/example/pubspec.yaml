@@ -1,0 +1,19 @@
+name: liquid_tab_bar_example
+description: Demonstrates the liquid_tab_bar package.
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  liquid_tab_bar:
+    path: ../
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true

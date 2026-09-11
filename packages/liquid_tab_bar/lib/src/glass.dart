@@ -3,16 +3,17 @@ import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import '../theme/colors.dart';
-
-/// The tab bar's glass shader — loaded once at startup, gated at runtime.
+/// The glass shader — loaded once at startup, gated at runtime.
 ///
 /// `ImageFilter.shader` only exists on Impeller (iOS, and Android where the
 /// device runs it); everywhere else [supported] is false and the bar falls
 /// back to its blur tier. Loading never throws into the app: a missing or
 /// uncompilable shader simply leaves [ready] false.
-class NavGlass {
-  NavGlass._();
+///
+/// Call [load] before the first frame (`await LiquidGlass.load()` in `main`)
+/// or the bar starts on the blur tier and stays there until it rebuilds.
+class LiquidGlass {
+  LiquidGlass._();
 
   static ui.FragmentProgram? _program;
 
@@ -25,7 +26,7 @@ class NavGlass {
     if (_program != null) return;
     try {
       _program = await ui.FragmentProgram.fromAsset(
-        'assets/shaders/nav_glass.frag',
+        'packages/liquid_tab_bar/assets/shaders/nav_glass.frag',
       );
     } catch (_) {
       // Blur tier it is.
@@ -92,16 +93,39 @@ class GlassStyle {
     edgeDark: 0.03,
   );
 
+  /// Width of the lensing rim.
   final double rim;
+
+  /// How steeply the rim's surface tilts.
   final double curve;
+
+  /// Refraction displacement at the rim.
   final double depth;
+
+  /// Chromatic dispersion — how far red and blue are bent apart at the rim.
+  /// This is the soap-bubble fringe; the bar keeps it near zero, the lens
+  /// opens it with its speed.
   final double dispersion;
+
+  /// Frost radius; 0 is clear glass.
   final double blur;
+
+  /// Saturation multiplier on what shows through.
   final double saturation;
+
+  /// Straight-alpha tint laid over the sampled page.
   final Color tint;
+
+  /// Rim light strength.
   final double specular;
+
+  /// Light direction, in the surface's own xy.
   final Offset light;
+
+  /// Rim shade on the side facing away from the light.
   final double edgeDark;
+
+  /// Drop shadow alpha; 0 for none.
   final double shadow;
   final double shadowBlur;
   final Offset shadowOffset;
@@ -139,7 +163,9 @@ class GlassStyle {
 /// The shader is told where the capsule is in *screen* pixels, measured at
 /// paint time, because the engine gives a backdrop shader the whole screen as
 /// its input rather than the widget's own clip (see the comment atop
-/// `nav_glass.frag`). Only build it when [NavGlass.supported] is true.
+/// `nav_glass.frag`). That breaks inside a save layer whose bounds are not
+/// the screen (an `Opacity` or `ShaderMask` ancestor) — never wrap it in one.
+/// Only build it when [LiquidGlass.supported] is true.
 class GlassSurface extends StatefulWidget {
   const GlassSurface({
     super.key,
@@ -159,7 +185,7 @@ class GlassSurface extends StatefulWidget {
 }
 
 class _GlassSurfaceState extends State<GlassSurface> {
-  late final ui.FragmentShader _shader = NavGlass.shader();
+  late final ui.FragmentShader _shader = LiquidGlass.shader();
 
   @override
   void dispose() {
@@ -311,10 +337,19 @@ class _RenderGlassFilter extends RenderProxyBox {
 ///
 /// Paint it INSIDE the capsule's clip, over the frost and the sheen.
 class GlassLightPainter extends CustomPainter {
-  const GlassLightPainter({required this.style, required this.radius});
+  const GlassLightPainter({
+    required this.style,
+    required this.radius,
+    this.fringeWarm = const Color(0xFFFFB347),
+    this.fringeCool = const Color(0xFF4DA3FF),
+  });
 
   final GlassStyle style;
   final double radius;
+
+  /// The two threads the hairline splits into while the glass disperses.
+  final Color fringeWarm;
+  final Color fringeCool;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -379,15 +414,12 @@ class GlassLightPainter extends CustomPainter {
         ..shader = LinearGradient(
           begin: begin,
           end: end,
-          colors: [
-            c.withValues(alpha: alpha),
-            c.withValues(alpha: 0),
-          ],
+          colors: [c.withValues(alpha: alpha), c.withValues(alpha: 0)],
           stops: const [0.0, 0.55],
         ).createShader(rect);
       canvas.drawRRect(
         RRect.fromRectAndRadius(rect.deflate(0.5), r),
-        thread(AppColors.navFringeWarm, lit * k),
+        thread(fringeWarm, lit * k),
       );
       final inset = 0.5 + 1.5 * k;
       canvas.drawRRect(
@@ -395,12 +427,15 @@ class GlassLightPainter extends CustomPainter {
           rect.deflate(inset),
           Radius.circular(radius - inset),
         ),
-        thread(AppColors.navFringeCool, lit * 0.8 * k),
+        thread(fringeCool, lit * 0.8 * k),
       );
     }
   }
 
   @override
   bool shouldRepaint(GlassLightPainter old) =>
-      old.style != style || old.radius != radius;
+      old.style != style ||
+      old.radius != radius ||
+      old.fringeWarm != fringeWarm ||
+      old.fringeCool != fringeCool;
 }
