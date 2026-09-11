@@ -92,6 +92,9 @@ class BottomNav extends StatefulWidget {
   static const double _fringeSpecular = 0.36;
   static const double _fringeFullSpeed = 3;
 
+  /// How far a finger travels along the bar before a press is a scrub.
+  static const double _scrubSlop = 6;
+
   /// Where the glyph's centre sits when the bar is open.
   static const double _iconCenterY =
       (barHeight - (_iconSize + _iconLabelGap + _labelHeight)) / 2 +
@@ -140,6 +143,9 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
 
   bool _pressed = false;
   bool _scrubbing = false;
+
+  /// Where the finger landed; null once it has lifted.
+  Offset? _down;
 
   /// The finger's speed along the bar while scrubbing, in slots per second,
   /// and the short relaxation that lets the stretch it drives ease off once
@@ -569,24 +575,41 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
   /// before it calls a drag a drag, and that wait was a beat where the lens
   /// sat still under a finger already moving — small, and Ahmed felt it. The
   /// bar sits in the Scaffold's own slot, never inside a scrollable, so there
-  /// is no arena to be polite in. Open: down swells the lens, the first move
-  /// glues it to the finger, up chooses the tab under it (a tap is a down and
-  /// an up with nothing between; a finger that wanders far off the bar is a
-  /// cancel). Folded: up opens the bar.
+  /// is no arena to be polite in.
+  ///
+  /// A press is a **tap** until the finger has travelled [_scrubSlop]: down
+  /// swells the lens, up chooses the tab under it and the lens springs there
+  /// from wherever it is. Past the slop it is a **scrub**: the lens glues to
+  /// the finger from that point on, and release chooses the tab under it
+  /// carrying the finger's speed. The slop is a third of a recognizer's — a
+  /// real scrub crosses it inside a frame — but it is there: without it the
+  /// pixel of wobble in a tap (every mouse click has one) teleported the lens
+  /// to the pointer, parked it there for as long as the button was down, and
+  /// sprang the rest of the way on release — Ahmed's «too fast sometimes,
+  /// laggy sometimes». A finger that wanders far off the bar is a cancel;
+  /// folded, up opens the bar.
   Widget _touch(_Geometry g, Rect rect, double t) {
     final folded = t > 0.5;
     return Listener(
       behavior: HitTestBehavior.opaque,
       onPointerDown: (e) {
         if (folded) return;
-        _scrubbing = true;
+        _down = e.localPosition;
+        _scrubbing = false;
         _fingerVelocity = 0;
-        _fingerAt = DateTime.now().microsecondsSinceEpoch;
+        _fingerAt = null;
         _hover = _visualAt(g, rect, e.localPosition.dx);
         setState(() => _pressed = true);
       },
       onPointerMove: (e) {
-        if (folded || !_scrubbing) return;
+        if (folded || _down == null) return;
+        if (!_scrubbing) {
+          if ((e.localPosition.dx - _down!.dx).abs() < BottomNav._scrubSlop) {
+            return;
+          }
+          _scrubbing = true;
+          _fingerAt = DateTime.now().microsecondsSinceEpoch;
+        }
         _follow(g, rect, e.localPosition.dx);
       },
       onPointerUp: (e) {
@@ -594,22 +617,29 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
           _nav.expand();
           return;
         }
-        if (!_scrubbing) return;
-        _scrubbing = false;
+        if (_down == null) return;
+        _down = null;
         final dy = e.localPosition.dy;
         if (dy < -rect.height || dy > 2 * rect.height) {
+          _scrubbing = false;
           _cancel();
           return;
         }
-        final carried = _lensVelocity;
-        _choose(
-          _hover ?? _visualAt(g, rect, e.localPosition.dx),
-          velocity: carried,
-        );
+        if (_scrubbing) {
+          final carried = _lensVelocity;
+          _scrubbing = false;
+          _choose(
+            _hover ?? _visualAt(g, rect, e.localPosition.dx),
+            velocity: carried,
+          );
+        } else {
+          _choose(_visualAt(g, rect, e.localPosition.dx));
+        }
         _release();
       },
       onPointerCancel: (_) {
-        if (!_scrubbing) return;
+        if (_down == null) return;
+        _down = null;
         _scrubbing = false;
         _cancel();
       },
@@ -644,14 +674,18 @@ class _BottomNavState extends State<BottomNav> with TickerProviderStateMixin {
     final target = (_slotsFrom(g, rect, localX) - 0.5).clamp(-0.15, _n - 0.85);
     final now = DateTime.now().microsecondsSinceEpoch;
     final at = _fingerAt;
-    if (at != null && now > at) {
+    // Samples closer than 4 ms apart are jitter, and a jitter's tiny dt turns
+    // a pixel of travel into a hundred slots a second.
+    if (at != null && now - at >= 4000) {
       final dt = (now - at) / 1e6;
       final sample = (target - _lens.value) / dt;
       // Two-sample smoothing: pointer timestamps are jittery, the stretch
       // must not be.
       _fingerVelocity = _fingerVelocity * 0.4 + sample * 0.6;
+      _fingerAt = now;
+    } else if (at == null) {
+      _fingerAt = now;
     }
-    _fingerAt = now;
     _lens.stop();
     _lens.value = target;
     if (AppMotion.reduced(context)) {

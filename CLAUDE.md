@@ -470,11 +470,18 @@ bar (Files on the iOS 26.5 iPhone 17 Pro simulator, pixel-scanned) and the user'
   (0.08) never shows it and the lens at rest never does. The blur tier paints the split hairline
   (`navFringeWarm` / `navFringeCool` in `GlassLightPainter`) since it cannot bend the page. Both
   land as one commit («Tab bar: the lens disperses…») so the whole thing reverts in one step.
-- **The scrub starts on the first pixel.** The bar's touch is a raw `Listener`, not a
+- **The scrub starts at 6pt, not 18.** The bar's touch is a raw `Listener`, not a
   `GestureDetector`: a drag recognizer waits out the 18pt touch slop before it calls a drag a drag,
   and that wait was a small but visible beat before the lens moved under a finger already moving
-  (Ahmed felt it). Down swells the lens, the first move glues it, up chooses the tab under it; the
-  bar lives in the Scaffold's own slot, never inside a scrollable, so there is no arena to respect.
+  (Ahmed felt it). A press is a *tap* until the finger has travelled `BottomNav._scrubSlop` (6pt):
+  down swells the lens, up chooses the tab under it and the lens springs there from wherever it is,
+  carrying nothing. Past the slop it is a scrub: the lens glues to the finger, release carries the
+  finger's speed. The slop is there because without it the pixel of wobble in every tap (every
+  mouse click has one) teleported the lens to the pointer, parked it there while the button was
+  down and sprang the rest on release — tracked frame by frame in Ahmed's recording as «too fast
+  sometimes, laggy sometimes». Velocity samples closer than 4 ms apart are dropped (a wobble's dt
+  turns a pixel into a hundred slots a second). The bar lives in the Scaffold's own slot, never
+  inside a scrollable, so there is no arena to respect.
 - **Lens**: neutral 7% shade (`navLensTint` — iOS's lens has no colour of its own; the tint comes
   from the glyph), slides between tabs on `AppMotion.spring` (ratio .84), stretches with its own
   speed, swells under a press; **press-and-scrub** along the bar is **glued to the finger** — no
@@ -586,7 +593,13 @@ a runtime-effect pass over the *whole padded screen* (the coverage hint does not
 `compose`), so 8 zones cost 100–200 ms of raster on the first frame after switching to a page
 whose ladder is live and 4 cost 5–20 (the ramp is pixel-identical; one 90 ms warm-up on the
 session's first ladder remains). Plain `BackdropFilter` blurs are cheap (coverage-limited), which
-is why the web tier is fine with hard strips. Shader-first (`compose(outer: blur, inner: shader)`)
+is why the web tier is fine with hard strips. **The spike is allocation, not compilation**: a hidden
+page renders no ladder, the pool lets its full-screen textures go, and the first frame back
+allocates them again (30–90 ms, unpredictably) — `HeaderBlurWarmUp` (mounted permanently under the
+whole app in `main.dart`) keeps one two-point strip at the top sigma with an empty window alive,
+which holds the pipeline and the largest texture: switches into the ladder page measure 8–22 ms
+for ~1 ms a frame while anything animates (one strip per zone gave 14–16 for three times the
+tax). Shader-first (`compose(outer: blur, inner: shader)`)
 would be cheap but the engine drops the blur; `TileMode.decal` on plain strips feathers for free
 but darkens everything within σ of a clip edge. The other half of the tab-switch lag was the
 shell rebuilding all five page trees on every `setState` (30–60 ms of build) — the pages are built

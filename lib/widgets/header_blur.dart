@@ -31,6 +31,64 @@ class HeaderBlur {
   static ui.FragmentShader shader() => _program!.fragmentShader();
 }
 
+/// Keeps the ladder's textures warm so a tap into a scrolled page does not
+/// pay for them. Each zone of the ladder is a runtime-effect pass over the
+/// whole padded screen with a full-screen texture behind it; a page that is
+/// hidden renders none, the pool lets them go, and the first frame back
+/// allocates them again — 30–90 ms of raster on the simulator, felt as the
+/// lens stalling and then jumping (a time-based spring catches up in one
+/// frame). This mounts one two-point strip at the ladder's top sigma with an
+/// empty window (alpha 0 everywhere, so nothing shows), permanently, under
+/// the whole app: the pipeline compiles once at launch under the login
+/// screen and the largest texture stays in the pool. Measured: switches into
+/// the ladder page went from 30–90 ms to 8–22 ms, for about a millisecond a
+/// frame while anything animates (four strips, one per zone, took them to
+/// 14–16 for three times the tax — not worth it on the older phones). Builds
+/// nothing where the shader path is unsupported.
+class HeaderBlurWarmUp extends StatefulWidget {
+  const HeaderBlurWarmUp({super.key});
+
+  @override
+  State<HeaderBlurWarmUp> createState() => _HeaderBlurWarmUpState();
+}
+
+class _HeaderBlurWarmUpState extends State<HeaderBlurWarmUp> {
+  final ui.FragmentShader? _shader = HeaderBlur.supported
+      ? HeaderBlur.shader()
+      : null;
+
+  @override
+  void dispose() {
+    _shader?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final shader = _shader;
+    if (shader == null) return const SizedBox.shrink();
+    return IgnorePointer(
+      child: SizedBox(
+        width: 2,
+        height: 2,
+        child: ClipRect(
+          child: _FadeFilter(
+            shader: shader,
+            sigma: HeaderBackdrop.sigma,
+            // A window that starts past its own end: alpha 0 throughout.
+            start: 2,
+            fadeFrom: 2,
+            fadeTo: 3,
+            dpr: MediaQuery.devicePixelRatioOf(context),
+            screen: MediaQuery.sizeOf(context),
+            child: const SizedBox.expand(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// The progressive blur under the unified header — the page dissolving into
 /// the bar instead of hitting an edge, the way iOS 26's scroll edge and
 /// Instagram's header do it.

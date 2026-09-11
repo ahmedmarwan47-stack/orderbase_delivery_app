@@ -164,7 +164,15 @@ class _CourierMaterialApp extends StatelessWidget {
           data: mq.copyWith(
             textScaler: mq.textScaler.clamp(maxScaleFactor: 1.3),
           ),
-          child: child!,
+          // An invisible two-point strip keeps the header ladder's textures
+          // warm, so a tap into a scrolled page does not pay to allocate
+          // them on its first frame — see [HeaderBlurWarmUp].
+          child: Stack(
+            children: [
+              child!,
+              const Positioned(top: 0, left: 0, child: HeaderBlurWarmUp()),
+            ],
+          ),
         );
       },
       routerConfig: Modular.routerConfig,
