@@ -4,8 +4,28 @@
     {
       "name": "flutter-web",
       "runtimeExecutable": "/Users/ahmed/development/flutter/bin/flutter",
-      "runtimeArgs": ["run", "-d", "web-server", "--web-port", "8080", "--web-hostname", "127.0.0.1"],
+      "runtimeArgs": [
+        "run",
+        "-d",
+        "web-server",
+        "--web-port",
+        "8080",
+        "--web-hostname",
+        "127.0.0.1"
+      ],
       "port": 8080
+    },
+    {
+      "name": "web-static",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8081",
+        "--directory",
+        "build/web"
+      ],
+      "port": 8081
     }
   ]
 }

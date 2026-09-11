@@ -150,6 +150,13 @@ class HeaderBackdrop extends StatelessWidget {
   static const double tintAlpha = 0.5;
   static const int steps = 4;
 
+  /// Without shader filters the zones keep hard edges, and four of them read
+  /// as stairs (Ahmed, on GitHub Pages: «bad and broken»). Plain blurs are
+  /// coverage-limited and cheap, so the web climbs the same run in sixteen
+  /// 3pt strips instead — a sigma step of under one point, which the eye
+  /// reads as one slope.
+  static const int webSteps = 16;
+
   @override
   Widget build(BuildContext context) {
     if (strength <= 0) return const SizedBox.shrink();
@@ -197,8 +204,12 @@ class HeaderBackdrop extends StatelessWidget {
 
 /// Zone j (1 = the lowest) of the ramp in a box [h] tall: its top, its bottom
 /// and its sigma. Zone [HeaderBackdrop.steps] is the block above the run.
-({double top, double bottom, double sigma}) _zone(int j, double h, double s) {
-  const n = HeaderBackdrop.steps;
+({double top, double bottom, double sigma}) _zone(
+  int j,
+  double h,
+  double s, {
+  int n = HeaderBackdrop.steps,
+}) {
   const run = HeaderBackdrop.reach + HeaderBackdrop.rampIn;
   return (
     top: j == n ? 0.0 : h - run * j / n,
@@ -428,9 +439,9 @@ class _Strips extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        for (var j = 1; j <= HeaderBackdrop.steps; j++)
+        for (var j = 1; j <= HeaderBackdrop.webSteps; j++)
           () {
-            final z = _zone(j, height, strength);
+            final z = _zone(j, height, strength, n: HeaderBackdrop.webSteps);
             return Positioned(
               left: 0,
               right: 0,

@@ -575,7 +575,9 @@ stairs on any sharp horizontal edge (each smears it by a different amount), so o
 strip reaches one zone further down and **fades out across it** (`_Ladder`: the engine blur
 composed with `header_fade.frag`, whose window is nothing / opaque / fade / nothing), which
 crossfades neighbouring levels into one slope; without shader filters (the web) the zones keep
-hard edges (`_Strips`).
+hard edges (`_Strips`) — **sixteen** of them (`webSteps`), 3pt each: four hard zones read as stairs
+on GitHub Pages (Ahmed: «bad and broken»), and plain blurs are coverage-limited, so the web can
+afford the finer ladder that the composed one cannot.
 
 **The composed-filter contract, all measured by pixel readback** (constant-colour probes and
 encoded uniforms — the only way; guessing cost a day): the engine composites a runtime-effect
@@ -740,6 +742,12 @@ shell (and the *Tab bar lab*). **Add a gallery entry for each new screen.**
   squashed every 44×44 tile by ~15%. Native builds keep the normal `ScreenUtilInit` path — note
   the same squash exists natively on short phones (an SE's 667pt gives an 0.82 height scale),
   so if the fleet's older iPhones show it, move native onto the width-only scale too.
+- **Browser verification that actually works:** `flutter build web --release`, then the
+  `web-static` launch config (`python3 -m http.server 8081 --directory build/web`) through the
+  Browser pane's `preview_start`. The `flutter-web` dev-server config dies within a minute when
+  its debug websocket fails to upgrade, and the page it leaves is solid ink. Canvas clicks still
+  do not register; a `ScrollController(initialScrollOffset:)` on a throwaway build is how to land
+  on a scrolled page. The wheel does scroll.
 - **Browser fallback (no Xcode needed):**
   `flutter run -d web-server --web-port 8080 --web-hostname 127.0.0.1`, then open
   `http://127.0.0.1:8080` in the Browser pane at a phone viewport (~390×844). First compile is slow
