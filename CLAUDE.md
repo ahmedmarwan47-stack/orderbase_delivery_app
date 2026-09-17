@@ -638,8 +638,7 @@ haptic:)`, `LiquidTabItem(label:, iconBuilder:, badge:)` / `.icon(...)`, `Liquid
 colour and number), `LiquidTabBarController` (`.shared`), `LiquidTabBarMaterial`, `LiquidGlass.load()`.
 The app's `lib/widgets/bottom_nav.dart` is a thin adapter — `NavTab`, `BottomNav(active:, onTap:)`,
 `reservedHeight` — that dresses the package in `AppColors` / `IconWidget` / `LocaleKeys`, feeds the
-Orders badge from `ShiftController` and the opaque tier from `RoadMode` (`material:`, since 2.0.0
-dropped `forceOpaque`); `nav_bar_controller.dart`
+Orders badge from `ShiftController` and `forceOpaque` from `RoadMode`; `nav_bar_controller.dart`
 keeps `NavBarController.instance` (= `LiquidTabBarController.shared`) and `typedef NavMaterial`.
 `nav_glass.dart` is gone (`main.dart` calls `LiquidGlass.load()`). **Change the bar in the package,
 not the adapter.** `packages/liquid_tab_bar/example/` is a runnable demo (colour bands, a dark card,
@@ -649,16 +648,26 @@ rows, a material picker) for anyone trying the package. **It is published**, at
 1.0 because the public surface is settled, not because any of it moved, and 1.0.0 was skipped
 knowingly).
 
-**2.0.0 is Mohammed Hafiz's rework** (PR #5, merged 17 Sep 2026): `LiquidTabBarScaffold` (zero-config
-scroll folding + reserved padding), a dedicated `droplet_glass.frag` refracting the icons and labels
-the lens holds *while it moves*, expandable search, separate actions, badges, and the style objects
-(`LiquidBarStyle` / `LiquidDropletSurfaceStyle` / `DropletRefractionStyle` / `LiquidTabActionStyle` /
-`LiquidBadgeStyle`) that replace the flat theme. It also carries a real Android fix: the
-`IMPELLER_TARGET_OPENGLES` branch flipped Y a second time and mirrored the sampled page on GLES
-devices. **It drops the grab** — the lens is no longer a `GlassSurface` of its own, so
-`GlassStyle.zoom` and `pressLens` have no host and a press is the old 6% swell again; restoring it
-means re-authoring it against the droplet shader, not reverting a diff. 1.1.0 was never published,
-so pub.dev goes 1.0.1 → 2.0.0.
+**1.2.0 carries a SECOND bar beside ours** (Mohammed Hafiz's PR #5, merged 17 Sep 2026). It did not
+replace ours — his lens is a contained pill with the optics moved to a `droplet_glass.frag` behind
+it, which leaves `GlassStyle.zoom` and `pressLens` with no host, so **the grab cannot survive his
+architecture**. Rather than pick, the package ships both:
+
+- `package:liquid_tab_bar/liquid_tab_bar.dart` — **ours**, unchanged, the grab included. This is
+  what `BottomNav` imports and what the app renders. Sources in `lib/src/classic/`, shader at
+  `assets/shaders/nav_glass.frag`.
+- `package:liquid_tab_bar/droplet.dart` — **his**: `LiquidTabBarScaffold` (zero-config scroll
+  folding + reserved padding), expandable search, separate actions, badges, and the style objects
+  (`LiquidBarStyle` / `LiquidDropletSurfaceStyle` / `DropletRefractionStyle` / `LiquidTabActionStyle`
+  / `LiquidBadgeStyle`). Sources in `lib/src/droplet/`, shaders under `assets/shaders/droplet/`.
+
+The two libraries **share type names on purpose** (both export `LiquidTabBar`, `LiquidTabBarTheme`,
+`LiquidTabItem`, `LiquidTabBarController`) — import one, or prefix the other. **Don't "unify" them.**
+
+His Android fix is in **both** shaders: the `IMPELLER_TARGET_OPENGLES` branch flipped Y a second time
+and sampled the page mirrored on every GLES device — a real bug in ours too. Version went 1.0.1 →
+**1.2.0** (additive, not breaking: ours is untouched and his arrives beside it); 1.1.0 was never
+published.
 
 Release it with `flutter pub publish` from the package folder after bumping
 `version:` and writing the CHANGELOG entry — the first publish on a machine opens a Google OAuth
