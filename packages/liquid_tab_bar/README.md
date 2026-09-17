@@ -1,9 +1,102 @@
 # liquid_tab_bar
 
-A floating liquid-glass navigation bar for Flutter with optical refraction, spring-driven selection, expandable search, actions, badges, and scroll-aware folding.
+Floating liquid-glass navigation bars for Flutter: optical refraction,
+spring-driven selection, expandable search, actions, badges, and scroll-aware
+folding.
 
 [![pub package](https://img.shields.io/pub/v/liquid_tab_bar.svg)](https://pub.dev/packages/liquid_tab_bar)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+---
+
+## Two bars, one package
+
+They are two answers to the same question, not a bar and its successor. Pick
+the one whose selection lens behaves the way you want.
+
+| | **The default bar** | **The droplet** |
+|:---|:---|:---|
+| Import | `package:liquid_tab_bar/liquid_tab_bar.dart` | `package:liquid_tab_bar/droplet.dart` |
+| The lens | A pane of glass in its own right | A contained pill |
+| On press | **Grabs** — balloons past the capsule while the glass magnifies the tab it holds | Swells 6% |
+| Refraction | The lens bends the page it slides over | A shader bends the icons and labels *behind* it, while it moves |
+| Extras | — | Scaffold, expandable search, separate actions, badges |
+| Scroll folding | You forward the notifications | `LiquidTabBarScaffold` does it |
+
+Both carry the three material tiers, the spring, finger scrubbing, fold on
+scroll, RTL, reduced motion and the frame governor.
+
+Their type names overlap on purpose — both call their widget `LiquidTabBar`
+and their theme `LiquidTabBarTheme` — so import one, or prefix the other:
+
+```dart
+import 'package:liquid_tab_bar/liquid_tab_bar.dart';
+import 'package:liquid_tab_bar/droplet.dart' as droplet;
+```
+
+---
+
+## The default bar
+
+```dart
+import 'package:liquid_tab_bar/liquid_tab_bar.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await LiquidGlass.load(); // the shader, once; it falls back to blur without it
+  LiquidTabBarController.shared.armGovernor();
+  runApp(const MyApp());
+}
+```
+
+Put it in a `Scaffold(extendBody: true)` so the page passes underneath, and
+give the page `LiquidTabBar.reservedHeight(context)` of bottom padding. One
+bar over every tab page (an `IndexedStack`) lets the lens slide from the old
+tab to the new one.
+
+```dart
+Scaffold(
+  extendBody: true,
+  body: NotificationListener<ScrollNotification>(
+    onNotification: LiquidTabBarController.shared.handleScroll,
+    child: IndexedStack(index: _tab, children: pages),
+  ),
+  bottomNavigationBar: LiquidTabBar(
+    items: [
+      LiquidTabItem.icon(label: 'Home', icon: Icons.home_outlined, activeIcon: Icons.home),
+      LiquidTabItem.icon(label: 'Orders', icon: Icons.receipt_long_outlined, badge: true),
+      LiquidTabItem.icon(label: 'Wallet', icon: Icons.account_balance_wallet_outlined),
+      LiquidTabItem.icon(label: 'Me', icon: Icons.person_outline),
+    ],
+    selectedIndex: _tab,
+    onSelected: (i) => setState(() => _tab = i),
+  ),
+)
+```
+
+**The grab.** A press balloons the lens past the capsule — taller than the
+bar, escaping its top and bottom edge evenly — and the glass magnifies the tab
+it holds, the colour channels zooming slightly apart so the enlarged glyph
+fringes at its own edges. It rides one spring, up on touch-down and home on
+release. `LiquidTabBarTheme(pressLens: false)` restores the older, quieter
+swell instead.
+
+**Scrub.** Press and drag along the bar and the lens is glued to your finger,
+ticking at every tab; release to choose, the lens landing with the speed you
+gave it.
+
+`LiquidTabItem` takes an `iconBuilder` for custom glyphs (SVGs, say); the bar
+hands it the colour and whether the tab is selected. `LiquidTabBarTheme`
+carries every colour and number — including `pressLens`;
+`LiquidTabBarController.material` pins a tier (`glass`, `blur`, `opaque`) or
+leaves it `auto`.
+
+---
+
+# The droplet variant
+
+Everything below this line documents
+`package:liquid_tab_bar/droplet.dart`.
 
 ---
 
@@ -47,7 +140,7 @@ A floating liquid-glass navigation bar for Flutter with optical refraction, spri
 
 ## Style Architecture
 
-Version `2.0.0` organizes styling into single-responsibility configuration objects:
+The droplet organizes styling into single-responsibility configuration objects:
 
 | Style Class | Target Layer | Key Properties |
 |:---|:---|:---|
@@ -65,7 +158,7 @@ Add `liquid_tab_bar` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  liquid_tab_bar: ^2.0.0
+  liquid_tab_bar: ^1.2.0
 ```
 
 Fragment shaders are bundled with the package; no custom asset declarations are required in your host application.
@@ -428,21 +521,19 @@ controller.armGovernor();
 
 ---
 
-## Migration from 1.x to 2.0.0
+## Coming from an older droplet branch
 
-Version `2.0.0` streamlines configuration into dedicated style objects:
-- Use `LiquidBarStyle` for outer navigation bar surfaces.
-- Use `LiquidDropletSurfaceStyle` for droplet visual appearance.
-- Use `DropletRefractionStyle` for optical refraction physics.
-- Use `shrinkOnScroll` instead of the removed `foldOnScroll`.
-- `LiquidTabItem.icon` now supports compile-time `const` construction.
+The droplet's styling lives in dedicated objects:
+- `LiquidBarStyle` for outer navigation bar surfaces.
+- `LiquidDropletSurfaceStyle` for droplet visual appearance.
+- `DropletRefractionStyle` for optical refraction physics.
+- `shrinkOnScroll` rather than `foldOnScroll`.
+- `LiquidTabItem.icon` is `const`-constructible.
 
-It also **drops the grab** — 1.1.0's press, where the lens ballooned past
-the capsule and the glass magnified the tab it held. The lens is no longer a
-glass surface of its own, so `GlassStyle.zoom` and `LiquidTabBarTheme.pressLens`
-are gone with it; a press is a 6% swell again.
+Before/after comparisons are in the [style guide](doc/migration_0.3.0.md).
 
-For comprehensive migration steps and before/after comparisons, see the [migration guide](doc/migration_0.3.0.md).
+> Nothing here is a migration *from the default bar* — that bar is unchanged
+> and still the package's default import. The two live side by side.
 
 ---
 
@@ -457,7 +548,7 @@ change one and the bar stops reading as the system's.
 
 ---
 
-## The shader contract (for anyone changing the glass)
+## The shader contract (for anyone changing either bar's glass)
 
 Hard-won, and contradicted by the documentation — measured by pixel readback,
 not guessed:
@@ -480,8 +571,9 @@ not guessed:
 
 ## Credits
 
-The `2.0.0` shape — the scaffold, the droplet refraction shader, search,
-actions, badges and the style objects — is the work of
+The droplet variant — the scaffold, its refraction shader, search, actions,
+badges and the style objects — and the Android Impeller backdrop fix that
+both bars now carry, are the work of
 **[Mohammed Hafiz](https://github.com/MohammedHafiz27)**
 ([#5](https://github.com/ahmedmarwan47-stack/orderbase_delivery_app/pull/5)).
 The fold-and-unfold lens fixes in `1.0.1` are

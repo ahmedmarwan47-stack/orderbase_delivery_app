@@ -54,12 +54,8 @@ class BottomNav extends StatelessWidget {
       builder: (context, _) => LiquidTabBar(
         items: [
           for (final tab in NavTab.values)
-            LiquidTabItem.icon(
+            LiquidTabItem(
               label: _label(tab),
-              // The app draws its own stroke SVGs, so [icon] is never used —
-              // [iconBuilder] wins. It is required all the same, so it carries
-              // the nearest Material glyph as a placeholder.
-              icon: _fallbackIcon(tab),
               iconBuilder: (color, selected) => IconWidget(
                 icon: selected ? _activeIcon(tab) : _icon(tab),
                 color: color,
@@ -80,26 +76,22 @@ class BottomNav extends StatelessWidget {
           activeColor: AppColors.dangerAccent,
           inactiveColor: AppColors.textPrimary,
           labelStyle: const TextStyle().s12,
-          barStyle: LiquidBarStyle(
-            blurTint: AppColors.navGlassTint,
-            blurSheenTop: AppColors.navGlassSheenTop,
-            blurSheenBottom: AppColors.navGlassSheenBottom,
-            blurEdge: AppColors.navGlassEdge,
-            opaqueFill: AppColors.surface,
-            opaqueEdge: AppColors.navOpaqueEdge,
-            shadow: AppShadows.floatingBar,
-          ),
-          dropletSurfaceStyle: LiquidDropletSurfaceStyle.light.copyWith(
-            opaqueFill: AppColors.navLensTint,
-          ),
-          badgeStyle: const LiquidBadgeStyle(
-            color: AppColors.brand,
-            borderColor: AppColors.surface,
-          ),
+          glassTint: AppColors.navGlassTint,
+          sheenTop: AppColors.navGlassSheenTop,
+          sheenBottom: AppColors.navGlassSheenBottom,
+          glassEdge: AppColors.navGlassEdge,
+          opaqueSurface: AppColors.surface,
+          opaqueEdge: AppColors.navOpaqueEdge,
+          lensTint: AppColors.navLensTint,
+          fringeWarm: AppColors.navFringeWarm,
+          fringeCool: AppColors.navFringeCool,
+          badgeColor: AppColors.brand,
+          badgeBorder: AppColors.surface,
+          shadow: AppShadows.floatingBar,
           spring: AppMotion.spring,
           relax: AppMotion.tick,
         ),
-        material: RoadMode.instance.on ? LiquidTabBarMaterial.opaque : null,
+        forceOpaque: RoadMode.instance.on,
         haptic: AppHaptics.tick,
       ),
     );
@@ -119,15 +111,6 @@ class BottomNav extends StatelessWidget {
     NavTab.orders => AppAssets.svg.orders,
     NavTab.settlement => AppAssets.svg.wallet,
     NavTab.profile => AppAssets.svg.user,
-  };
-
-  /// Required by [LiquidTabItem.icon] and never drawn: the app's own
-  /// [iconBuilder] replaces it on every tab.
-  IconData _fallbackIcon(NavTab t) => switch (t) {
-    NavTab.home => Icons.home_outlined,
-    NavTab.orders => Icons.receipt_long_outlined,
-    NavTab.settlement => Icons.account_balance_wallet_outlined,
-    NavTab.profile => Icons.person_outline,
   };
 
   /// The filled twin, for the selected tab only.

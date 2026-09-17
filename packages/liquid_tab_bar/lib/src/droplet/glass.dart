@@ -40,14 +40,14 @@ class LiquidGlass {
     return _loadingFuture ??= () async {
       try {
         _program ??= await ui.FragmentProgram.fromAsset(
-          'packages/liquid_tab_bar/assets/shaders/nav_glass.frag',
+          'packages/liquid_tab_bar/assets/shaders/droplet/nav_glass.frag',
         );
       } catch (_) {
         // Blur tier it is.
       }
       try {
         _dropletProgram ??= await ui.FragmentProgram.fromAsset(
-          'packages/liquid_tab_bar/assets/shaders/droplet_glass.frag',
+          'packages/liquid_tab_bar/assets/shaders/droplet/droplet_glass.frag',
         );
       } catch (_) {
         // Blur tier fallback for droplet

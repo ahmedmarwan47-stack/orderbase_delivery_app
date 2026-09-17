@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:liquid_tab_bar/liquid_tab_bar.dart';
-import 'package:liquid_tab_bar/src/test_overrides.dart';
+import 'package:liquid_tab_bar/droplet.dart';
+import 'package:liquid_tab_bar/src/droplet/test_overrides.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

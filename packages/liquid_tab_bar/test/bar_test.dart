@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:liquid_tab_bar/liquid_tab_bar.dart';
-import 'package:liquid_tab_bar/src/glass.dart';
+import 'package:liquid_tab_bar/droplet.dart';
+import 'package:liquid_tab_bar/src/droplet/glass.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

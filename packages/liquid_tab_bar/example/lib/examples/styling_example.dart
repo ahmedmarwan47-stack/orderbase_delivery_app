@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:liquid_tab_bar/liquid_tab_bar.dart';
+import 'package:liquid_tab_bar/droplet.dart';
 
 import 'showcase_content.dart';
 

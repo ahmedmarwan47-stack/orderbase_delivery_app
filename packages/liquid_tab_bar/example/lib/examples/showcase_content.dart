@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:liquid_tab_bar/liquid_tab_bar.dart';
+import 'package:liquid_tab_bar/droplet.dart';
 
 List<LiquidTabItem> showcaseItems({bool rtl = false}) => [
       LiquidTabItem.icon(
