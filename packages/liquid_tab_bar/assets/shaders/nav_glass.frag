@@ -31,7 +31,6 @@ uniform float uEdgeDark;   // 20    rim shade on the side facing away
 uniform float uShadow;     // 21    drop shadow alpha; 0 = none
 uniform float uShadowBlur; // 22    shadow softness (px)
 uniform vec2 uShadowOff;   // 23-24 shadow offset (px)
-uniform float uZoom;       // 25    interior magnification; 1 = optically flat
 
 uniform sampler2D uTex;
 
@@ -56,13 +55,10 @@ vec2 boxNormal(vec2 p, vec2 hs, float r) {
 
 vec3 tap(vec2 px) {
   vec2 uv = clamp(px / uSize, vec2(0.0), vec2(1.0));
-#ifdef IMPELLER_TARGET_OPENGLES
-  uv.y = 1.0 - uv.y;
-#endif
   return texture(uTex, uv).rgb;
 }
 
-// The frost: three rings of taps around the centre, rotated per pixel so the
+// The frost: four rings of taps around the centre, rotated per pixel so the
 // ring pattern dissolves into fine grain instead of banding.
 //
 // Cost matters here — this runs for every pixel under the bar, every frame
@@ -70,7 +66,12 @@ vec3 tap(vec2 px) {
 // (a single sin/cos pair), and each tap steps around its ring by a constant
 // matrix: four multiply-adds instead of a sin and a cos per tap. Same taps,
 // same picture, a fraction of the ALU.
-const mat2 kStep8 = mat2(0.70710678, 0.70710678, -0.70710678, 0.70710678); // 45°
+//
+// Four rings at 0.25×, 0.50×, 0.75×, 1.0× with Gaussian-like weights
+// eliminate the visible ring/banding artifacts that three widely-spaced rings
+// produced on high-contrast backgrounds.
+const mat2 kStep8  = mat2(0.70710678, 0.70710678, -0.70710678, 0.70710678); // 45°
+const mat2 kStep10 = mat2(0.80901699, 0.58778525, -0.58778525, 0.80901699); // 36°
 const mat2 kStep12 = mat2(0.86602540, 0.5, -0.5, 0.86602540);              // 30°
 const mat2 kStep16 = mat2(0.92387953, 0.38268343, -0.38268343, 0.92387953); // 22.5°
 
@@ -82,25 +83,31 @@ vec3 frost(vec2 c) {
   mat2 jitter = mat2(ca, sa, -sa, ca);
   vec3 acc = tap(c);
   float w = 1.0;
-  // Ring 1: 8 taps from a0, 45° apart.
-  vec2 d = jitter * vec2(uBlur * 0.35, 0.0);
+  // Ring 1: 8 taps at 0.25× radius, 45° apart — Gaussian weight ≈ 0.88.
+  vec2 d = jitter * vec2(uBlur * 0.25, 0.0);
   for (int i = 0; i < 8; i++) {
-    acc += tap(c + d) * 0.85;
+    acc += tap(c + d) * 0.88;
     d = kStep8 * d;
   }
-  // Ring 2: 12 taps from a0 + 15°, 30° apart.
-  d = jitter * (vec2(0.96592583, 0.25881905) * (uBlur * 0.7));
+  // Ring 2: 10 taps at 0.50× radius, 36° apart — Gaussian weight ≈ 0.68.
+  d = jitter * vec2(uBlur * 0.50, 0.0);
+  for (int i = 0; i < 10; i++) {
+    acc += tap(c + d) * 0.68;
+    d = kStep10 * d;
+  }
+  // Ring 3: 12 taps at 0.75× radius, 30° apart — Gaussian weight ≈ 0.42.
+  d = jitter * (vec2(0.96592583, 0.25881905) * (uBlur * 0.75));
   for (int i = 0; i < 12; i++) {
-    acc += tap(c + d) * 0.55;
+    acc += tap(c + d) * 0.42;
     d = kStep12 * d;
   }
-  // Ring 3: 16 taps from a0 + 11.25°, 22.5° apart.
+  // Ring 4: 16 taps at 1.0× radius, 22.5° apart — Gaussian weight ≈ 0.20.
   d = jitter * (vec2(0.98078528, 0.19509032) * uBlur);
   for (int i = 0; i < 16; i++) {
-    acc += tap(c + d) * 0.3;
+    acc += tap(c + d) * 0.20;
     d = kStep16 * d;
   }
-  w += 8.0 * 0.85 + 12.0 * 0.55 + 16.0 * 0.3;
+  w += 8.0 * 0.88 + 10.0 * 0.68 + 12.0 * 0.42 + 16.0 * 0.20;
   return acc / w;
 }
 
@@ -138,33 +145,17 @@ void main() {
   vec3 t = refract(vec3(0.0, 0.0, -1.0), n, 1.0 / 1.5);
   vec2 off = t.xy / max(-t.z, 0.3) * uDepth;
 
-  // The grabbed lens: uZoom > 1 magnifies the interior — every sample is
-  // pulled toward the capsule's centre, so what the glass holds reads larger
-  // the way a lifted magnifier shows it. At 1 (the bar, the resting lens)
-  // this whole branch reduces to sampling at p, exactly as before.
-  float z = max(uZoom, 1.0);
-  bool zoomed = z > 1.001;
-  vec2 zc = uRect.xy + hs;
-  vec2 pg = zoomed ? zc + q / z : p;
-
-  vec3 col = frost(pg + off);
+  vec3 col = frost(p + off);
   float rimW = 1.0 - h;
   // Dispersion: glass bends blue more than red, so the rim shows the page's
   // red from a little nearer the edge and its blue from a little further in.
   // uDisp is that spread as a fraction of the bend — a whisper at rest, and
   // on the lens opened wide while a finger drags it, so the glyphs and labels
   // it slides across split into a warm copy and a cool one at its edge: the
-  // fringe a soap bubble shows in the sun. Zoomed, the channels also magnify
-  // slightly apart, so the magnified content fringes at its own edges, not
-  // only where the rim bends.
-  if (uDisp > 0.0 && (rimW > 0.01 || zoomed)) {
-    float zr = zoomed ? mix(1.0, z, 1.0 - uDisp * 0.12) : 1.0;
-    float zb = zoomed ? mix(1.0, z, 1.0 + uDisp * 0.12) : 1.0;
-    vec2 pr = zoomed ? zc + q / zr : p;
-    vec2 pb = zoomed ? zc + q / zb : p;
-    float w = max(rimW, zoomed ? 0.85 : 0.0);
-    col.r = mix(col.r, tap(pr + off * (1.0 - uDisp)).r, w);
-    col.b = mix(col.b, tap(pb + off * (1.0 + uDisp)).b, w);
+  // fringe a soap bubble shows in the sun.
+  if (uDisp > 0.0 && rimW > 0.01) {
+    col.r = mix(col.r, tap(p + off * (1.0 - uDisp)).r, rimW);
+    col.b = mix(col.b, tap(p + off * (1.0 + uDisp)).b, rimW);
   }
 
   float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
@@ -184,16 +175,24 @@ void main() {
   // touch added on top so it still shows over ink. Nothing at rest: the
   // lens's resting dispersion sits below the threshold, and so does the
   // bar's.
-  float film = smoothstep(0.25, 0.8, uDisp) * smoothstep(0.0, 0.04, x) *
-      (1.0 - smoothstep(0.12, 0.45, x)) * (0.6 + 0.4 * toward);
+  // Thin film: while the lens disperses, a band of colour lies across the
+  // outer rim — warm at the very edge, magenta, then blue a little way in —
+  // the way a soap film bands where it thins, strongest where the light
+  // falls. Multiplied in so it reads as a pastel on a white page, with a
+  // touch added on top so it still shows over ink.
+  float film = smoothstep(0.05, 0.70, uDisp) * smoothstep(0.0, 0.05, x) *
+      (1.0 - smoothstep(0.10, 0.50, x));
   if (film > 0.001) {
-    float u = clamp(x / 0.3, 0.0, 1.0);
-    vec3 warm = vec3(1.0, 0.72, 0.4);
-    vec3 magenta = vec3(1.0, 0.55, 0.9);
-    vec3 blue = vec3(0.5, 0.75, 1.0);
-    vec3 tone = u < 0.5 ? mix(warm, magenta, u * 2.0)
-                        : mix(magenta, blue, u * 2.0 - 1.0);
-    col = mix(col, col * mix(vec3(1.0), tone, 0.75) + tone * 0.14, film);
+    float u = clamp(x / 0.35, 0.0, 1.0);
+    vec3 warm = vec3(1.0, 0.68, 0.30);
+    vec3 magenta = vec3(1.0, 0.35, 0.85);
+    vec3 blue = vec3(0.25, 0.65, 1.0);
+    vec3 cyan = vec3(0.10, 0.90, 1.0);
+    vec3 tone = u < 0.33 ? mix(warm, magenta, u * 3.0)
+              : (u < 0.66 ? mix(magenta, blue, (u - 0.33) * 3.0)
+                          : mix(blue, cyan, (u - 0.66) * 3.0));
+    // Additive luminous caustics so the rainbow sparkles on both dark and light backgrounds
+    col += tone * film * (0.35 + 0.65 * uDisp);
   }
 
   // Lighting: a Blinn highlight where the rim faces the light, a whisper of
@@ -206,8 +205,8 @@ void main() {
   float hairG = 1.0 - smoothstep(0.0, 2.5, d);
   vec3 hair = vec3(hairG);
   if (uDisp > 0.0) {
-    float s = max(uDisp * uDepth * 0.35, 0.01);
-    float hairR = 1.0 - smoothstep(0.0, 2.5, d + s * 0.5);
+    float s = max(uDisp * uDepth * 0.45, 0.02);
+    float hairR = 1.0 - smoothstep(0.0, 2.5, d + s * 0.6);
     float hairB = smoothstep(0.0, s, d) * (1.0 - smoothstep(0.0, 2.5, d - s));
     hair = vec3(hairR, hairG, hairB);
   }
@@ -215,7 +214,8 @@ void main() {
   col = col * (1.0 - uEdgeDark * rimW * away) + vec3(spec) + line;
 
   // Anti-aliased edge: the glass fades to the shadow underneath it.
-  float aa = 1.0 - smoothstep(-1.0, 1.0, sd);
+  // 3px band (in texture pixels) for smooth edges on Retina displays.
+  float aa = 1.0 - smoothstep(-1.5, 1.5, sd);
   float a = aa + shadow * (1.0 - aa);
   fragColor = vec4(col * aa, a);
 }

@@ -1,0 +1,11 @@
+# Files to ignore when publishing to pub.dev
+.DS_Store
+.dart_tool/
+.flutter-plugins-dependencies
+build/
+.history
+.vscode/
+.idea/
+*.iml
+/example/android/
+/example/ios/

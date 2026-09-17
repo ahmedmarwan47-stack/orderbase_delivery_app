@@ -1,7 +1,14 @@
 name: liquid_tab_bar
 description: An iOS 26-style floating liquid-glass tab bar for Flutter — refraction, a soap-bubble selection lens, finger scrubbing, fold on scroll.
-version: 1.1.0
+version: 0.3.0
 repository: https://github.com/ahmedmarwan47-stack/orderbase_delivery_app/tree/main/packages/liquid_tab_bar
+issue_tracker: https://github.com/ahmedmarwan47-stack/orderbase_delivery_app/issues
+topics:
+  - navigation
+  - tabs
+  - glassmorphism
+  - ios
+  - ui
 
 environment:
   sdk: ^3.6.0
@@ -13,7 +20,10 @@ dependencies:
 
 dev_dependencies:
   flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
 
 flutter:
   shaders:
     - assets/shaders/nav_glass.frag
+    - assets/shaders/droplet_glass.frag
