@@ -169,17 +169,11 @@ void main() {
   float away = smoothstep(-0.25, 0.7, -facing);
 
   // Thin film: while the lens disperses, a band of colour lies across the
-  // outer rim — warm at the very edge, magenta, then blue a little way in —
-  // the way a soap film bands where it thins, strongest where the light
-  // falls. Multiplied in so it reads as a pastel on a white page, with a
-  // touch added on top so it still shows over ink. Nothing at rest: the
-  // lens's resting dispersion sits below the threshold, and so does the
-  // bar's.
-  // Thin film: while the lens disperses, a band of colour lies across the
-  // outer rim — warm at the very edge, magenta, then blue a little way in —
-  // the way a soap film bands where it thins, strongest where the light
-  // falls. Multiplied in so it reads as a pastel on a white page, with a
-  // touch added on top so it still shows over ink.
+  // outer rim — warm at the very edge, magenta, then blue, then cyan a little
+  // way in — the way a soap film bands where it thins. Added in rather than
+  // multiplied, so it sparkles over ink as well as over a white page.
+  // Nothing at rest: the lens's resting dispersion sits below the threshold,
+  // and so does the bar's.
   float film = smoothstep(0.05, 0.70, uDisp) * smoothstep(0.0, 0.05, x) *
       (1.0 - smoothstep(0.10, 0.50, x));
   if (film > 0.001) {

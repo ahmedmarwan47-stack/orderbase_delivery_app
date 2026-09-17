@@ -34,7 +34,7 @@ A floating liquid-glass navigation bar for Flutter with optical refraction, spri
 
 - **Fluid Droplet Navigation**: Selection lens driven by analytical spring physics with velocity stretch during interactive scrubbing.
 - **Physical Optical Refraction**: Snell's-law shader dynamically bends underlying graphics along the moving droplet's bevel rim, returning to zero displacement at rest.
-- **Three Material Tiers**: Automatic tier selection across GPU Shader Glass (Impeller), real-time Backdrop Blur, and high-contrast Opaque materials.
+- **Three Material Tiers**: GPU shader glass (Impeller), real-time backdrop blur, and a high-contrast opaque fill — picked for the device automatically, or pinned by hand.
 - **Expandable Search**: Morphs navigation into an edge-to-edge floating search bar that anchors above the software keyboard without layout jumps.
 - **Separate Action Buttons**: Attach standalone actions with grouped (`together`) or edge-spaced (`split`) placement.
 - **Versatile Badges**: Unread dots, auto-truncating count pills (`99+`), text badges (`PRO`), and custom badge widgets that participate in droplet refraction.
@@ -47,7 +47,7 @@ A floating liquid-glass navigation bar for Flutter with optical refraction, spri
 
 ## Style Architecture
 
-Version `0.3.0` organizes styling into single-responsibility configuration objects:
+Version `2.0.0` organizes styling into single-responsibility configuration objects:
 
 | Style Class | Target Layer | Key Properties |
 |:---|:---|:---|
@@ -65,7 +65,7 @@ Add `liquid_tab_bar` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  liquid_tab_bar: ^0.3.0
+  liquid_tab_bar: ^2.0.0
 ```
 
 Fragment shaders are bundled with the package; no custom asset declarations are required in your host application.
@@ -145,7 +145,7 @@ LiquidTabBar(
 
 ### Material Tiers
 
-`LiquidTabBar` supports three rendering tiers, selectable via `material:`:
+`LiquidTabBar` renders in one of three tiers. `material:` picks one, or `auto` chooses for the device:
 
 | Tier | Description |
 |:---|:---|
@@ -428,16 +428,66 @@ controller.armGovernor();
 
 ---
 
-## Migration from 0.2.x to 0.3.0
+## Migration from 1.x to 2.0.0
 
-Version `0.3.0` streamlines configuration into dedicated style objects:
+Version `2.0.0` streamlines configuration into dedicated style objects:
 - Use `LiquidBarStyle` for outer navigation bar surfaces.
 - Use `LiquidDropletSurfaceStyle` for droplet visual appearance.
 - Use `DropletRefractionStyle` for optical refraction physics.
 - Use `shrinkOnScroll` instead of the removed `foldOnScroll`.
 - `LiquidTabItem.icon` now supports compile-time `const` construction.
 
-For comprehensive migration steps and before/after comparisons, see the [0.3.0 Migration Guide](doc/migration_0.3.0.md).
+It also **drops the grab** — 1.1.0's press, where the lens ballooned past
+the capsule and the glass magnified the tab it held. The lens is no longer a
+glass surface of its own, so `GlassStyle.zoom` and `LiquidTabBarTheme.pressLens`
+are gone with it; a press is a 6% swell again.
+
+For comprehensive migration steps and before/after comparisons, see the [migration guide](doc/migration_0.3.0.md).
+
+---
+
+## Where the numbers come from
+
+The geometry was measured off the real iOS 26 bar (Files on an iPhone 17 Pro,
+pixel-scanned): 62pt tall and 21pt off the screen edge — 64 and 20 here, on a
+4px grid — `n × 86 + 16` wide, the lens a slot + 8 wide. The glass was tuned
+against that same bar over a white page, and the scrub's 6pt slop came from
+frame-by-frame recordings of the bar under a finger. They are not arbitrary:
+change one and the bar stops reading as the system's.
+
+---
+
+## The shader contract (for anyone changing the glass)
+
+Hard-won, and contradicted by the documentation — measured by pixel readback,
+not guessed:
+
+- `ImageFilter.shader` hands the shader the **whole screen** as its texture,
+  and `FlutterFragCoord()` is in screen pixels. The widget's clip only limits
+  which pixels are asked for, so the capsule is described by its **global
+  rect**, measured every paint.
+- That breaks inside a save layer whose bounds are not the screen. **Never
+  wrap the bar in an `Opacity` or a `ShaderMask`** — the backdrop coordinates
+  go with it.
+- Outside the capsule the shader outputs transparent, so the page underneath
+  is untouched by construction.
+- A backdrop is re-rendered **every frame anything beneath it changes**. One
+  looping animation on a page that hosts the bar turns the shader into a
+  60 fps render loop, and everything else queues behind it. A `repeat()` with
+  no `count` under this bar is a bug.
+
+---
+
+## Credits
+
+The `2.0.0` shape — the scaffold, the droplet refraction shader, search,
+actions, badges and the style objects — is the work of
+**[Mohammed Hafiz](https://github.com/MohammedHafiz27)**
+([#5](https://github.com/ahmedmarwan47-stack/orderbase_delivery_app/pull/5)).
+The fold-and-unfold lens fixes in `1.0.1` are
+**[Yousef Sobhy](https://github.com/yousefsobhy12)**'s
+([#4](https://github.com/ahmedmarwan47-stack/orderbase_delivery_app/pull/4)).
+The package was extracted from the Orderbase courier app.
 
 ---
 
