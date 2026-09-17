@@ -400,7 +400,8 @@ void main() {
         expect(
           droplet.motionStrength,
           0.0,
-          reason: 'Multiple rapid reversals must leave exactly zero residual motionStrength',
+          reason:
+              'Multiple rapid reversals must leave exactly zero residual motionStrength',
         );
       },
     );
@@ -605,7 +606,8 @@ void main() {
         expect(
           droplet.motionStrength,
           0.0,
-          reason: 'Even with extreme refractionStrength: 3.0, settled state must have strictly 0.0 motionStrength',
+          reason:
+              'Even with extreme refractionStrength: 3.0, settled state must have strictly 0.0 motionStrength',
         );
       },
     );

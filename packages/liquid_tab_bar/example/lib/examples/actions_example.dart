@@ -15,42 +15,42 @@ class _ActionsExampleState extends State<ActionsExample> {
   LiquidTabActionPlacement _placement = LiquidTabActionPlacement.together;
   @override
   Widget build(BuildContext context) => Scaffold(
-    extendBody: true,
-    appBar: AppBar(title: const Text('Actions')),
-    body: ShowcaseContent(
-      selected: _selected,
-      controls: Wrap(
-        spacing: 8,
-        children: [
-          for (final placement in LiquidTabActionPlacement.values)
-            ChoiceChip(
-              label: Text(
-                placement == LiquidTabActionPlacement.together
-                    ? 'Together'
-                    : 'Split',
-              ),
-              selected: _placement == placement,
-              onSelected: (_) => setState(() => _placement = placement),
-            ),
-        ],
-      ),
-    ),
-    bottomNavigationBar: LiquidTabBar(
-      key: const ValueKey('actions-bar'),
-      shrinkOnScroll: false,
-      selectedIndex: _selected,
-      onSelected: (index) => setState(() => _selected = index),
-      items: showcaseItems(),
-      separateActionPlacement: _placement,
-      separateAction: LiquidTabAction.icon(
-        icon: Icons.add_rounded,
-        activeIcon: Icons.check_rounded,
-        tooltip: 'Create',
-        selected: _actionSelected,
-        badge: true,
-        badgeText: '1',
-        onTap: () => setState(() => _actionSelected = !_actionSelected),
-      ),
-    ),
-  );
+        extendBody: true,
+        appBar: AppBar(title: const Text('Actions')),
+        body: ShowcaseContent(
+          selected: _selected,
+          controls: Wrap(
+            spacing: 8,
+            children: [
+              for (final placement in LiquidTabActionPlacement.values)
+                ChoiceChip(
+                  label: Text(
+                    placement == LiquidTabActionPlacement.together
+                        ? 'Together'
+                        : 'Split',
+                  ),
+                  selected: _placement == placement,
+                  onSelected: (_) => setState(() => _placement = placement),
+                ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: LiquidTabBar(
+          key: const ValueKey('actions-bar'),
+          shrinkOnScroll: false,
+          selectedIndex: _selected,
+          onSelected: (index) => setState(() => _selected = index),
+          items: showcaseItems(),
+          separateActionPlacement: _placement,
+          separateAction: LiquidTabAction.icon(
+            icon: Icons.add_rounded,
+            activeIcon: Icons.check_rounded,
+            tooltip: 'Create',
+            selected: _actionSelected,
+            badge: true,
+            badgeText: '1',
+            onTap: () => setState(() => _actionSelected = !_actionSelected),
+          ),
+        ),
+      );
 }

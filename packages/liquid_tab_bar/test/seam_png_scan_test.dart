@@ -40,8 +40,7 @@ void main() {
     final lum = List<double>.filled(w * h, 0.0);
     for (var i = 0; i < w * h; i++) {
       final o = i * 4;
-      lum[i] =
-          0.2126 * rgba[o] / 255 +
+      lum[i] = 0.2126 * rgba[o] / 255 +
           0.7152 * rgba[o + 1] / 255 +
           0.0722 * rgba[o + 2] / 255;
     }

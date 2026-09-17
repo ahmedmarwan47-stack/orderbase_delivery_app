@@ -87,58 +87,58 @@ class DropletRefractionStyle {
     this.dispersion = 0.0,
     this.specularStrength = 0.15,
     this.refractionStrength = 1.0,
-  }) : assert(thickness >= 1.0, 'thickness must be >= 1.0'),
-       assert(refractiveIndex >= 1.0, 'refractiveIndex must be >= 1.0'),
-       assert(baseHeight >= 0.0, 'baseHeight cannot be negative'),
-       assert(dispersion >= 0.0, 'dispersion cannot be negative'),
-       assert(specularStrength >= 0.0, 'specularStrength cannot be negative'),
-       assert(
-         refractionStrength >= 0.0,
-         'refractionStrength cannot be negative',
-       );
+  })  : assert(thickness >= 1.0, 'thickness must be >= 1.0'),
+        assert(refractiveIndex >= 1.0, 'refractiveIndex must be >= 1.0'),
+        assert(baseHeight >= 0.0, 'baseHeight cannot be negative'),
+        assert(dispersion >= 0.0, 'dispersion cannot be negative'),
+        assert(specularStrength >= 0.0, 'specularStrength cannot be negative'),
+        assert(
+          refractionStrength >= 0.0,
+          'refractionStrength cannot be negative',
+        );
 
   /// Disables optical refraction displacement completely while preserving the
   /// droplet's normal visual appearance (gradient, border, shadow, resting highlight).
   const DropletRefractionStyle.none()
-    : thickness = 13.0,
-      refractiveIndex = 1.50,
-      baseHeight = 18.0,
-      dispersion = 0.0,
-      specularStrength = 0.15,
-      refractionStrength = 0.0;
+      : thickness = 13.0,
+        refractiveIndex = 1.50,
+        baseHeight = 18.0,
+        dispersion = 0.0,
+        specularStrength = 0.15,
+        refractionStrength = 0.0;
 
   /// Subtle optical refraction with gentle boundary displacement.
   ///
   /// Keeps [dispersion] at 0.0 for clean, distortion-free native glass.
   const DropletRefractionStyle.subtle()
-    : thickness = 10.0,
-      refractiveIndex = 1.35,
-      baseHeight = 12.0,
-      dispersion = 0.0,
-      specularStrength = 0.10,
-      refractionStrength = 0.6;
+      : thickness = 10.0,
+        refractiveIndex = 1.35,
+        baseHeight = 12.0,
+        dispersion = 0.0,
+        specularStrength = 0.10,
+        refractionStrength = 0.6;
 
   /// Medium (default) optical refraction calibrated for the navigation droplet.
   ///
   /// Keeps [dispersion] at 0.0 for clean, distortion-free native glass.
   const DropletRefractionStyle.medium()
-    : thickness = 13.0,
-      refractiveIndex = 1.50,
-      baseHeight = 18.0,
-      dispersion = 0.0,
-      specularStrength = 0.15,
-      refractionStrength = 1.0;
+      : thickness = 13.0,
+        refractiveIndex = 1.50,
+        baseHeight = 18.0,
+        dispersion = 0.0,
+        specularStrength = 0.15,
+        refractionStrength = 1.0;
 
   /// Strong optical refraction with pronounced lens curvature and deeper displacement.
   ///
   /// Keeps [dispersion] at 0.0 by default for clean, non-chromatic native glass.
   const DropletRefractionStyle.strong()
-    : thickness = 16.0,
-      refractiveIndex = 1.65,
-      baseHeight = 26.0,
-      dispersion = 0.0,
-      specularStrength = 0.25,
-      refractionStrength = 1.6;
+      : thickness = 16.0,
+        refractiveIndex = 1.65,
+        baseHeight = 26.0,
+        dispersion = 0.0,
+        specularStrength = 0.25,
+        refractionStrength = 1.6;
 
   /// Optical bevel thickness (rim width) in logical pixels.
   final double thickness;
@@ -230,13 +230,13 @@ class DropletRefractionStyle {
 
   @override
   int get hashCode => Object.hash(
-    thickness,
-    refractiveIndex,
-    baseHeight,
-    dispersion,
-    specularStrength,
-    refractionStrength,
-  );
+        thickness,
+        refractiveIndex,
+        baseHeight,
+        dispersion,
+        specularStrength,
+        refractionStrength,
+      );
 
   @override
   String toString() {
@@ -467,20 +467,20 @@ class GlassStyle {
 
   @override
   int get hashCode => Object.hash(
-    rim,
-    curve,
-    depth,
-    dispersion,
-    blur,
-    saturation,
-    tint,
-    specular,
-    light,
-    edgeDark,
-    shadow,
-    shadowBlur,
-    shadowOffset,
-  );
+        rim,
+        curve,
+        depth,
+        dispersion,
+        blur,
+        saturation,
+        tint,
+        specular,
+        light,
+        edgeDark,
+        shadow,
+        shadowBlur,
+        shadowOffset,
+      );
 }
 
 /// A capsule of [style] glass, [size] big with [radius] corners, rendered as a
@@ -513,9 +513,8 @@ class GlassSurface extends StatefulWidget {
 }
 
 class _GlassSurfaceState extends State<GlassSurface> {
-  late final ui.FragmentShader? _shader = LiquidGlass.ready
-      ? _glassShader()
-      : null;
+  late final ui.FragmentShader? _shader =
+      LiquidGlass.ready ? _glassShader() : null;
 
   @override
   void dispose() {
@@ -631,8 +630,7 @@ class _RenderGlassFilter extends RenderProxyBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final layer =
-        (this.layer as _GlassBackdropLayer?) ??
+    final layer = (this.layer as _GlassBackdropLayer?) ??
         _GlassBackdropLayer(_createFilter);
     this.layer = layer;
     context.pushLayer(layer, super.paint, offset);
@@ -722,9 +720,8 @@ class DropletGlassSurface extends StatefulWidget {
 }
 
 class _DropletGlassSurfaceState extends State<DropletGlassSurface> {
-  late final ui.FragmentShader? _shader = LiquidGlass.dropletReady
-      ? _dropletShader()
-      : null;
+  late final ui.FragmentShader? _shader =
+      LiquidGlass.dropletReady ? _dropletShader() : null;
 
   DropletRefractionStyle get _effectiveRefraction =>
       widget.refractionStyle ??
@@ -867,8 +864,7 @@ class _RenderDropletGlassFilter extends RenderProxyBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final layer =
-        (this.layer as _GlassBackdropLayer?) ??
+    final layer = (this.layer as _GlassBackdropLayer?) ??
         _GlassBackdropLayer(_createFilter);
     this.layer = layer;
     context.pushLayer(layer, super.paint, offset);
@@ -986,7 +982,7 @@ class GlassLightPainter extends CustomPainter {
     // along the far one for a razor-crisp chamfer.
     final awayColor = isDark
         ? const Color(0xFFFFFFFF)
-              .withValues(alpha: (dark * 0.35).clamp(0.06, 0.20))
+            .withValues(alpha: (dark * 0.35).clamp(0.06, 0.20))
         : const Color(0xFF000000).withValues(alpha: dark * 0.4);
 
     _linePaint.shader = LinearGradient(
@@ -1010,9 +1006,8 @@ class GlassLightPainter extends CustomPainter {
     final k = ((style.dispersion - 0.2) / 0.6).clamp(0.0, 1.0);
     if (k > 0) {
       const fringeWarm = Color(0xFFFFB347);
-      final fringeCool = isDark
-          ? const Color(0xFF64D2FF)
-          : const Color(0xFF4DA3FF);
+      final fringeCool =
+          isDark ? const Color(0xFF64D2FF) : const Color(0xFF4DA3FF);
       _threadWarmPaint.shader = LinearGradient(
         begin: begin,
         end: end,
@@ -1155,8 +1150,7 @@ class LiquidDropletChromaticPainter extends CustomPainter {
         1.0,
       );
 
-      final bool needCausticsUpdate =
-          rectChanged ||
+      final bool needCausticsUpdate = rectChanged ||
           darkChanged ||
           motionChanged ||
           fadeChanged ||
@@ -1236,8 +1230,7 @@ class LiquidDropletChromaticPainter extends CustomPainter {
 
       if (velocity.abs() > 0.05) {
         final isMovingRight = velocity > 0;
-        final bool velChanged =
-            c.velocity == null ||
+        final bool velChanged = c.velocity == null ||
             (c.velocity! > 0) != isMovingRight ||
             (c.velocity! - velocity).abs() > 0.1;
         if (needCausticsUpdate || velChanged || c.directionalShader == null) {

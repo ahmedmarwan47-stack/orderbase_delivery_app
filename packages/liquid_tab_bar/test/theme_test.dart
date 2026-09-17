@@ -432,7 +432,9 @@ void main() {
       },
     );
 
-    test('default iconBuilder correctly applies icon, activeIcon, color and iconSize', () {
+    test(
+        'default iconBuilder correctly applies icon, activeIcon, color and iconSize',
+        () {
       const itemWithActive = LiquidTabItem.icon(
         icon: Icons.home_outlined,
         activeIcon: Icons.home,

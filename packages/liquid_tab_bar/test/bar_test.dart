@@ -1000,9 +1000,8 @@ void main() {
         expect(find.byType(TextField), findsOneWidget);
 
         final noKeyboardFieldRect = tester.getRect(find.byType(TextField));
-        final noKeyboardBarHeight = tester
-            .getSize(find.byType(LiquidTabBar))
-            .height;
+        final noKeyboardBarHeight =
+            tester.getSize(find.byType(LiquidTabBar)).height;
         // Without keyboard, search field is near the bottom of 800px screen
         expect(noKeyboardFieldRect.bottom, greaterThan(700.0));
         expect(
@@ -1015,9 +1014,8 @@ void main() {
         await tester.pumpAndSettle();
 
         final withKeyboardFieldRect = tester.getRect(find.byType(TextField));
-        final withKeyboardBarHeight = tester
-            .getSize(find.byType(LiquidTabBar))
-            .height;
+        final withKeyboardBarHeight =
+            tester.getSize(find.byType(LiquidTabBar)).height;
         expect(withKeyboardBarHeight, closeTo(noKeyboardBarHeight, 0.001));
         // With keyboard of 320px, the search field must sit above 800 - 320 = 480px!
         expect(withKeyboardFieldRect.bottom, lessThanOrEqualTo(480.0));
@@ -1171,9 +1169,8 @@ void main() {
         expect(textFieldFinder, findsOneWidget);
 
         // Verify focus is acquired
-        final FocusNode focusNode = tester
-            .widget<TextField>(textFieldFinder)
-            .focusNode!;
+        final FocusNode focusNode =
+            tester.widget<TextField>(textFieldFinder).focusNode!;
         expect(focusNode.hasFocus, isTrue);
 
         // Tap on body area outside search field
@@ -1211,9 +1208,8 @@ void main() {
       await tester.pumpAndSettle();
 
       final textFieldFinder = find.byType(TextField);
-      final FocusNode focusNode = tester
-          .widget<TextField>(textFieldFinder)
-          .focusNode!;
+      final FocusNode focusNode =
+          tester.widget<TextField>(textFieldFinder).focusNode!;
       expect(focusNode.hasFocus, isTrue);
 
       // Enter text
@@ -1266,9 +1262,8 @@ void main() {
 
         // In reduced motion, focus is immediately requested
         final textFieldFinder = find.byType(TextField);
-        final FocusNode focusNode = tester
-            .widget<TextField>(textFieldFinder)
-            .focusNode!;
+        final FocusNode focusNode =
+            tester.widget<TextField>(textFieldFinder).focusNode!;
         expect(focusNode.hasFocus, isTrue);
       },
     );
@@ -2880,7 +2875,9 @@ void main() {
       },
     );
 
-    test('folded glass tier increases shader tint alpha, scales blur, and elevates shadow', () {
+    test(
+        'folded glass tier increases shader tint alpha, scales blur, and elevates shadow',
+        () {
       const theme = LiquidTabBarTheme.dark();
 
       // At rest / expanded (foldProgress = 0.0), unchanged
@@ -3092,8 +3089,8 @@ void main() {
               child: LiquidScrollPadding(
                 child: Builder(
                   builder: (context) {
-                    capturedBottomPadding = MediaQuery.paddingOf(context)
-                        .bottom;
+                    capturedBottomPadding =
+                        MediaQuery.paddingOf(context).bottom;
                     capturedScope = LiquidScrollPaddingScope.maybeOf(context);
                     return const SizedBox.shrink();
                   },

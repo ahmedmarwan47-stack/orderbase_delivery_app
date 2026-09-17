@@ -97,12 +97,13 @@ class LiquidTabBar extends StatefulWidget {
     this.maxWidth,
     this.dropletRefraction,
     this.warnOnMissingExtendBodyPadding = true,
-  }) : assert(items.length > 0, 'LiquidTabBar requires at least one tab item.'),
-       assert(
-         selectedIndex == null ||
-             (selectedIndex >= 0 && selectedIndex < items.length),
-         'selectedIndex must be null or within 0 and items.length - 1.',
-       );
+  })  : assert(
+            items.length > 0, 'LiquidTabBar requires at least one tab item.'),
+        assert(
+          selectedIndex == null ||
+              (selectedIndex >= 0 && selectedIndex < items.length),
+          'selectedIndex must be null or within 0 and items.length - 1.',
+        );
 
   final List<LiquidTabItem> items;
   final int? selectedIndex;
@@ -206,10 +207,11 @@ class LiquidTabBar extends StatefulWidget {
   static bool handleScroll(
     ScrollNotification notification, {
     bool allowNested = false,
-  }) => LiquidTabBarController.shared.handleScroll(
-    notification,
-    allowNested: allowNested,
-  );
+  }) =>
+      LiquidTabBarController.shared.handleScroll(
+        notification,
+        allowNested: allowNested,
+      );
 
   /// Expand the tab bar open.
   static void expand() => LiquidTabBarController.shared.expand();
@@ -274,8 +276,7 @@ class LiquidTabBar extends StatefulWidget {
       return theme.barStyle.glass;
     }
 
-    final isDark =
-        theme.barStyle.blurTint.computeLuminance() < 0.2 ||
+    final isDark = theme.barStyle.blurTint.computeLuminance() < 0.2 ||
         theme.barStyle.opaqueFill.computeLuminance() < 0.5;
     final level = densityLevel ?? _defaultFoldedDensityLevel;
 
@@ -324,7 +325,7 @@ class LiquidTabBar extends StatefulWidget {
   /// Where the glyph's centre sits when the bar is open.
   static const double _iconCenterY =
       (barHeight - (_iconSize + _iconLabelGap + _labelHeight)) / 2 +
-      _iconSize / 2;
+          _iconSize / 2;
 
   /// Total bottom space in logical pixels to reserve for the tab bar.
   ///
@@ -340,8 +341,7 @@ class LiquidTabBar extends StatefulWidget {
   }) {
     final textScaler = MediaQuery.textScalerOf(context);
     final extraTextHeight = (textScaler.scale(12.0) - 12.0).clamp(0.0, 16.0);
-    final base =
-        barHeight +
+    final base = barHeight +
         _bottomGap(context) +
         12.0 +
         extraTextHeight +
@@ -387,8 +387,8 @@ class _LiquidTabBarState extends State<LiquidTabBar>
     vsync: this,
     value:
         (_nav.minimized || (widget.initiallyMinimized && widget.shrinkOnScroll))
-        ? 1
-        : 0,
+            ? 1
+            : 0,
   );
 
   /// The lens's position in visual slots (0 = the leftmost slot).
@@ -455,8 +455,7 @@ class _LiquidTabBarState extends State<LiquidTabBar>
       final s = _effectiveSearch;
       final th = widget.theme ?? const LiquidTabBarTheme();
       final text = s?.hintText ?? 'Search';
-      final baseStyle =
-          s?.style ??
+      final baseStyle = s?.style ??
           TextStyle(
             color: th.activeColor,
             fontSize: 15,
@@ -578,16 +577,14 @@ class _LiquidTabBarState extends State<LiquidTabBar>
       _nav.expand();
     }
     if (!LiquidGlass.ready) {
-      LiquidGlass.load()
-          .then((_) {
-            if (mounted) {
-              _nav.checkGovernor();
-              setState(() {});
-            }
-          })
-          .catchError((_) {
-            // Blur tier is used when shaders are unsupported or fail to load.
-          });
+      LiquidGlass.load().then((_) {
+        if (mounted) {
+          _nav.checkGovernor();
+          setState(() {});
+        }
+      }).catchError((_) {
+        // Blur tier is used when shaders are unsupported or fail to load.
+      });
     }
   }
 
@@ -691,8 +688,7 @@ class _LiquidTabBarState extends State<LiquidTabBar>
 
     _warnedRoutes.add(routeKey);
 
-    final message =
-        '\n'
+    final message = '\n'
         '================================================================================\n'
         '⚠️  [LiquidTabBar] extendBody: true detected without bottom scroll padding\n'
         '--------------------------------------------------------------------------------\n'
@@ -793,20 +789,19 @@ class _LiquidTabBarState extends State<LiquidTabBar>
     final generation = ++_springGeneration;
     c
         .animateWith(
-          SpringSimulation(
-            _theme.spring,
-            c.value,
-            target,
-            velocity ?? c.velocity,
-          ),
-        )
+      SpringSimulation(
+        _theme.spring,
+        c.value,
+        target,
+        velocity ?? c.velocity,
+      ),
+    )
         .then((_) {
-          if (mounted && generation == _springGeneration) {
-            c.value = target;
-            setState(() {});
-          }
-        })
-        .catchError((_) {});
+      if (mounted && generation == _springGeneration) {
+        c.value = target;
+        setState(() {});
+      }
+    }).catchError((_) {});
   }
 
   List<LiquidTabItem> get _innerItems => widget.items;
@@ -872,9 +867,8 @@ class _LiquidTabBarState extends State<LiquidTabBar>
     }
 
     // Proportional slot widths: 86 for 1-3 tabs, or adaptively scaled for 4+ tabs
-    final idealMaxSlotW = (hasAction && _n >= 4)
-        ? 76.0
-        : LiquidTabBar._slotWidth;
+    final idealMaxSlotW =
+        (hasAction && _n >= 4) ? 76.0 : LiquidTabBar._slotWidth;
     final maxBarW = _n * idealMaxSlotW + 2 * LiquidTabBar._barPadding;
     final configuredMaxW = widget.maxWidth ?? _theme.maxWidth;
     final widthLimit = configuredMaxW ?? maxBarW;
@@ -1041,8 +1035,7 @@ class _LiquidTabBarState extends State<LiquidTabBar>
     } else {
       resolvedMaterial = _nav.effectiveMaterial;
     }
-    final material =
-        (resolvedMaterial == LiquidTabBarMaterial.glass &&
+    final material = (resolvedMaterial == LiquidTabBarMaterial.glass &&
             !LiquidGlass.supported)
         ? LiquidTabBarMaterial.blur
         : resolvedMaterial;
@@ -1061,15 +1054,14 @@ class _LiquidTabBarState extends State<LiquidTabBar>
         ? Rect.lerp(baseRect, g.searchCollapsedTabRect!, s)!
         : baseRect;
     final radius = rect.height / 2;
-    final pad = material == LiquidTabBarMaterial.glass
-        ? LiquidTabBar._glassPad
-        : 0.0;
+    final pad =
+        material == LiquidTabBarMaterial.glass ? LiquidTabBar._glassPad : 0.0;
 
     final action = _effectiveAction;
     final effectiveSearchRect =
         (g.searchExpandedRect != null && g.actionRect != null && s > 0)
-        ? Rect.lerp(g.actionRect!, g.searchExpandedRect!, s)!
-        : g.actionRect;
+            ? Rect.lerp(g.actionRect!, g.searchExpandedRect!, s)!
+            : g.actionRect;
     final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
     if (_searchCloseRequested && keyboardInset <= 1.0) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1239,8 +1231,7 @@ class _LiquidTabBarState extends State<LiquidTabBar>
   }) {
     final r = BorderRadius.circular(radius);
     final fp = foldProgress.clamp(0.0, 1.0);
-    final isDark =
-        th.barStyle.blurTint.computeLuminance() < 0.2 ||
+    final isDark = th.barStyle.blurTint.computeLuminance() < 0.2 ||
         th.barStyle.opaqueFill.computeLuminance() < 0.5;
 
     // Density parameters based on foldedDensityLevel (1: Subtle, 2: Balanced, 3: Dense)
@@ -1452,9 +1443,8 @@ class _LiquidTabBarState extends State<LiquidTabBar>
         : t * (g.pill.center.dx - g.slotCenterX(activeV.toDouble()));
     final iconCy =
         ui.lerpDouble(LiquidTabBar._iconCenterY, g.pill.center.dy, t)! -
-        rect.top;
-    final labelTop =
-        LiquidTabBar._iconCenterY +
+            rect.top;
+    final labelTop = LiquidTabBar._iconCenterY +
         LiquidTabBar._iconSize / 2 +
         LiquidTabBar._iconLabelGap -
         rect.top;
@@ -1477,9 +1467,8 @@ class _LiquidTabBarState extends State<LiquidTabBar>
       final stretch = (speed * 0.055).clamp(0.0, 0.45);
       final press = _pressed ? 1.06 : 1.0;
       final distFromSlot = (v - v.round()).abs();
-      final scrubBetween = _scrubbing
-          ? (distFromSlot * 2.0).clamp(0.0, 1.0)
-          : 0.0;
+      final scrubBetween =
+          _scrubbing ? (distFromSlot * 2.0).clamp(0.0, 1.0) : 0.0;
       final motion = math.max(
         scrubBetween * 0.85,
         (speed / (LiquidTabBar._fringeFullSpeed * 0.5)).clamp(0.0, 1.0),
@@ -1501,9 +1490,8 @@ class _LiquidTabBarState extends State<LiquidTabBar>
               (distFromSlot * 2.0).clamp(0.0, 1.0),
             )
           : 0.0;
-      dropletMotionStrength = math
-          .max(scrubFactor, vFactor * dFactor)
-          .clamp(0.0, 1.0);
+      dropletMotionStrength =
+          math.max(scrubFactor, vFactor * dFactor).clamp(0.0, 1.0);
 
       final isDark = th.barStyle.blurTint.computeLuminance() < 0.2;
       final style = isDark ? _darkDropletGlass : _lightDropletGlass;
@@ -1608,8 +1596,7 @@ class _LiquidTabBarState extends State<LiquidTabBar>
               : null;
 
           badgeWidget = Container(
-            padding:
-                bs.padding ??
+            padding: bs.padding ??
                 EdgeInsets.symmetric(
                   horizontal: isSingleDigit ? 0 : 5,
                   vertical: isSingleDigit ? 0 : 1,
@@ -1631,14 +1618,13 @@ class _LiquidTabBarState extends State<LiquidTabBar>
             alignment: Alignment.center,
             child: Text(
               badgeText,
-              style:
-                  (bs.textStyle ??
-                          TextStyle(
-                            fontSize: badgeSize * (10.5 / 18.0),
-                            fontWeight: FontWeight.w700,
-                            height: 1.1,
-                          ))
-                      .copyWith(color: badgeTextCol),
+              style: (bs.textStyle ??
+                      TextStyle(
+                        fontSize: badgeSize * (10.5 / 18.0),
+                        fontWeight: FontWeight.w700,
+                        height: 1.1,
+                      ))
+                  .copyWith(color: badgeTextCol),
             ),
           );
         } else {
@@ -1663,12 +1649,10 @@ class _LiquidTabBarState extends State<LiquidTabBar>
 
         final defaultTop = badgeText != null ? -5.0 : -2.0;
         final defaultRight = badgeText != null ? -7.0 : -2.0;
-        final posTop = bs.offset != null
-            ? defaultTop + bs.offset!.dy
-            : defaultTop;
-        final posRight = bs.offset != null
-            ? defaultRight - bs.offset!.dx
-            : defaultRight;
+        final posTop =
+            bs.offset != null ? defaultTop + bs.offset!.dy : defaultTop;
+        final posRight =
+            bs.offset != null ? defaultRight - bs.offset!.dx : defaultRight;
 
         Widget badgeSlot = Positioned(
           top: posTop,
@@ -1756,8 +1740,8 @@ class _LiquidTabBarState extends State<LiquidTabBar>
               selected: selected,
               label: item.hasBadge
                   ? (badgeText != null
-                        ? '${item.label}, $badgeText notifications'
-                        : '${item.label}, unread notification')
+                      ? '${item.label}, $badgeText notifications'
+                      : '${item.label}, unread notification')
                   : item.label,
               onTap: () {
                 _nav.expand();
@@ -2184,8 +2168,7 @@ class _SeparateActionButtonState extends State<_SeparateActionButton> {
               final showBorder = actBs.showBorder;
               final badgeBgColor = actBs.color ?? _defaultBadgeColor;
               final badgeBorderCol = actBs.borderColor ?? _defaultBadgeBorder;
-              final badgeTextCol =
-                  actBs.textColor ??
+              final badgeTextCol = actBs.textColor ??
                   actBs.textStyle?.color ??
                   const Color(0xFFFFFFFF);
               final border = showBorder
@@ -2193,8 +2176,7 @@ class _SeparateActionButtonState extends State<_SeparateActionButton> {
                   : null;
 
               badgeWidget = Container(
-                padding:
-                    actBs.padding ??
+                padding: actBs.padding ??
                     EdgeInsets.symmetric(
                       horizontal: isSingleDigit ? 0 : 4,
                       vertical: isSingleDigit ? 0 : 1,
@@ -2211,20 +2193,19 @@ class _SeparateActionButtonState extends State<_SeparateActionButton> {
                   borderRadius: isSingleDigit && actBs.borderRadius == null
                       ? null
                       : (actBs.borderRadius ??
-                            BorderRadius.circular(badgeSize / 2)),
+                          BorderRadius.circular(badgeSize / 2)),
                   border: border,
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   badgeText,
-                  style:
-                      (actBs.textStyle ??
-                              TextStyle(
-                                fontSize: badgeSize * (10.5 / 18.0),
-                                fontWeight: FontWeight.w700,
-                                height: 1.1,
-                              ))
-                          .copyWith(color: badgeTextCol),
+                  style: (actBs.textStyle ??
+                          TextStyle(
+                            fontSize: badgeSize * (10.5 / 18.0),
+                            fontWeight: FontWeight.w700,
+                            height: 1.1,
+                          ))
+                      .copyWith(color: badgeTextCol),
                   textAlign: TextAlign.center,
                 ),
               );
@@ -2248,9 +2229,8 @@ class _SeparateActionButtonState extends State<_SeparateActionButton> {
               );
             }
             final defaultTop = -2.0;
-            final defaultRight = badgeText != null && badgeText.isNotEmpty
-                ? -8.0
-                : -2.0;
+            final defaultRight =
+                badgeText != null && badgeText.isNotEmpty ? -8.0 : -2.0;
             final posTop = actBs.offset != null
                 ? defaultTop + actBs.offset!.dy
                 : defaultTop;
@@ -2307,8 +2287,7 @@ class _SeparateActionButtonState extends State<_SeparateActionButton> {
                     child: TextField(
                       controller: widget.searchController,
                       focusNode: widget.searchFocusNode,
-                      textInputAction:
-                          widget.search?.textInputAction ??
+                      textInputAction: widget.search?.textInputAction ??
                           TextInputAction.search,
                       onTapOutside: (event) {
                         widget.search?.onTapOutside?.call(event);
@@ -2319,37 +2298,32 @@ class _SeparateActionButtonState extends State<_SeparateActionButton> {
                         widget.search?.onChanged?.call(val);
                       },
                       onSubmitted: widget.search?.onSubmitted,
-                      style:
-                          (widget.search?.style ??
-                                  TextStyle(
-                                    color: th.activeColor,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w400,
-                                  ))
-                              .copyWith(
-                                color:
-                                    (widget.search?.style?.color ??
-                                            th.activeColor)
-                                        .withValues(alpha: searchOpacity),
-                              ),
+                      style: (widget.search?.style ??
+                              TextStyle(
+                                color: th.activeColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400,
+                              ))
+                          .copyWith(
+                        color: (widget.search?.style?.color ?? th.activeColor)
+                            .withValues(alpha: searchOpacity),
+                      ),
                       decoration: InputDecoration(
                         hintText: widget.search?.hintText,
-                        hintStyle:
-                            (widget.search?.hintStyle ??
-                                    TextStyle(
-                                      color: th.inactiveColor.withValues(
-                                        alpha: 0.65,
-                                      ),
-                                      fontSize: 15,
-                                    ))
-                                .copyWith(
-                                  color:
-                                      (widget.search?.hintStyle?.color ??
-                                              th.inactiveColor.withValues(
-                                                alpha: 0.65,
-                                              ))
-                                          .withValues(alpha: searchOpacity),
-                                ),
+                        hintStyle: (widget.search?.hintStyle ??
+                                TextStyle(
+                                  color: th.inactiveColor.withValues(
+                                    alpha: 0.65,
+                                  ),
+                                  fontSize: 15,
+                                ))
+                            .copyWith(
+                          color: (widget.search?.hintStyle?.color ??
+                                  th.inactiveColor.withValues(
+                                    alpha: 0.65,
+                                  ))
+                              .withValues(alpha: searchOpacity),
+                        ),
                         border: InputBorder.none,
                         isDense: true,
                         contentPadding: EdgeInsets.zero,

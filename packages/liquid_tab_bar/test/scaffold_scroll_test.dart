@@ -5,10 +5,10 @@ import 'package:liquid_tab_bar/src/test_overrides.dart';
 
 void main() {
   List<LiquidTabItem> sampleItems() => [
-    LiquidTabItem.icon(icon: Icons.home_rounded, label: 'Home'),
-    LiquidTabItem.icon(icon: Icons.search_rounded, label: 'Search'),
-    LiquidTabItem.icon(icon: Icons.person_rounded, label: 'Profile'),
-  ];
+        LiquidTabItem.icon(icon: Icons.home_rounded, label: 'Home'),
+        LiquidTabItem.icon(icon: Icons.search_rounded, label: 'Search'),
+        LiquidTabItem.icon(icon: Icons.person_rounded, label: 'Profile'),
+      ];
 
   Widget buildApp({
     required Widget body,
@@ -663,9 +663,8 @@ void main() {
 
         for (int i = 0; i < 50; i++) {
           final useExplicit = i % 2 == 0;
-          final explicitController = useExplicit
-              ? LiquidTabBarController()
-              : null;
+          final explicitController =
+              useExplicit ? LiquidTabBarController() : null;
 
           await tester.pumpWidget(
             MaterialApp(

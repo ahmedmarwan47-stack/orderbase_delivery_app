@@ -27,7 +27,8 @@ void main() {
   group('Issue A: folded circle seam / right-edge flat cut', () {
     // Closest headless mirror of `_LiquidTabBarState._geometry` for the Apple
     // Music configuration (4 tabs + search action, `together`, circle).
-    test('together-placement geometry: padded bounds overlap ONLY in the '
+    test(
+        'together-placement geometry: padded bounds overlap ONLY in the '
         'expanded state, never in the folded state', () {
       const double w = 390;
       const double actionSize = LiquidTabBar.barHeight; // 64
@@ -63,8 +64,7 @@ void main() {
       expect(
         expanded.inflate(glassPad).overlaps(action.inflate(glassPad)),
         isTrue,
-        reason:
-            'expanded state: two glass pads overlap (old ClipRect seam '
+        reason: 'expanded state: two glass pads overlap (old ClipRect seam '
             'case) — this is what the ClipRRect fix addressed',
       );
 
@@ -123,8 +123,7 @@ void main() {
           expect(
             clipRRect.contains(corner),
             isTrue,
-            reason:
-                'ClipRRect(radius + pad) fully wraps the 64x64 folded '
+            reason: 'ClipRRect(radius + pad) fully wraps the 64x64 folded '
                 'circle concentrically (corner $corner inside radius '
                 '$clipRadius)',
           );
@@ -147,7 +146,8 @@ void main() {
       },
     );
 
-    testWidgets('folded circle renders geometrically ROUND on its right edge '
+    testWidgets(
+        'folded circle renders geometrically ROUND on its right edge '
         '(pixel scan, together placement)', (tester) async {
       final controller = LiquidTabBarController();
       addTearDown(controller.dispose);
@@ -238,11 +238,9 @@ void main() {
         final y = (pillTopPhysical + row * pixelRatio).round();
         if (y < 0 || y >= imageH) continue;
         double rightmost = -1;
-        for (
-          int x = (pillLeftPhysical + sizePhysical).round() - 1;
-          x >= (pillLeftPhysical + sizePhysical * 0.55).round();
-          x--
-        ) {
+        for (int x = (pillLeftPhysical + sizePhysical).round() - 1;
+            x >= (pillLeftPhysical + sizePhysical * 0.55).round();
+            x--) {
           if (x >= 0 && x < imageW && isCapsule(x, y)) {
             rightmost = (x - pillLeftPhysical) / pixelRatio;
             break;
@@ -260,8 +258,7 @@ void main() {
       expect(
         spread,
         greaterThan(8.0),
-        reason:
-            'a perfect 64px circle bows from ~47.5 to ~64 across rows '
+        reason: 'a perfect 64px circle bows from ~47.5 to ~64 across rows '
             '4..28 (spread ~16); a flat vertical right-edge cut would keep the '
             'edge pinned near 64 on every row (spread ~0). Got $rightEdges.',
       );
@@ -272,11 +269,9 @@ void main() {
         final y = (pillTopPhysical + row * pixelRatio).round();
         if (y < 0 || y >= imageH) continue;
         double leftmost = -1;
-        for (
-          int x = (pillLeftPhysical).round();
-          x < (pillLeftPhysical + sizePhysical * 0.45).round();
-          x++
-        ) {
+        for (int x = (pillLeftPhysical).round();
+            x < (pillLeftPhysical + sizePhysical * 0.45).round();
+            x++) {
           if (x >= 0 && x < imageW && isCapsule(x, y)) {
             leftmost = (x - pillLeftPhysical) / pixelRatio;
             break;
@@ -343,7 +338,8 @@ void main() {
       );
     }
 
-    testWidgets('scroll-fold (minimize) and expand never fire onSelected and '
+    testWidgets(
+        'scroll-fold (minimize) and expand never fire onSelected and '
         'never move the visually selected tab', (tester) async {
       final controller = LiquidTabBarController();
       addTearDown(controller.dispose);
@@ -398,7 +394,8 @@ void main() {
       expect(chatsIcon.color, equals(accent));
     });
 
-    testWidgets('theme / MediaQuery rebuild while folded keeps selection and '
+    testWidgets(
+        'theme / MediaQuery rebuild while folded keeps selection and '
         'lens on the selected tab', (tester) async {
       final controller = LiquidTabBarController();
       addTearDown(controller.dispose);
@@ -475,7 +472,8 @@ void main() {
       expect(chatsIcon.color, equals(accent));
     });
 
-    testWidgets('two contemporaneous bars with distinct controllers keep '
+    testWidgets(
+        'two contemporaneous bars with distinct controllers keep '
         'independent selection (no state leak between stacked screens)', (
       tester,
     ) async {
@@ -600,7 +598,8 @@ void main() {
       expect(find.byIcon(Icons.chat_bubble), findsOneWidget);
     });
 
-    testWidgets('a cancelled press/scrub leaves selection and the lens on the '
+    testWidgets(
+        'a cancelled press/scrub leaves selection and the lens on the '
         'selected tab', (tester) async {
       final controller = LiquidTabBarController();
       addTearDown(controller.dispose);

@@ -456,7 +456,9 @@ void main() {
       },
     );
 
-    test('governor degrades immediately when maxSlowFrames threshold is reached without waiting for window end', () {
+    test(
+        'governor degrades immediately when maxSlowFrames threshold is reached without waiting for window end',
+        () {
       final controller = LiquidTabBarController();
       addTearDown(controller.dispose);
       controller.armGovernor();

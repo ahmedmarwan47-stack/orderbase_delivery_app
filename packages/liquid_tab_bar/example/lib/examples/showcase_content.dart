@@ -2,27 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:liquid_tab_bar/liquid_tab_bar.dart';
 
 List<LiquidTabItem> showcaseItems({bool rtl = false}) => [
-  LiquidTabItem.icon(
-    icon: Icons.home_outlined,
-    activeIcon: Icons.home_rounded,
-    label: rtl ? 'الرئيسية' : 'Home',
-  ),
-  LiquidTabItem.icon(
-    icon: Icons.explore_outlined,
-    activeIcon: Icons.explore_rounded,
-    label: rtl ? 'استكشاف' : 'Explore',
-  ),
-  LiquidTabItem.icon(
-    icon: Icons.bookmark_outline_rounded,
-    label: rtl ? 'المحفوظات' : 'Saved',
-    badge: true,
-    badgeCount: 4,
-  ),
-  LiquidTabItem.icon(
-    icon: Icons.person_outline_rounded,
-    label: rtl ? 'الحساب' : 'Profile',
-  ),
-];
+      LiquidTabItem.icon(
+        icon: Icons.home_outlined,
+        activeIcon: Icons.home_rounded,
+        label: rtl ? 'الرئيسية' : 'Home',
+      ),
+      LiquidTabItem.icon(
+        icon: Icons.explore_outlined,
+        activeIcon: Icons.explore_rounded,
+        label: rtl ? 'استكشاف' : 'Explore',
+      ),
+      LiquidTabItem.icon(
+        icon: Icons.bookmark_outline_rounded,
+        label: rtl ? 'المحفوظات' : 'Saved',
+        badge: true,
+        badgeCount: 4,
+      ),
+      LiquidTabItem.icon(
+        icon: Icons.person_outline_rounded,
+        label: rtl ? 'الحساب' : 'Profile',
+      ),
+    ];
 
 /// Shared scrolling content provides text and edges behind the glass.
 class ShowcaseContent extends StatelessWidget {

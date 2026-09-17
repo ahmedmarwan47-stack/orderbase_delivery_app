@@ -275,17 +275,15 @@ class LiquidTabBarController extends ChangeNotifier {
     if (effectiveMaterial == LiquidTabBarMaterial.glass) {
       _watchFrames();
     } else if (!LiquidGlass.ready) {
-      LiquidGlass.load()
-          .then((_) {
-            if (!_disposed && _governorArmed && !_degraded) {
-              if (effectiveMaterial == LiquidTabBarMaterial.glass) {
-                _watchFrames();
-              } else {
-                _unwatchFrames();
-              }
-            }
-          })
-          .catchError((_) {});
+      LiquidGlass.load().then((_) {
+        if (!_disposed && _governorArmed && !_degraded) {
+          if (effectiveMaterial == LiquidTabBarMaterial.glass) {
+            _watchFrames();
+          } else {
+            _unwatchFrames();
+          }
+        }
+      }).catchError((_) {});
     } else {
       _unwatchFrames();
     }

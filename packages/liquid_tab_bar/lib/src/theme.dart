@@ -94,9 +94,10 @@ class LiquidTabActionStyle {
     LiquidTabActionStyle a,
     LiquidTabActionStyle b,
     double t,
-  ) => LiquidTabActionStyle(
-    selectedFill: Color.lerp(a.selectedFill, b.selectedFill, t)!,
-  );
+  ) =>
+      LiquidTabActionStyle(
+        selectedFill: Color.lerp(a.selectedFill, b.selectedFill, t)!,
+      );
 
   @override
   bool operator ==(Object other) =>
@@ -235,22 +236,21 @@ class LiquidBadgeStyle {
 
   @override
   int get hashCode => Object.hash(
-    color,
-    textColor,
-    textStyle,
-    size,
-    dotSize,
-    showBorder,
-    borderColor,
-    borderWidth,
-    offset,
-    padding,
-    borderRadius,
-  );
+        color,
+        textColor,
+        textStyle,
+        size,
+        dotSize,
+        showBorder,
+        borderColor,
+        borderWidth,
+        offset,
+        padding,
+        borderRadius,
+      );
 
   @override
-  String toString() =>
-      'LiquidBadgeStyle(color: $color, textColor: $textColor, '
+  String toString() => 'LiquidBadgeStyle(color: $color, textColor: $textColor, '
       'size: $size, dotSize: $dotSize, showBorder: $showBorder, '
       'borderColor: $borderColor, borderWidth: $borderWidth, offset: $offset, '
       'padding: $padding, borderRadius: $borderRadius)';
@@ -290,26 +290,26 @@ class LiquidTabAction {
     Color? color,
     Color? activeColor,
   }) : this(
-         icon: Builder(
-           builder: (context) {
-             final iconColor = IconTheme.of(context).color;
-             return Icon(
-               selected ? (activeIcon ?? icon) : icon,
-               color: iconColor,
-               size: iconSize,
-             );
-           },
-         ),
-         onTap: onTap,
-         selected: selected,
-         badge: badge,
-         badgeText: badgeText,
-         badgeStyle: badgeStyle,
-         tooltip: tooltip,
-         size: size,
-         color: color,
-         activeColor: activeColor,
-       );
+          icon: Builder(
+            builder: (context) {
+              final iconColor = IconTheme.of(context).color;
+              return Icon(
+                selected ? (activeIcon ?? icon) : icon,
+                color: iconColor,
+                size: iconSize,
+              );
+            },
+          ),
+          onTap: onTap,
+          selected: selected,
+          badge: badge,
+          badgeText: badgeText,
+          badgeStyle: badgeStyle,
+          tooltip: tooltip,
+          size: size,
+          color: color,
+          activeColor: activeColor,
+        );
 
   /// Creates a search action button that automatically morphs the bar into
   /// an expanded liquid-glass search input field when tapped.
@@ -389,15 +389,15 @@ class LiquidTabItem {
     this.badgeWidget,
     this.iconSize = 23.0,
     LiquidTabIconBuilder? iconBuilder,
-  }) : assert(
-         badge || badgeCount == null,
-         'badgeCount cannot be set when badge is false. Set badge: true to display a badge with a count.',
-       ),
-       assert(
-         badge || badgeText == null,
-         'badgeText cannot be set when badge is false. Set badge: true to display a badge with text.',
-       ),
-       _customIconBuilder = iconBuilder;
+  })  : assert(
+          badge || badgeCount == null,
+          'badgeCount cannot be set when badge is false. Set badge: true to display a badge with a count.',
+        ),
+        assert(
+          badge || badgeText == null,
+          'badgeText cannot be set when badge is false. Set badge: true to display a badge with text.',
+        ),
+        _customIconBuilder = iconBuilder;
 
   final String label;
   final IconData icon;
@@ -409,10 +409,10 @@ class LiquidTabItem {
   LiquidTabIconBuilder get iconBuilder =>
       _customIconBuilder ??
       ((color, selected) => Icon(
-        selected ? (activeIcon ?? icon) : icon,
-        color: color,
-        size: iconSize,
-      ));
+            selected ? (activeIcon ?? icon) : icon,
+            color: color,
+            size: iconSize,
+          ));
 
   /// A small dot on the glyph's top-trailing corner — "something is waiting".
   final bool badge;
@@ -501,14 +501,15 @@ class LiquidDropletSurfaceStyle {
     double? borderWidth,
     BoxShadow? shadow,
     Color? opaqueFill,
-  }) => LiquidDropletSurfaceStyle(
-    gradientTop: gradientTop ?? this.gradientTop,
-    gradientBottom: gradientBottom ?? this.gradientBottom,
-    borderColor: borderColor ?? this.borderColor,
-    borderWidth: borderWidth ?? this.borderWidth,
-    shadow: shadow ?? this.shadow,
-    opaqueFill: opaqueFill ?? this.opaqueFill,
-  );
+  }) =>
+      LiquidDropletSurfaceStyle(
+        gradientTop: gradientTop ?? this.gradientTop,
+        gradientBottom: gradientBottom ?? this.gradientBottom,
+        borderColor: borderColor ?? this.borderColor,
+        borderWidth: borderWidth ?? this.borderWidth,
+        shadow: shadow ?? this.shadow,
+        opaqueFill: opaqueFill ?? this.opaqueFill,
+      );
 
   @override
   bool operator ==(Object other) =>
@@ -522,30 +523,30 @@ class LiquidDropletSurfaceStyle {
 
   @override
   int get hashCode => Object.hash(
-    gradientTop,
-    gradientBottom,
-    borderColor,
-    borderWidth,
-    shadow,
-    opaqueFill,
-  );
+        gradientTop,
+        gradientBottom,
+        borderColor,
+        borderWidth,
+        shadow,
+        opaqueFill,
+      );
 
   static LiquidDropletSurfaceStyle lerp(
     LiquidDropletSurfaceStyle a,
     LiquidDropletSurfaceStyle b,
     double t,
-  ) => LiquidDropletSurfaceStyle(
-    gradientTop: Color.lerp(a.gradientTop, b.gradientTop, t)!,
-    gradientBottom: Color.lerp(a.gradientBottom, b.gradientBottom, t)!,
-    borderColor: Color.lerp(a.borderColor, b.borderColor, t)!,
-    borderWidth: ui.lerpDouble(a.borderWidth, b.borderWidth, t)!,
-    shadow: BoxShadow.lerp(a.shadow, b.shadow, t) ?? a.shadow,
-    opaqueFill: Color.lerp(a.opaqueFill, b.opaqueFill, t)!,
-  );
+  ) =>
+      LiquidDropletSurfaceStyle(
+        gradientTop: Color.lerp(a.gradientTop, b.gradientTop, t)!,
+        gradientBottom: Color.lerp(a.gradientBottom, b.gradientBottom, t)!,
+        borderColor: Color.lerp(a.borderColor, b.borderColor, t)!,
+        borderWidth: ui.lerpDouble(a.borderWidth, b.borderWidth, t)!,
+        shadow: BoxShadow.lerp(a.shadow, b.shadow, t) ?? a.shadow,
+        opaqueFill: Color.lerp(a.opaqueFill, b.opaqueFill, t)!,
+      );
 
   @override
-  String toString() =>
-      'LiquidDropletSurfaceStyle('
+  String toString() => 'LiquidDropletSurfaceStyle('
       'gradientTop: $gradientTop, gradientBottom: $gradientBottom, '
       'borderColor: $borderColor, borderWidth: $borderWidth, '
       'shadow: $shadow, opaqueFill: $opaqueFill)';
@@ -647,16 +648,17 @@ class LiquidBarStyle {
     Color? opaqueFill,
     Color? opaqueEdge,
     List<BoxShadow>? shadow,
-  }) => LiquidBarStyle(
-    glass: glass ?? this.glass,
-    blurTint: blurTint ?? this.blurTint,
-    blurSheenTop: blurSheenTop ?? this.blurSheenTop,
-    blurSheenBottom: blurSheenBottom ?? this.blurSheenBottom,
-    blurEdge: blurEdge ?? this.blurEdge,
-    opaqueFill: opaqueFill ?? this.opaqueFill,
-    opaqueEdge: opaqueEdge ?? this.opaqueEdge,
-    shadow: shadow ?? this.shadow,
-  );
+  }) =>
+      LiquidBarStyle(
+        glass: glass ?? this.glass,
+        blurTint: blurTint ?? this.blurTint,
+        blurSheenTop: blurSheenTop ?? this.blurSheenTop,
+        blurSheenBottom: blurSheenBottom ?? this.blurSheenBottom,
+        blurEdge: blurEdge ?? this.blurEdge,
+        opaqueFill: opaqueFill ?? this.opaqueFill,
+        opaqueEdge: opaqueEdge ?? this.opaqueEdge,
+        shadow: shadow ?? this.shadow,
+      );
 
   static LiquidBarStyle lerp(LiquidBarStyle a, LiquidBarStyle b, double t) =>
       LiquidBarStyle(
@@ -684,19 +686,18 @@ class LiquidBarStyle {
 
   @override
   int get hashCode => Object.hash(
-    glass,
-    blurTint,
-    blurSheenTop,
-    blurSheenBottom,
-    blurEdge,
-    opaqueFill,
-    opaqueEdge,
-    Object.hashAll(shadow),
-  );
+        glass,
+        blurTint,
+        blurSheenTop,
+        blurSheenBottom,
+        blurEdge,
+        opaqueFill,
+        opaqueEdge,
+        Object.hashAll(shadow),
+      );
 
   @override
-  String toString() =>
-      'LiquidBarStyle(glass: $glass, blurTint: $blurTint, '
+  String toString() => 'LiquidBarStyle(glass: $glass, blurTint: $blurTint, '
       'opaqueFill: $opaqueFill, shadow: $shadow)';
 }
 
@@ -851,9 +852,8 @@ class LiquidTabBarTheme {
       labelStyle: TextStyle.lerp(a.labelStyle, b.labelStyle, t)!,
       barStyle: LiquidBarStyle.lerp(a.barStyle, b.barStyle, t),
       actionStyle: LiquidTabActionStyle.lerp(a.actionStyle, b.actionStyle, t),
-      dropletSurfaceStyle: t < 0.5
-          ? a.dropletSurfaceStyle
-          : b.dropletSurfaceStyle,
+      dropletSurfaceStyle:
+          t < 0.5 ? a.dropletSurfaceStyle : b.dropletSurfaceStyle,
       badgeStyle:
           LiquidBadgeStyle.lerp(a.badgeStyle, b.badgeStyle, t) ?? a.badgeStyle,
       dropletRefraction: DropletRefractionStyle.lerp(
@@ -892,15 +892,15 @@ class LiquidTabBarTheme {
 
   @override
   int get hashCode => Object.hash(
-    activeColor,
-    inactiveColor,
-    labelStyle,
-    actionStyle,
-    dropletSurfaceStyle,
-    badgeStyle,
-    barStyle,
-    spring,
-    relax,
-    Object.hash(foldedShape, maxWidth, dropletRefraction),
-  );
+        activeColor,
+        inactiveColor,
+        labelStyle,
+        actionStyle,
+        dropletSurfaceStyle,
+        badgeStyle,
+        barStyle,
+        spring,
+        relax,
+        Object.hash(foldedShape, maxWidth, dropletRefraction),
+      );
 }
