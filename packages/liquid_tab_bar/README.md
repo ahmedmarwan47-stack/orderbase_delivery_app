@@ -37,6 +37,7 @@ A floating liquid-glass navigation bar for Flutter with optical refraction, spri
 - **Three Material Tiers**: Automatic tier selection across GPU Shader Glass (Impeller), real-time Backdrop Blur, and high-contrast Opaque materials.
 - **Expandable Search**: Morphs navigation into an edge-to-edge floating search bar that anchors above the software keyboard without layout jumps.
 - **Separate Action Buttons**: Attach standalone actions with grouped (`together`) or edge-spaced (`split`) placement.
+- **Custom Widget Icons**: Render arbitrary Flutter widgets (SVGs, raster images, custom painters, and animated widgets) as tab items and search glyphs while preserving theme tinting, droplet movement, badges, and optical refraction.
 - **Versatile Badges**: Unread dots, auto-truncating count pills (`99+`), text badges (`PRO`), and custom badge widgets that participate in droplet refraction.
 - **Adaptive Scroll Folding**: Automatically collapses into a compact pill on downward scroll and restores on scroll-up or tap.
 - **Bidirectional RTL**: Native mirroring for Arabic, Hebrew, and Persian layouts following ambient `Directionality`.
@@ -69,6 +70,9 @@ dependencies:
 ```
 
 Fragment shaders are bundled with the package; no custom asset declarations are required in your host application.
+
+> [!NOTE]
+> `liquid_tab_bar` is dependency-free from external SVG or image packages. If you want to render SVG assets, add your preferred package (such as [`flutter_svg`](https://pub.dev/packages/flutter_svg)) to your host application's dependencies.
 
 ---
 
@@ -116,6 +120,147 @@ LiquidTabBarScaffold(
   ),
 )
 ```
+
+---
+
+## Custom Icons
+
+`LiquidTabBar` supports both standard Material/Cupertino `IconData` and arbitrary custom Flutter `Widget`s (such as SVGs, raster images, custom painters, and animated widgets).
+
+### Standard Icons (`IconData`)
+
+For standard glyphs, use the compile-time `const` constructor `LiquidTabItem.icon`:
+
+```dart
+const LiquidTabItem.icon(
+  label: 'Home',
+  icon: Icons.home_outlined,
+  activeIcon: Icons.home_rounded,
+)
+```
+
+`LiquidTabItem.icon` remains the default, first-class workflow for standard icons.
+
+### Custom Widget Icons
+
+Use `LiquidTabItem.custom` to render custom widgets, such as vector icons via `flutter_svg`, raster artwork via `Image.asset`, or custom painters:
+
+```dart
+LiquidTabItem.custom(
+  label: 'Explore',
+  icon: SvgPicture.asset(
+    'assets/icons/explore.svg',
+  ),
+)
+```
+
+> [!NOTE]
+> `liquid_tab_bar` does **not** depend on or bundle `flutter_svg` or any specific image library. The package receives a standard Flutter `Widget`; the host application owns its asset packages and widget construction.
+
+Arbitrary Flutter widgets are fully supported:
+
+```dart
+LiquidTabItem.custom(
+  label: 'Photos',
+  icon: Image.asset('assets/photos.png'),
+)
+```
+
+### Custom Active Icons
+
+Supply `activeIcon` to specify an alternate widget when the tab becomes selected:
+
+```dart
+LiquidTabItem.custom(
+  label: 'Profile',
+  icon: SvgPicture.asset('assets/icons/profile_outline.svg'),
+  activeIcon: SvgPicture.asset('assets/icons/profile_filled.svg'),
+)
+```
+
+Custom active icons follow the exact same selection threshold (`coverage >= 0.5`) and animated spring transitions as standard `IconData` items.
+
+### Theme Color Tinting (`useThemeColor`)
+
+By default, `useThemeColor: true` is enabled. For custom widgets, this dynamically tints the artwork using the bar's resolved theme colors:
+
+```text
+inactiveColor
+   ↓ (spring droplet interpolation)
+activeColor
+```
+
+```dart
+LiquidTabItem.custom(
+  label: 'Favorite',
+  icon: SvgPicture.asset('assets/icons/heart.svg'),
+  useThemeColor: true, // Default: tints with activeColor/inactiveColor
+)
+```
+
+### Preserving Multi-Color Artwork
+
+When `useThemeColor: true`, custom artwork is tinted uniformly via `BlendMode.srcIn`. For multi-color logos, badges, or brand artwork, set `useThemeColor: false` to preserve the original colors in both selected and unselected states:
+
+```dart
+LiquidTabItem.custom(
+  label: 'Brand',
+  icon: SvgPicture.asset('assets/icons/brand_multicolor.svg'),
+  useThemeColor: false, // Preserves original multi-color artwork
+)
+```
+
+> [!TIP]
+> - **`useThemeColor: true`**: Recommended for monochrome vector icons that should follow your bar's active and inactive theme colors.
+> - **`useThemeColor: false`**: Recommended for multi-color logos, user avatars, or artwork whose distinct color regions must remain intact.
+> 
+> Even with `useThemeColor: false`, the tab item still fully participates in layout, droplet movement, fold transitions, badges, and optical refraction.
+
+### Custom Icon Sizing
+
+Control glyph layout size with `iconSize:` (defaults to `23.0`):
+
+```dart
+LiquidTabItem.custom(
+  label: 'Explore',
+  icon: SvgPicture.asset('assets/icons/explore.svg'),
+  iconSize: 20.0,
+)
+```
+
+Tab items center the glyph within the bar's standard icon slot (`24.0`), with `FittedBox` containing and scaling artwork cleanly within the logical slot bounds without overflowing tab layout.
+
+### Mixed Tab Bar Example
+
+You can seamlessly combine standard icons, custom SVG tabs, and custom search actions in a single bar:
+
+```dart
+LiquidTabBar(
+  selectedIndex: selectedIndex,
+  onSelected: (index) => setState(() => selectedIndex = index),
+  items: [
+    const LiquidTabItem.icon(
+      label: 'Home',
+      icon: Icons.home_outlined,
+      activeIcon: Icons.home_rounded,
+    ),
+    LiquidTabItem.custom(
+      label: 'Explore',
+      icon: SvgPicture.asset('assets/icons/explore.svg'),
+    ),
+    LiquidTabItem.custom(
+      label: 'Profile',
+      icon: SvgPicture.asset('assets/icons/profile_outline.svg'),
+      activeIcon: SvgPicture.asset('assets/icons/profile_filled.svg'),
+    ),
+  ],
+  separateAction: LiquidTabAction.search(
+    customIcon: SvgPicture.asset('assets/icons/search.svg'),
+  ),
+)
+```
+
+*(This example assumes your host application has imported its chosen SVG renderer, such as `flutter_svg`.)*
 
 ---
 
@@ -306,6 +451,59 @@ separateAction: LiquidTabAction.search(
 - **Keyboard-aware**: Automatically floats above the on-screen software keyboard without artificial layout height jumps.
 - **Programmatic & gesture control**: Dismisses on close tap or Android back button, and can be driven programmatically via `controller.openSearch()` and `controller.closeSearch()`.
 
+### Custom Search Icon
+
+Pass `customIcon` to supply a custom widget (e.g. SVG or image) for the Search action:
+
+```dart
+separateAction: LiquidTabAction.search(
+  hintText: 'Search notes, files...',
+  customIcon: SvgPicture.asset('assets/icons/search.svg'),
+  clearOnClose: true,
+  onChanged: (query) => onFilter(query),
+),
+```
+
+The custom icon source is shared across both Search presentation states:
+- **Closed circular action**: Displays the custom widget with standard tap scale animations and theme color tinting.
+- **Expanded Search field**: Displays the exact same custom widget as the leading icon in the search input field rather than reverting to `Icons.search_rounded`.
+
+#### Search Theme Tinting & Original Colors
+
+Like custom tab items, `LiquidTabAction.search` supports `useThemeColor`:
+
+```dart
+// Theme-tinted (default): tints with button color when closed, inactiveColor when expanded
+LiquidTabAction.search(
+  customIcon: SvgPicture.asset('assets/icons/search.svg'),
+  useThemeColor: true,
+)
+
+// Original colors: preserves multi-color artwork while maintaining smooth open/close fade
+LiquidTabAction.search(
+  customIcon: SvgPicture.asset('assets/icons/search_multicolor.svg'),
+  useThemeColor: false,
+)
+```
+
+#### Action Geometry (`size`) vs Glyph Dimensions (`iconSize`)
+
+`LiquidTabAction.search` strictly separates outer button geometry from glyph dimensions:
+
+| Property | Purpose | Default |
+|:---|:---|:---|
+| **`size`** | Outer capsule width & height of the circular Search button. | `64.0` |
+| **`iconSize`** | Dimensions of the visual glyph / custom widget container. | `24.0` (closed) / `22.0` (expanded) |
+
+Specifying `iconSize` resizes only the glyph layout without altering the outer button geometry:
+
+```dart
+LiquidTabAction.search(
+  customIcon: SvgPicture.asset('assets/icons/search.svg'),
+  iconSize: 28.0, // 28×28 glyph layout inside the standard 64×64 circular capsule
+)
+```
+
 ---
 
 ## Adaptive Folding
@@ -443,12 +641,13 @@ For comprehensive migration steps and before/after comparisons, see the [0.3.0 M
 
 ## Example Application
 
-The repository includes four focused interactive demonstrations:
+The repository includes five focused interactive demonstrations:
 
 - **Basic Navigation**: Standard bottom bar with fluid spring droplet.
 - **Styling & Refraction**: Custom materials, light/dark themes, and refraction presets.
 - **Action Buttons**: Together and Split action placements.
 - **Search & Folding**: Expandable search morphing, circle/oval folding, and live RTL layout.
+- **Custom Icons Demo**: Standard `IconData`, custom SVG widgets, activeIcon switching, theme tinting vs original multi-color artwork, custom Search glyphs, and Search glyph sizing.
 
 ```sh
 cd example

@@ -5,12 +5,14 @@ import 'package:liquid_tab_bar_example/main.dart';
 import 'package:liquid_tab_bar_example/examples/basic_example.dart';
 import 'package:liquid_tab_bar_example/examples/actions_example.dart';
 import 'package:liquid_tab_bar_example/examples/advanced_example.dart';
+import 'package:liquid_tab_bar_example/examples/custom_icons_example.dart';
 
 void main() {
-  testWidgets('launcher boots with four demos', (tester) async {
+  testWidgets('launcher boots with demos', (tester) async {
     await tester.pumpWidget(const LiquidTabBarExampleApp());
-    expect(find.byType(ListTile), findsNWidgets(4));
+    expect(find.byType(ListTile), findsNWidgets(5));
     expect(find.text('Basic'), findsOneWidget);
+    expect(find.text('Custom Icons Demo'), findsOneWidget);
   });
   testWidgets('basic selection updates', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: BasicExample()));
@@ -65,6 +67,38 @@ void main() {
     await tester.tap(find.byIcon(Icons.close_rounded));
     await tester.pumpAndSettle();
     expect(find.byType(TextField), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('custom icons demo renders and transitions correctly',
+      (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: CustomIconsExample()));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Home'), findsAtLeast(1));
+    expect(find.text('Explore'), findsOneWidget);
+    expect(find.text('Profile'), findsOneWidget);
+    expect(find.text('Favorite'), findsOneWidget);
+    expect(find.text('Brand'), findsOneWidget);
+
+    await tester.tap(find.text('Explore'), warnIfMissed: false);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(ActionChip, 'Open Search'));
+    await tester.pump();
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsNothing);
+
+    await tester.tap(find.text('Icon Sizes (16/23/28px)'));
+    await tester.pumpAndSettle();
+    expect(find.text('Small'), findsOneWidget);
+    expect(find.text('Medium'), findsOneWidget);
+    expect(find.text('Large'), findsOneWidget);
+
     expect(tester.takeException(), isNull);
   });
 }

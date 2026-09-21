@@ -269,10 +269,14 @@ class LiquidTabAction {
     this.badgeStyle,
     this.tooltip,
     this.size = 64.0,
+    this.iconSize,
     this.color,
     this.activeColor,
     this.isSearch = false,
     this.search,
+    this.customIcon,
+    this.useThemeColor = true,
+    this.searchIcon,
   });
 
   /// A convenience constructor that wraps an [IconData] in an [Icon] widget.
@@ -307,6 +311,7 @@ class LiquidTabAction {
           badgeStyle: badgeStyle,
           tooltip: tooltip,
           size: size,
+          iconSize: iconSize,
           color: color,
           activeColor: activeColor,
         );
@@ -324,6 +329,9 @@ class LiquidTabAction {
     VoidCallback? onClose,
     bool autofocus = true,
     IconData icon = Icons.search_rounded,
+    Widget? customIcon,
+    bool useThemeColor = true,
+    double? iconSize,
     double size = 64.0,
     String? tooltip = 'Search',
     VoidCallback? onTap,
@@ -334,13 +342,38 @@ class LiquidTabAction {
     return LiquidTabAction(
       icon: Builder(
         builder: (context) {
-          final iconColor = IconTheme.of(context).color;
-          return Icon(icon, color: iconColor, size: 24);
+          final iconColor =
+              IconTheme.of(context).color ?? const Color(0xFF1C1C1E);
+          final glyphSize = iconSize ?? 24.0;
+          if (customIcon != null) {
+            Widget glyph = customIcon;
+            if (useThemeColor) {
+              glyph = ColorFiltered(
+                colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                child: glyph,
+              );
+            }
+            return SizedBox(
+              width: glyphSize,
+              height: glyphSize,
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: glyph,
+                ),
+              ),
+            );
+          }
+          return Icon(icon, color: iconColor, size: glyphSize);
         },
       ),
       size: size,
+      iconSize: iconSize,
       tooltip: tooltip,
       isSearch: true,
+      customIcon: customIcon,
+      useThemeColor: useThemeColor,
+      searchIcon: icon,
       search: LiquidTabBarSearch(
         controller: controller,
         focusNode: focusNode,
@@ -367,10 +400,14 @@ class LiquidTabAction {
   final LiquidBadgeStyle? badgeStyle;
   final String? tooltip;
   final double size;
+  final double? iconSize;
   final Color? color;
   final Color? activeColor;
   final bool isSearch;
   final LiquidTabBarSearch? search;
+  final Widget? customIcon;
+  final bool useThemeColor;
+  final IconData? searchIcon;
 }
 
 /// One tab of a [LiquidTabBar].
@@ -380,8 +417,8 @@ class LiquidTabItem {
   /// when selected.
   const LiquidTabItem.icon({
     required this.label,
-    required this.icon,
-    this.activeIcon,
+    required IconData icon,
+    IconData? activeIcon,
     this.badge = false,
     this.badgeText,
     this.badgeCount,
@@ -389,7 +426,12 @@ class LiquidTabItem {
     this.badgeWidget,
     this.iconSize = 23.0,
     LiquidTabIconBuilder? iconBuilder,
-  })  : assert(
+  })  : _icon = icon,
+        _activeIcon = activeIcon,
+        _customIcon = null,
+        _customActiveIcon = null,
+        _useThemeColor = true,
+        assert(
           badge || badgeCount == null,
           'badgeCount cannot be set when badge is false. Set badge: true to display a badge with a count.',
         ),
@@ -399,20 +441,96 @@ class LiquidTabItem {
         ),
         _customIconBuilder = iconBuilder;
 
+  /// A tab drawn with custom [Widget]s (e.g. SvgPicture, Image, custom artwork).
+  const LiquidTabItem.custom({
+    required this.label,
+    required Widget icon,
+    Widget? activeIcon,
+    this.badge = false,
+    this.badgeText,
+    this.badgeCount,
+    this.badgeStyle,
+    this.badgeWidget,
+    this.iconSize = 23.0,
+    bool useThemeColor = true,
+  })  : _icon = null,
+        _activeIcon = null,
+        _customIcon = icon,
+        _customActiveIcon = activeIcon,
+        _useThemeColor = useThemeColor,
+        _customIconBuilder = null,
+        assert(
+          badge || badgeCount == null,
+          'badgeCount cannot be set when badge is false. Set badge: true to display a badge with a count.',
+        ),
+        assert(
+          badge || badgeText == null,
+          'badgeText cannot be set when badge is false. Set badge: true to display a badge with text.',
+        );
+
   final String label;
-  final IconData icon;
-  final IconData? activeIcon;
+  final IconData? _icon;
+  final IconData? _activeIcon;
+  final Widget? _customIcon;
+  final Widget? _customActiveIcon;
+  final bool _useThemeColor;
   final double iconSize;
   final LiquidTabIconBuilder? _customIconBuilder;
 
+  /// The [IconData] glyph for tabs constructed via [LiquidTabItem.icon].
+  ///
+  /// Throws an [UnsupportedError] if this item was constructed via [LiquidTabItem.custom].
+  IconData get icon {
+    final val = _icon;
+    if (val != null) return val;
+    throw UnsupportedError(
+      'LiquidTabItem.custom does not have an IconData. '
+      'Use customIcon or iconBuilder instead.',
+    );
+  }
+
+  /// The active [IconData] glyph for tabs constructed via [LiquidTabItem.icon].
+  IconData? get activeIcon => _activeIcon;
+
+  /// The custom widget glyph for tabs constructed via [LiquidTabItem.custom].
+  Widget? get customIcon => _customIcon;
+
+  /// The custom active widget glyph for tabs constructed via [LiquidTabItem.custom].
+  Widget? get customActiveIcon => _customActiveIcon;
+
+  /// Whether this tab item is driven by custom widget glyphs rather than [IconData].
+  bool get isCustom => _customIcon != null;
+
   /// The builder used to render this tab's icon.
-  LiquidTabIconBuilder get iconBuilder =>
-      _customIconBuilder ??
-      ((color, selected) => Icon(
-            selected ? (activeIcon ?? icon) : icon,
-            color: color,
-            size: iconSize,
-          ));
+  LiquidTabIconBuilder get iconBuilder {
+    if (_customIconBuilder != null) return _customIconBuilder;
+    if (_customIcon != null) {
+      return (color, selected) {
+        Widget w = selected ? (_customActiveIcon ?? _customIcon) : _customIcon;
+        if (_useThemeColor) {
+          w = ColorFiltered(
+            colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+            child: w,
+          );
+        }
+        return SizedBox(
+          width: iconSize,
+          height: iconSize,
+          child: Center(
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: w,
+            ),
+          ),
+        );
+      };
+    }
+    return (color, selected) => Icon(
+          selected ? (_activeIcon ?? _icon!) : _icon!,
+          color: color,
+          size: iconSize,
+        );
+  }
 
   /// A small dot on the glyph's top-trailing corner — "something is waiting".
   final bool badge;

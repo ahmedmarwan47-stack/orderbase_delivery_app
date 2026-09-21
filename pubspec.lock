@@ -331,7 +331,7 @@ packages:
       path: "packages/liquid_tab_bar"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.3.0"
   logging:
     dependency: transitive
     description:

@@ -492,5 +492,117 @@ void main() {
       expect(rendered, isA<SizedBox>());
       expect((rendered as SizedBox).key, const ValueKey('custom-true'));
     });
+
+    test('LiquidTabItem.custom constructor and properties', () {
+      const customWidget = SizedBox(
+        key: ValueKey('custom-icon'),
+        width: 24,
+        height: 24,
+      );
+      const customActiveWidget = SizedBox(
+        key: ValueKey('custom-active-icon'),
+        width: 24,
+        height: 24,
+      );
+
+      const item = LiquidTabItem.custom(
+        label: 'Custom',
+        icon: customWidget,
+        activeIcon: customActiveWidget,
+        iconSize: 25.0,
+      );
+
+      expect(item.label, 'Custom');
+      expect(item.isCustom, isTrue);
+      expect(item.customIcon, customWidget);
+      expect(item.customActiveIcon, customActiveWidget);
+      expect(item.iconSize, 25.0);
+
+      // Accessing item.icon on custom tab throws UnsupportedError with helpful message
+      expect(
+        () => item.icon,
+        throwsA(
+          isA<UnsupportedError>().having(
+            (e) => e.message,
+            'message',
+            contains('LiquidTabItem.custom does not have an IconData'),
+          ),
+        ),
+      );
+      expect(item.activeIcon, isNull);
+    });
+
+    test('LiquidTabItem.custom iconBuilder applies theme color when useThemeColor is true', () {
+      const customWidget = SizedBox(
+        key: ValueKey('svg-mock'),
+        width: 20,
+        height: 20,
+      );
+
+      const item = LiquidTabItem.custom(
+        label: 'Custom',
+        icon: customWidget,
+        useThemeColor: true,
+      );
+
+      final built = item.iconBuilder(const Color(0xFF007AFF), false);
+      expect(built, isA<SizedBox>());
+      final sizedBox = built as SizedBox;
+      expect(sizedBox.width, 23.0);
+      expect(sizedBox.height, 23.0);
+
+      // Verify ColorFiltered is present with theme color
+      final center = sizedBox.child as Center;
+      final fittedBox = center.child as FittedBox;
+      final colorFiltered = fittedBox.child as ColorFiltered;
+      expect(
+        colorFiltered.colorFilter,
+        const ColorFilter.mode(Color(0xFF007AFF), BlendMode.srcIn),
+      );
+      expect(colorFiltered.child, customWidget);
+    });
+
+    test('LiquidTabItem.custom iconBuilder preserves original colors when useThemeColor is false', () {
+      const customWidget = SizedBox(
+        key: ValueKey('svg-multicolor'),
+        width: 20,
+        height: 20,
+      );
+
+      const item = LiquidTabItem.custom(
+        label: 'Custom',
+        icon: customWidget,
+        useThemeColor: false,
+      );
+
+      final built = item.iconBuilder(const Color(0xFF007AFF), false);
+      expect(built, isA<SizedBox>());
+      final sizedBox = built as SizedBox;
+
+      // Verify NO ColorFiltered wrapper exists
+      final center = sizedBox.child as Center;
+      final fittedBox = center.child as FittedBox;
+      expect(fittedBox.child, customWidget);
+    });
+
+    test('LiquidTabItem.custom iconBuilder swaps to activeIcon when selected', () {
+      const inactiveWidget = SizedBox(key: ValueKey('inactive'));
+      const activeWidget = SizedBox(key: ValueKey('active'));
+
+      const item = LiquidTabItem.custom(
+        label: 'Custom',
+        icon: inactiveWidget,
+        activeIcon: activeWidget,
+        useThemeColor: false,
+      );
+
+      final unselectedBuilt = item.iconBuilder(const Color(0xFF8E8E93), false);
+      final unselectedFitted = ((unselectedBuilt as SizedBox).child as Center).child as FittedBox;
+      expect(unselectedFitted.child, inactiveWidget);
+
+      final selectedBuilt = item.iconBuilder(const Color(0xFF007AFF), true);
+      final selectedFitted = ((selectedBuilt as SizedBox).child as Center).child as FittedBox;
+      expect(selectedFitted.child, activeWidget);
+    });
   });
 }

@@ -32,17 +32,23 @@ class ShowcaseContent extends StatelessWidget {
     this.rtl = false,
     this.query = '',
     this.controls,
+    this.itemLabels,
   });
   final int selected;
   final bool rtl;
   final String query;
   final Widget? controls;
+  final List<String>? itemLabels;
 
   @override
   Widget build(BuildContext context) {
     final titles = rtl
         ? ['ملاحظات', 'مستندات', 'صور', 'روابط']
         : ['Notes', 'Documents', 'Photos', 'Links'];
+    final labels =
+        itemLabels ?? showcaseItems(rtl: rtl).map((e) => e.label).toList();
+    final activeLabel =
+        (selected >= 0 && selected < labels.length) ? labels[selected] : 'Tab $selected';
     return CustomScrollView(
       slivers: [
         SliverPadding(
@@ -52,7 +58,7 @@ class ShowcaseContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  showcaseItems(rtl: rtl)[selected].label,
+                  activeLabel,
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 const SizedBox(height: 8),

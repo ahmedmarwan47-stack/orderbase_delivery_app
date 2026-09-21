@@ -4656,4 +4656,310 @@ void main() {
       },
     );
   });
+
+  group('LiquidTabAction.search customIcon & glyph sizing', () {
+    testWidgets(
+      'customIcon renders in closed Search action and in expanded Search field',
+      (tester) async {
+        const customKey = ValueKey('custom-search-glyph');
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: LiquidTabBar(
+                selectedIndex: 0,
+                material: LiquidTabBarMaterial.opaque,
+                items: testItems,
+                separateAction: LiquidTabAction.search(
+                  customIcon: const SizedBox(
+                    key: customKey,
+                    width: 20,
+                    height: 20,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // 1. In closed state: customIcon is rendered
+        expect(find.byKey(customKey), findsOneWidget);
+        // Default search IconData is NOT rendered
+        expect(find.byIcon(Icons.search_rounded), findsNothing);
+
+        // Tap to open search
+        await tester.tap(find.byKey(customKey), warnIfMissed: false);
+        await tester.pump(const Duration(milliseconds: 200));
+        await tester.pumpAndSettle();
+
+        // 2. In expanded state: customIcon is STILL rendered as leading glyph
+        expect(find.byKey(customKey), findsOneWidget);
+        expect(find.byIcon(Icons.search_rounded), findsNothing);
+
+        LiquidTabBar.closeSearch();
+        await tester.pumpAndSettle();
+      },
+    );
+
+    testWidgets(
+      'when customIcon is null, existing IconData is rendered in closed and expanded states',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: LiquidTabBar(
+                selectedIndex: 0,
+                material: LiquidTabBarMaterial.opaque,
+                items: testItems,
+                separateAction: LiquidTabAction.search(
+                  icon: Icons.search_rounded,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // In closed state: search icon is rendered
+        expect(find.byIcon(Icons.search_rounded), findsOneWidget);
+
+        // Tap to open search
+        await tester.tap(find.byIcon(Icons.search_rounded), warnIfMissed: false);
+        await tester.pump(const Duration(milliseconds: 200));
+        await tester.pumpAndSettle();
+
+        // In expanded state: search icon is rendered as leading glyph
+        expect(find.byIcon(Icons.search_rounded), findsOneWidget);
+
+        LiquidTabBar.closeSearch();
+        await tester.pumpAndSettle();
+      },
+    );
+
+    testWidgets(
+      'precedence: when both icon and customIcon are provided, customIcon is rendered',
+      (tester) async {
+        const customKey = ValueKey('precedence-custom');
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: LiquidTabBar(
+                selectedIndex: 0,
+                material: LiquidTabBarMaterial.opaque,
+                items: testItems,
+                separateAction: LiquidTabAction.search(
+                  icon: Icons.search_rounded,
+                  customIcon: const SizedBox(key: customKey, width: 20, height: 20),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(customKey), findsOneWidget);
+        expect(find.byIcon(Icons.search_rounded), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'useThemeColor: true applies ColorFiltered in closed and expanded states',
+      (tester) async {
+        const customKey = ValueKey('tinted-custom');
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: LiquidTabBar(
+                selectedIndex: 0,
+                material: LiquidTabBarMaterial.opaque,
+                items: testItems,
+                separateAction: LiquidTabAction.search(
+                  customIcon: const SizedBox(key: customKey, width: 20, height: 20),
+                  useThemeColor: true,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // In closed state: ColorFiltered wrapper is present around the custom icon
+        expect(
+          find.ancestor(of: find.byKey(customKey), matching: find.byType(ColorFiltered)),
+          findsOneWidget,
+        );
+
+        // Open search
+        await tester.tap(find.byKey(customKey), warnIfMissed: false);
+        await tester.pump(const Duration(milliseconds: 200));
+        await tester.pumpAndSettle();
+
+        // In expanded state: ColorFiltered wrapper is present with theme color
+        expect(
+          find.ancestor(of: find.byKey(customKey), matching: find.byType(ColorFiltered)),
+          findsOneWidget,
+        );
+
+        LiquidTabBar.closeSearch();
+        await tester.pumpAndSettle();
+      },
+    );
+
+    testWidgets(
+      'useThemeColor: false preserves original colors and retains opening fade animation',
+      (tester) async {
+        const customKey = ValueKey('original-color-custom');
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: LiquidTabBar(
+                selectedIndex: 0,
+                material: LiquidTabBarMaterial.opaque,
+                items: testItems,
+                separateAction: LiquidTabAction.search(
+                  customIcon: const SizedBox(key: customKey, width: 20, height: 20),
+                  useThemeColor: false,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // In closed state: NO ColorFiltered wrapper around custom widget
+        expect(
+          find.ancestor(of: find.byKey(customKey), matching: find.byType(ColorFiltered)),
+          findsNothing,
+        );
+
+        // Open search
+        await tester.tap(find.byKey(customKey), warnIfMissed: false);
+        await tester.pump(); // executes postFrameCallback to show overlay
+        await tester.pump(const Duration(milliseconds: 100)); // advances morph animation
+
+        // In opening/expanded state: NO ColorFiltered, but Opacity is applied for the fade transition
+        expect(
+          find.ancestor(of: find.byKey(customKey), matching: find.byType(ColorFiltered)),
+          findsNothing,
+        );
+        expect(
+          find.ancestor(of: find.byKey(customKey), matching: find.byType(Opacity)),
+          findsWidgets,
+        );
+
+        // Close search to reset state
+        LiquidTabBar.closeSearch();
+        await tester.pumpAndSettle();
+      },
+    );
+
+    testWidgets(
+      'explicit iconSize sets actual glyph container size without changing 64x64 action button geometry',
+      (tester) async {
+        const customKey = ValueKey('sized-custom');
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: LiquidTabBar(
+                selectedIndex: 0,
+                material: LiquidTabBarMaterial.opaque,
+                items: testItems,
+                separateAction: LiquidTabAction.search(
+                  customIcon: const SizedBox(key: customKey, width: 28, height: 28),
+                  iconSize: 28.0,
+                  size: 64.0,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // 1. Enclosing glyph SizedBox has width 28, height 28
+        final glyphSizedBox = tester.widget<SizedBox>(
+          find.ancestor(of: find.byKey(customKey), matching: find.byType(SizedBox)).first,
+        );
+        expect(glyphSizedBox.width, equals(28.0));
+        expect(glyphSizedBox.height, equals(28.0));
+
+        // 2. Action button capsule geometry is still 64x64
+        final actionButton = find.byType(LayoutBuilder).last;
+        final actionSize = tester.getSize(actionButton);
+        expect(actionSize.width, equals(64.0));
+        expect(actionSize.height, equals(64.0));
+      },
+    );
+
+    testWidgets(
+      'mixed bar with LiquidTabItem.icon, LiquidTabItem.custom, and custom search action functions seamlessly',
+      (tester) async {
+        const customTabKey = ValueKey('custom-tab-icon');
+        const customSearchKey = ValueKey('custom-search-action');
+        int selectedIndex = 0;
+        final controller = LiquidTabBarController();
+        addTearDown(controller.dispose);
+
+        await tester.pumpWidget(
+          StatefulBuilder(
+            builder: (context, setState) {
+              return MaterialApp(
+                home: Scaffold(
+                  bottomNavigationBar: LiquidTabBar(
+                    controller: controller,
+                    selectedIndex: selectedIndex,
+                    material: LiquidTabBarMaterial.opaque,
+                    onSelected: (i) => setState(() => selectedIndex = i),
+                    items: const [
+                      LiquidTabItem.icon(
+                        label: 'Home',
+                        icon: Icons.home_rounded,
+                      ),
+                      LiquidTabItem.custom(
+                        label: 'Custom',
+                        icon: SizedBox(key: customTabKey, width: 20, height: 20),
+                      ),
+                      LiquidTabItem.icon(
+                        label: 'Settings',
+                        icon: Icons.settings_rounded,
+                      ),
+                    ],
+                    separateAction: LiquidTabAction.search(
+                      customIcon: const SizedBox(key: customSearchKey, width: 20, height: 20),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Verify all 3 tabs and custom search are mounted
+        expect(find.byIcon(Icons.home_rounded), findsOneWidget);
+        expect(find.byKey(customTabKey), findsOneWidget);
+        expect(find.byIcon(Icons.settings_rounded), findsOneWidget);
+        expect(find.byKey(customSearchKey), findsOneWidget);
+
+        // Tap custom tab item via its label
+        await tester.tap(find.text('Custom'), warnIfMissed: false);
+        await tester.pumpAndSettle();
+        expect(selectedIndex, equals(1));
+
+        // Open search with custom search glyph
+        await tester.tap(find.byKey(customSearchKey), warnIfMissed: false);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 200));
+        await tester.pumpAndSettle();
+
+        // Search field is expanded and displays customSearchKey leading glyph
+        expect(find.byType(TextField), findsOneWidget);
+        expect(find.byKey(customSearchKey), findsOneWidget);
+      },
+    );
+  });
 }

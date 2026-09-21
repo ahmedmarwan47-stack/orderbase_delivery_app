@@ -2457,12 +2457,13 @@ class _SeparateActionButtonState extends State<_SeparateActionButton> {
         Widget content;
         if (searchAnim < 0.15) {
           // Circular button with icon
+          final effectiveGlyphSize = act.iconSize ?? LiquidTabBar._iconSize;
           Widget glyph = SizedBox(
-            width: LiquidTabBar._iconSize,
-            height: LiquidTabBar._iconSize,
+            width: effectiveGlyphSize,
+            height: effectiveGlyphSize,
             child: Center(
               child: IconTheme.merge(
-                data: IconThemeData(color: color, size: LiquidTabBar._iconSize),
+                data: IconThemeData(color: color, size: effectiveGlyphSize),
                 child: act.icon,
               ),
             ),
@@ -2582,17 +2583,44 @@ class _SeparateActionButtonState extends State<_SeparateActionButton> {
         } else {
           // Expanded search input field
           final searchOpacity = ((searchAnim - 0.15) / 0.85).clamp(0.0, 1.0);
+          final expandedGlyphSize = act.iconSize ?? 22.0;
+          Widget leading;
+          if (act.customIcon != null) {
+            Widget glyph = act.customIcon!;
+            if (act.useThemeColor) {
+              glyph = ColorFiltered(
+                colorFilter:
+                    ColorFilter.mode(th.inactiveColor, BlendMode.srcIn),
+                child: glyph,
+              );
+            }
+            leading = Opacity(
+              opacity: searchOpacity,
+              child: SizedBox(
+                width: expandedGlyphSize,
+                height: expandedGlyphSize,
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: glyph,
+                  ),
+                ),
+              ),
+            );
+          } else {
+            leading = Icon(
+              act.searchIcon ?? Icons.search_rounded,
+              color: th.inactiveColor.withValues(alpha: searchOpacity),
+              size: expandedGlyphSize,
+            );
+          }
           content = TextFieldTapRegion(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.search_rounded,
-                    color: th.inactiveColor.withValues(alpha: searchOpacity),
-                    size: 22,
-                  ),
+                  leading,
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(

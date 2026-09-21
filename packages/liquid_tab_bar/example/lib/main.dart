@@ -4,6 +4,7 @@ import 'package:liquid_tab_bar/liquid_tab_bar.dart';
 import 'examples/actions_example.dart';
 import 'examples/advanced_example.dart';
 import 'examples/basic_example.dart';
+import 'examples/custom_icons_example.dart';
 import 'examples/styling_example.dart';
 
 void main() async {
@@ -140,6 +141,17 @@ class LauncherScreen extends StatelessWidget {
             onTap: () => Navigator.of(
               context,
             ).push(MaterialPageRoute(builder: (_) => const AdvancedExample())),
+          ),
+          ListTile(
+            leading: const Icon(Icons.auto_awesome_rounded),
+            title: const Text('Custom Icons Demo'),
+            subtitle: const Text(
+              'Custom SVG tabs, activeIcon, theme tinting, and search glyphs',
+            ),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const CustomIconsExample()),
+            ),
           ),
         ],
       ),
