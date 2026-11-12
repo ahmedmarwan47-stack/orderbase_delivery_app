@@ -1,0 +1,45 @@
+name: Android APK
+
+# Builds a release APK of the current main and attaches it to a GitHub Release,
+# so there is a plain download link. Run it from the Actions tab
+# ("Run workflow"), or with: gh workflow run android-apk.yml
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.2
+          cache: true
+
+      - run: flutter pub get
+
+      # The build number is the run number, so every APK gets a higher
+      # versionCode than the one before it.
+      - run: flutter build apk --release --build-number=${{ github.run_number }}
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHORT=$(git rev-parse --short HEAD)
+          TAG="apk-${{ github.run_number }}-$SHORT"
+          cp build/app/outputs/flutter-apk/app-release.apk orderbase-courier.apk
+          gh release create "$TAG" orderbase-courier.apk \
+            --target "$GITHUB_SHA" \
+            --title "Courier app APK · build ${{ github.run_number }} ($SHORT)" \
+            --notes "Release APK built from $SHORT. Signed with a debug key: uninstall an earlier build before installing this one."
